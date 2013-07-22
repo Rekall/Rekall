@@ -47,6 +47,7 @@ public:
     bool updateFile(const QFileInfo &file, qint16 version = -1, quint16 falseInfoForTest = 0);
     bool updateImport(const QString &name, qint16 version = -1);
     const QPair<QString, QPixmap> getThumbnail(qint16 version = -1);
+    const QPair<QString,QString> getGps();
 public:
     inline qint16 getMetadataIndexVersion(qint16 version = -1) const {
         if(version < 0) return getMetadataCountM();

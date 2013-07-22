@@ -22,7 +22,7 @@ private:
     QString baseText;
     bool showCounter;
 public:
-    void resetCounter(const QString &_baseText, quint16 _counter);
+    void resetCounter(const QString &_baseText, quint16 _counter = 0);
     void disableCounter();
 
 protected:

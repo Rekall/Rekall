@@ -46,4 +46,24 @@
     <qresource prefix="/textures">
         <file>res_texture_strips.png</file>
     </qresource>
+    <qresource prefix="/weather">
+        <file>weather/01d.png</file>
+        <file>weather/01n.png</file>
+        <file>weather/02d.png</file>
+        <file>weather/02n.png</file>
+        <file>weather/03d.png</file>
+        <file>weather/03n.png</file>
+        <file>weather/04d.png</file>
+        <file>weather/04n.png</file>
+        <file>weather/09d.png</file>
+        <file>weather/09n.png</file>
+        <file>weather/10d.png</file>
+        <file>weather/10n.png</file>
+        <file>weather/11d.png</file>
+        <file>weather/11n.png</file>
+        <file>weather/13d.png</file>
+        <file>weather/13n.png</file>
+        <file>weather/50d.png</file>
+        <file>weather/50n.png</file>
+    </qresource>
 </RCC>

@@ -33,7 +33,8 @@ public:
 public slots:
     void fileWatcherDirChanged(QString);
     void fileWatcherFileChanged(QString);
-    void trayIconToOn(Document *document);
+    void takeTemporarySnapshot();
+    void trayIconToOn(Document *document = 0);
     void trayIconToOff();
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
 };

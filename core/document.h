@@ -12,7 +12,6 @@ public:
 
 public:
     QList<Tag*> tags;
-    QPixmap temporaryScreenshot;
 
 private:
     ProjectBase *project;

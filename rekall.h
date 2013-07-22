@@ -51,6 +51,12 @@ private slots:
     void refreshPerson();
     void chutierItemChanged(QTreeWidgetItem*,QTreeWidgetItem*);
     void showInspector();
+
+private:
+    qint32 updateUserName, updateLocation;
+protected:
+    void timerEvent(QTimerEvent *);
+
 private:
     Ui::Rekall *ui;
 };

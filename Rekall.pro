@@ -61,6 +61,14 @@ SOURCES  += interfaces/http/staticfilecontroller.cpp
 HEADERS  += core/person.h
 SOURCES  += core/person.cpp
 
+#Location
+HEADERS += interfaces/location.h
+macx {
+    DEFINES           += LOCATION_INSTALLED
+    OBJECTIVE_SOURCES += interfaces/location.mm
+    LIBS              += -framework Cocoa -framework CoreLocation
+}
+
 
 #TRANSLATIONS          = Tools/Translation_fr_FR.ts
 RESOURCES             += icons/Rekall.qrc

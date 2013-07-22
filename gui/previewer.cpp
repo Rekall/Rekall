@@ -36,10 +36,13 @@ void Previewer::displayPixmap(const QPair<QString, QPixmap> &_picture) {
     else
         ui->picture->setVisible(false);
 }
-void Previewer::displayGps(const QString &gps) {
+void Previewer::displayGps(const QPair<QString,QString> &gps) {
+    displayGps(gps.first, gps.second);
+}
+void Previewer::displayGps(const QString &gps, const QString &place) {
     QStringList gpsData = gps.split(",");
-    if((gps.length()) && (gpsData.count() > 1)) {
-        ui->gps->page()->mainFrame()->evaluateJavaScript("initializeMaps([" + QString("['%1',%2,%3],").arg("Document").arg(gpsData.at(0)).arg(gpsData.at(1)) + "])");
+    if(gpsData.count() > 1) {
+        ui->gps->page()->mainFrame()->evaluateJavaScript("initializeMaps([" + QString("['%1',%2,%3],").arg(place).arg(gpsData.at(0).trimmed()).arg(gpsData.at(1).trimmed()) + "])");
         ui->tabWidget->setTabEnabled(1, true);
     }
     else

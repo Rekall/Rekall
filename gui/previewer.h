@@ -28,7 +28,8 @@ private:
 
 public:
     void displayPixmap(const QPair<QString, QPixmap> &_picture);
-    void displayGps(const QString &gps);
+    void displayGps(const QPair<QString,QString> &gps);
+    void displayGps(const QString &gps, const QString &place);
 
 public slots:
     void action();

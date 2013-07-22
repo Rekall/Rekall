@@ -347,7 +347,7 @@ const QRectF Tag::paintTimeline(bool before) {
             getDocument()->thumbnails.first().drawTexture(Global::timelineGL->visibleRect);
         }
         Global::previewer->displayPixmap(getDocument()->getThumbnail(documentVersion));
-        Global::previewer->displayGps(getDocument()->getMetadata("GPS Coordinates").toString());
+        Global::previewer->displayGps(getDocument()->getGps());
     }
     return timelineBoundingRect.translated(timelinePos);
 }

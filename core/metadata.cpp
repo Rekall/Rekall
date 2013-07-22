@@ -105,11 +105,16 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
 
     if(!file.exists())
         setMetadata("Rekall", "Document Category",  "Marker", version);
-    setMetadata("Rekall", "Document Name",      name, version);
-    setMetadata("Rekall", "Document Author",    Global::userName, version);
-    setMetadata("Rekall", "Document Date/Time", QDateTime::currentDateTime(), version);
-    setMetadata("Rekall", "Import Date/Time",   QDateTime::currentDateTime(), version);
-    setMetadata("Rekall", "Import User Name",   Global::userName, version);
+    setMetadata("Rekall", "Document Name",         name, version);
+    setMetadata("Rekall", "Document Author",       Global::userName, version);
+    setMetadata("Rekall", "Document Date/Time",    QDateTime::currentDateTime(), version);
+    setMetadata("Rekall", "Import Date/Time",      QDateTime::currentDateTime(), version);
+    setMetadata("Rekall", "Import User Name",      Global::userName, version);
+    setMetadata("Rekall", "Import Location GPS",   Global::userLocation->currentLocationGps, version);
+    setMetadata("Rekall", "Import Location Place", Global::userLocation->currentLocationPlace, version);
+    setMetadata("Rekall", "Import Weather Temperature", Global::userLocation->currentWeatherTemp, version);
+    setMetadata("Rekall", "Import Weather Sky",         Global::userLocation->currentWeatherSky,  version);
+    setMetadata("Rekall", "Import Weather Sky Icon",    Global::userLocation->currentWeatherIcon, version);
 
     //setMetadata("Rekall", "Document Danger", version);
 
@@ -141,24 +146,30 @@ const MetadataElement Metadata::getMetadata(const QString &category, const QStri
     }
     return retour;
 }
+
+
 void Metadata::setMetadata(const QString &category, const QString &key, const QString &value, qint16 version) {
     if(key.toLower().contains("date"))
         setMetadata(category, key, QDateTime::fromString(value, "yyyy:MM:dd hh:mm:ss"), version);
-    else {
+    else if(!value.isEmpty()) {
         metadataMutex.lock();
         metadatas[getMetadataIndexVersion(version)][category][key] = value;
         metadataMutex.unlock();
     }
 }
 void Metadata::setMetadata(const QString &category, const QString &key, const QDateTime &value, qint16 version) {
-    metadataMutex.lock();
-    metadatas[getMetadataIndexVersion(version)][category][key] = value;
-    metadataMutex.unlock();
+    if(!value.isNull()) {
+        metadataMutex.lock();
+        metadatas[getMetadataIndexVersion(version)][category][key] = value;
+        metadataMutex.unlock();
+    }
 }
 void Metadata::setMetadata(const QString &category, const QString &key, const MetadataElement &value, qint16 version) {
-    metadataMutex.lock();
-    metadatas[getMetadataIndexVersion(version)][category][key] = value;
-    metadataMutex.unlock();
+    if(!value.toString().isEmpty()) {
+        metadataMutex.lock();
+        metadatas[getMetadataIndexVersion(version)][category][key] = value;
+        metadataMutex.unlock();
+    }
 }
 void Metadata::setMetadata(const QString &category, const QString &key, qreal value, qint16 version) {
     setMetadata(category, key, QString::number(value), version);
@@ -219,6 +230,18 @@ const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) {
         return qMakePair(file.absoluteFilePath(), QPixmap::fromImage(thumbnails.first().image));
     else
         return retour;
+}
+const QPair<QString, QString> Metadata::getGps() {
+    QPair<QString,QString> gps;
+    gps.first  = getMetadata("GPS Coordinates").toString();
+    gps.second = getMetadata("Rekall", "Document Name").toString();
+    if(gps.first.isEmpty()) {
+        gps.first  = getMetadata("Rekall", "Import Location GPS").toString();
+        gps.second = getMetadata("Rekall", "Import Location Place").toString();
+    }
+    if(gps.second.isEmpty())
+        gps.second = getMetadata("Rekall", "Import Location Place").toString();
+    return gps;
 }
 
 

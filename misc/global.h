@@ -19,6 +19,7 @@
 #include "misc/options.h"
 #include "gui/previewer.h"
 #include "interfaces/udp.h"
+#include "interfaces/location.h"
 #include "qmath.h"
 
 using namespace Phonon;
@@ -137,6 +138,8 @@ enum TagType      { TagTypeContextualMilestone, TagTypeContextualTime };
 class Global {
 public:
     static QString userName;
+    static Location *userLocation;
+    static QImage temporaryScreenshot;
     static qreal thumbsEach, waveEach;
     static QFileInfo pathApplication, pathDocuments, pathCurrent;
     static GlWidget *timelineGL, *viewerGL;

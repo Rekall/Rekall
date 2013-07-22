@@ -39,20 +39,43 @@ WatcherFeeling::WatcherFeeling(QWidget *parent) :
     ui->setupUi(this);
 }
 
-void WatcherFeeling::display(Document *_document) {
+void WatcherFeeling::display(Document *document) {
+    bool resetInfo = false;
     if(!isVisible())
         documents.clear();
-    if(!documents.contains(_document)) {
-        documents.append(_document);
+    if(!document) {
+        resetInfo = true;
+        ui->ok->resetCounter("Save");
+    }
+    else if(!documents.contains(document)) {
+        documents.append(document);
+        resetInfo = true;
+        ui->ok->resetCounter("Ok", 5);
+    }
+    if(resetInfo) {
         ui->baseText->clear();
         ui->moreText->clear();
+        ui->location->setText(Global::userLocation->currentLocation);
+        if(!Global::userLocation->currentWeather.isEmpty()) {
+            ui->weatherTemperature->setVisible(true);
+            ui->weatherIcon->setVisible(true);
+            ui->weatherSky->setVisible(true);
+            ui->weatherTemperature->setText(QString("%1°C").arg(Global::userLocation->currentWeatherTemp));
+            ui->weatherSky        ->setText(Global::userLocation->currentWeatherSky);
+            ui->weatherIcon->setPixmap(QPixmap(":/weather/weather/" + Global::userLocation->currentWeatherIcon + ".png"));
+        }
+        else {
+            ui->weatherTemperature->setVisible(false);
+            ui->weatherIcon->setVisible(false);
+            ui->weatherSky->setVisible(false);
+        }
         ui->preview->setChecked(true);
-        ui->preview->setIcon(documents.first()->temporaryScreenshot);
-        ui->ok->resetCounter("Ok", 5);
+        ui->preview->setIcon(QPixmap::fromImage(Global::temporaryScreenshot));
         move(QApplication::desktop()->screenGeometry().topRight() + QPoint(-width()-5, 5));
     }
-    if(documents.count() == 1)  ui->label->setText(tr("Something to say about your changes on %1 since last time (%2)?").arg(documents.first()->file.baseName()).arg(Global::dateToString(documents.first()->getMetadata("Document Date/Time").toDateTime())));
-    else                        ui->label->setText(tr("Something to say about your changes on these %1 since last time?").arg(Global::plurial(documents.count(), "document")));
+    if(documents.count() == 1)       ui->label->setText(tr("Something to say about your changes on %1 since last time (%2)?").arg(documents.first()->file.baseName()).arg(Global::dateToString(documents.first()->getMetadata("Document Date/Time").toDateTime())));
+    else if(documents.count()  > 1)  ui->label->setText(tr("Something to say about your changes on these %1 since last time?").arg(Global::plurial(documents.count(), "document")));
+    else if(documents.count() == 0)  ui->label->setText(tr("Something to say?"));
     show();
 }
 
@@ -76,18 +99,37 @@ void WatcherFeeling::changeEvent(QEvent *e) {
 
 void WatcherFeeling::action() {
     if((sender() == ui->ok) || (sender() == ui->baseText)) {
-        foreach(Document *document, documents) {
-            if(document->updateFile(document->file))
-                document->createTagBasedOnPrevious();
-            qint16 version = document->getMetadataIndexVersion(-1);
-            QString baseText = ui->baseText->text(), moreTexte = ui->moreText->toPlainText();
-            if(!baseText.isEmpty())
-                document->setMetadata("Rekall", "Comments", baseText, version);
-            if(!moreTexte.isEmpty())
-                document->setMetadata("Rekall", "Comments (details)", moreTexte, version);
-            if(ui->preview->isChecked()) {
-                document->temporaryScreenshot.save(QString("%1_%2.jpg").arg(Global::cacheFile("comment", document->file)).arg(version), "jpeg", 70);
-                document->setMetadata("Rekall", "Snapshot", "Comment", version);
+        if(documents.count() == 0) {
+
+        }
+        else {
+            foreach(Document *document, documents) {
+                if(document->updateFile(document->file))
+                    document->createTagBasedOnPrevious();
+                qint16 version = document->getMetadataIndexVersion(-1);
+                QString baseText = ui->baseText->text(), moreTexte = ui->moreText->toPlainText(), location = ui->location->text();
+                if(!baseText.isEmpty())
+                    document->setMetadata("Rekall", "Comments", baseText, version);
+                if(!moreTexte.isEmpty())
+                    document->setMetadata("Rekall", "Comments (details)", moreTexte, version);
+                if(!location.isEmpty()) {
+                    QStringList gpsElements = ui->location->text().split("@", QString::SkipEmptyParts);
+                    if(gpsElements.count() > 1) {
+                        document->setMetadata("Rekall", "Import Location Place", gpsElements.at(0).trimmed(), version);
+                        document->setMetadata("Rekall", "Import Location GPS",   gpsElements.at(1).trimmed(), version);
+                    }
+                    else if(gpsElements.count() > 0)
+                        document->setMetadata("Rekall", "Import Location Place", gpsElements.first().trimmed(), version);
+                }
+                if(!Global::userLocation->currentWeather.isEmpty()) {
+                    document->setMetadata("Rekall", "Import Weather Temperature", Global::userLocation->currentWeatherTemp, version);
+                    document->setMetadata("Rekall", "Import Weather Sky",         Global::userLocation->currentWeatherSky,  version);
+                    document->setMetadata("Rekall", "Import Weather Sky Icon",    Global::userLocation->currentWeatherIcon, version);
+                }
+                if(ui->preview->isChecked()) {
+                    Global::temporaryScreenshot.save(QString("%1_%2.jpg").arg(Global::cacheFile("comment", document->file)).arg(version), "jpeg", 70);
+                    document->setMetadata("Rekall", "Snapshot", "Comment", version);
+                }
             }
         }
         Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = true;

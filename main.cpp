@@ -61,12 +61,6 @@ int main(int argc, char *argv[]) {
     if(Global::pathApplication.absoluteFilePath().endsWith("/Rekall-debug"))
         Global::pathApplication = QFileInfo(Global::pathApplication.absoluteFilePath().remove("-debug"));
 
-    QProcessEnvironment systemEnvironment = QProcessEnvironment::systemEnvironment();
-    foreach(const QString &key, systemEnvironment.keys()) {
-        if(key.toLower().contains("user"))
-            Global::userName = systemEnvironment.value(key);
-    }
-
     qDebug("Pathes");
     qDebug("\tDocuments  : %s", qPrintable(Global::pathDocuments  .absoluteFilePath()));
     qDebug("\tApplication: %s", qPrintable(Global::pathApplication.absoluteFilePath()));

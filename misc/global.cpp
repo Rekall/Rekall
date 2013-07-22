@@ -1,6 +1,8 @@
 #include "global.h"
 
-QString      Global::userName = "";
+QString      Global::userName     = "";
+Location*    Global::userLocation = 0;
+QImage       Global::temporaryScreenshot;
 QFileInfo    Global::pathApplication;
 QFileInfo    Global::pathDocuments;
 QFileInfo    Global::pathCurrent;

@@ -9,6 +9,11 @@ Rekall::Rekall(QWidget *parent) :
     currentProject = 0;
     metaIsChanging = false;
 
+    Global::userLocation = new Location();
+    Global::userLocation->start();
+    updateUserName = updateLocation = -1;
+    timerEvent(0);
+
     Global::mainWindow = this;
 
     QApplication::setQuitOnLastWindowClosed(false);
@@ -69,6 +74,8 @@ Rekall::Rekall(QWidget *parent) :
     splash->show();
     QTimer::singleShot(1500, this, SLOT(closeSplash()));
     QCoreApplication::processEvents();
+
+    startTimer(1000);
 }
 
 Rekall::~Rekall() {
@@ -82,7 +89,7 @@ void Rekall::fileUploaded(QString gps, QString filename, QTemporaryFile *file) {
         picture.first = file->fileName();
         picture.second = QPixmap(file->fileName());
         Global::previewer->displayPixmap(picture);
-        Global::previewer->displayGps(gps);
+        Global::previewer->displayGps(gps, "Imported file");
     }
 }
 
@@ -269,7 +276,7 @@ void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
             else                                            ui->metadata->collapseItem(rootItem);
         }
         Global::previewer->displayPixmap(currentDocument->getThumbnail(ui->metadataSlider->value()));
-        Global::previewer->displayGps(currentDocument->getMetadata("GPS Coordinates").toString());
+        Global::previewer->displayGps(currentDocument->getGps());
     }
     metaIsChanging = false;
 }
@@ -278,4 +285,24 @@ void Rekall::showInspector() {
     inspector->toolbarButton = ui->actionInspector;
     if(inspector->isVisible())   inspector->close();
     else                         inspector->show();
+}
+
+void Rekall::timerEvent(QTimerEvent *) {
+    if(updateUserName < 0) {
+        updateUserName = 600;
+        QProcessEnvironment systemEnvironment = QProcessEnvironment::systemEnvironment();
+        foreach(const QString &key, systemEnvironment.keys()) {
+            if(key.toLower().contains("user")) {
+                Global::userName = systemEnvironment.value(key);
+                Global::userName = Global::userName.left(1).toUpper() + Global::userName.mid(1);
+            }
+        }
+    }
+    updateUserName--;
+
+    if(updateLocation < 0) {
+        updateLocation = 600;
+        Global::userLocation->update();
+    }
+    updateLocation--;
 }

@@ -10,7 +10,7 @@ Watcher::Watcher(QObject *parent) :
     connect(trayMenu, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
     trayIconToOff();
     QMenu *trayElements = new QMenu(Global::mainWindow);
-    trayElements->addAction(tr("OK"), Global::mainWindow, SLOT(show()));
+    trayElements->addAction(tr("Write a note"), this, SLOT(trayIconToOn()));
     trayMenu->setContextMenu(trayElements);
     trayMenu->show();
 
@@ -19,6 +19,8 @@ Watcher::Watcher(QObject *parent) :
 }
 
 void Watcher::trayIconToOn(Document *document) {
+    if(!document)
+        takeTemporarySnapshot();
     trayMenu->setIcon(trayIconOn);
     QTimer::singleShot(1000, this, SLOT(trayIconToOff()));
     feeling->display(document);
@@ -57,6 +59,28 @@ void Watcher::unsync(const QString &file, bool inTracker) {
     }
 }
 
+void Watcher::takeTemporarySnapshot() {
+    QRect screenSize = QApplication::desktop()->screenGeometry();
+    if(lastScreenshotTimestamp.secsTo(QDateTime::currentDateTime()) > 3) {
+        lastScreenshot = QPixmap();
+#ifdef Q_OS_MAC
+        CGRect screenRect;
+        screenRect.origin.x    = screenSize.x();
+        screenRect.origin.y    = screenSize.y();
+        screenRect.size.width  = screenSize.width();
+        screenRect.size.height = screenSize.height();
+        CGImageRef screenshotMac = CGWindowListCreateImage(screenRect, kCGWindowListOptionOnScreenOnly, kCGNullWindowID, kCGWindowImageDefault);
+#ifdef QT4
+        lastScreenshot = QPixmap::fromMacCGImageRef(screenshotMac);
+#endif
+        CGImageRelease(screenshotMac);
+#endif
+        if(lastScreenshot.isNull())
+            lastScreenshot = QPixmap::grabWindow(QApplication::desktop()->winId(), screenSize.x(), screenSize.y(), screenSize.width(), screenSize.height());
+        lastScreenshotTimestamp = QDateTime::currentDateTime();
+    }
+    Global::temporaryScreenshot = lastScreenshot.toImage();
+}
 
 void Watcher::fileWatcherDirChanged(QString dir) {
     if(watcherTracking.contains(dir)) {
@@ -71,33 +95,7 @@ void Watcher::fileWatcherFileChanged(QString file) {
     if(watcherTracking.contains(file)) {
         Document *document = ((Project*)Global::currentProject)->getDocument(file);
         if(document) {
-            QRect screenSize = QApplication::desktop()->screenGeometry();
-
-            if(lastScreenshotTimestamp.secsTo(QDateTime::currentDateTime()) > 3) {
-                lastScreenshot = QPixmap();
-#ifdef Q_OS_MAC
-                CGRect screenRect;
-                screenRect.origin.x    = screenSize.x();
-                screenRect.origin.y    = screenSize.y();
-                screenRect.size.width  = screenSize.width();
-                screenRect.size.height = screenSize.height();
-                CGImageRef screenshotMac = CGWindowListCreateImage(screenRect, kCGWindowListOptionOnScreenOnly, kCGNullWindowID, kCGWindowImageDefault);
-#ifdef QT4
-                lastScreenshot = QPixmap::fromMacCGImageRef(screenshotMac);
-#endif
-                CGImageRelease(screenshotMac);
-#endif
-                if(lastScreenshot.isNull())
-                    lastScreenshot = QPixmap::grabWindow(QApplication::desktop()->winId(), screenSize.x(), screenSize.y(), screenSize.width(), screenSize.height());
-                lastScreenshotTimestamp = QDateTime::currentDateTime();
-            }
-            document->temporaryScreenshot = lastScreenshot;
-
-            //Redimentionnement
-            /*
-            if((desiredSize.width() > 0) && (desiredSize.height() > 0))
-                screenshotPixmap = screenshotPixmap.scaled(desiredSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            */
+            takeTemporarySnapshot();
             trayIconToOn(document);
         }
     }
