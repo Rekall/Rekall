@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html style="height: 100%;">
+	<head> 
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
+		<title>Rekall Places</title> 
+		<style>
+			html, body, div, span, applet, object, iframe,
+			h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+			a, abbr, acronym, address, big, cite, code,
+			del, dfn, em, font, img, ins, kbd, q, s, samp,
+			small, strike, strong, sub, sup, tt, var,
+			b, u, i, center,
+			dl, dt, dd, ol, ul, li,
+			fieldset, form, label, legend,
+				table, caption, tbody, tfoot, thead, tr, th, td {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				outline: 0;
+				font-size: 100%;
+				//vertical-align: baseline;
+				background: transparent;
+			}
+			body {
+				line-height: 1;
+			}
+			ol, ul {
+				list-style: none;
+			}
+			blockquote, q {
+				quotes: none;
+			}
+			blockquote:before, blockquote:after,
+			q:before, q:after {
+				content: '';
+				content: none;
+			}
+			a {
+				border: 0;
+				color: inherit;
+			}
+			:link, :visited {
+				text-decoration: none;
+				border: 0;
+			}
+			:focus {
+				outline: 0;
+			}
+			ins {
+				text-decoration: none;
+			}
+			del {
+				text-decoration: line-through;
+			}
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+			}
+		</style>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+		<script type="text/javascript">
+			function initializeMaps(markers) {
+				var myOptions = {
+					mapTypeId: google.maps.MapTypeId.TERRAIN,
+					mapTypeControl: false
+				};
+				var map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+				var infowindow = new google.maps.InfoWindow(); 
+				var marker, i;
+				var bounds = new google.maps.LatLngBounds();
+
+				for (i = 0; i < markers.length; i++) { 
+					var pos = new google.maps.LatLng(markers[i][1], markers[i][2]);
+					bounds.extend(pos);
+					marker = new google.maps.Marker({
+						position: pos,
+						map: map
+					});
+					google.maps.event.addListener(marker, 'click', (function(marker, i) {
+						return function() {
+							infowindow.setContent(markers[i][0]);
+							infowindow.open(map, marker);
+						}
+					})(marker, i));
+				}
+				map.fitBounds(bounds);
+			}
+			</script>
+		</head>
+		<body onLoad="initializeMaps([['Rekall Development Team', 48.8670599,2.36185769]])" style="height: 100%;">
+			<div id="map_canvas" style="width:100%; height:100%"></div>	
+	</body>
+</html>
