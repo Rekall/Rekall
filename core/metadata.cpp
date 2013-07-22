@@ -231,6 +231,7 @@ const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) {
     else
         return retour;
 }
+
 const QPair<QString, QString> Metadata::getGps() {
     QPair<QString,QString> gps;
     gps.first  = getMetadata("GPS Coordinates").toString();
