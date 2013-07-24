@@ -5,17 +5,20 @@ WatcherFeelingWaiter::WatcherFeelingWaiter(QWidget *parent) :
     QPushButton(parent) {
     counter     = 0;
     showCounter = false;
+    counterTimeout = false;
     startTimer(1000);
 }
 void WatcherFeelingWaiter::resetCounter(const QString &_baseText, quint16 _counter) {
     baseText = _baseText;
     counter  = _counter;
     showCounter = true;
+    counterTimeout = false;
     timerEvent(0);
 }
 void WatcherFeelingWaiter::disableCounter() {
     counter  = 0;
     showCounter = false;
+    counterTimeout = false;
     timerEvent(0);
 }
 
@@ -23,8 +26,10 @@ void WatcherFeelingWaiter::timerEvent(QTimerEvent *e) {
     if((showCounter) && (counter)) {
         if(e)
             counter--;
-        if(counter == 0)
+        if(counter == 0) {
+            counterTimeout = true;
             emit(released());
+        }
         else
             setText(QString("%1 (%2)").arg(baseText).arg(counter));
     }
@@ -40,6 +45,16 @@ WatcherFeeling::WatcherFeeling(QWidget *parent) :
 }
 
 void WatcherFeeling::display(Document *document) {
+#ifdef Q_OS_MAC
+    QProcess process;
+    process.start("osascript", QStringList()
+                  << "-e" << QString("tell application \"System Events\"")
+                  << "-e" << QString("item 1 of (get name of processes whose frontmost is true)")
+                  << "-e" << QString("end tell"));
+    process.waitForFinished();
+    launchedApplicationBeforePopup = process.readAllStandardOutput().trimmed();
+#endif
+
     bool resetInfo = false;
     if(!isVisible())
         documents.clear();
@@ -140,6 +155,12 @@ void WatcherFeeling::action() {
         }
         Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = true;
         close();
+
+#ifdef Q_OS_MAC
+        QProcess process;
+        process.start("osascript", QStringList() << "-e" << QString("tell application \"%1\" to activate").arg(launchedApplicationBeforePopup));
+        process.waitForFinished();
+#endif
     }
     else if(sender() == ui->cancel) {
         close();

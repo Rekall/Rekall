@@ -22,6 +22,8 @@ private:
     QString baseText;
     bool showCounter;
 public:
+    bool counterTimeout;
+public:
     void resetCounter(const QString &_baseText, quint16 _counter = 0);
     void disableCounter();
 
@@ -39,6 +41,7 @@ public:
 private:
     QString locationBase;
     QList<Document*> documents;
+    QString launchedApplicationBeforePopup;
 public:
     void display(Document *document);
 

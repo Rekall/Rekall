@@ -14,9 +14,8 @@ void UserInfos::update() {
     setInfo("Location (verbose)", "");
     setInfo("Weather (verbose)", "");
 
-    //Location
-    getWifiSSID();
-    getGPS();
+    //Infos
+    getPlateformInfos();
     QString location = "", locationGps = getInfo("Location GPS"), locationPlace = getInfo("Location Place");
     if((!locationPlace.isEmpty()) && (!locationGps.isEmpty()))
         location = locationPlace + " @ " + locationGps;
@@ -30,11 +29,6 @@ void UserInfos::update() {
     //Weather
     getWeather();
 
-    //User name
-    getUserName();
-
-    //More precised info
-    getDetailedInfo();
 
     //List
     debug();
@@ -54,11 +48,11 @@ void UserInfos::getWeather() {
     QStringList gpsCoord = getInfo("Location GPS").split(",");
     if(gpsCoord.count() > 1) {
         weatherManager = new QNetworkAccessManager(this);
-        connect(weatherManager, SIGNAL(finished(QNetworkReply*)), SLOT(updateWeatherFinished(QNetworkReply*)));
+        connect(weatherManager, SIGNAL(finished(QNetworkReply*)), SLOT(getWeatherFinished(QNetworkReply*)));
         weatherManager->get(QNetworkRequest(QUrl(QString("http://api.openweathermap.org/data/2.5/weather?mode=xml&units=metric&lat=%1&lon=%2").arg(gpsCoord.at(0).trimmed()).arg(gpsCoord.at(1).trimmed()), QUrl::TolerantMode)));
     }
 }
-void UserInfos::updateWeatherFinished(QNetworkReply *reply) {
+void UserInfos::getWeatherFinished(QNetworkReply *reply) {
     if(reply->error() != QNetworkReply::NoError)
         qDebug("Network error. %s", qPrintable(reply->errorString()));
     else {
@@ -86,23 +80,23 @@ void UserInfos::updateWeatherFinished(QNetworkReply *reply) {
     }
 }
 
-
-void UserInfos::getWifiSSID() {
+void UserInfos::getPlateformInfos() {
 #ifdef Q_OS_MAC
-    QProcess process;
-    process.start("/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport", QStringList() << "-I");
-    process.waitForFinished();
-    QStringList infos = QString(process.readAllStandardOutput()).split("\n", QString::SkipEmptyParts);
-    foreach(const QString &info, infos) {
+    setInfo("Location GPS", getGPS_mac());
+
+    //Wifi name
+    QProcess wifiProcess;
+    wifiProcess.start("/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport", QStringList() << "-I");
+    wifiProcess.waitForFinished();
+    QStringList wifiPnfos = QString(wifiProcess.readAllStandardOutput()).split("\n", QString::SkipEmptyParts);
+    foreach(const QString &info, wifiPnfos) {
         QPair<QString, QString> infoSeperated = Global::seperateMetadata(info);
         if(infoSeperated.first == "SSID")
             setInfo("Location Place", infoSeperated.second);
     }
-#endif
-}
 
-void UserInfos::getUserName() {
-#ifdef Q_OS_MAC
+    //User name (basic)
+    /*
     QProcessEnvironment systemEnvironment = QProcessEnvironment::systemEnvironment();
     foreach(const QString &key, systemEnvironment.keys()) {
         if(key.toLower().contains("user")) {
@@ -111,31 +105,35 @@ void UserInfos::getUserName() {
             setInfo("User Name", name);
         }
     }
+    */
 
-#endif
-}
+    //Opened applications
+    QProcess finderProcess;
+    finderProcess.start("osascript", QStringList() << "-e" << QString("tell application \"System Events\" to get the name of every process whose background only is false"));
+    finderProcess.waitForFinished();
+    QString apps = finderProcess.readAllStandardOutput().trimmed();
+    setInfo("Applications running", apps);
 
-void UserInfos::getDetailedInfo() {
-#ifdef Q_OS_MAC
-    QProcess process;
-    process.start("system_profiler", QStringList() << "SPSoftwareDataType" << "SPHardwareDataType" << "SPAudioDataType" << "SPDisplaysDataType");
-    process.waitForFinished();
-    QStringList infos = QString(process.readAllStandardOutput()).split("\n", QString::SkipEmptyParts);
+    //Hardware infos
+    QProcess hardwareProcess;
+    hardwareProcess.start("system_profiler", QStringList() << "SPSoftwareDataType" << "SPHardwareDataType" << "SPAudioDataType" << "SPDisplaysDataType");
+    hardwareProcess.waitForFinished();
+    QStringList hardwareInfos = QString(hardwareProcess.readAllStandardOutput()).split("\n", QString::SkipEmptyParts);
     QString lastSection = "";
     quint16 graphicalCardIndex = 0, screenIndex = 0;
-    foreach(const QString &info, infos) {
+    foreach(const QString &info, hardwareInfos) {
         QPair<QString, QString> infoSeperated = Global::seperateMetadata(info);
 
         if(infoSeperated.second.isEmpty())
             lastSection = infoSeperated.first;
 
         if(lastSection == "System Software Overview") {
-            if(infoSeperated.first == "System Version")      setInfo("Computer OS",   infoSeperated.second);
-            else if(infoSeperated.first == "Computer Name")  setInfo("Computer Name", infoSeperated.second);
-            else if(infoSeperated.first == "User Name")      setInfo("User Name",     Global::seperateMetadata(infoSeperated.second, "(").first);
+            if     (infoSeperated.first == "System Version")    setInfo("Computer OS",   infoSeperated.second);
+            else if(infoSeperated.first == "Computer Name")     setInfo("Computer Name", infoSeperated.second);
+            else if(infoSeperated.first == "User Name")         setInfo("User Name",     Global::seperateMetadata(infoSeperated.second, "(").first);
         }
         else if(lastSection == "Hardware Overview") {
-            if(infoSeperated.first == "Model Name")             setInfo("Computer Type",            infoSeperated.second);
+            if     (infoSeperated.first == "Model Name")        setInfo("Computer Type",            infoSeperated.second);
             else if(infoSeperated.first == "Model Identifier")  setInfo("Computer Model",           infoSeperated.second);
             else if(infoSeperated.first == "Processor Name")    setInfo("Computer Processor Name",  infoSeperated.second);
             else if(infoSeperated.first == "Processor Speed")   setInfo("Computer Processor Speed", infoSeperated.second);
@@ -143,7 +141,7 @@ void UserInfos::getDetailedInfo() {
             else if(infoSeperated.first == "Serial Number")     setInfo("Computer Serial Number",   infoSeperated.second);
         }
         else {
-            if(infoSeperated.first == "Chipset Model")          setInfo(QString("Computer Graphical Card #%1").arg(++graphicalCardIndex),    infoSeperated.second);
+            if     (infoSeperated.first == "Chipset Model")     setInfo(QString("Computer Graphical Card #%1").arg(++graphicalCardIndex),    infoSeperated.second);
             else if(infoSeperated.first == "VRAM (Total)")      setInfo(QString("Computer Graphical Card #%1 VRAM").arg(graphicalCardIndex), infoSeperated.second);
             else if(infoSeperated.first == "Display Type")      setInfo(QString("Computer Screen #%1").arg(++screenIndex),                   infoSeperated.second);
             else if(infoSeperated.first == "Resolution")        setInfo(QString("Computer Screen #%1 Resolution").arg(screenIndex),          infoSeperated.second);
@@ -151,12 +149,5 @@ void UserInfos::getDetailedInfo() {
             else if(infoSeperated.first == "Mirror")            setInfo(QString("Computer Screen #%1 Is Mirrored").arg(screenIndex),         infoSeperated.second);
         }
     }
-#endif
-}
-
-
-void UserInfos::getGPS() {
-#ifdef Q_OS_MAC
-    setInfo("Location GPS", getGPS_mac());
 #endif
 }

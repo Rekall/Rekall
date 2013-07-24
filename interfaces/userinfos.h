@@ -39,13 +39,9 @@ private:
 
 private:
     void getWeather();
+    void getPlateformInfos();
 private slots:
-    void updateWeatherFinished(QNetworkReply *reply);
-private:
-    void getGPS();
-    void getWifiSSID();
-    void getUserName();
-    void getDetailedInfo();
+    void getWeatherFinished(QNetworkReply *reply);
 };
 
 #endif // USERINFOS_H
