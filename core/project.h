@@ -2,6 +2,7 @@
 #define PROJECT_H
 
 #include <QObject>
+#include <QMenu>
 #include "document.h"
 #include "cluster.h"
 #include "person.h"
@@ -26,10 +27,13 @@ public:
     QMap<QString, QMap<QString, QMap<QString, QList<Tag*> > > > timelineSortTags;
 
 public:
+    quint32 nbTagsPerCategories;
     QMap< QPair<QString, QString>, Cluster*> timelineClusters;
     QList<GlText> timelineCategories;
     QList< QPair<QRectF, UiBool*> > guiToggles;
+    QList< QPair<QRectF, QPair<QString, QString> > > guiCategories;
     GlRect textureStrips;
+    QMenu *timelineFilesMenu;
 public:
     Document* getDocument(const QString &name);
     Document* getDocumentAndSelect(const QString &name);

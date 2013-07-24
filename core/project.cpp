@@ -4,6 +4,8 @@ Project::Project(QWidget *parent) :
     ProjectBase(parent) {
     categoryColorOpacity = categoryColorOpacityDest = 0;
     textureStrips.setTexture(":/textures/res_texture_strips.png");
+    nbTagsPerCategories = 1;
+    timelineFilesMenu = new QMenu(Global::mainWindow);
 }
 
 
@@ -158,6 +160,7 @@ const QRectF Project::paintTimeline(bool before) {
         //Gather info about tags and classify them
         if(Global::timelineSortChanged) {
             //Clear
+            nbTagsPerCategories = 1;
             timelineSortTags.clear();
             QMap<QString, QMap<QString, Cluster*> > clustersToLink;
             QMapIterator<QPair<QString, QString>, Cluster*> timelineClustersIterator(timelineClusters);
@@ -243,6 +246,23 @@ const QRectF Project::paintTimeline(bool before) {
                     clusterOld = clustersToLinkIterator.value();
                 }
             }
+
+            //Quantity per categories
+            QMapIterator<QString, QMap<QString, QMap<QString, QList<Tag*> > > > categoriesInPhasesIterator(timelineSortTags);
+            while(categoriesInPhasesIterator.hasNext()) {
+                categoriesInPhasesIterator.next();
+                QMapIterator<QString, QMap<QString, QList<Tag*> > > clustersInCategoriesIterator(categoriesInPhasesIterator.value());
+                while(clustersInCategoriesIterator.hasNext()) {
+                    clustersInCategoriesIterator.next();
+                    QMapIterator<QString, QList<Tag*> > tagsInClusterIterator(clustersInCategoriesIterator.value());
+                    while(tagsInClusterIterator.hasNext()) {
+                        tagsInClusterIterator.next();
+                        nbTagsPerCategories = qMax(nbTagsPerCategories, (quint32)tagsInClusterIterator.value().count());
+                    }
+                }
+            }
+
+            //Unlock
             Global::timelineSortChanged = false;
         }
 
@@ -254,17 +274,27 @@ const QRectF Project::paintTimeline(bool before) {
 
 
         //Drawing tags and categories
+        bool debug = false;
         QList<QRectF> zones;
         quint16 categoryIndex = 0;
         QPointF tagSortPosOffset = QPointF(0, Global::timelineTagVSpacingSeparator), categoryStart= QPointF(0, 0);
         guiToggles.clear();
+        guiCategories.clear();
         QMapIterator<QString, QMap<QString, QMap<QString, QList<Tag*> > > > categoriesInPhasesIterator(timelineSortTags);
         while(categoriesInPhasesIterator.hasNext()) {
             categoriesInPhasesIterator.next();
 
+            QString phase = categoriesInPhasesIterator.key();
+            if(debug)
+                qDebug("\t > [Phase] %s", qPrintable(phase));
+
             QMapIterator<QString, QMap<QString, QList<Tag*> > > clustersInCategoriesIterator(categoriesInPhasesIterator.value());
             while(clustersInCategoriesIterator.hasNext()) {
                 clustersInCategoriesIterator.next();
+
+                QString sorting = clustersInCategoriesIterator.key();
+                if(debug)
+                    qDebug("\t\t > [Sorting] %s", qPrintable(sorting));
 
                 //New category
                 qreal yMax = 0;
@@ -273,9 +303,15 @@ const QRectF Project::paintTimeline(bool before) {
                 UiBool *drawToggleActive = 0;
 
                 //Draw tags of this categetory
+                quint16 nbTagsPerCategory = 0;
                 QMapIterator<QString, QList<Tag*> > tagsInClusterIterator(clustersInCategoriesIterator.value());
                 while(tagsInClusterIterator.hasNext()) {
                     tagsInClusterIterator.next();
+
+                    QString cluster = tagsInClusterIterator.key();
+                    if(debug)
+                        qDebug("\t\t\t > [Cluster] %s (%d)", qPrintable(cluster), tagsInClusterIterator.value().count());
+
                     foreach(Tag *tag, tagsInClusterIterator.value()) {
                         QRectF tagRect = tag->getTimelineBoundingRect().translated(tagSortPosOffset);
                         QPointF tagPosOffset;
@@ -309,12 +345,13 @@ const QRectF Project::paintTimeline(bool before) {
                                 tagRect.translate(QPointF(0, Global::timelineTagHeight + Global::timelineTagVSpacing));
                             }
                             else
-                                tag->setTimelinePos(tagPosOffset + tagSortPosOffset + QPointF(Global::timelineHeaderSize.width(), 0));
+                                tag->setTimelinePos(tagPosOffset + tagSortPosOffset + QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0));
                         }
                         //Drawing
                         retour = retour.united(tag->paintTimeline(before));
                         zones.append(tagRect);
                         yMax = qMax(yMax, tagRect.bottom());
+                        nbTagsPerCategory++;
                     }
                 }
 
@@ -361,6 +398,16 @@ const QRectF Project::paintTimeline(bool before) {
                     glEnable(GL_SCISSOR_TEST);
                 }
 
+                //Draw heatmap
+                QRectF categoryHeatRect = QRectF(QPointF(tagCategoryRect.left() + tagCategoryRect.width(), tagCategoryRect.top()), QSizeF(Global::timelineNegativeHeaderWidth, tagCategoryRect.height()));
+                if(Global::timelineGL->visibleRect.intersects(categoryHeatRect.translated(QPointF(0, Global::timelineHeaderSize.height())))) {
+                    glDisable(GL_SCISSOR_TEST);
+                    quint16 val = nbTagsPerCategory * 255 / nbTagsPerCategories;
+                    Global::timelineGL->qglColor(QColor(val, val, val));
+                    GlRect::drawRect(categoryHeatRect);
+                    glEnable(GL_SCISSOR_TEST);
+                    guiCategories.append(qMakePair(categoryHeatRect.translated(QPointF(0, Global::timelineHeaderSize.height())), qMakePair(phase, sorting)));
+                }
 
                 //Super separator si big change of category
                 qreal vSpacing = Global::timelineTagVSpacingSeparator;
@@ -446,10 +493,10 @@ const QRectF Project::paintViewer() {
 
 QPointF Project::getTimelineCursorPos(qreal time) {
     //Linear cursor
-    return QPointF(Global::timelineHeaderSize.width() + Global::timeUnit * time, 0);
+    return QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + Global::timeUnit * time, 0);
 }
 qreal Project::getTimelineCursorTime(const QPointF &pos) {
-    qreal cursorTime = qMax(0., (pos.x() - Global::timelineHeaderSize.width()) / Global::timeUnit);
+    qreal cursorTime = qMax(0., (pos.x() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth) / Global::timeUnit);
     Global::selectedTagHoverSnapped = -1;
     if((Global::selectedTagHoverSnap) && (Global::selectedTagHoverSnap != Global::selectedTag))
         ((Tag*)Global::selectedTagHoverSnap)->snapTime(&cursorTime);
@@ -496,6 +543,33 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
         for(quint16 i = 0 ; i < guiToggles.count() ; i++) {
             if(guiToggles.at(i).first.contains(pos)) {
                 *guiToggles[i].second = !(*guiToggles[i].second);
+                return true;
+            }
+        }
+        for(quint16 i = 0 ; i < guiCategories.count() ; i++) {
+            if(guiCategories.at(i).first.contains(pos)) {
+                qDebug("> %s / %s", qPrintable(guiCategories.at(i).second.first), qPrintable(guiCategories.at(i).second.second));
+                timelineFilesMenu->clear();
+                QMapIterator<QString, QList<Tag*> > tagsInClusterIterator(timelineSortTags.value(guiCategories.at(i).second.first).value(guiCategories.at(i).second.second));
+                while(tagsInClusterIterator.hasNext()) {
+                    tagsInClusterIterator.next();
+                    foreach(Tag *tag, tagsInClusterIterator.value()) {
+                        tag->timelineFilesAction = timelineFilesMenu->addAction(tag->getDocument()->getMetadata("Rekall", "Document Name").toString());
+                    }
+                }
+                QAction *retour = timelineFilesMenu->exec(QCursor::pos());
+                if(retour) {
+                    QMapIterator<QString, QList<Tag*> > tagsInClusterIterator2(timelineSortTags.value(guiCategories.at(i).second.first).value(guiCategories.at(i).second.second));
+                    while(tagsInClusterIterator2.hasNext()) {
+                        tagsInClusterIterator2.next();
+                        foreach(Tag *tag, tagsInClusterIterator2.value()) {
+                            if(retour == tag->timelineFilesAction) {
+                                if(tag->getDocument()->chutierItem)
+                                    Global::chutier->setCurrentItem(tag->getDocument()->chutierItem);
+                            }
+                        }
+                    }
+                }
                 return true;
             }
         }

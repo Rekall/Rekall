@@ -11,6 +11,7 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
     mouseHoverPreview = false;
     breathing         = false;
     blinkTime         = 0;
+    timelineFilesAction = 0;
     timeStart = timeEnd = 0;
 
     viewerTimeText          .setStyle(QSize( 70, Global::viewerTagHeight), Qt::AlignCenter,    Global::font);
@@ -325,7 +326,7 @@ const QRectF Tag::paintTimeline(bool before) {
         //Snapping
         if((Global::selectedTagHoverSnapped >= 0) && (Global::selectedTagHoverSnap == this) && (Global::selectedTag)) {
             Tag *snappedTag = (Tag*)Global::selectedTag;
-            qint16 pos = Global::timelineHeaderSize.width() + Global::timeUnit * Global::selectedTagHoverSnapped - timelinePos.x();
+            qint16 pos = Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + Global::timeUnit * Global::selectedTagHoverSnapped - timelinePos.x();
 
             Global::timelineGL->qglColor(Global::colorAlternateStrong);
             glLineStipple(5, 0xAAAA);

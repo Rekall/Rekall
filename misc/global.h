@@ -201,7 +201,7 @@ public:
     static qreal timeUnit, timeUnitTick;
     static UiReal timeUnitDest, timelineTagHeightDest;
     static qreal timelineTagHeight, timelineTagVSpacing, timelineTagVSpacingSeparator, timelineTagThumbHeight;
-    static qreal viewerTagHeight;
+    static qreal viewerTagHeight, timelineNegativeHeaderWidth;
     static QSizeF timelineHeaderSize;
     static bool  timerPlay;
     static qreal time, thumbnailSlider, thumbnailSliderStep;

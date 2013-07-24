@@ -48,7 +48,7 @@ void TimelineGL::paintGL() {
     drawingBoundingRect = QRectF();
     scroll = scroll + (scrollDest - scroll) / Global::inertie;
     visibleRect = QRectF(scroll, size());
-    glScissor(Global::timelineHeaderSize.width(), 0, width() - Global::timelineHeaderSize.width(), height());
+    glScissor(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0, width() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth, height());
     glPushMatrix();
     glTranslatef(qRound(-scroll.x()), qRound(-scroll.y()), 0);
     if(Global::timeline)        drawingBoundingRect = drawingBoundingRect.united(Global::timeline      ->paintTimeline(true));

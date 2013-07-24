@@ -43,8 +43,8 @@ const QRectF Timeline::paintTimeline(bool before) {
         Global::timelineGL->qglColor(Global::colorAlternate);
         QRectF tickRectOld;
         glBegin(GL_LINES);
-        for(quint16 tickIndex = 1 ; tickIndex < ticks.count() ; tickIndex++) {
-            QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
+        for(quint16 tickIndex = 0 ; tickIndex < ticks.count() ; tickIndex++) {
+            QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
             if(!tickRect.intersects(tickRectOld)) {
                 glVertex2f(tickRect.x(), Global::timelineGL->scroll.y());
                 glVertex2f(tickRect.x(), Global::timelineGL->scroll.y() + Global::timelineGL->height());
@@ -56,11 +56,11 @@ const QRectF Timeline::paintTimeline(bool before) {
     else {
         //Timetext
         Global::timelineGL->qglColor(Global::colorAlternateInv);
-        GlRect::drawRect(QRectF(QPointF(Global::timelineHeaderSize.width() + Global::timelineGL->scroll.x(), Global::timelineGL->scroll.y()), QSizeF(Global::timelineGL->width(), Global::timelineHeaderSize.height())));
+        GlRect::drawRect(QRectF(QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + Global::timelineGL->scroll.x(), Global::timelineGL->scroll.y()), QSizeF(Global::timelineGL->width(), Global::timelineHeaderSize.height())));
         Global::timelineGL->qglColor(Global::colorText);
         QRectF tickRectOld;
         for(quint16 tickIndex = 1 ; tickIndex < ticks.count() ; tickIndex++) {
-            QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
+            QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
             if(!tickRect.intersects(tickRectOld)) {
                 ticks[tickIndex].drawText((tickRect.topLeft() + QPointF(-ticksWidth/2, Global::timelineGL->scroll.y())).toPoint());
                 tickRectOld = tickRect;

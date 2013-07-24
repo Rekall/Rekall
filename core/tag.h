@@ -32,6 +32,7 @@ public:
 
 
 public:
+    QAction *timelineFilesAction;
     QList<Tag*> linkedTags;
     qreal   timeStart, timeEnd;
     qint16  documentVersion;
