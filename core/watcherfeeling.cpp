@@ -55,14 +55,14 @@ void WatcherFeeling::display(Document *document) {
     if(resetInfo) {
         ui->baseText->clear();
         ui->moreText->clear();
-        ui->location->setText(Global::userLocation->currentLocation);
-        if(!Global::userLocation->currentWeather.isEmpty()) {
+        ui->location->setText(Global::userInfos->getInfo("Location (verbose)"));
+        if(!Global::userInfos->getInfo("Weather (verbose)").isEmpty()) {
             ui->weatherTemperature->setVisible(true);
             ui->weatherIcon->setVisible(true);
             ui->weatherSky->setVisible(true);
-            ui->weatherTemperature->setText(QString("%1°C").arg(Global::userLocation->currentWeatherTemp));
-            ui->weatherSky        ->setText(Global::userLocation->currentWeatherSky);
-            ui->weatherIcon->setPixmap(QPixmap(":/weather/weather/" + Global::userLocation->currentWeatherIcon + ".png"));
+            ui->weatherTemperature->setText(QString("%1°C").arg(Global::userInfos->getInfo("Weather Temperature")));
+            ui->weatherSky        ->setText(Global::userInfos->getInfo("Weather Sky"));
+            ui->weatherIcon->setPixmap(QPixmap(":/weather/weather/" + Global::userInfos->getInfo("Weather Sky Icon") + ".png"));
         }
         else {
             ui->weatherTemperature->setVisible(false);
@@ -100,37 +100,55 @@ void WatcherFeeling::changeEvent(QEvent *e) {
 void WatcherFeeling::action() {
     if((sender() == ui->ok) || (sender() == ui->baseText)) {
         if(documents.count() == 0) {
-
+            Document *document = new Document(Global::currentProject);
+            documents.append(document);
+            if(!ui->baseText->text().isEmpty()) document->updateImport(QString("Note %1: %2").arg(Global::currentProject->noteId).arg(ui->baseText->text()));
+            else                                document->updateImport(QString("Note %1").arg(Global::currentProject->noteId));
+            document->setMetadata("Rekall", "Note ID", Global::currentProject->noteId, document->getMetadataIndexVersion(-1));
+            document->createTagBasedOnPrevious();
+            Global::currentProject->noteId++;
         }
-        else {
-            foreach(Document *document, documents) {
+        foreach(Document *document, documents) {
+            QString action = "Creation";
+            if(document->file.exists()) {
                 if(document->updateFile(document->file))
                     document->createTagBasedOnPrevious();
-                qint16 version = document->getMetadataIndexVersion(-1);
-                QString baseText = ui->baseText->text(), moreTexte = ui->moreText->toPlainText(), location = ui->location->text();
-                if(!baseText.isEmpty())
-                    document->setMetadata("Rekall", "Comments", baseText, version);
-                if(!moreTexte.isEmpty())
-                    document->setMetadata("Rekall", "Comments (details)", moreTexte, version);
-                if(!location.isEmpty()) {
-                    QStringList gpsElements = ui->location->text().split("@", QString::SkipEmptyParts);
-                    if(gpsElements.count() > 1) {
-                        document->setMetadata("Rekall", "Import Location Place", gpsElements.at(0).trimmed(), version);
-                        document->setMetadata("Rekall", "Import Location GPS",   gpsElements.at(1).trimmed(), version);
-                    }
-                    else if(gpsElements.count() > 0)
-                        document->setMetadata("Rekall", "Import Location Place", gpsElements.first().trimmed(), version);
+                else
+                    action = "Update";
+            }
+            qint16 version = document->getMetadataIndexVersion(-1);
+            if(!ui->baseText->text().isEmpty())
+                document->setMetadata("Rekall", "Comments", ui->baseText->text(), version);
+            if(!ui->moreText->toPlainText().isEmpty())
+                document->setMetadata("Rekall", "Comments (details)", ui->moreText->toPlainText(), version);
+            if(!ui->location->text().isEmpty()) {
+                QStringList gpsElements = ui->location->text().split("@", QString::SkipEmptyParts);
+                if(gpsElements.count() > 1) {
+                    document->setMetadata("Rekall", "Import Location Place", gpsElements.at(0).trimmed(), version);
+                    document->setMetadata("Rekall", "Import Location GPS",   gpsElements.at(1).trimmed(), version);
                 }
-                if(!Global::userLocation->currentWeather.isEmpty()) {
-                    document->setMetadata("Rekall", "Import Weather Temperature", Global::userLocation->currentWeatherTemp, version);
-                    document->setMetadata("Rekall", "Import Weather Sky",         Global::userLocation->currentWeatherSky,  version);
-                    document->setMetadata("Rekall", "Import Weather Sky Icon",    Global::userLocation->currentWeatherIcon, version);
-                }
-                if(ui->preview->isChecked()) {
-                    Global::temporaryScreenshot.save(QString("%1_%2.jpg").arg(Global::cacheFile("comment", document->file)).arg(version), "jpeg", 70);
+                else if(gpsElements.count() > 0)
+                    document->setMetadata("Rekall", "Import Location Place", gpsElements.first().trimmed(), version);
+            }
+            if(!Global::userInfos->getInfo("Weather (verbose)").isEmpty()) {
+                document->setMetadata("Rekall", "Import Weather Temperature", Global::userInfos->getInfo("Weather Temperature"), version);
+                document->setMetadata("Rekall", "Import Weather Sky",         Global::userInfos->getInfo("Weather Sky"),  version);
+                document->setMetadata("Rekall", "Import Weather Sky Icon",    Global::userInfos->getInfo("Weather Sky Icon"), version);
+            }
+            if(ui->preview->isChecked()) {
+                QString filename = "";
+                if(document->file.exists()) {
+                    filename = QString("%1_%2.jpg").arg(Global::cacheFile("comment", document->file)).arg(version);
                     document->setMetadata("Rekall", "Snapshot", "Comment", version);
                 }
+                else {
+                    filename = QString("%1_%2.jpg").arg(Global::cacheFile("note", document->getMetadata("Rekall", "Note ID").toString())).arg(version);
+                    document->setMetadata("Rekall", "Snapshot", "Note", version);
+                }
+                Global::temporaryScreenshot.save(filename, "jpeg", 70);
             }
+
+            Global::feedList->addFeed(new FeedItemBase(document->getMetadata("Document Name").toString(), action, document->getMetadata("Import User Name").toString(), document->getMetadata("Import Date/Time").toDateTime()));
         }
         Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = true;
         close();

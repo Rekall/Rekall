@@ -21,10 +21,6 @@ public:
     QStringList resultOutput;
 public:
     void parseOutput(const QPair<QString,QString> &result);
-    static QString getBetween(const QString &data, const QString &start, const QString &end, bool trim = true);
-    static qreal getDurationFromString(const QString &timeStr);
-    static QPair<QString,QString> seperateMetadata(const QString &metaline, const QString &separator = QString(":"));
-    static QPair<QString, QPair<QString,QString> > seperateMetadataAndGroup(const QString &metaline, const QString &separator = QString(":"));
 
 public:
     explicit TaskProcessData() {}

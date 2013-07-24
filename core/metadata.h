@@ -26,7 +26,7 @@ class Metadata : public QObject {
     Q_OBJECT
     
 public:
-    explicit Metadata(QObject *parent = 0);
+    explicit Metadata(QObject *parent = 0, bool createEmpty = false);
     ~Metadata();
 
 public:
@@ -78,6 +78,7 @@ public:
     const QString getAcceptableWithClusterFilters(qint16 version = -1);
 
 public:
+    void debug();
     QDomElement serializeMetadata(QDomDocument &xmlDoc);
     void deserializeMetadata(const QDomElement &xmlElement);
 

@@ -8,11 +8,10 @@ Rekall::Rekall(QWidget *parent) :
     setAcceptDrops(true);
     currentProject = 0;
     metaIsChanging = false;
+    openProject    = true;
 
-    Global::userLocation = new Location();
-    Global::userLocation->start();
-    updateUserName = updateLocation = -1;
-    timerEvent(0);
+    Global::userInfos = new UserInfos();
+    updateUserInfos = -1;
 
     Global::mainWindow = this;
 
@@ -21,6 +20,7 @@ Rekall::Rekall(QWidget *parent) :
     Watcher *watcher  = new Watcher(this);
     Global::watcher   = watcher;
     Global::taskList  = new TasksList(this);
+    Global::feedList  = new FeedList(this);
     Global::previewer = new Previewer(Global::pathApplication.absoluteFilePath(), this);
 
     Global::chutier = ui->chutier->getTree();
@@ -45,7 +45,6 @@ Rekall::Rekall(QWidget *parent) :
 
     currentProject = new Project(this);
     Global::currentProject = currentProject;
-    currentProject->test(QDir(Global::pathCurrent.absoluteFilePath()));
     connect(currentProject, SIGNAL(displayMetaData()), SLOT(displayMetadata()));
     connect(currentProject, SIGNAL(refreshMetadata()), SLOT(refreshAndLastMetadata()));
 
@@ -288,21 +287,14 @@ void Rekall::showInspector() {
 }
 
 void Rekall::timerEvent(QTimerEvent *) {
-    if(updateUserName < 0) {
-        updateUserName = 600;
-        QProcessEnvironment systemEnvironment = QProcessEnvironment::systemEnvironment();
-        foreach(const QString &key, systemEnvironment.keys()) {
-            if(key.toLower().contains("user")) {
-                Global::userName = systemEnvironment.value(key);
-                Global::userName = Global::userName.left(1).toUpper() + Global::userName.mid(1);
-            }
-        }
+    if(updateUserInfos < 0) {
+        updateUserInfos = 600;
+        Global::userInfos->update();
     }
-    updateUserName--;
+    updateUserInfos--;
 
-    if(updateLocation < 0) {
-        updateLocation = 600;
-        Global::userLocation->update();
+    if(openProject) {
+        openProject = false;
+        currentProject->open(QDir(Global::pathCurrent.absoluteFilePath()));
     }
-    updateLocation--;
 }

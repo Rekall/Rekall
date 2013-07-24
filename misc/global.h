@@ -19,7 +19,6 @@
 #include "misc/options.h"
 #include "gui/previewer.h"
 #include "interfaces/udp.h"
-#include "interfaces/location.h"
 #include "qmath.h"
 
 using namespace Phonon;
@@ -72,27 +71,6 @@ public:
     inline void scrollTo() { scrollTo(scrollDest); }
 };
 
-class WatcherBase {
-public:
-    QFileSystemWatcher *watcher;
-public:
-    virtual void sync  (const QString &file, bool inTracker = false) = 0;
-    virtual void unsync(const QString &file, bool inTracker = false) = 0;
-public slots:
-    virtual void fileWatcherDirChanged(QString) = 0;
-    virtual void fileWatcherFileChanged(QString) = 0;
-};
-
-enum TaskProcessType { TaskProcessTypeProcess, TaskProcessTypeMetadata };
-class Metadata;
-class ProjectBase {};
-class TaskListBase {
-public:
-    virtual void addTask(Metadata *metadata, TaskProcessType type, qint16 version) = 0;
-};
-
-
-
 class GlText {
 public:
     GLuint  texture;
@@ -131,19 +109,87 @@ public:
 };
 
 
+
+
+
+
+class WatcherBase {
+public:
+    QFileSystemWatcher *watcher;
+public:
+    virtual void sync  (const QString &file, bool inTracker = false) = 0;
+    virtual void unsync(const QString &file, bool inTracker = false) = 0;
+public slots:
+    virtual void fileWatcherDirChanged(QString) = 0;
+    virtual void fileWatcherFileChanged(QString) = 0;
+};
+
+enum TaskProcessType { TaskProcessTypeProcess, TaskProcessTypeMetadata };
+class Metadata;
+class ProjectBase : public QObject, public GlDrawable {
+public:
+    quint32 noteId;
+public:
+    explicit ProjectBase(QObject *parent) : QObject(parent) {
+        noteId = 0;
+    }
+public:
+    virtual void addDocument(void *document) = 0;
+};
+class TaskListBase {
+public:
+    virtual void addTask(Metadata *metadata, TaskProcessType type, qint16 version) = 0;
+};
+class FeedItemBase : public QTreeWidgetItem {
+public:
+    explicit FeedItemBase(const QString &_name, const QString &_action, const QString &_author, const QDateTime &_date) {
+        name   = _name;
+        action = _action;
+        author = _author;
+        date   = _date;
+        update();
+    }
+    void update(const QString &dateStr = "") {
+        setText(0, author);
+        setText(1, action);
+        setText(2, name);
+        setText(3, dateStr);
+    }
+public:
+    QString name, author, action;
+    QDateTime date;
+};
+class FeedListBase {
+public:
+    virtual void addFeed(FeedItemBase *feedItem) = 0;
+};
+
+class UserInfosBase {
+public:
+    virtual const QString getInfo(const QString &key) = 0;
+    virtual void update() = 0;
+};
+
+
+
+
+
+
+
+
 enum TagSelection { TagSelectionStart, TagSelectionEnd, TagSelectionMove };
 enum TagType      { TagTypeContextualMilestone, TagTypeContextualTime };
 
 
 class Global {
 public:
-    static QString userName;
-    static Location *userLocation;
+    static UserInfosBase *userInfos;
     static QImage temporaryScreenshot;
     static qreal thumbsEach, waveEach;
     static QFileInfo pathApplication, pathDocuments, pathCurrent;
     static GlWidget *timelineGL, *viewerGL;
-    static GlDrawable *currentProject, *timeline;
+    static ProjectBase *currentProject;
+    static GlDrawable *timeline;
     static QTreeWidget *chutier;
     static qreal timeUnit, timeUnitTick;
     static UiReal timeUnitDest, timelineTagHeightDest;
@@ -172,6 +218,7 @@ public:
     static WatcherBase *watcher;
     static QMainWindow* mainWindow;
     static TaskListBase *taskList;
+    static FeedListBase *feedList;
     static Previewer *previewer;
 
 public:
@@ -179,15 +226,19 @@ public:
     static const QString dateToString(const QDateTime &date);
     static const QString plurial(qint16 value, const QString &text);
     static const QString cacheFile(const QString &type, const QFileInfo &file) {
-        return Global::pathCurrent.absoluteFilePath() + "/rekall_cache/" + type + "_" + file.absoluteDir().absolutePath().remove(Global::pathCurrent.absoluteFilePath()).replace("/", "_") + "_" + file.fileName();
+        return cacheFile(type, file.absoluteDir().absolutePath().remove(Global::pathCurrent.absoluteFilePath()).replace("/", "_") + "_" + file.fileName());
     }
+    static const QString cacheFile(const QString &type, const QString &info) {
+        return Global::pathCurrent.absoluteFilePath() + "/rekall_cache/" + type + "_" + info;
+    }
+    static QString getBetween(const QString &data, const QString &start, const QString &end, bool trim = true);
+    static qreal getDurationFromString(const QString &timeStr);
+    static QPair<QString,QString> seperateMetadata(const QString &metaline, const QString &separator = QString(":"));
+    static QPair<QString, QPair<QString,QString> > seperateMetadataAndGroup(const QString &metaline, const QString &separator = QString(":"));
 
 public:
     static void seek(qreal);
     static void play(bool);
-
-
-
 
 public:
     static inline quint16 alea(quint16 min, quint16 max) {

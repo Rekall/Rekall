@@ -20,9 +20,9 @@ TARGET    = Rekall
 TEMPLATE  = app
 
 SOURCES  += main.cpp
-HEADERS  += tasks/taskslist.h   tasks/taskprocess.h
-SOURCES  += tasks/taskslist.cpp tasks/taskprocess.cpp
-FORMS    += tasks/taskslist.ui
+HEADERS  += tasks/taskslist.h   tasks/feedlist.h   tasks/taskprocess.h
+SOURCES  += tasks/taskslist.cpp tasks/feedlist.cpp tasks/taskprocess.cpp
+FORMS    += tasks/taskslist.ui  tasks/feedlist.ui
 
 HEADERS  += core/watcherfeeling.h   core/watcher.h
 SOURCES  += core/watcherfeeling.cpp core/watcher.cpp
@@ -32,7 +32,7 @@ HEADERS  += rekall.h   gui/splash.h   misc/global.h   misc/options.h
 SOURCES  += rekall.cpp gui/splash.cpp misc/global.cpp misc/options.cpp
 FORMS    += rekall.ui  gui/splash.ui
 
-HEADERS  += core/sorting.h   core/phases.h  core/metadata.h   core/project.h   core/document.h   core/tag.h   core/cluster.h
+HEADERS  += core/sorting.h   core/phases.h   core/metadata.h   core/project.h   core/document.h   core/tag.h   core/cluster.h
 SOURCES  += core/sorting.cpp core/phases.cpp core/metadata.cpp core/project.cpp core/document.cpp core/tag.cpp core/cluster.cpp
 FORMS    += core/sorting.ui  core/phases.ui
 
@@ -62,13 +62,13 @@ HEADERS  += core/person.h
 SOURCES  += core/person.cpp
 
 #Location
-HEADERS += interfaces/location.h
+HEADERS += interfaces/userinfos.h
+SOURCES += interfaces/userinfos.cpp
 macx {
     DEFINES           += LOCATION_INSTALLED
-    OBJECTIVE_SOURCES += interfaces/location.mm
+    OBJECTIVE_SOURCES += interfaces/userinfos_mac.mm
     LIBS              += -framework Cocoa -framework CoreLocation
 }
-
 
 #TRANSLATIONS          = Tools/Translation_fr_FR.ts
 RESOURCES             += icons/Rekall.qrc

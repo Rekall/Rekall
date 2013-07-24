@@ -8,7 +8,7 @@ class Document : public DocumentBase {
     Q_OBJECT
 
 public:
-    explicit Document(ProjectBase *_project, QObject *parent = 0);
+    explicit Document(ProjectBase *_project);
 
 public:
     QList<Tag*> tags;

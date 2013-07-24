@@ -19,7 +19,7 @@ void TaskProcess::run() {
             changeText(tr("Extracting metadatas of %1").arg(processedDocument.metadata->file.baseName()));
             QStringList exifDatas = launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", Global::pathApplication.absoluteFilePath() + "/tools", QStringList() << "−c" << "%+.6f" << "-d" << "%Y:%m:%d %H:%M:%S" << "-G" << processedDocument.metadata->file.absoluteFilePath())).second.split("\n");
             foreach(const QString &exifData, exifDatas) {
-                QPair<QString, QPair<QString,QString> > meta = TaskProcessData::seperateMetadataAndGroup(exifData);
+                QPair<QString, QPair<QString,QString> > meta = Global::seperateMetadataAndGroup(exifData);
                 if(meta.second.first == "File Type")
                     processedDocument.metadata->setMetadata(meta.first, meta.second.first, meta.second.second.toUpper(), processedDocument.version);
                 else if((meta.second.first == "File Inode Change Date/Time") || (meta.second.first == "File Modification Date/Time") || (meta.second.first == "File Creation Date/Time") || (meta.second.first == "File Access Date/Time")) {}
@@ -30,7 +30,7 @@ void TaskProcess::run() {
                     processedDocument.metadata->setMetadata(meta.first, metaTitle, meta.second.second, processedDocument.version);
                 }
                 if(meta.second.first.toLower().contains("duration")) {
-                    qreal duration = TaskProcessData::getDurationFromString(meta.second.second);
+                    qreal duration = Global::getDurationFromString(meta.second.second);
                     if(duration) {
                         processedDocument.metadata->mediaDuration = duration;
                         processedDocument.metadata->setMetadata("Rekall", "Media Duration", duration, processedDocument.version);
@@ -168,7 +168,6 @@ void TaskProcess::changeText(const QString &message) {
 
 
 
-
 QPair<QString,QString> TaskProcess::launchCommand(const TaskProcessData &processData) {
     QPair<QString,QString> retour;
     QString fullCommand = processData.command;
@@ -194,38 +193,3 @@ void TaskProcessData::parseOutput(const QPair<QString,QString> &result) {
     resultOutput  = result.second.split("\n");
 }
 
-QString TaskProcessData::getBetween(const QString &data, const QString &start, const QString &end, bool trim) {
-    qint16 startIndex = data.indexOf(start)+start.length()+1;
-    qint16 endIndex   = data.indexOf(end, startIndex);
-    if(trim)    return data.mid(startIndex, endIndex-startIndex).trimmed();
-    else        return data.mid(startIndex, endIndex-startIndex);
-}
-qreal TaskProcessData::getDurationFromString(const QString &timeStr) {
-    QStringList parts = timeStr.split(" ").first().split(":");
-    qreal duration = 0;
-    if(parts.count() == 3) {
-        duration     += parts.at(0).toDouble()*3600;
-        duration     += parts.at(1).toDouble()*60;
-        if(parts.at(2).contains("."))
-            duration += parts.at(2).split(".").first().toDouble();
-        else
-            duration += parts.at(2).toDouble();
-    }
-    return duration;
-}
-QPair<QString,QString> TaskProcessData::seperateMetadata(const QString &metaline, const QString &separator) {
-    QPair<QString,QString> retour;
-    qint16 index = metaline.indexOf(separator);
-    if(index > 0) {
-        retour.first = metaline.left(index).trimmed();
-        retour.second = metaline.right(metaline.length() - index - 1).trimmed();
-    }
-    return retour;
-}
-QPair<QString, QPair<QString,QString> > TaskProcessData::seperateMetadataAndGroup(const QString &metaline, const QString &separator) {
-    QPair<QString, QPair<QString,QString> > retour;
-    QPair<QString,QString> firstRetour = seperateMetadata(metaline, "]");
-    retour.first = firstRetour.first.remove("[").trimmed();
-    retour.second = seperateMetadata(firstRetour.second, separator);
-    return retour;
-}

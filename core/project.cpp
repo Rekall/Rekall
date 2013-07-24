@@ -1,17 +1,17 @@
 #include "project.h"
 
 Project::Project(QWidget *parent) :
-    QObject(parent) {
+    ProjectBase(parent) {
     categoryColorOpacity = categoryColorOpacityDest = 0;
     textureStrips.setTexture(":/textures/res_texture_strips.png");
 }
 
 
-void Project::test(const QDir &dir) {
+void Project::open(const QDir &dir) {
     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
     foreach(const QFileInfo &file, files) {
         if((file.isFile()) && (UiFileItem::conformFile(file))) {
-            Document *document = new Document(this, this);
+            Document *document = new Document(this);
             document->chutierItem = UiFileItem::find(file, Global::chutier);
             if(file.absoluteFilePath().contains("Test.txt"))
                 document->chutierItem->setData(1, Qt::EditRole, true);
@@ -23,19 +23,16 @@ void Project::test(const QDir &dir) {
                 for(quint16 i = 1 ; i < 10 ; i++)
                     if(document->updateFile(file, -1, i))
                         document->createTagBasedOnPrevious();
-
-            documents.append(document);
         }
         else if((file.isDir()) && (UiFileItem::conformFile(file)))
-            test(QDir(file.absoluteFilePath() + "/"));
+            open(QDir(file.absoluteFilePath() + "/"));
     }
 
 
     for(quint16 i = 1 ; i < 6 ; i++) {
-        Document *document = new Document(this, this);
+        Document *document = new Document(this);
         if(document->updateImport(QString("Marker #%1").arg(i)))
             document->createTagBasedOnPrevious();
-        documents.append(document);
     }
 
     Tag *previousTag = 0;

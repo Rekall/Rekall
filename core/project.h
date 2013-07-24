@@ -6,15 +6,18 @@
 #include "cluster.h"
 #include "person.h"
 
-class Project : public QObject, public ProjectBase, public GlDrawable {
+class Project : public ProjectBase {
     Q_OBJECT
+
 public:
     explicit Project(QWidget *parent = 0);
-    void test(const QDir &dir);
+    void open(const QDir &dir);
 
 public:
     QList<Document*> documents;
     QList<Person*> persons;
+public:
+    void addDocument(void *document) { documents.append((Document*)document); }
 
 private:
     qreal categoryColorOpacity, categoryColorOpacityDest;

@@ -1,9 +1,10 @@
 #include "document.h"
 
-Document::Document(ProjectBase *_project, QObject *parent) :
-    DocumentBase(parent) {
+Document::Document(ProjectBase *_project) :
+    DocumentBase(_project) {
     project     = _project;
     chutierItem = 0;
+    project->addDocument(this);
 }
 
 
@@ -34,9 +35,8 @@ void Document::createTagBasedOnPrevious(qint16 _forVersion) {
     }
     else {
         qreal tS = Global::aleaF(5, 60);
-        if(function == DocumentFunctionRender) {
+        if(function == DocumentFunctionRender)
             tS = Global::aleaF(0, 10);
-        }
         for(quint16 i = 0 ; i < getMetadataCount() ; i++) {
             if(getMetadataCount() > 1) {
                 quint16 nb = Global::alea(1, 1);

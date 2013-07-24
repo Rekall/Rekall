@@ -6,7 +6,7 @@ QStringList Metadata::suffixesTypeImage;
 QStringList Metadata::suffixesTypeAudio;
 QStringList Metadata::suffixesTypePatches;
 
-Metadata::Metadata(QObject *parent) :
+Metadata::Metadata(QObject *parent, bool createEmpty) :
     QObject(parent) {
     type     = DocumentTypeMarker;
     function = DocumentFunctionContextual;
@@ -21,6 +21,9 @@ Metadata::Metadata(QObject *parent) :
         suffixesTypePatches << "pde" << "maxpat" << "sc" << "pd" << "iannix";
     if(!suffixesTypeVideo.count())
         suffixesTypeVideo << "3g2" << "3gp" << "4xm" << "a64" << "act" << "adf" << "adts" << "adx" << "aea" << "aiff" << "alaw" << "amr" << "anm" << "apc" << "ape" << "asf" << "asf_stream" << "ass" << "au" << "avi" << "avm2" << "avs" << "bethsoftvid" << "bfi" << "bin" << "bink" << "bit" << "bmv" << "c93" << "caf" << "cavsvideo" << "cdg" << "cdxl" << "crc" << "daud" << "dfa" << "dirac" << "dnxhd" << "dsicin" << "dts" << "dv" << "dvd" << "dxa" << "ea" << "ea_cdata" << "eac3" << "f32be" << "f32le" << "f4v" << "f64be" << "f64le" << "ffm" << "ffmetadata" << "film_cpk" << "filmstrip" << "flac" << "flic" << "flv" << "framecrc" << "framemd5" << "g722" << "g723_1" << "g729" << "gif" << "gsm" << "gxf" << "h261" << "h263" << "h264" << "hls" << "applehttp" << "ico" << "idcin" << "idf" << "iff" << "ilbc" << "image2" << "image2pipe" << "ingenient" << "ipmovie" << "ipod" << "ismv" << "iss" << "iv8" << "ivf" << "jacosub" << "jv" << "latm" << "lavfi" << "libmodplug" << "lmlm4" << "loas" << "lxf" << "m4v" << "matroska" << "matroska" << "webm" << "md5" << "mgsts" << "microdvd" << "mjpeg" << "mkvtimestamp_v2" << "mlp" << "mm" << "mmf" << "mov" << "mov" << "mp4" << "3gp" << "mp2"<< "mp4" << "mpc" << "mpc8" << "mpeg" << "mpeg1video" << "mpeg2video" << "mpegts" << "mpegtsraw" << "mpegvideo" << "mpjpeg" << "msnwctcp" << "mtv" << "mulaw" << "mvi" << "mxf" << "mxf_d10" << "mxg" << "nc" << "nsv" << "null" << "nut" << "nuv" << "ogg" << "oma" << "paf" << "pmp" << "psp" << "psxstr" << "pva" << "qcp" << "r3d" << "rawvideo" << "rcv" << "realtext" << "rl2" << "rm" << "roq" << "rpl" << "rso" << "rtp" << "rtsp" << "s16be" << "s16le" << "s24be" << "s24le" << "s32be" << "s32le" << "s8" << "sami" << "sap" << "sbg" << "sdl" << "sdp" << "segment" << "shn" << "siff" << "smjpeg" << "smk" << "smoothstreaming" << "smush" << "sol" << "sox" << "spdif" << "srt" << "stream_segment" << "s" << "subviewer" << "svcd" << "swf" << "thp" << "tiertexseq" << "tmv" << "truehd" << "tta" << "tty" << "txd" << "u16be" << "u16le" << "u24be" << "u24le" << "u32be" << "u32le" << "u8" << "vc1" << "vc1test" << "vcd" << "vmd" << "vob" << "voc" << "vqf" << "w64" << "wav" << "wc3movie" << "webm" << "webvtt" << "wsaud" << "wsvqa" << "wtv" << "wv" << "xa" << "xbin" << "xmv" << "xwma" << "yop" << "yuv4mpegpipe";
+
+    if(createEmpty)
+        metadatas.append(QMetaDictionnay());
 }
 
 Metadata::~Metadata() {
@@ -106,15 +109,15 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     if(!file.exists())
         setMetadata("Rekall", "Document Category",  "Marker", version);
     setMetadata("Rekall", "Document Name",         name, version);
-    setMetadata("Rekall", "Document Author",       Global::userName, version);
+    setMetadata("Rekall", "Document Author",       Global::userInfos->getInfo("User Name"), version);
     setMetadata("Rekall", "Document Date/Time",    QDateTime::currentDateTime(), version);
     setMetadata("Rekall", "Import Date/Time",      QDateTime::currentDateTime(), version);
-    setMetadata("Rekall", "Import User Name",      Global::userName, version);
-    setMetadata("Rekall", "Import Location GPS",   Global::userLocation->currentLocationGps, version);
-    setMetadata("Rekall", "Import Location Place", Global::userLocation->currentLocationPlace, version);
-    setMetadata("Rekall", "Import Weather Temperature", Global::userLocation->currentWeatherTemp, version);
-    setMetadata("Rekall", "Import Weather Sky",         Global::userLocation->currentWeatherSky,  version);
-    setMetadata("Rekall", "Import Weather Sky Icon",    Global::userLocation->currentWeatherIcon, version);
+    setMetadata("Rekall", "Import User Name",           Global::userInfos->getInfo("User Name"), version);
+    setMetadata("Rekall", "Import Location GPS",        Global::userInfos->getInfo("Location GPS"), version);
+    setMetadata("Rekall", "Import Location Place",      Global::userInfos->getInfo("Location Place"), version);
+    setMetadata("Rekall", "Import Weather Temperature", Global::userInfos->getInfo("Weather Temperature"), version);
+    setMetadata("Rekall", "Import Weather Sky",         Global::userInfos->getInfo("Weather Sky"),  version);
+    setMetadata("Rekall", "Import Weather Sky Icon",    Global::userInfos->getInfo("Weather Sky Icon"), version);
 
     //setMetadata("Rekall", "Document Danger", version);
 
@@ -224,6 +227,8 @@ const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) {
     QPair<QString, QPixmap> retour;
     if(getMetadata("Rekall", "Snapshot", version).toString() == "Comment")
         return qMakePair(QString("%1_%2.jpg").arg(Global::cacheFile("comment", file)).arg(version), QPixmap(QString("%1_%2.jpg").arg(Global::cacheFile("comment", file)).arg(version)));
+    else if(getMetadata("Rekall", "Snapshot", version).toString() == "Note")
+        return qMakePair(QString("%1_%2.jpg").arg(Global::cacheFile("note", getMetadata("Rekall", "Note ID").toString())).arg(version), QPixmap(QString("%1_%2.jpg").arg(Global::cacheFile("note", getMetadata("Rekall", "Note ID").toString())).arg(version)));
     else if(getMetadata("Rekall", "Snapshot", version).toString() == "File")
         return qMakePair(file.absoluteFilePath(), QPixmap(file.absoluteFilePath()));
     else if(thumbnails.count())
@@ -247,7 +252,22 @@ const QPair<QString, QString> Metadata::getGps() {
 
 
 
-
+void Metadata::debug() {
+    qDebug("------------------------------");
+    foreach(const QMetaDictionnay & metaDictionnay, metadatas) {
+        QMapIterator<QString, QMetaMap> categoryIterator(metaDictionnay);
+        while(categoryIterator.hasNext()) {
+            categoryIterator.next();
+            QMapIterator<QString, MetadataElement> metaIterator(categoryIterator.value());
+            qDebug("\t%s", qPrintable(categoryIterator.key()));
+            while(metaIterator.hasNext()) {
+                metaIterator.next();
+                qDebug("\t\t%s\t:\t%s", qPrintable(metaIterator.key()), qPrintable(metaIterator.value().toString()));
+            }
+        }
+    }
+    qDebug("------------------------------");
+}
 QDomElement Metadata::serializeMetadata(QDomDocument &xmlDoc) {
     QDomElement xmlData = xmlDoc.createElement("metadata");
     xmlData.setAttribute("function", function);

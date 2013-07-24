@@ -1,14 +1,11 @@
 #include "global.h"
 
-QString      Global::userName     = "";
-Location*    Global::userLocation = 0;
 QImage       Global::temporaryScreenshot;
 QFileInfo    Global::pathApplication;
 QFileInfo    Global::pathDocuments;
 QFileInfo    Global::pathCurrent;
 GlWidget*    Global::timelineGL                   = 0;
 GlWidget*    Global::viewerGL                     = 0;
-GlDrawable*  Global::currentProject               = 0;
 GlDrawable*  Global::timeline                     = 0;
 qreal        Global::thumbsEach                   = 5;
 qreal        Global::waveEach                     = 0.1;
@@ -43,7 +40,9 @@ QFont        Global::font;
 QFont        Global::fontSmall;
 QFont        Global::fontLarge;
 GlVideo*     Global::video                        = 0;
-QTreeWidget* Global::chutier                      = 0;
+QTreeWidget*  Global::chutier                      = 0;
+ProjectBase*  Global::currentProject               = 0;
+UserInfosBase* Global::userInfos                = 0;
 
 QColor       Global::colorAlternate               = QColor(0, 0, 0, 24);
 QColor       Global::colorAlternateBold           = QColor(0, 0, 0, 92);
@@ -70,6 +69,7 @@ WatcherBase* Global::watcher            = 0;
 QMainWindow* Global::mainWindow         = 0;
 Previewer*   Global::previewer          = 0;
 TaskListBase* Global::taskList          = 0;
+FeedListBase* Global::feedList          = 0;
 
 void Global::seek(qreal _time) {
     time = _time;
@@ -108,16 +108,55 @@ const QString Global::dateToString(const QDateTime &date) {
 
     if(monthsTo > 12)     return QString("on %1").arg(date.toString("dddd dd MM yyyy, hh:mm"));
     else if(monthsTo > 1) return QString("%1 ago, on %2").arg(plurial(monthsTo, "month" )).arg(date.toString("dddd dd MM hh:mm"));
-    else if(weeksTo > 1)  return QString("%1 ago, on %2").arg(plurial(weeksTo,  "weekd" )).arg(date.toString("dddd dd MM hh:mm"));
+    else if(weeksTo > 1)  return QString("%1 ago, on %2").arg(plurial(weeksTo,  "week"  )).arg(date.toString("dddd dd MM hh:mm"));
     else if(daysTo > 1)   return QString("%1 ago, on %2").arg(plurial(daysTo,   "day"   )).arg(date.toString("dddd, hh:mm"));
     else if(hoursTo > 1)  return QString("%1 ago, on %2").arg(plurial(hoursTo,  "hour"  )).arg(date.toString("hh:mm"));
     else if(minsTo  > 1)  return QString("%1 ago, on %2").arg(plurial(minsTo,   "minute")).arg(date.toString("hh:mm"));
-    else                  return QString("%1 ago, on %2").arg(plurial(secsTo,   "second")).arg(date.toString("hh:mm:ss"));
+    else if(secsTo  > 10) return QString("%1 ago, on %2").arg(plurial(secsTo,   "second")).arg(date.toString("hh:mm:ss"));
+    else                  return QString("A few seconds ago, on %1").arg(date.toString("hh:mm:ss"));
 }
 const QString Global::plurial(qint16 value, const QString &text) {
     if(qAbs(value) > 1) return QString("%1 %2s") .arg(value).arg(text);
     else                return QString("%1 %2").arg(value).arg(text);
 }
+
+QString Global::getBetween(const QString &data, const QString &start, const QString &end, bool trim) {
+    qint16 startIndex = data.indexOf(start)+start.length()+1;
+    qint16 endIndex   = data.indexOf(end, startIndex);
+    if(trim)    return data.mid(startIndex, endIndex-startIndex).trimmed();
+    else        return data.mid(startIndex, endIndex-startIndex);
+}
+qreal Global::getDurationFromString(const QString &timeStr) {
+    QStringList parts = timeStr.split(" ").first().split(":");
+    qreal duration = 0;
+    if(parts.count() == 3) {
+        duration     += parts.at(0).toDouble()*3600;
+        duration     += parts.at(1).toDouble()*60;
+        if(parts.at(2).contains("."))
+            duration += parts.at(2).split(".").first().toDouble();
+        else
+            duration += parts.at(2).toDouble();
+    }
+    return duration;
+}
+QPair<QString,QString> Global::seperateMetadata(const QString &metaline, const QString &separator) {
+    QPair<QString,QString> retour;
+    qint16 index = metaline.indexOf(separator);
+    if(index > 0) {
+        retour.first = metaline.left(index).trimmed();
+        retour.second = metaline.right(metaline.length() - index - 1).trimmed();
+    }
+    return retour;
+}
+QPair<QString, QPair<QString,QString> > Global::seperateMetadataAndGroup(const QString &metaline, const QString &separator) {
+    QPair<QString, QPair<QString,QString> > retour;
+    QPair<QString,QString> firstRetour = seperateMetadata(metaline, "]");
+    retour.first = firstRetour.first.remove("[").trimmed();
+    retour.second = seperateMetadata(firstRetour.second, separator);
+    return retour;
+}
+
+
 
 
 void GlWidget::ensureVisible(const QPointF &point, qreal ratio) {

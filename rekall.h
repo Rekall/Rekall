@@ -5,11 +5,13 @@
 #include <QTimer>
 #include <QClipboard>
 #include "core/watcher.h"
+#include "interfaces/userinfos.h"
 #include "gui/inspector.h"
 #include "items/uifileitem.h"
 #include "gui/splash.h"
 #include "gui/timeline.h"
 #include "tasks/taskslist.h"
+#include "tasks/feedlist.h"
 #include "interfaces/http/httplistener.h"
 #include "interfaces/fileuploadcontroller.h"
 
@@ -29,7 +31,7 @@ private:
     Splash *splash;
     Project *currentProject;
     Inspector *inspector;
-    bool metaIsChanging;
+    bool metaIsChanging, openProject;
     Document *currentDocument;
     HttpListener *http;
     FileUploadController *httpUpload;
@@ -53,7 +55,7 @@ private slots:
     void showInspector();
 
 private:
-    qint32 updateUserName, updateLocation;
+    qint32 updateUserInfos;
 protected:
     void timerEvent(QTimerEvent *);
 
