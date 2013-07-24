@@ -23,13 +23,15 @@ void TasksList::addTask(const TaskProcessData &data) {
         show();
         TaskProcess *task = new TaskProcess(data, ui->tasks->invisibleRootItem(), this);
         connect(task, SIGNAL(finished(TaskProcess*)), SLOT(finished(TaskProcess*)));
+        connect(task, SIGNAL(updateList(TaskProcess*,QString)), SLOT(updateList(TaskProcess*,QString)));
         tasks.append(task);
+        task->init();
         nextTask();
     }
 }
 
 void TasksList::nextTask() {
-    if(taskIsRunning < 10) {
+    if(taskIsRunning < 5) {
         if(tasks.count()) {
             taskIsRunning++;
             foreach(TaskProcess *task, tasks)
@@ -41,6 +43,10 @@ void TasksList::nextTask() {
         else
             hide();
     }
+}
+
+void TasksList::updateList(TaskProcess *task, const QString &message) {
+    task->setText(0, message);
 }
 
 void TasksList::finished(TaskProcess *task) {

@@ -29,7 +29,7 @@ void Phases::analyse() {
             oldDate = startingDate = currentDate;
 
         if(oldDate.daysTo(currentDate) > phasesByDaysTo) {
-            phasesByDate.insert(currentDate, QString("Phase %1 : %2 to %3").arg(index).arg(startingDate.toString("yyyy-MM-dd hh:mm:ss")).arg(currentDate.toString("yyyy-MM-dd hh:mm:ss")));
+            phasesByDate.insert(currentDate, QString("Phase %1 : %2 to %3").arg(index).arg(startingDate.toString("yyyy:MM:dd hh:mm:ss")).arg(currentDate.toString("yyyy:MM:dd hh:mm:ss")));
             index++;
             startingDate = currentDate;
         }
@@ -37,7 +37,7 @@ void Phases::analyse() {
         firstElement = false;
     }
     currentDate = currentDate.addSecs(1);
-    phasesByDate.insert(currentDate, QString("Phase %1 : after %2").arg(index).arg(currentDate.toString("yyyy-MM-dd hh:mm:ss")));
+    phasesByDate.insert(currentDate, QString("Phase %1 : after %2").arg(index).arg(currentDate.toString("yyyy:MM:dd hh:mm:ss")));
 }
 
 const QString Phases::getPhaseFor(const MetadataElement &value) {
@@ -67,7 +67,7 @@ QDomElement Phases::serialize(QDomDocument &xmlDoc) {
     while(phaseIterator.hasNext()) {
         phaseIterator.next();
         QDomElement phaseXml = xmlDoc.createElement("phase");
-        phaseXml.setAttribute("date" , phaseIterator.key().toString("yyyy-MM-dd hh:mm:ss"));
+        phaseXml.setAttribute("date" , phaseIterator.key().toString("yyyy:MM:dd hh:mm:ss"));
         phaseXml.setAttribute("name" , phaseIterator.value());
     }
     return xmlData;

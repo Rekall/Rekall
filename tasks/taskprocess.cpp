@@ -3,20 +3,22 @@
 TaskProcess::TaskProcess(const TaskProcessData &_data, QTreeWidgetItem *parentItem, QObject *parent) :
     QThread(parent), QTreeWidgetItem(parentItem) {
     processedDocument = _data;
+}
+void TaskProcess::init() {
     taskStarted = false;
     if(processedDocument.type == TaskProcessTypeMetadata)
-        changeText(tr("Waiting for file analysis of %1").arg(processedDocument.metadata->file.baseName()));
+        emit(updateList(this, tr("Waiting for file analysis of %1").arg(processedDocument.metadata->file.baseName())));
 }
 
 void TaskProcess::run() {
     taskStarted = true;
     if(processedDocument.type == TaskProcessTypeMetadata) {
-        changeText(tr("Starting file analysis of %1").arg(processedDocument.metadata->file.baseName()));
+        emit(updateList(this, tr("Starting file analysis of %1").arg(processedDocument.metadata->file.baseName())));
         QDir().mkpath(Global::pathCurrent.absoluteFilePath() + "/rekall_cache");
 
         //Extract meta with ExifTool
         if(true) {
-            changeText(tr("Extracting metadatas of %1").arg(processedDocument.metadata->file.baseName()));
+            emit(updateList(this, tr("Extracting metadatas of %1").arg(processedDocument.metadata->file.baseName())));
             QStringList exifDatas = launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", Global::pathApplication.absoluteFilePath() + "/tools", QStringList() << "−c" << "%+.6f" << "-d" << "%Y:%m:%d %H:%M:%S" << "-G" << processedDocument.metadata->file.absoluteFilePath())).second.split("\n");
             foreach(const QString &exifData, exifDatas) {
                 QPair<QString, QPair<QString,QString> > meta = Global::seperateMetadataAndGroup(exifData);
@@ -43,7 +45,7 @@ void TaskProcess::run() {
 
         //Image thumb
         if(processedDocument.metadata->type == DocumentTypeImage) {
-            changeText(tr("Creating picture thumbnail of %1").arg(processedDocument.metadata->file.baseName()));
+            emit(updateList(this, tr("Creating picture thumbnail of %1").arg(processedDocument.metadata->file.baseName())));
             QString thumbFilename = thumbFilepath + ".jpg";
             if(!QFileInfo(thumbFilename).exists()) {
                 QImage thumbnail(processedDocument.metadata->file.absoluteFilePath());
@@ -58,7 +60,7 @@ void TaskProcess::run() {
 
         //Waveform
         if((processedDocument.metadata->type == DocumentTypeAudio) || (processedDocument.metadata->type == DocumentTypeVideo)) {
-            changeText(tr("Creating audio waveform of %1").arg(processedDocument.metadata->file.baseName()));
+            emit(updateList(this, tr("Creating audio waveform of %1").arg(processedDocument.metadata->file.baseName())));
             QString thumbFilenameIntermediate = thumbFilepath + ".raw", thumbFilename = thumbFilepath + ".peak";
 
             if(!QFileInfo(thumbFilename).exists()) {
@@ -128,7 +130,7 @@ void TaskProcess::run() {
 
         //Video thumbnails
         if(processedDocument.metadata->type == DocumentTypeVideo) {
-            changeText(tr("Creating video thumbnails of %1").arg(processedDocument.metadata->file.baseName()));
+            emit(updateList(this, tr("Creating video thumbnails of %1").arg(processedDocument.metadata->file.baseName())));
             //qDebug("===> %s", qPrintable(QDir(Global::pathCurrent.absoluteFilePath() + "/").relativeFilePath(data.metadata->file.absoluteFilePath())));
             quint16 thumbsNumber = qCeil(processedDocument.metadata->mediaDuration / Global::thumbsEach);
             if(!QFileInfo(thumbFilepath + "_1.jpg").exists()) {
@@ -155,15 +157,10 @@ void TaskProcess::run() {
                     processedDocument.metadata->thumbnails.append(GlRect(thumbFilename));
             }
         }
-        changeText(tr("Finishing analysis of %1").arg(processedDocument.metadata->file.baseName()));
+        emit(updateList(this, tr("Finishing analysis of %1").arg(processedDocument.metadata->file.baseName())));
     }
     emit(finished(this));
 }
-void TaskProcess::changeText(const QString &message) {
-    setText(0, message);
-    //QApplication::processEvents();
-}
-
 
 
 

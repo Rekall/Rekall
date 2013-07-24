@@ -37,6 +37,7 @@ public:
     ~WatcherFeeling();
 
 private:
+    QString locationBase;
     QList<Document*> documents;
 public:
     void display(Document *document);

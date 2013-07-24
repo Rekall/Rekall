@@ -30,7 +30,7 @@ const QString UiFileItem::dateToString(const QDateTime &date) {
     quint16 daysTo = date.daysTo(QDateTime::currentDateTime());
 
     if(daysTo > 7)
-        return date.toString("yyyy-MM-dd hh:mm");
+        return date.toString("yyyy:MM:dd hh:mm");
     else if(daysTo > 1)
         return date.toString("dddd, hh:mm");
     else

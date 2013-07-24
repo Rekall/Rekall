@@ -18,10 +18,6 @@ public:
 
 
 
-typedef QMap<QString, MetadataElement> QMetaMap;
-typedef QMap<QString, QMetaMap > QMetaDictionnay;
-typedef QList<GlRect> Thumbnails;
-
 class Metadata : public QObject {
     Q_OBJECT
     
@@ -46,6 +42,7 @@ protected:
 public:
     bool updateFile(const QFileInfo &file, qint16 version = -1, quint16 falseInfoForTest = 0);
     bool updateImport(const QString &name, qint16 version = -1);
+    void updateFeed();
     const QPair<QString, QPixmap> getThumbnail(qint16 version = -1);
     const QPair<QString,QString> getGps();
 public:
@@ -64,6 +61,7 @@ public:
     void setMetadata(const QString &category, const QString &key, const QDateTime &value, qint16 version);
     void setMetadata(const QString &category, const QString &key, const MetadataElement &value, qint16 version);
     void setMetadata(const QString &category, const QString &key, qreal value, qint16 version);
+    void setMetadata(const QMetaDictionnay &metaDictionnay);
 public:
     const QString getCriteriaSort(qint16 version = -1);
     const QString getCriteriaCluster(qint16 version = -1);

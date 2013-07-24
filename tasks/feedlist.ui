@@ -11,11 +11,23 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Feed</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QTreeWidget" name="feeds">
+     <property name="indentation">
+      <number>0</number>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
      <column>
       <property name="text">
        <string>Author</string>

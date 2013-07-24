@@ -32,6 +32,7 @@ public:
 
 public:
     const QString getInfo(const QString &key);
+    const QMetaDictionnay getInfos();
 private:
     void setInfo(const QString &key, const QString &value);
 

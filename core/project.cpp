@@ -18,11 +18,14 @@ void Project::open(const QDir &dir) {
 
             if(document->updateFile(file))
                 document->createTagBasedOnPrevious();
+            document->updateFeed();
 
             if(file.baseName() == "Plan de salle 2")
-                for(quint16 i = 1 ; i < 10 ; i++)
+                for(quint16 i = 1 ; i < 10 ; i++) {
                     if(document->updateFile(file, -1, i))
                         document->createTagBasedOnPrevious();
+                    document->updateFeed();
+                }
         }
         else if((file.isDir()) && (UiFileItem::conformFile(file)))
             open(QDir(file.absoluteFilePath() + "/"));
@@ -33,6 +36,7 @@ void Project::open(const QDir &dir) {
         Document *document = new Document(this);
         if(document->updateImport(QString("Marker #%1").arg(i)))
             document->createTagBasedOnPrevious();
+        document->updateFeed();
     }
 
     Tag *previousTag = 0;

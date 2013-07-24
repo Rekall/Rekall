@@ -41,10 +41,13 @@ void UserInfos::update() {
 }
 
 const QString UserInfos::getInfo(const QString &key) {
-    return getMetadata("User", key).toString();
+    return getMetadata("Rekall User Infos", key).toString();
 }
 void UserInfos::setInfo(const QString &key, const QString &value) {
-    setMetadata("User", key, value, -1);
+    setMetadata("Rekall User Infos", key, value, -1);
+}
+const QMetaDictionnay UserInfos::getInfos() {
+    return getMetadata();
 }
 
 void UserInfos::getWeather() {

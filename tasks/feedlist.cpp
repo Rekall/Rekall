@@ -13,7 +13,7 @@ FeedList::~FeedList() {
 }
 
 void FeedList::addFeed(FeedItemBase *feedItem) {
-    ui->feeds->addTopLevelItem(feedItem);
+    ui->feeds->insertTopLevelItem(0, feedItem);
     timerEvent(0);
     show();
 }

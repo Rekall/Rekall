@@ -26,6 +26,7 @@ private:
 
 public slots:
     void finished(TaskProcess*);
+    void updateList(TaskProcess*, const QString &);
 
 private:
     Ui::TasksList *ui;

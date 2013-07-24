@@ -42,6 +42,7 @@ class TaskProcess : public QThread, public QTreeWidgetItem {
     Q_OBJECT
 public:
     explicit TaskProcess(const TaskProcessData &_data, QTreeWidgetItem *parentItem, QObject *parent = 0);
+    void init();
 
 public:
     TaskProcessData processedDocument;
@@ -51,10 +52,10 @@ public:
 
 private:
     void run();
-    void changeText(const QString &message);
-    
+
 signals:
     void finished(TaskProcess*);
+    void updateList(TaskProcess*, const QString &);
 };
 
 #endif // TASKPROCESS_H

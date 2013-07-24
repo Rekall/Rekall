@@ -21,6 +21,10 @@
 #include "interfaces/udp.h"
 #include "qmath.h"
 
+typedef QMap<QString, MetadataElement> QMetaMap;
+typedef QMap<QString, QMetaMap > QMetaDictionnay;
+
+
 using namespace Phonon;
 
 class GlDrawable {
@@ -107,6 +111,7 @@ public:
     static void drawRoundedRect(const QRectF &rect, bool border, qreal precision = M_PI/4);
     static void drawRect(const QRectF &rect, qreal borderRadius = 0, const QRectF &texCoord = QRectF(0,0,1,1));
 };
+typedef QList<GlRect> Thumbnails;
 
 
 
@@ -154,6 +159,7 @@ public:
         setText(1, action);
         setText(2, name);
         setText(3, dateStr);
+        setText(4, date.toString("yyyy:MM:dd hh:mm:ss"));
     }
 public:
     QString name, author, action;
@@ -168,6 +174,7 @@ class UserInfosBase {
 public:
     virtual const QString getInfo(const QString &key) = 0;
     virtual void update() = 0;
+    virtual const QMetaDictionnay getInfos() = 0;
 };
 
 

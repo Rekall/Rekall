@@ -112,13 +112,7 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     setMetadata("Rekall", "Document Author",       Global::userInfos->getInfo("User Name"), version);
     setMetadata("Rekall", "Document Date/Time",    QDateTime::currentDateTime(), version);
     setMetadata("Rekall", "Import Date/Time",      QDateTime::currentDateTime(), version);
-    setMetadata("Rekall", "Import User Name",           Global::userInfos->getInfo("User Name"), version);
-    setMetadata("Rekall", "Import Location GPS",        Global::userInfos->getInfo("Location GPS"), version);
-    setMetadata("Rekall", "Import Location Place",      Global::userInfos->getInfo("Location Place"), version);
-    setMetadata("Rekall", "Import Weather Temperature", Global::userInfos->getInfo("Weather Temperature"), version);
-    setMetadata("Rekall", "Import Weather Sky",         Global::userInfos->getInfo("Weather Sky"),  version);
-    setMetadata("Rekall", "Import Weather Sky Icon",    Global::userInfos->getInfo("Weather Sky Icon"), version);
-
+    setMetadata(Global::userInfos->getInfos());
     //setMetadata("Rekall", "Document Danger", version);
 
     if(name.toLower().contains("captation"))
@@ -127,8 +121,17 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     return creation;
 }
 
+void Metadata::updateFeed() {
+    QString action = "Creation";
+    if(getMetadataCount() > 1)
+        action = "Update";
+    Global::feedList->addFeed(new FeedItemBase(getMetadata("Rekall", "Document Name").toString(), action, getMetadata("Rekall User Infos", "User Name").toString(), getMetadata("Rekall", "Import Date/Time").toDateTime()));
+}
+
+
 const MetadataElement Metadata::getMetadata(const QString &key, qint16 version) {
     MetadataElement retour;
+    metadataMutex.lock();
     if(metadatas.count()) {
         QMapIterator<QString, QMetaMap> metaIterator(getMetadata(version));
         while(metaIterator.hasNext()) {
@@ -139,14 +142,17 @@ const MetadataElement Metadata::getMetadata(const QString &key, qint16 version) 
             }
         }
     }
+    metadataMutex.unlock();
     return retour;
 }
 const MetadataElement Metadata::getMetadata(const QString &category, const QString &key, qint16 version) {
     MetadataElement retour;
+    metadataMutex.lock();
     if(metadatas.count()) {
         if((getMetadata(version).contains(category)) && (getMetadata(version).value(category).contains(key)))
             retour = getMetadata(version).value(category).value(key);
     }
+    metadataMutex.unlock();
     return retour;
 }
 
@@ -177,6 +183,18 @@ void Metadata::setMetadata(const QString &category, const QString &key, const Me
 void Metadata::setMetadata(const QString &category, const QString &key, qreal value, qint16 version) {
     setMetadata(category, key, QString::number(value), version);
 }
+void Metadata::setMetadata(const QMetaDictionnay &metaDictionnay) {
+    QMapIterator<QString, QMetaMap> categoryIterator(metaDictionnay);
+    while(categoryIterator.hasNext()) {
+        categoryIterator.next();
+        QMapIterator<QString, MetadataElement> metaIterator(categoryIterator.value());
+        while(metaIterator.hasNext()) {
+            metaIterator.next();
+            setMetadata(categoryIterator.key(), metaIterator.key(), metaIterator.value(), -1);
+        }
+    }
+}
+
 
 
 bool Metadata::isAcceptableWithSortFilters(qint16 version) {
@@ -242,11 +260,11 @@ const QPair<QString, QString> Metadata::getGps() {
     gps.first  = getMetadata("GPS Coordinates").toString();
     gps.second = getMetadata("Rekall", "Document Name").toString();
     if(gps.first.isEmpty()) {
-        gps.first  = getMetadata("Rekall", "Import Location GPS").toString();
-        gps.second = getMetadata("Rekall", "Import Location Place").toString();
+        gps.first  = getMetadata("Rekall User Infos", "Location GPS").toString();
+        gps.second = getMetadata("Rekall User Infos", "Location Place").toString();
     }
     if(gps.second.isEmpty())
-        gps.second = getMetadata("Rekall", "Import Location Place").toString();
+        gps.second = getMetadata("Rekall User Infos", "Location Place").toString();
     return gps;
 }
 
