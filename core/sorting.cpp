@@ -50,10 +50,17 @@ void Sorting::action() {
     emit(actionned());
 }
 
-const QString Sorting::getCriteriaFormated(const QString &criteria) {
-    if(criteria.isEmpty())
-        return criteria;
-    else if(asDate) {
+const QString Sorting::getCriteriaFormated(const QString &_criteria) {
+    if(_criteria.isEmpty())
+        return _criteria;
+
+    QString criteria = _criteria, suffix;
+    qint16 index = criteria.indexOf("\n");
+    if(index > 0) {
+        criteria = criteria.left(index);
+        suffix   = criteria.right(criteria.length() - index - 1);
+    }
+    if(asDate) {
         if(criteriaFormatedCache.contains(criteria))
             return criteriaFormatedCache.value(criteria);
         else {
@@ -65,12 +72,12 @@ const QString Sorting::getCriteriaFormated(const QString &criteria) {
             else if(criteria.length() <= 15)  retour = QDateTime::fromString(criteria, QString("yyyy:MM:dd hh:mm:ss").left(criteria.length())).toString("dddd dd MMMM yyyy, hh:mm");
             else                              retour = QDateTime::fromString(criteria, QString("yyyy:MM:dd hh:mm:ss").left(criteria.length())).toString("dddd dd MMMM yyyy, hh:mm:ss");
             criteriaFormatedCache.insert(criteria, retour);
-            return retour;
+            return retour + suffix;
         }
     }
     else if(left >= 0)
-        return criteria + "...";
-    return criteria;
+        return criteria + suffix + "...";
+    return criteria + suffix;
 }
 bool Sorting::isAcceptableWithFilters(const QString &_criteria) {
     if(!ui->matches->text().isEmpty()) {

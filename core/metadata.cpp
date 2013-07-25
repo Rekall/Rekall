@@ -235,7 +235,7 @@ const QString Metadata::getCriteriaColor(qint16 version) {
 const QString Metadata::getCriteriaSort(qint16 version) {
     if(function == DocumentFunctionRender) {
         if(Global::tagSortCriteria->asDate)
-            return getMetadata(Global::tagSortCriteria->tagName, version).toString(Global::tagSortCriteria->left);//.arg(getMetadata("Rekall", "Document Name", version).toString());
+            return getMetadata(Global::tagSortCriteria->tagName, version).toString(Global::tagSortCriteria->left) + "\n" + getMetadata("Rekall", "Document Name", version).toString();
         else
             return "\n" + getMetadata("Rekall", "Document Name", version).toString();
     }
