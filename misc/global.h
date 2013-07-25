@@ -185,7 +185,7 @@ public:
 
 
 enum TagSelection { TagSelectionStart, TagSelectionEnd, TagSelectionMove };
-enum TagType      { TagTypeContextualMilestone, TagTypeContextualTime };
+enum TagType      { TagTypeContextualMilestone, TagTypeContextualTime, TagTypeGlobal };
 
 
 class Global {

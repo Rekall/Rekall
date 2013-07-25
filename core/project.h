@@ -25,9 +25,10 @@ private:
 public:
     QList<Tag*> viewerTags, eventsTags;
     QMap<QString, QMap<QString, QMap<QString, QList<Tag*> > > > timelineSortTags;
+    QList< QPair<QRectF,qreal> > timelineCategoriesRectCache;
 
 public:
-    quint32 nbTagsPerCategories;
+    qreal nbTagsPerCategories;
     QMap< QPair<QString, QString>, Cluster*> timelineClusters;
     QList<GlText> timelineCategories;
     QList< QPair<QRectF, UiBool*> > guiToggles;

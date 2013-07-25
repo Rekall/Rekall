@@ -55,7 +55,38 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     else                        setMetadata("File", "File Modification Date/Time", file.lastModified(), version);
     setMetadata("Rekall", "Document Date/Time", getMetadata("File", "File Modification Date/Time", version), version);
 
+    QString typeStr = "";
+    if(suffixesTypeDoc.contains(file.suffix().toLower())) {
+        type = DocumentTypeDoc;
+        typeStr = "Document";
+    }
+    else if(suffixesTypeAudio.contains(file.suffix().toLower())) {
+        type = DocumentTypeAudio;
+        typeStr = "Document";
+    }
+    else if(suffixesTypeImage.contains(file.suffix().toLower())) {
+        type = DocumentTypeImage;
+        typeStr = "Image";
+    }
+    else if(suffixesTypeVideo.contains(file.suffix().toLower())) {
+        type = DocumentTypeVideo;
+        typeStr = "Video";
+    }
+    else if(suffixesTypePatches.contains(file.suffix().toLower())) {
+        type = DocumentTypeFile;
+        typeStr = "Patches";
+    }
+    else {
+        type = DocumentTypeFile;
+        typeStr = "Other";
+    }
+    if(function == DocumentFunctionRender)
+        typeStr = "Recording";
+    setMetadata("Rekall", "Document Category", typeStr, version);
+
     QString documentTags;
+    if(typeStr != "Other")
+        documentTags += typeStr.toLower() + ", ";
     QStringList fileTags = QDir(Global::pathDocuments.absoluteFilePath() + "/").relativeFilePath(file.absoluteFilePath()).remove(file.suffix()).toLower().replace("-", " ").replace("_", " ").split("/", QString::SkipEmptyParts);
     QStringList forbiddenTags = QStringList() << ".." << "rekall";
     foreach(const QString &fileTag, fileTags) {
@@ -68,34 +99,6 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     }
     documentTags.chop(2);
     setMetadata("Rekall", "Document Tags", documentTags, version);
-
-    if(suffixesTypeDoc.contains(file.suffix().toLower())) {
-        type = DocumentTypeDoc;
-        setMetadata("Rekall", "Document Category", "Document", version);
-    }
-    else if(suffixesTypeAudio.contains(file.suffix().toLower())) {
-        type = DocumentTypeAudio;
-        setMetadata("Rekall", "Document Category", "Audio",    version);
-    }
-    else if(suffixesTypeImage.contains(file.suffix().toLower())) {
-        type = DocumentTypeImage;
-        setMetadata("Rekall", "Document Category", "Image",    version);
-    }
-    else if(suffixesTypeVideo.contains(file.suffix().toLower())) {
-        type = DocumentTypeVideo;
-        setMetadata("Rekall", "Document Category", "Video",    version);
-    }
-    else if(suffixesTypePatches.contains(file.suffix().toLower())) {
-        type = DocumentTypeFile;
-        setMetadata("Rekall", "Document Category", "Patches",  version);
-    }
-    else {
-        type = DocumentTypeFile;
-        setMetadata("Rekall", "Document Category", "Other",    version);
-    }
-    if(function == DocumentFunctionRender) {
-        setMetadata("Rekall", "Document Category", "Recording", version);
-    }
 
     return creation;
 }

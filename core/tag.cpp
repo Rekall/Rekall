@@ -35,8 +35,11 @@ void Tag::test(qreal tS) {
         connect(&document->renderActive, SIGNAL(triggered(bool)), SLOT(renderActiveChanged()));
     }
     else {
-        if(Global::alea(0, 100) > 50) setType(TagTypeContextualMilestone, tS);
-        else                          setType(TagTypeContextualTime, tS);
+        qreal val = Global::alea(0, 100);
+        if(val < 30)      setType(TagTypeContextualTime, tS);
+        else if(val < 50) setType(TagTypeContextualMilestone, tS);
+        else              setType(TagTypeGlobal, 0);
+
         if(type == TagTypeContextualTime)
             setTimeEnd(timeStart + Global::aleaF(2, 8));
         if(Global::aleaF(0, 1) > 50) {
@@ -54,13 +57,13 @@ void Tag::test(qreal tS) {
 
 void Tag::setType(TagType _type, qreal time) {
     type = _type;
-    if(type == TagTypeContextualMilestone)
-        timeStart = timeEnd = time;
-    else if(type == TagTypeContextualTime) {
+    if(type == TagTypeContextualTime) {
         if((timeStart == 0) && (timeEnd == 0))  timeStart = time;
         else                                    timeStart = time - 5;
         timeEnd = timeStart + 10;
     }
+    else
+        timeStart = timeEnd = time;
     Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
 }
 
@@ -72,11 +75,15 @@ void Tag::setTimeStart(qreal _timeStart) {
     Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
 }
 void Tag::setTimeEnd(qreal _timeEnd) {
-    qreal mediaDuration = document->getMetadata("Rekall", "Media Duration").toDouble();
-    qreal mediaOffset   = document->getMetadata("Rekall", "Media Offset").toDouble();
-    if(mediaDuration <= 0) mediaDuration = 999999;
-    timeEnd = qBound(timeStart, _timeEnd, timeStart + mediaDuration - mediaOffset);
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    if(type == TagTypeContextualTime) {
+        qreal mediaDuration = document->getMetadata("Rekall", "Media Duration").toDouble();
+        qreal mediaOffset   = document->getMetadata("Rekall", "Media Offset").toDouble();
+        if(mediaDuration <= 0) mediaDuration = 999999;
+        timeEnd = qBound(timeStart, _timeEnd, timeStart + mediaDuration - mediaOffset);
+        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    }
+    else
+        timeEnd = timeStart;
 }
 void Tag::moveTo(qreal _val) {
     qreal _duration = getDuration();
@@ -124,7 +131,9 @@ void Tag::renderActiveChanged() {
 const QRectF Tag::paintTimeline(bool before) {
     if(before) {
         timelinePos = timelinePos + (timelineDestPos - timelinePos) / Global::inertie;
-        timelineBoundingRect = QRectF(QPointF(timeStart * Global::timeUnit, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration() * Global::timeUnit), Global::timelineTagHeight));
+        if(type == TagTypeGlobal)   timelineBoundingRect = QRectF(QPointF(Global::timelineGL->scroll.x()-Global::timelineNegativeHeaderWidth, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration() * Global::timeUnit), Global::timelineTagHeight));
+        else                        timelineBoundingRect = QRectF(QPointF(timeStart * Global::timeUnit, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration() * Global::timeUnit), Global::timelineTagHeight));
+
         bool isLargeTag = (document->getMetadata("Rekall", "Timeline thumbnail").toString() == "picture");
         if(isLargeTag)
             timelineBoundingRect.setHeight(Global::timelineTagThumbHeight);
@@ -141,7 +150,12 @@ const QRectF Tag::paintTimeline(bool before) {
         if(breathing)
             color = color.lighter(100 + (1-Global::breathing)*15);
 
+
+
         glPushMatrix();
+        if(type == TagTypeGlobal)
+            glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
+
         glTranslatef(qRound(timelinePos.x()), qRound(timelinePos.y()), 0);
 
         //Drawing
@@ -190,14 +204,14 @@ const QRectF Tag::paintTimeline(bool before) {
                 GlRect::drawRoundedRect(timelineBoundingRect.adjusted(1, 1, -1, -1), true, shape);
             }
             //Text
-            if(Global::selectedTagHover == this) {
+            if((Global::selectedTagHover == this) && (type != TagTypeGlobal)) {
                 QPoint textPos;
                 Global::timelineGL->qglColor(color);
 
                 textPos = QPoint(timelineBoundingRect.left() - 2 - timelineTimeStartText.size.width(), 1 + timelineBoundingRect.center().y() - timelineTimeStartText.size.height()/2);
                 timelineTimeStartText.drawText(Global::timeToString(timeStart), textPos);
 
-                if(type != TagTypeContextualMilestone) {
+                if(type == TagTypeContextualTime) {
                     textPos = QPoint(timelineBoundingRect.right() + 2, 1 + timelineBoundingRect.center().y() - timelineTimeEndText.size.height()/2);
                     timelineTimeEndText.drawText(Global::timeToString(timeEnd), textPos);
 
@@ -209,6 +223,8 @@ const QRectF Tag::paintTimeline(bool before) {
             }
         }
 
+
+        glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
 
 
         //History tags
@@ -338,6 +354,7 @@ const QRectF Tag::paintTimeline(bool before) {
             glDisable(GL_LINE_STIPPLE);
         }
 
+        glScissor(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth, Global::timelineGL->height());
         glPopMatrix();
     }
     else if(mouseHoverPreview) {
@@ -399,7 +416,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         if(isTagLastVersion(this))  Global::viewerGL->qglColor(Qt::white);
         else                        Global::viewerGL->qglColor(color);
         QString texte = document->getMetadata("Rekall", "Document Name", documentVersion).toString();
-        if(type != TagTypeContextualMilestone)
+        if(type == TagTypeContextualTime)
             texte += QString(" (%1)").arg(Global::timeToString(getDuration()));
         viewerDocumentText.drawText(texte, QPoint(75, 0));
 
@@ -425,9 +442,9 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
         if(Global::selectedTag != this) {
             Global::selectedTag = this;
             Global::selectedTagStartDrag = timelineProgress(pos) * getDuration();
-            if((timelineProgress(pos) < 0.1) && (type != TagTypeContextualMilestone))
+            if((timelineProgress(pos) < 0.1) && (type == TagTypeContextualTime))
                 Global::selectedTagMode = TagSelectionStart;
-            else if((timelineProgress(pos) > 0.9) && (type != TagTypeContextualMilestone))
+            else if((timelineProgress(pos) > 0.9) && (type == TagTypeContextualTime))
                 Global::selectedTagMode = TagSelectionEnd;
             else
                 Global::selectedTagMode = TagSelectionMove;
