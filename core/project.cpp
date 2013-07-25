@@ -9,11 +9,11 @@ Project::Project(QWidget *parent) :
 }
 
 
-void Project::open(const QDir &dir) {
+void Project::open(const QDir &dir, const QDir &dirBase) {
     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
     foreach(const QFileInfo &file, files) {
         if((file.isFile()) && (UiFileItem::conformFile(file))) {
-            Document *document = new Document(this);
+            Document *document = new Document(this, dirBase);
             document->chutierItem = UiFileItem::find(file, Global::chutier);
             if(file.absoluteFilePath().contains("Test.txt"))
                 document->chutierItem->setData(1, Qt::EditRole, true);
@@ -30,7 +30,7 @@ void Project::open(const QDir &dir) {
                 }
         }
         else if((file.isDir()) && (UiFileItem::conformFile(file)))
-            open(QDir(file.absoluteFilePath() + "/"));
+            open(QDir(file.absoluteFilePath() + "/"), dirBase);
     }
 
 
@@ -258,6 +258,7 @@ const QRectF Project::paintTimeline(bool before) {
                     while(tagsInClusterIterator.hasNext()) {
                         tagsInClusterIterator.next();
                         nbTagsPerCategories = qMax(nbTagsPerCategories, (qreal)tagsInClusterIterator.value().count());
+                        qSort(timelineSortTags[categoriesInPhasesIterator.key()][clustersInCategoriesIterator.key()][tagsInClusterIterator.key()].begin(), timelineSortTags[categoriesInPhasesIterator.key()][clustersInCategoriesIterator.key()][tagsInClusterIterator.key()].end(), Tag::sortCriteria);
                     }
                 }
             }

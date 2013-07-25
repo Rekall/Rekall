@@ -9,6 +9,7 @@ class Document : public DocumentBase {
 
 public:
     explicit Document(ProjectBase *_project);
+    explicit Document(ProjectBase *_project, const QDir &_dirBase);
 
 public:
     QList<Tag*> tags;

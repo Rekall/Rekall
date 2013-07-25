@@ -157,9 +157,11 @@ void WatcherFeeling::action() {
         close();
 
 #ifdef Q_OS_MAC
-        QProcess process;
-        process.start("osascript", QStringList() << "-e" << QString("tell application \"%1\" to activate").arg(launchedApplicationBeforePopup));
-        process.waitForFinished();
+        if((!launchedApplicationBeforePopup.isEmpty()) && (launchedApplicationBeforePopup != "Rekall")) {
+            QProcess process;
+            process.start("osascript", QStringList() << "-e" << QString("tell application \"%1\" to activate").arg(launchedApplicationBeforePopup));
+            process.waitForFinished();
+        }
 #endif
     }
     else if(sender() == ui->cancel) {

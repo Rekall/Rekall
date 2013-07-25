@@ -169,8 +169,8 @@ void GlWidget::ensureVisible(const QPointF &point, qreal ratio) {
     }
 }
 void GlWidget::scrollTo(const QPointF &point) {
-    scrollDest.setX(qBound(0., point.x(), qMax(0., drawingBoundingRect.right()  + 50 - width())));
-    scrollDest.setY(qBound(0., point.y(), qMax(0., drawingBoundingRect.bottom() + 50 - height())));
+    scrollDest.setX(qBound(0., point.x(), qMax(0., drawingBoundingRect.right()  + 200 - width())));
+    scrollDest.setY(qBound(0., point.y(), qMax(0., drawingBoundingRect.bottom() + 200 - height())));
 }
 
 

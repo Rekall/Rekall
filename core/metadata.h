@@ -29,6 +29,7 @@ public:
     DocumentFunction function;
     QFileInfo file;
 protected:
+    QDir dirBase;
     QList<QMetaDictionnay> metadatas;
 
 

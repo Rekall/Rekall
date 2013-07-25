@@ -21,6 +21,7 @@ void Player::load(void *_tag) {
         tag->videoPlayer->setVisible(true);
         play(Global::timerPlay);
         seek(Global::time);
+        qDebug("%s, %d %d", qPrintable(tag->getDocument()->getMetadata("Rekall", "Document Name").toString()), tag->videoPlayer->width(), tag->videoPlayer->height());
     }
 }
 void Player::unload(void *_tag) {

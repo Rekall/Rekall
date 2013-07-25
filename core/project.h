@@ -12,7 +12,9 @@ class Project : public ProjectBase {
 
 public:
     explicit Project(QWidget *parent = 0);
-    void open(const QDir &dir);
+    inline void open(const QDir &dir) { open(dir, dir); }
+private:
+    void open(const QDir &dir, const QDir &dirBase);
 
 public:
     QList<Document*> documents;

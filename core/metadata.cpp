@@ -44,16 +44,20 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
         fileContextVerbose += ((fileContext.isDir())?("[DIR] "):("")) + fileContext.fileName() + ", ";
     fileContextVerbose.chop(2);
 
+    QDir dirBaseParent = dirBase;
+    dirBaseParent.cdUp();
+
     setMetadata("File",   "Basename",                    file.baseName(),         version);
     setMetadata("File",   "Owner",                       file.owner(),            version);
     setMetadata("File",   "File Type",                   file.suffix().toUpper(), version);
     setMetadata("File",   "File Raw Size",               file.size(),             version);
     setMetadata("File",   "File Creation Date/Time",     file.created(),          version);
     setMetadata("File",   "File Access Date/Time",       file.lastRead(),         version);
-    setMetadata("Rekall", "File context",                fileContextVerbose,      version);
+    //setMetadata("Rekall", "File context",                fileContextVerbose,      version);
     if(falseInfoForTest > 0)    setMetadata("File", "File Modification Date/Time", file.lastModified().addMonths(falseInfoForTest), version);
     else                        setMetadata("File", "File Modification Date/Time", file.lastModified(), version);
     setMetadata("Rekall", "Document Date/Time", getMetadata("File", "File Modification Date/Time", version), version);
+    setMetadata("Rekall", "Document Folder", QString(file.absoluteDir().absolutePath() + "/").remove(dirBaseParent.absolutePath() + "/"), version);
 
     QString typeStr = "";
     if(suffixesTypeDoc.contains(file.suffix().toLower())) {

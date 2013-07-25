@@ -30,7 +30,7 @@ void Tag::test(qreal tS) {
         videoPlayer->setGeometry(0, 0, 320, 240);
         videoPlayer->load(MediaSource(document->file.absoluteFilePath()));
         setTimeEnd(timeStart + Global::aleaF(30, 60));
-        //document->setMetadata("Rekall", "Media Offset", Global::aleaF(0, 5), documentVersion);
+        //document->setMetadata("Rekall", "Media Offset", Global::aleaF(142, 142), documentVersion);
         document->setMetadata("Rekall", "Timeline thumbnail", "picture", documentVersion);
         connect(&document->renderActive, SIGNAL(triggered(bool)), SLOT(renderActiveChanged()));
     }
@@ -162,6 +162,10 @@ const QRectF Tag::paintTimeline(bool before) {
         if(Global::timelineGL->visibleRect.intersects(timelineBoundingRect.translated(timelinePos + QPointF(0, Global::timelineHeaderSize.height())))) {
             //Thumbnail strip
             if(isLargeTag) {
+                //Thumb adapt
+                if((document->type == DocumentTypeVideo) && (document->thumbnails.count()))
+                    timelineBoundingRect.setHeight((Global::thumbsEach * Global::timeUnit) * document->thumbnails.first().size.height() / document->thumbnails.first().size.width());
+
                 //Strip
                 Global::timelineGL->qglColor(color);
                 GlRect::drawRect(timelineBoundingRect);
@@ -169,12 +173,15 @@ const QRectF Tag::paintTimeline(bool before) {
                 if((document->type == DocumentTypeVideo) && (document->thumbnails.count())) {
                     //Media offset
                     qreal mediaOffset    = document->getMetadata("Rekall", "Media Offset").toDouble();
-                    qreal timeThumbStart = qCeil(mediaOffset / Global::thumbsEach)                    * Global::thumbsEach;
-                    qreal timeThumbEnd   = qFloor((mediaOffset + getDuration()) / Global::thumbsEach) * Global::thumbsEach;
+                    qreal timeThumbStart = (mediaOffset / Global::thumbsEach)                    * Global::thumbsEach;
+                    qreal timeThumbEnd   = ((mediaOffset + getDuration()) / Global::thumbsEach) * Global::thumbsEach;
 
                     Global::timelineGL->qglColor(Qt::white);
-                    for(qreal timeThumbX = timeThumbStart ; timeThumbX < timeThumbEnd ; timeThumbX += Global::thumbsEach)
-                        document->thumbnails[qMin((int)(timeThumbX / Global::thumbsEach), document->thumbnails.count()-1)].drawTexture(QRectF(QPointF(timeThumbX * Global::timeUnit, 0), QSizeF(Global::thumbsEach * Global::timeUnit, timelineBoundingRect.height())).translated(timelineBoundingRect.topLeft()));
+                    for(qreal timeThumbX = timeThumbStart ; timeThumbX < timeThumbEnd ; timeThumbX += Global::thumbsEach) {
+                        QRectF thumbRect = QRectF(QPointF((timeThumbX-timeThumbStart) * Global::timeUnit, 0), QSizeF(Global::thumbsEach * Global::timeUnit, timelineBoundingRect.height())).translated(timelineBoundingRect.topLeft());
+                        thumbRect.setRight(qMin(thumbRect.right(), timelineBoundingRect.right()));
+                        document->thumbnails[qMin(qFloor(timeThumbX / Global::thumbsEach), document->thumbnails.count()-1)].drawTexture(thumbRect, 0);
+                    }
                 }
                 else if(document->waveform.count()) {
                     qreal mediaDuration  = document->getMetadata("Rekall", "Media Duration").toDouble();
@@ -523,20 +530,7 @@ const QString Tag::getAcceptableWithClusterFilters() {
 
 
 bool Tag::sortCriteria(Tag *first, Tag *second) {
-    if((!first) || (!second))
-        return false;
-    if(((first->document->function == DocumentFunctionRender) || (second->document->function == DocumentFunctionRender)) && (!Global::tagSortCriteria->asDate)) {
-        if((first->document->function == DocumentFunctionRender) && (second->document->function != DocumentFunctionRender))
-            return true;
-        else if((second->document->function == DocumentFunctionRender) && (first->document->function != DocumentFunctionRender))
-            return false;
-        else
-            return getCriteriaSort(first) < getCriteriaSort(second);
-    }
-    else if(Global::tagSortCriteria->left >= 0)
-        return Global::tagSortCriteria->orderBy(getCriteriaSort(first) < getCriteriaSort(second));
-    else
-        return Global::tagSortCriteria->orderBy(getCriteriaSort(first) < getCriteriaSort(second));
+    return Tag::getCriteriaColor(first) < Tag::getCriteriaColor(second);
 }
 
 const QString Tag::getCriteriaSort(Tag *tag) {
