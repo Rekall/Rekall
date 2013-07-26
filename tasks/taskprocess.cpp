@@ -8,7 +8,7 @@ void TaskProcess::init() {
     taskStarted = false;
     if(processedDocument.type == TaskProcessTypeMetadata) {
         processedDocument.metadata->status = DocumentStatusWaiting;
-        emit(updateList(this, tr("Waiting for metadata analysis of %1").arg(processedDocument.metadata->file.baseName())));
+        emit(updateList(this, tr("<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #AAAAAA'>Waiting for analysis of <span style='color: #FFFFFF'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
     }
 }
 
@@ -17,12 +17,12 @@ void TaskProcess::run() {
     if(processedDocument.type == TaskProcessTypeMetadata) {
         processedDocument.metadata->status = DocumentStatusProcessing;
         emit(updateList(this, FeedItemBaseTypeProcessingStart));
-        emit(updateList(this, tr("Starting analysis of %1").arg(processedDocument.metadata->file.baseName())));
+        emit(updateList(this, tr("<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #AAAAAA'>Starting analysis of <span style='color: #FFFFFF'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
         QDir().mkpath(Global::pathCurrent.absoluteFilePath() + "/rekall_cache");
 
         //Extract meta with ExifTool
         if(true) {
-            emit(updateList(this, tr("Extracting metadatas of %1").arg(processedDocument.metadata->file.baseName())));
+            emit(updateList(this, tr("<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #AAAAAA'>Extracting metadatas of <span style='color: #FFFFFF'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
             QStringList exifDatas = launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", Global::pathApplication.absoluteFilePath() + "/tools", QStringList() << "−c" << "%+.6f" << "-d" << "%Y:%m:%d %H:%M:%S" << "-G" << processedDocument.metadata->file.absoluteFilePath())).second.split("\n");
             foreach(const QString &exifData, exifDatas) {
                 QPair<QString, QPair<QString,QString> > meta = Global::seperateMetadataAndGroup(exifData);
@@ -49,7 +49,7 @@ void TaskProcess::run() {
 
         //Image thumb
         if(processedDocument.metadata->type == DocumentTypeImage) {
-            emit(updateList(this, tr("Creating picture thumbnail of %1").arg(processedDocument.metadata->file.baseName())));
+            emit(updateList(this, tr("<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #AAAAAA'>Creating picture thumbnail of <span style='color: #FFFFFF'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
             QString thumbFilename = thumbFilepath + ".jpg";
             if(!QFileInfo(thumbFilename).exists()) {
                 QImage thumbnail(processedDocument.metadata->file.absoluteFilePath());
@@ -64,7 +64,7 @@ void TaskProcess::run() {
 
         //Waveform
         if((processedDocument.metadata->type == DocumentTypeAudio) || (processedDocument.metadata->type == DocumentTypeVideo)) {
-            emit(updateList(this, tr("Creating audio waveform of %1").arg(processedDocument.metadata->file.baseName())));
+            emit(updateList(this, tr("<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #AAAAAA'>Creating audio waveform of <span style='color: #FFFFFF'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
             QString thumbFilenameIntermediate = thumbFilepath + ".raw", thumbFilename = thumbFilepath + ".peak";
 
             if(!QFileInfo(thumbFilename).exists()) {
@@ -134,7 +134,7 @@ void TaskProcess::run() {
 
         //Video thumbnails
         if(processedDocument.metadata->type == DocumentTypeVideo) {
-            emit(updateList(this, tr("Creating video thumbnails of %1").arg(processedDocument.metadata->file.baseName())));
+            emit(updateList(this, tr("<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #AAAAAA'>Creating video thumbnails of <span style='color: #FFFFFF'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
             //qDebug("===> %s", qPrintable(QDir(Global::pathCurrent.absoluteFilePath() + "/").relativeFilePath(data.metadata->file.absoluteFilePath())));
             quint16 thumbsNumber = qCeil(processedDocument.metadata->mediaDuration / Global::thumbsEach);
             if(!QFileInfo(thumbFilepath + "_1.jpg").exists()) {
@@ -163,7 +163,7 @@ void TaskProcess::run() {
         }
         processedDocument.metadata->status = DocumentStatusReady;
         emit(updateList(this, FeedItemBaseTypeProcessingEnd));
-        emit(updateList(this, tr("Finishing analysis of %1").arg(processedDocument.metadata->file.baseName())));
+        emit(updateList(this, tr("<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #AAAAAA'>Finishing analysis of <span style='color: #FFFFFF'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
     }
     emit(finished(this));
 }
@@ -177,7 +177,7 @@ QPair<QString,QString> TaskProcess::launchCommand(const TaskProcessData &process
     foreach(const QString &argument, processData.arguments)
         fullCommand += " " + argument;
 
-    //qDebug("[PROCESS] %s in %s", qPrintable(fullCommand), qPrintable(processData.workingDirectory));
+    qDebug("[PROCESS] %s in %s", qPrintable(fullCommand), qPrintable(processData.workingDirectory));
     QProcess process;
     process.setWorkingDirectory(processData.workingDirectory);
     process.start(processData.command, processData.arguments);

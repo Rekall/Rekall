@@ -11,7 +11,6 @@
 #include <QTreeWidget>
 #include <QTimer>
 #include <QToolBox>
-#include <Phonon>
 #include <QImage>
 #include <QMainWindow>
 #include <QFileSystemWatcher>
@@ -21,14 +20,13 @@
 #include "core/phases.h"
 #include "misc/options.h"
 #include "gui/previewer.h"
+#include "gui/playervideo.h"
 #include "interfaces/udp.h"
 #include "qmath.h"
 
 typedef QMap<QString, MetadataElement> QMetaMap;
 typedef QMap<QString, QMetaMap > QMetaDictionnay;
 
-
-using namespace Phonon;
 
 class GlDrawable {
 public:
@@ -146,6 +144,7 @@ public:
 };
 class TaskListBase {
 public:
+    virtual void setToolbox(QToolBox*) = 0;
     virtual void addTask(Metadata *metadata, TaskProcessType type, qint16 version) = 0;
 };
 
@@ -154,11 +153,10 @@ class FeedItemBase : public QTreeWidgetItem {
 public:
     explicit FeedItemBase(FeedItemBaseType _action, const QString &_author, const QString &_object, const QDateTime &_date = QDateTime::currentDateTime());
 
-private:
+public:
     QIcon icon;
     FeedItemBaseType action;
     QString object, author, actionStr;
-public:
     QDateTime date;
 public:
     void update();
@@ -238,7 +236,7 @@ public:
         return Global::pathCurrent.absoluteFilePath() + "/rekall_cache/" + type + "_" + info;
     }
     static QString getBetween(const QString &data, const QString &start, const QString &end, bool trim = true);
-    static qreal getDurationFromString(const QString &timeStr);
+    static qreal getDurationFromString(QString timeStr);
     static QPair<QString,QString> seperateMetadata(const QString &metaline, const QString &separator = QString(":"));
     static QPair<QString, QPair<QString,QString> > seperateMetadataAndGroup(const QString &metaline, const QString &separator = QString(":"));
 

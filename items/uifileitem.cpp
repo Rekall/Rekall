@@ -353,7 +353,7 @@ void UiFileItem::configure(UiTreeView *tree, bool _showDateTime) {
     showDateTime = _showDateTime;
 
     tree->getTree()->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
-    tree->getTree()->setIndentation(15);
+    tree->getTree()->setIndentation(10);
     tree->getTree()->setHeaderHidden(false);
 
     quint16 columnIndex = 0;

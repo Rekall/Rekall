@@ -28,6 +28,9 @@ public:
     void seek(qreal time);
     qreal getCurrentTime() const;
 
+protected:
+    void resizeEvent(QResizeEvent *);
+
 private:
     Ui::Player *ui;
 };

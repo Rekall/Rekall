@@ -19,7 +19,8 @@ Rekall::Rekall(QWidget *parent) :
 
     Watcher *watcher  = new Watcher(this);
     Global::watcher   = watcher;
-    Global::taskList  = new TasksList(this);
+    Global::taskList  = ui->tasks;
+    Global::taskList->setToolbox(ui->toolBoxLeft);
     Global::feedList  = ui->feeds;
     Global::feedList->setToolbox(ui->toolBoxLeft);
     Global::previewer = new Previewer(Global::pathApplication.absoluteFilePath(), this);
@@ -55,7 +56,7 @@ Rekall::Rekall(QWidget *parent) :
     connect(ui->actionSave, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionPaste, SIGNAL(triggered()), SLOT(action()));
 
-    ui->metadata->setColumnWidth(0, 250);
+    ui->metadata->setColumnWidth(0, 135);
     ui->metadataSlider->setVisible(false);
 
     ui->chutier->showNew(false);
@@ -186,8 +187,7 @@ void Rekall::closeSplash() {
     inspector->show();
     updateGeometry();
     ui->mainSplitter->setSizes(QList<int>()     << height() * 0.50 << height() * 0.50);
-    ui->fileSplitter->setSizes(QList<int>()     << width()  * 0.15 << width()  * 0.85);
-    ui->timelineSplitter->setSizes(QList<int>() << width()  * 0.70 << width()  * 0.30);
+    ui->fileSplitter->setSizes(QList<int>()     << width()  * 0.20 << width()  * 0.60 << width() * 0.20);
     ui->personsSplitter->setSizes(QList<int>()  << width()  * 0.35 << width()  * 0.65);
     inspector->move(QDesktopWidget().screenGeometry().topRight() - QPoint(inspector->width(), 0));
     //trayMenu->showMessage("Rekall", "Ready!", QSystemTrayIcon::NoIcon);

@@ -4,19 +4,31 @@
 qint16 TasksList::taskIsRunning = 0;
 
 TasksList::TasksList(QWidget *parent) :
-    QWidget(parent, Qt::Tool),
+    QWidget(parent),
     ui(new Ui::TasksList) {
     ui->setupUi(this);
     hide();
     move(0, 0);
     taskIsRunning = 0;
+
+    ui->tasks->setItemDelegateForColumn(0, new HtmlDelegate());
 }
 
 TasksList::~TasksList() {
     delete ui;
 }
+
+void TasksList::setToolbox(QToolBox *_toolbox) {
+    toolbox = _toolbox;
+    //connect(toolbox, SIGNAL(currentChanged(int)), SLOT(timerEvent()));
+}
+
 void TasksList::addTask(Metadata *metadata, TaskProcessType type, qint16 version) {
     addTask(TaskProcessData(metadata, type, version));
+    if(toolbox->currentIndex() != 2)
+        oldToolboxIndex = toolbox->currentIndex();
+    toolbox->setCurrentIndex(2);
+    toolbox->setItemEnabled(2, true);
 }
 void TasksList::addTask(const TaskProcessData &data) {
     if(data.metadata->file.exists()) {
@@ -41,8 +53,12 @@ void TasksList::nextTask() {
                     return;
                 }
         }
-        else
+        else {
             hide();
+            if(toolbox->currentIndex() == 2)
+                toolbox->setCurrentIndex(oldToolboxIndex);
+            toolbox->setItemEnabled(2, false);
+        }
     }
 }
 

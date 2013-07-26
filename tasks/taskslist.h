@@ -17,7 +17,11 @@ public:
 
 public:
     QList<TaskProcess*> tasks;
+private:
+    QToolBox *toolbox;
+    quint16 oldToolboxIndex;
 public:
+    void setToolbox(QToolBox *);
     void addTask(Metadata *metadata, TaskProcessType type, qint16 version);
     void addTask(const TaskProcessData &data);
     static qint16 taskIsRunning;

@@ -5,8 +5,8 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
     document          = _document;
     documentVersion   = _documentVersion;
     timelineWasInside = false;
-    videoPlayer       = 0;
-    progression       = progressionDest = 0;
+    playerVideo       = 0;
+    progression       = progressionDest = decounter = 0;
     mouseHover        = false;
     mouseHoverPreview = false;
     breathing         = false;
@@ -25,10 +25,8 @@ void Tag::test(qreal tS) {
     if(document->function == DocumentFunctionRender) {
         setType(TagTypeContextualTime, tS);
         Global::renders.insert(document->getMetadata("Rekall", "Document Name").toString(), this);
-        videoPlayer = new VideoPlayer(0);
-        videoPlayer->setVolume(0);
-        videoPlayer->setGeometry(0, 0, 320, 240);
-        videoPlayer->load(MediaSource(document->file.absoluteFilePath()));
+        playerVideo = new PlayerVideo();
+        playerVideo->load(document->file.absoluteFilePath());
         setTimeEnd(timeStart + Global::aleaF(30, 60));
         //document->setMetadata("Rekall", "Media Offset", Global::aleaF(142, 142), documentVersion);
         document->setMetadata("Rekall", "Timeline thumbnail", "picture", documentVersion);
@@ -98,6 +96,7 @@ void Tag::fireEvents() {
     //Progression
     progressionDest = progress(Global::time);
     progression = progression + (progressionDest - progression) / Global::inertie;
+    decounter = qMin(0., Global::time - timeStart);
 
     //Enter / Leave
     qreal progressionAbs = progressAbs(Global::time);
@@ -118,11 +117,11 @@ void Tag::renderActiveChanged() {
         qreal progressionAbs = progressAbs(Global::time);
         if(((0. <= progressionAbs) && (progressionAbs <= 1.)) && (document->renderActive)) {
             Global::video->load(this);
-            videoPlayer->setVolume(0.5);
+            playerVideo->setVolume(0.5);
         }
         else if(((0. > progressionAbs) || (progressionAbs > 1.)) || (!document->renderActive)) {
             Global::video->unload(this);
-            videoPlayer->setVolume(0);
+            playerVideo->setVolume(0);
         }
     }
 }
@@ -403,7 +402,9 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         }
 
         //Progression
+        bool hightlighted = false;
         if((type == TagTypeContextualMilestone) && (blinkTime)) {
+            hightlighted = true;
             blinkTime = qMax(0., blinkTime-20);
             if(qFloor(blinkTime / 250) % 2) {
                 Global::viewerGL->qglColor(Global::colorProgression);
@@ -411,20 +412,40 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
             }
         }
         else if((0 < progression) && (progression < 0.99)) {
+            hightlighted = true;
             Global::viewerGL->qglColor(Global::colorProgression);
             GlRect::drawRect(QRectF(viewerBoundingRect.topLeft(), QSizeF(viewerBoundingRect.width() * progression, viewerBoundingRect.height())));
         }
 
         //Bar
+        if((decounter == 0) && (!hightlighted) && (Global::timerPlay))
+            color.setAlphaF(0.2);
+        else
+            color.setAlphaF(1.0);
+
         qreal shape = (document->type == DocumentTypeMarker)?(M_PI/2):(M_PI/4);
         Global::viewerGL->qglColor(color);
         if(isTagLastVersion(this))
             GlRect::drawRoundedRect(viewerBoundingRect.adjusted(7, 7, -75, -7).translated(QPointF(60, 0)), false, shape);
         GlRect::drawRoundedRect(viewerBoundingRect.adjusted(7, 7, -75, -7).translated(QPointF(60, 0)), true, shape);
 
-        //Texte
-        Global::viewerGL->qglColor(Global::colorText);
-        viewerTimeText.drawText(Global::timeToString(timeStart));
+
+        //Décompte
+        if((Global::timerPlay) && (-5 <= decounter) && (decounter < 0)) {
+            Global::viewerGL->qglColor(Global::colorText);
+            qreal angleMax = 2*M_PI * -decounter/5, cote = (Global::viewerTagHeight / 2) * 0.6;
+            QRect rect(QPoint(0, 0), QSize(70, Global::viewerTagHeight));
+            glBegin(GL_TRIANGLE_FAN);
+            glVertex2f(rect.center().x(), rect.center().y());
+            for(qreal angle = 0 ; angle < angleMax ; angle += 0.1)
+                glVertex2f(rect.center().x() + cote * qCos(-M_PI/2 + angle), rect.center().y() + cote * qSin(-M_PI/2 + angle));
+            glEnd();
+        }
+        else if((decounter < 0) || (!Global::timerPlay)) {
+            Global::viewerGL->qglColor(Global::colorText);
+            viewerTimeText.drawText(Global::timeToString(timeStart));
+        }
+
         if(isTagLastVersion(this))  Global::viewerGL->qglColor(Qt::white);
         else                        Global::viewerGL->qglColor(color);
         QString texte = document->getMetadata("Rekall", "Document Name", documentVersion).toString();

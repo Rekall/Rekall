@@ -141,16 +141,18 @@ QString Global::getBetween(const QString &data, const QString &start, const QStr
     if(trim)    return data.mid(startIndex, endIndex-startIndex).trimmed();
     else        return data.mid(startIndex, endIndex-startIndex);
 }
-qreal Global::getDurationFromString(const QString &timeStr) {
-    QStringList parts = timeStr.split(" ").first().split(":");
+qreal Global::getDurationFromString(QString timeStr) {
     qreal duration = 0;
-    if(parts.count() == 3) {
-        duration     += parts.at(0).toDouble()*3600;
-        duration     += parts.at(1).toDouble()*60;
-        if(parts.at(2).contains("."))
+    if(timeStr.length() > 0) {
+        timeStr.remove("seconds").remove("second").remove("secs").remove("sec").remove("s");
+        QStringList parts = timeStr.split(" ").first().split(":");
+        if(parts.count() == 3) {
+            duration += parts.at(0).toDouble()*3600;
+            duration += parts.at(1).toDouble()*60;
             duration += parts.at(2).split(".").first().toDouble();
+        }
         else
-            duration += parts.at(2).toDouble();
+            duration += parts.last().split(".").first().toDouble();
     }
     return duration;
 }
@@ -279,9 +281,8 @@ void GlRect::setTexture(const QString &filename, const QSize &desiredSize) {
     if(filename != filenameOld) {
         init = false;
         image.load(filename);
-        if((desiredSize.width() > 0) && (desiredSize.height() > 0)) {
+        if((desiredSize.width() > 0) && (desiredSize.height() > 0))
             image = image.scaled(desiredSize, Qt::KeepAspectRatio);
-        }
         size = image.size();
         filenameOld = filename;
     }

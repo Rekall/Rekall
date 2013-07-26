@@ -44,7 +44,7 @@ public:
     QList<Tag*> historyTags;
 private:
     bool timelineWasInside;
-    qreal progression, progressionDest;
+    qreal progression, progressionDest, decounter;
     QColor colorDest;
     QList<QString> linkedRenders;
     DocumentBase *document;
@@ -66,7 +66,7 @@ public:
     void setTimeStart(qreal _timeStart);
     void setTimeEnd(qreal _timeEnd);
     void moveTo(qreal _val);
-    VideoPlayer *videoPlayer;
+    PlayerVideo *playerVideo;
     void fireEvents();
 private slots:
     void renderActiveChanged();

@@ -14,10 +14,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QFrame#frameGlobal {
-	background-color: 	rgb(242, 241, 237);
-	border: 					4px solid rgb(186, 185, 182);
-}</string>
+   <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
