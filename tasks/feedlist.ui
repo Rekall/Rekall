@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Feed</string>
+   <string>Events</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -22,30 +22,18 @@
    </property>
    <item>
     <widget class="QTreeWidget" name="feeds">
-     <property name="indentation">
-      <number>0</number>
-     </property>
-     <property name="sortingEnabled">
+     <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
+     <property name="indentation">
+      <number>10</number>
+     </property>
+     <attribute name="headerVisible">
+      <bool>false</bool>
+     </attribute>
      <column>
       <property name="text">
        <string>Author</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Action</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Description</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Date/Time</string>
       </property>
      </column>
     </widget>

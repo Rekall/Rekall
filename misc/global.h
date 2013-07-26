@@ -10,10 +10,13 @@
 #include <QGLWidget>
 #include <QTreeWidget>
 #include <QTimer>
+#include <QToolBox>
 #include <Phonon>
 #include <QImage>
 #include <QMainWindow>
 #include <QFileSystemWatcher>
+#include <QStyledItemDelegate>
+#include <QApplication>
 #include "core/sorting.h"
 #include "core/phases.h"
 #include "misc/options.h"
@@ -145,28 +148,24 @@ class TaskListBase {
 public:
     virtual void addTask(Metadata *metadata, TaskProcessType type, qint16 version) = 0;
 };
+
+enum FeedItemBaseType { FeedItemBaseTypeCreation, FeedItemBaseTypeUpdate, FeedItemBaseTypeDelete, FeedItemBaseTypeProcessingStart, FeedItemBaseTypeProcessingEnd };
 class FeedItemBase : public QTreeWidgetItem {
 public:
-    explicit FeedItemBase(const QString &_name, const QString &_action, const QString &_author, const QDateTime &_date) {
-        name   = _name;
-        action = _action;
-        author = _author;
-        date   = _date;
-        update();
-    }
-    void update(const QString &dateStr = "") {
-        setText(0, author);
-        setText(1, action);
-        setText(2, name);
-        setText(3, dateStr);
-        setText(4, date.toString("yyyy:MM:dd hh:mm:ss"));
-    }
+    explicit FeedItemBase(FeedItemBaseType _action, const QString &_author, const QString &_object, const QDateTime &_date = QDateTime::currentDateTime());
+
+private:
+    QIcon icon;
+    FeedItemBaseType action;
+    QString object, author, actionStr;
 public:
-    QString name, author, action;
     QDateTime date;
+public:
+    void update();
 };
 class FeedListBase {
 public:
+    virtual void setToolbox(QToolBox*) = 0;
     virtual void addFeed(FeedItemBase *feedItem) = 0;
 };
 
@@ -206,7 +205,7 @@ public:
     static bool  timerPlay;
     static qreal time, thumbnailSlider, thumbnailSliderStep;
     static qreal tagBlinkTime;
-    static qreal breathing, breathingDest;
+    static qreal breathing, breathingDest, breathingFast, breathingFastDest;
     static QTime timer;
     static Sorting *tagSortCriteria, *tagColorCriteria, *tagClusterCriteria, *tagFilterCriteria;
     static Phases *phases;
@@ -230,7 +229,7 @@ public:
 
 public:
     static const QString timeToString(qreal time);
-    static const QString dateToString(const QDateTime &date);
+    static const QString dateToString(const QDateTime &date, bool addExactTime = true);
     static const QString plurial(qint16 value, const QString &text);
     static const QString cacheFile(const QString &type, const QFileInfo &file) {
         return cacheFile(type, file.absoluteDir().absolutePath().remove(Global::pathCurrent.absoluteFilePath()).replace("/", "_") + "_" + file.fileName());
@@ -261,6 +260,14 @@ public:
         else if(val >= 1)   return 1;
         else                return (qExp(facteur * val - facteur) - qExp(-facteur)) / (1 - qExp(-facteur));
     }
+};
+
+
+
+class HtmlDelegate : public QStyledItemDelegate {
+protected:
+    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 };
 
 

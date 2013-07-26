@@ -4,9 +4,9 @@
 #include <QMutex>
 #include "misc/global.h"
 
-enum DocumentType       { DocumentTypeFile, DocumentTypeVideo, DocumentTypeAudio, DocumentTypeImage, DocumentTypeDoc, DocumentTypeMarker };
-enum DocumentFunction   { DocumentFunctionContextual, DocumentFunctionRender };
-
+enum DocumentType     { DocumentTypeFile, DocumentTypeVideo, DocumentTypeAudio, DocumentTypeImage, DocumentTypeDoc, DocumentTypeMarker };
+enum DocumentFunction { DocumentFunctionContextual, DocumentFunctionRender };
+enum DocumentStatus   { DocumentStatusWaiting, DocumentStatusProcessing, DocumentStatusReady };
 
 
 class MetadataWaveform : public QList< QPair<qreal,qreal> > {
@@ -28,6 +28,7 @@ public:
 public:
     DocumentFunction function;
     QFileInfo file;
+    DocumentStatus status;
 protected:
     QDir dirBase;
     QList<QMetaDictionnay> metadatas;

@@ -141,6 +141,11 @@ const QRectF Tag::paintTimeline(bool before) {
             timelineBoundingRect.adjust(-(timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0, (timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0);
 
         QColor colorDestTmp = (Global::selectedTagHover == this)?(Global::colorSelection):(document->getColor());
+        if(getDocument()->status == DocumentStatusWaiting)
+            colorDestTmp.setAlphaF(0.1);
+        if(getDocument()->status == DocumentStatusProcessing)
+            colorDestTmp.setAlphaF(Global::breathingFast);
+
         if(!((colorDestTmp.red() == 0) && (colorDestTmp.green() == 0) && (colorDestTmp.blue() == 0)))
             colorDest = colorDestTmp;
         color.setRedF  (color.redF()   + (colorDest.redF()   - color.redF()  ) / Global::inertie);

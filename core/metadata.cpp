@@ -8,6 +8,7 @@ QStringList Metadata::suffixesTypePatches;
 
 Metadata::Metadata(QObject *parent, bool createEmpty) :
     QObject(parent) {
+    status   = DocumentStatusReady;
     type     = DocumentTypeMarker;
     function = DocumentFunctionContextual;
     mediaDuration = 0;
@@ -35,8 +36,11 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     file.refresh();
     type = DocumentTypeFile;
     creation = updateImport(file.baseName(), version);
-    if(creation)
+
+    if(creation) {
+        status = DocumentStatusWaiting;
         Global::taskList->addTask(this, TaskProcessTypeMetadata, version);
+    }
 
     QFileInfoList filesContext = file.absoluteDir().entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
     QString fileContextVerbose = "";
@@ -129,10 +133,13 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
 }
 
 void Metadata::updateFeed() {
-    QString action = "Creation";
+    FeedItemBaseType feedAction = FeedItemBaseTypeCreation;
     if(getMetadataCount() > 1)
-        action = "Update";
-    Global::feedList->addFeed(new FeedItemBase(getMetadata("Rekall", "Document Name").toString(), action, getMetadata("Rekall User Infos", "User Name").toString(), getMetadata("Rekall", "Import Date/Time").toDateTime()));
+        feedAction = FeedItemBaseTypeUpdate;
+    Global::feedList->addFeed(new FeedItemBase(feedAction,
+                                               getMetadata("Rekall User Infos", "User Name").toString(),
+                                               getMetadata("Rekall", "Document Name").toString(),
+                                               getMetadata("Rekall", "Import Date/Time").toDateTime()));
 }
 
 

@@ -14,7 +14,7 @@
    <string>Rekall</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QTabWidget, QLabel, QCheckBox, QLineEdit, QPlainTextEdit, QPushButton, QSpinBox, QDoubleSpinBox, QTreeView, QHeaderView, QTabBar, QComboBox, QFrame#globalFrame, QTabBar::tab, QTreeView, QHeaderView, QDockWidget, QStatusBar, QRadioButton {
+   <string notr="true">QTabWidget, QLabel, QCheckBox, QLineEdit, QPlainTextEdit, QPushButton, QSpinBox, QDoubleSpinBox, QTreeView, QHeaderView, QTabBar, QComboBox, QFrame#globalFrame, QTabBar::tab, QTreeView, QHeaderView, QDockWidget, QStatusBar, QRadioButton, QToolBox, QToolBox::tab {
 	font: 						10px &quot;Museo Sans&quot;, &quot;Museo Sans 500&quot;, &quot;Arial&quot;;
 	padding:					0px;
 	margin:					0px;
@@ -57,12 +57,12 @@ QTabWidget#tab {
 QTabBar::tab {
 	min-height: 							25px; /* FIX IN SS-TAB */
 	background-color: 				rgb(110, 110, 110);
+	color: 									rgb(220, 220, 220);
     border-top-left-radius: 		4px;
     border-top-right-radius: 	4px;
 	margin-right:						2px;
 	padding-left: 						5px;
 	padding-right:						5px;
-	color: 									rgb(220, 220, 220);
 }
 QTabBar::tab:selected {
 	background-color: 				rgb(242, 241, 237);
@@ -77,6 +77,21 @@ QTabBar::tab:!selected {
 QTabBar::tab:disabled {
 	color: 									gray;
 }
+
+QToolBox::tab {
+	background-color: 				rgb(110, 110, 110);
+	color: 									rgb(220, 220, 220);
+}
+QToolBox::tab:selected {
+	color:	white;
+}
+QToolBox {
+	background-color: 				rgb(80, 80, 80);
+}
+QToolBox QWidget#chutierPage, QToolBox QWidget#feedPage, QToolBox QWidget#infosPage, QToolBox QWidget#page {
+	background-color: 				rgb(40, 45, 45);
+}
+
 
 
 QPushButton {
@@ -321,7 +336,7 @@ QDialogButtonBox QPushButton {
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
      <widget class="QSplitter" name="mainSplitter">
       <property name="orientation">
@@ -331,17 +346,67 @@ QDialogButtonBox QPushButton {
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <widget class="QSplitter" name="splitter_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QToolBox" name="toolBoxLeft">
+        <property name="currentIndex">
+         <number>0</number>
         </property>
-        <widget class="UiTreeView" name="chutier" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>100</height>
-          </size>
+        <property name="tabSpacing">
+         <number>5</number>
+        </property>
+        <widget class="QWidget" name="chutierPage">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>247</width>
+           <height>317</height>
+          </rect>
          </property>
+         <attribute name="label">
+          <string>FILES</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="UiTreeView" name="chutier" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>100</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="feedPage">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>247</width>
+           <height>317</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>EVENTS</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="FeedList" name="feeds" native="true"/>
+          </item>
+         </layout>
         </widget>
        </widget>
        <widget class="QTabWidget" name="tabs">
@@ -352,37 +417,35 @@ QDialogButtonBox QPushButton {
          <attribute name="title">
           <string>TIMELINE</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="spacing">
-           <number>0</number>
+         <widget class="QSplitter" name="timelineSplitter">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>919</width>
+            <height>338</height>
+           </rect>
           </property>
-          <property name="margin">
-           <number>0</number>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-          <item>
-           <widget class="QSplitter" name="timelineSplitter">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <widget class="Player" name="player" native="true">
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>100</height>
-              </size>
-             </property>
-            </widget>
-            <widget class="Viewer" name="viewer" native="true">
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>100</height>
-              </size>
-             </property>
-            </widget>
-           </widget>
-          </item>
-         </layout>
+          <widget class="Player" name="player" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+          </widget>
+          <widget class="Viewer" name="viewer" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+          </widget>
+         </widget>
         </widget>
         <widget class="QWidget" name="tabMeta">
          <attribute name="title">
@@ -567,6 +630,40 @@ QDialogButtonBox QPushButton {
          </layout>
         </widget>
        </widget>
+       <widget class="QToolBox" name="toolBoxRight">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <property name="tabSpacing">
+         <number>5</number>
+        </property>
+        <widget class="QWidget" name="infosPage">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>94</width>
+           <height>317</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>INFOS</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="page">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>94</width>
+           <height>317</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>Page</string>
+         </attribute>
+        </widget>
+       </widget>
       </widget>
       <widget class="Timeline" name="timeline" native="true">
        <property name="minimumSize">
@@ -687,6 +784,12 @@ QDialogButtonBox QPushButton {
    <class>Viewer</class>
    <extends>QWidget</extends>
    <header>gui/viewer.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FeedList</class>
+   <extends>QWidget</extends>
+   <header>tasks/feedlist.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

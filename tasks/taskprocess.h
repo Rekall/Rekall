@@ -55,6 +55,7 @@ private:
 
 signals:
     void finished(TaskProcess*);
+    void updateList(TaskProcess*, int);
     void updateList(TaskProcess*, const QString &);
 };
 

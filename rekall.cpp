@@ -20,7 +20,8 @@ Rekall::Rekall(QWidget *parent) :
     Watcher *watcher  = new Watcher(this);
     Global::watcher   = watcher;
     Global::taskList  = new TasksList(this);
-    Global::feedList  = new FeedList(this);
+    Global::feedList  = ui->feeds;
+    Global::feedList->setToolbox(ui->toolBoxLeft);
     Global::previewer = new Previewer(Global::pathApplication.absoluteFilePath(), this);
 
     Global::chutier = ui->chutier->getTree();

@@ -10,7 +10,7 @@
 class DocumentBase : public Metadata {
 public:
     explicit DocumentBase(QObject *parent = 0) : Metadata(parent) {
-        renderActive = true;
+        renderActive   = true;
     }
 public:
     UiFileItem *chutierItem;

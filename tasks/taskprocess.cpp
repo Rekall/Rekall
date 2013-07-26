@@ -6,14 +6,18 @@ TaskProcess::TaskProcess(const TaskProcessData &_data, QTreeWidgetItem *parentIt
 }
 void TaskProcess::init() {
     taskStarted = false;
-    if(processedDocument.type == TaskProcessTypeMetadata)
-        emit(updateList(this, tr("Waiting for file analysis of %1").arg(processedDocument.metadata->file.baseName())));
+    if(processedDocument.type == TaskProcessTypeMetadata) {
+        processedDocument.metadata->status = DocumentStatusWaiting;
+        emit(updateList(this, tr("Waiting for metadata analysis of %1").arg(processedDocument.metadata->file.baseName())));
+    }
 }
 
 void TaskProcess::run() {
     taskStarted = true;
     if(processedDocument.type == TaskProcessTypeMetadata) {
-        emit(updateList(this, tr("Starting file analysis of %1").arg(processedDocument.metadata->file.baseName())));
+        processedDocument.metadata->status = DocumentStatusProcessing;
+        emit(updateList(this, FeedItemBaseTypeProcessingStart));
+        emit(updateList(this, tr("Starting analysis of %1").arg(processedDocument.metadata->file.baseName())));
         QDir().mkpath(Global::pathCurrent.absoluteFilePath() + "/rekall_cache");
 
         //Extract meta with ExifTool
@@ -157,6 +161,8 @@ void TaskProcess::run() {
                     processedDocument.metadata->thumbnails.append(GlRect(thumbFilename));
             }
         }
+        processedDocument.metadata->status = DocumentStatusReady;
+        emit(updateList(this, FeedItemBaseTypeProcessingEnd));
         emit(updateList(this, tr("Finishing analysis of %1").arg(processedDocument.metadata->file.baseName())));
     }
     emit(finished(this));

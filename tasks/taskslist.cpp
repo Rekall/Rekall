@@ -23,7 +23,8 @@ void TasksList::addTask(const TaskProcessData &data) {
         show();
         TaskProcess *task = new TaskProcess(data, ui->tasks->invisibleRootItem(), this);
         connect(task, SIGNAL(finished(TaskProcess*)), SLOT(finished(TaskProcess*)));
-        connect(task, SIGNAL(updateList(TaskProcess*,QString)), SLOT(updateList(TaskProcess*,QString)));
+        connect(task, SIGNAL(updateList(TaskProcess*,int)), SLOT(updateList(TaskProcess*,int)));
+        connect(task, SIGNAL(updateList(TaskProcess*,const QString &)), SLOT(updateList(TaskProcess*,const QString &)));
         tasks.append(task);
         task->init();
         nextTask();
@@ -45,6 +46,9 @@ void TasksList::nextTask() {
     }
 }
 
+void TasksList::updateList(TaskProcess *task, int feedAction) {
+    //Global::feedList->addFeed(new FeedItemBase((FeedItemBaseType)feedAction, "Rekall", task->processedDocument.metadata->file.baseName()));
+}
 void TasksList::updateList(TaskProcess *task, const QString &message) {
     task->setText(0, message);
 }

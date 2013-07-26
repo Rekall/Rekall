@@ -26,6 +26,8 @@ qreal        Global::thumbnailSliderStep          = 0.001;
 qreal        Global::tagBlinkTime                 = 2000;
 qreal        Global::breathing                    = 0;
 qreal        Global::breathingDest                = 1;
+qreal        Global::breathingFast                = 0;
+qreal        Global::breathingFastDest            = 1;
 QTime        Global::timer;
 bool         Global::timerPlay                    = false;
 void*        Global::selectedTag                  = 0;
@@ -99,7 +101,7 @@ const QString Global::timeToString(qreal time) {
 
     return timeStr;
 }
-const QString Global::dateToString(const QDateTime &date) {
+const QString Global::dateToString(const QDateTime &date, bool addExactTime) {
     quint16 daysTo   = date.daysTo(QDateTime::currentDateTime());
     quint16 secsTo   = date.secsTo(QDateTime::currentDateTime());
     quint16 minsTo   = secsTo / 60;
@@ -107,14 +109,26 @@ const QString Global::dateToString(const QDateTime &date) {
     quint16 weeksTo  = daysTo / 7;
     quint16 monthsTo = daysTo / 30;
 
-    if(monthsTo > 12)     return QString("on %1").arg(date.toString("dddd dd MM yyyy, hh:mm"));
-    else if(monthsTo > 1) return QString("%1 ago, on %2").arg(plurial(monthsTo, "month" )).arg(date.toString("dddd dd MM hh:mm"));
-    else if(weeksTo > 1)  return QString("%1 ago, on %2").arg(plurial(weeksTo,  "week"  )).arg(date.toString("dddd dd MM hh:mm"));
-    else if(daysTo > 1)   return QString("%1 ago, on %2").arg(plurial(daysTo,   "day"   )).arg(date.toString("dddd, hh:mm"));
-    else if(hoursTo > 1)  return QString("%1 ago, on %2").arg(plurial(hoursTo,  "hour"  )).arg(date.toString("hh:mm"));
-    else if(minsTo  > 1)  return QString("%1 ago, on %2").arg(plurial(minsTo,   "minute")).arg(date.toString("hh:mm"));
-    else if(secsTo  > 10) return QString("%1 ago, on %2").arg(plurial(secsTo,   "second")).arg(date.toString("hh:mm:ss"));
-    else                  return QString("A few seconds ago, on %1").arg(date.toString("hh:mm:ss"));
+    if(addExactTime) {
+        if(monthsTo > 12)     return QString("on %1").arg(date.toString("dddd dd MM yyyy, hh:mm"));
+        else if(monthsTo > 1) return QString("%1 ago, on %2").arg(plurial(monthsTo, "month" )).arg(date.toString("dddd dd MM hh:mm"));
+        else if(weeksTo > 1)  return QString("%1 ago, on %2").arg(plurial(weeksTo,  "week"  )).arg(date.toString("dddd dd MM hh:mm"));
+        else if(daysTo > 1)   return QString("%1 ago, on %2").arg(plurial(daysTo,   "day"   )).arg(date.toString("dddd, hh:mm"));
+        else if(hoursTo > 1)  return QString("%1 ago, on %2").arg(plurial(hoursTo,  "hour"  )).arg(date.toString("hh:mm"));
+        else if(minsTo  > 1)  return QString("%1 ago, on %2").arg(plurial(minsTo,   "minute")).arg(date.toString("hh:mm"));
+        else if(secsTo  > 10) return QString("%1 ago, on %2").arg(plurial(secsTo,   "second")).arg(date.toString("hh:mm:ss"));
+        else                  return QString("A few seconds ago, on %1").arg(date.toString("hh:mm:ss"));
+    }
+    else {
+        if(monthsTo > 12)     return QString("on %1").arg(date.toString("dddd dd MM yyyy, hh:mm"));
+        else if(monthsTo > 1) return QString("%1 ago").arg(plurial(monthsTo, "month" ));
+        else if(weeksTo > 1)  return QString("%1 ago").arg(plurial(weeksTo,  "week"  ));
+        else if(daysTo > 1)   return QString("%1 ago").arg(plurial(daysTo,   "day"   ));
+        else if(hoursTo > 1)  return QString("%1 ago").arg(plurial(hoursTo,  "hour"  ));
+        else if(minsTo  > 1)  return QString("%1 ago").arg(plurial(minsTo,   "minute"));
+        else if(secsTo  > 10) return QString("%1 ago").arg(plurial(secsTo,   "second"));
+        else                  return QString("A few seconds ago");
+    }
 }
 const QString Global::plurial(qint16 value, const QString &text) {
     if(qAbs(value) > 1) return QString("%1 %2s") .arg(value).arg(text);
@@ -155,6 +169,40 @@ QPair<QString, QPair<QString,QString> > Global::seperateMetadataAndGroup(const Q
     retour.first = firstRetour.first.remove("[").trimmed();
     retour.second = seperateMetadata(firstRetour.second, separator);
     return retour;
+}
+
+
+
+FeedItemBase::FeedItemBase(FeedItemBaseType _action, const QString &_author, const QString &_object, const QDateTime &_date) {
+    action = _action;
+    author = _author;
+    object = _object;
+    date   = _date;
+    if     (action == FeedItemBaseTypeCreation) {
+        icon = QIcon(":/icons/res_tray_icon_color.png");
+        actionStr = "added";
+    }
+    else if(action == FeedItemBaseTypeUpdate) {
+        icon = QIcon(":/icons/res_tray_icon_color.png");
+        actionStr = "updated";
+    }
+    else if(action == FeedItemBaseTypeDelete) {
+        icon = QIcon(":/icons/res_tray_icon_color.png");
+        actionStr = "removed";
+    }
+    else if(action == FeedItemBaseTypeProcessingStart) {
+        icon = QIcon(":/icons/res_tray_icon_color.png");
+        actionStr = "started metadata extraction on";
+    }
+    else if(action == FeedItemBaseTypeProcessingEnd) {
+        icon = QIcon(":/icons/res_tray_icon_color.png");
+        actionStr = "finished metadata extraction on";
+    }
+}
+void FeedItemBase::update() {
+    setIcon(0, icon);
+    setText(0, QString("<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #FFFFFF'>%1 <span style='color: #AAAAAA'>%2</span> %3<span style='color: #AAAAAA'>, %4</span></span>").arg(author).arg(actionStr).arg(object).arg(Global::dateToString(date, false).toLower()));
+    setToolTip(0, Global::dateToString(date));
 }
 
 
@@ -349,4 +397,44 @@ void GlRect::drawRect(const QRectF &rect, qreal roundPrecision, const QRectF &te
         glTexCoord2f(texCoord.topLeft()    .x(), texCoord.topLeft()    .y()); glVertex2f(rect.bottomLeft() .x(), rect.bottomLeft() .y());
         glEnd();
     }
+}
+
+
+
+
+void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    QStyleOptionViewItemV4 optionV4 = option;
+    initStyleOption(&optionV4, index);
+
+    QStyle *style = optionV4.widget? optionV4.widget->style() : QApplication::style();
+
+    QTextDocument doc;
+    doc.setHtml(optionV4.text);
+
+    /// Painting item without text
+    optionV4.text = QString();
+    style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter);
+
+    QAbstractTextDocumentLayout::PaintContext ctx;
+
+    // Highlighting text if item is selected
+    if (optionV4.state & QStyle::State_Selected)
+        ctx.palette.setColor(QPalette::Text, optionV4.palette.color(QPalette::Active, QPalette::HighlightedText));
+
+    QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &optionV4);
+    painter->save();
+    painter->translate(textRect.topLeft());
+    painter->setClipRect(textRect.translated(-textRect.topLeft()));
+    doc.documentLayout()->draw(painter, ctx);
+    painter->restore();
+}
+
+QSize HtmlDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    QStyleOptionViewItemV4 optionV4 = option;
+    initStyleOption(&optionV4, index);
+
+    QTextDocument doc;
+    doc.setHtml(optionV4.text);
+    doc.setTextWidth(optionV4.rect.width());
+    return QSize(doc.idealWidth(), doc.size().height());
 }
