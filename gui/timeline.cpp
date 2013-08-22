@@ -116,7 +116,7 @@ const QRectF Timeline::paintViewer() {
     QRectF viewerBoundingRect(QPointF(0, viewerPos.y()), QSizeF(Global::viewerGL->width(), -50));
 
     if(Global::timerPlay)
-        Global::viewerGL->ensureVisible(QPointF(-1, viewerPos.y()), 0.3);
+        Global::viewerGL->ensureVisible(QPointF(-1, viewerPos.y()), 0.5);
 
     return viewerBoundingRect;
 }

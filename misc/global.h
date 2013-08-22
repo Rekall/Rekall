@@ -19,7 +19,6 @@
 #include "core/sorting.h"
 #include "core/phases.h"
 #include "misc/options.h"
-#include "gui/previewer.h"
 #include "gui/playervideo.h"
 #include "interfaces/udp.h"
 #include "qmath.h"
@@ -117,8 +116,6 @@ typedef QList<GlRect> Thumbnails;
 
 
 
-
-
 class WatcherBase {
 public:
     QFileSystemWatcher *watcher;
@@ -174,6 +171,15 @@ public:
     virtual const QMetaDictionnay getInfos() = 0;
 };
 
+class RekallBase : public QMainWindow {
+public:
+    explicit RekallBase(QWidget *parent = 0) : QMainWindow(parent) {}
+public:
+    virtual void setVisbility(bool) = 0;
+    virtual void displayDocumentName(const QString &documentName = "") = 0;
+    virtual void displayPixmap(const QPair<QString, QPixmap> &_picture) = 0;
+    virtual void displayGps(const QPair<QString,QString> &gps) = 0;
+};
 
 
 
@@ -203,7 +209,7 @@ public:
     static bool  timerPlay;
     static qreal time, thumbnailSlider, thumbnailSliderStep;
     static qreal tagBlinkTime;
-    static qreal breathing, breathingDest, breathingFast, breathingFastDest;
+    static qreal breathing, breathingDest, breathingFast, breathingFastDest, breathingPics, breathingPicsDest;
     static QTime timer;
     static Sorting *tagSortCriteria, *tagColorCriteria, *tagClusterCriteria, *tagFilterCriteria;
     static Phases *phases;
@@ -220,10 +226,9 @@ public:
     static QMap<QString, QPair<QColor, qreal> > colorForMeta;
     static bool timelineSortChanged, viewerSortChanged, eventsSortChanged, metaChanged;
     static WatcherBase *watcher;
-    static QMainWindow* mainWindow;
+    static RekallBase* mainWindow;
     static TaskListBase *taskList;
     static FeedListBase *feedList;
-    static Previewer *previewer;
 
 public:
     static const QString timeToString(qreal time);

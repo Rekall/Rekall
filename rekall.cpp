@@ -2,7 +2,7 @@
 #include "ui_rekall.h"
 
 Rekall::Rekall(QWidget *parent) :
-    QMainWindow(parent),
+    RekallBase(parent),
     ui(new Ui::Rekall) {
     ui->setupUi(this);
     setAcceptDrops(true);
@@ -19,11 +19,8 @@ Rekall::Rekall(QWidget *parent) :
 
     Watcher *watcher  = new Watcher(this);
     Global::watcher   = watcher;
-    Global::taskList  = ui->tasks;
     Global::taskList->setToolbox(ui->toolBoxLeft);
-    Global::feedList  = ui->feeds;
     Global::feedList->setToolbox(ui->toolBoxLeft);
-    Global::previewer = new Previewer(Global::pathApplication.absoluteFilePath(), this);
 
     Global::chutier = ui->chutier->getTree();
     Global::udp = new Udp(0, 5678);
@@ -70,6 +67,14 @@ Rekall::Rekall(QWidget *parent) :
     ui->persons->setColumnWidth(2, 100);
     ui->persons->setColumnWidth(3, 100);
 
+
+    //GPS
+    ui->metadataOpenGps->setVisible(false);
+    gps = new QWebView(0);
+    gps->setWindowFlags(Qt::Tool);
+    gps->load(QUrl::fromLocalFile(Global::pathApplication.absoluteFilePath() + "/tools/maps.html"));
+
+
     //Display splash
     splash = new Splash();
     splash->show();
@@ -84,13 +89,14 @@ Rekall::~Rekall() {
     delete ui;
 }
 
-void Rekall::fileUploaded(QString gps, QString filename, QTemporaryFile *file) {
+void Rekall::fileUploaded(QString gpsCoord, QString filename, QTemporaryFile *file) {
     if((filename.toLower().endsWith("jpg")) || (filename.toLower().endsWith("jpeg"))) {
         QPair<QString, QPixmap> picture;
         picture.first = file->fileName();
         picture.second = QPixmap(file->fileName());
-        Global::previewer->displayPixmap(picture);
-        Global::previewer->displayGps(gps, "Imported file");
+        Global::mainWindow->displayDocumentName(tr("Imported file"));
+        Global::mainWindow->displayPixmap(picture);
+        Global::mainWindow->displayGps(qMakePair(gpsCoord, tr("Imported file")));
     }
 }
 
@@ -169,6 +175,8 @@ void Rekall::action() {
         currentProject->save();
     else if(sender() == ui->actionPaste)
         parseMimeData(QApplication::clipboard()->mimeData());
+    else if(sender() == ui->metadataOpenGps)
+        gps->show();
 }
 
 void Rekall::actionMetadata(QTreeWidgetItem *item, int) {
@@ -186,9 +194,10 @@ void Rekall::closeSplash() {
     showMaximized();
     inspector->show();
     updateGeometry();
-    ui->mainSplitter->setSizes(QList<int>()     << height() * 0.50 << height() * 0.50);
-    ui->fileSplitter->setSizes(QList<int>()     << width()  * 0.20 << width()  * 0.60 << width() * 0.20);
-    ui->personsSplitter->setSizes(QList<int>()  << width()  * 0.35 << width()  * 0.65);
+    ui->timelineSplitter->setSizes(QList<int>() << ui->timelineSplitter->height() * 0.50 << ui->timelineSplitter->height() * 0.50);
+    ui->fileSplitter->setSizes(QList<int>()     << ui->fileSplitter->width()      * 0.25 << ui->fileSplitter->width()      * 0.75);
+    ui->conduiteSplitter->setSizes(QList<int>() << ui->conduiteSplitter->width()  * 0.75 << ui->conduiteSplitter->width()  * 0.25);
+    ui->personsSplitter->setSizes(QList<int>()  << ui->personsSplitter->width()   * 0.35 << ui->personsSplitter->width()   * 0.65);
     inspector->move(QDesktopWidget().screenGeometry().topRight() - QPoint(inspector->width(), 0));
     //trayMenu->showMessage("Rekall", "Ready!", QSystemTrayIcon::NoIcon);
 }
@@ -218,7 +227,6 @@ void Rekall::displayMetadata() {
     ui->tabs->setCurrentIndex(1);
     refreshMetadata();
 }
-
 void Rekall::refreshMetadata() {
     if(!metaIsChanging)
         chutierItemChanged(ui->chutier->getTree()->currentItem(), ui->chutier->getTree()->currentItem());
@@ -227,7 +235,6 @@ void Rekall::refreshAndLastMetadata() {
     if(!metaIsChanging)
         chutierItemChanged(ui->chutier->getTree()->currentItem(), 0);
 }
-
 void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
     ui->chutier->getTree()->setCurrentItem(item);
     metaIsChanging = true;
@@ -241,6 +248,7 @@ void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
     currentDocument = currentProject->getDocumentAndSelect(((UiFileItem*)item)->filename.file.absoluteFilePath());
     if(currentDocument) {
         ui->metadata->clear();
+        ui->toolBoxRight->setItemText(0, tr("INFOS — %1 (%2)").arg(currentDocument->getMetadata("Document Name").toString()).arg(currentDocument->getMetadata("Document Folder").toString()));
 
         //Versions
         ui->metadataSlider->setMaximum(currentDocument->getMetadataCountM());
@@ -275,11 +283,29 @@ void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
             if(expandItems.contains(metaIterator.key()))    ui->metadata->expandItem(rootItem);
             else                                            ui->metadata->collapseItem(rootItem);
         }
-        Global::previewer->displayPixmap(currentDocument->getThumbnail(ui->metadataSlider->value()));
-        Global::previewer->displayGps(currentDocument->getGps());
+        Global::mainWindow->displayDocumentName(QString("%1 (%2)").arg(currentDocument->getMetadata("Document Name").toString()).arg(currentDocument->getMetadata("Document Folder").toString()));
+        Global::mainWindow->displayPixmap(currentDocument->getThumbnail(ui->metadataSlider->value()));
+        Global::mainWindow->displayGps(currentDocument->getGps());
     }
     metaIsChanging = false;
 }
+void Rekall::displayDocumentName(const QString &documentName) {
+    gps->setWindowTitle(tr("Location — %1").arg(documentName));
+}
+void Rekall::displayPixmap(const QPair<QString, QPixmap> &_picture) {
+    ui->preview->displayPixmap(_picture);
+}
+void Rekall::displayGps(const QPair<QString,QString> &gpsCoord) {
+    QStringList gpsData = gpsCoord.first.split(",");
+    if(gpsData.count() > 1) {
+        gps->page()->mainFrame()->evaluateJavaScript("initializeMaps([" + QString("['%1',%2,%3],").arg(gpsCoord.second).arg(gpsData.at(0).trimmed()).arg(gpsData.at(1).trimmed()) + "])");
+        ui->metadataOpenGps->setVisible(true);
+    }
+    else
+        ui->metadataOpenGps->setVisible(false);
+}
+
+
 
 void Rekall::showInspector() {
     inspector->toolbarButton = ui->actionInspector;
@@ -297,5 +323,34 @@ void Rekall::timerEvent(QTimerEvent *) {
     if(openProject) {
         openProject = false;
         currentProject->open(QDir(Global::pathCurrent.absoluteFilePath()));
+    }
+}
+
+void Rekall::closeEvent(QCloseEvent *) {
+    inspector->hide();
+    /*
+#ifdef Q_OS_MAC
+        ProcessSerialNumber psn;
+        if(GetCurrentProcess(&psn) == noErr)
+            TransformProcessType(&psn, kProcessTransformToBackgroundApplication);
+#endif
+    */
+}
+
+void Rekall::setVisbility(bool sh) {
+    if(sh) {
+        /*
+#ifdef Q_OS_MAC
+        ProcessSerialNumber psn;
+        if(GetCurrentProcess(&psn) == noErr)
+            TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+#endif
+*/
+        show();
+        inspector->show();
+        raise();
+    }
+    else {
+        close();
     }
 }

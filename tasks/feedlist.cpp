@@ -9,6 +9,8 @@ FeedList::FeedList(QWidget *parent) :
     toolbox      = 0;
     notifCounter = 0;
 
+    Global::feedList = this;
+
     ui->feeds->setItemDelegateForColumn(0, new HtmlDelegate());
     QString prefix = "<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #FFFFFF'>", suffix = "</span>";
     agoNow     = new QTreeWidgetItem(QStringList() << prefix+"Now"+suffix);

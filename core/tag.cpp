@@ -7,6 +7,7 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
     timelineWasInside = false;
     playerVideo       = 0;
     progression       = progressionDest = decounter = 0;
+    isInProgress      = false;
     mouseHover        = false;
     mouseHoverPreview = false;
     breathing         = false;
@@ -375,8 +376,9 @@ const QRectF Tag::paintTimeline(bool before) {
             Global::timelineGL->qglColor(Qt::white);
             getDocument()->thumbnails.first().drawTexture(Global::timelineGL->visibleRect);
         }
-        Global::previewer->displayPixmap(getDocument()->getThumbnail(documentVersion));
-        Global::previewer->displayGps(getDocument()->getGps());
+        Global::mainWindow->displayDocumentName(QString("%1 (%2)").arg(getDocument()->getMetadata("Document Name").toString()).arg(getDocument()->getMetadata("Document Folder").toString()));
+        Global::mainWindow->displayPixmap(getDocument()->getThumbnail(documentVersion));
+        Global::mainWindow->displayGps(getDocument()->getGps());
     }
     return timelineBoundingRect.translated(timelinePos);
 }
@@ -384,6 +386,14 @@ const QRectF Tag::paintTimeline(bool before) {
 const QRectF Tag::paintViewer(quint16 tagIndex) {
     viewerPos = viewerPos + (viewerDestPos - viewerPos) / Global::inertie;
     viewerBoundingRect = QRectF(QPointF(0, 0), QSizeF(Global::viewerGL->width(), Global::viewerTagHeight));
+    QRectF thumbnailRect;
+    bool hasThumbnail = false;
+    if(getDocument()->thumbnails.count()) {
+        thumbnailRect = QRectF(QPointF(75, 11), QSizeF(105, 70));
+        hasThumbnail = true;
+        viewerBoundingRect.setHeight(thumbnailRect.height() + 2*thumbnailRect.top());
+    }
+
 
     if(Global::viewerGL->visibleRect.intersects(viewerBoundingRect.translated(viewerPos))) {
         glPushMatrix();
@@ -402,56 +412,72 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         }
 
         //Progression
-        bool hightlighted = false;
+        isInProgress = false;
+        QRectF progressionRect(viewerBoundingRect.topLeft(), QSizeF(viewerBoundingRect.width(), 5));
         if((type == TagTypeContextualMilestone) && (blinkTime)) {
-            hightlighted = true;
+            isInProgress = true;
             blinkTime = qMax(0., blinkTime-20);
             if(qFloor(blinkTime / 250) % 2) {
                 Global::viewerGL->qglColor(Global::colorProgression);
-                GlRect::drawRect(viewerBoundingRect);
+                GlRect::drawRect(progressionRect);
             }
         }
-        else if((0 < progression) && (progression < 0.99)) {
-            hightlighted = true;
+        else if((0.001 < progression) && (progression < 0.999)) {
+            isInProgress = true;
             Global::viewerGL->qglColor(Global::colorProgression);
-            GlRect::drawRect(QRectF(viewerBoundingRect.topLeft(), QSizeF(viewerBoundingRect.width() * progression, viewerBoundingRect.height())));
+            GlRect::drawRect(QRectF(progressionRect.topLeft(), QSizeF(progressionRect.width() * progression, progressionRect.height())));
         }
 
         //Bar
-        if((decounter == 0) && (!hightlighted) && (Global::timerPlay))
-            color.setAlphaF(0.2);
-        else
-            color.setAlphaF(1.0);
+        QColor barColor = color;
+        if((decounter == 0) && (!isInProgress) && (Global::timerPlay))  barColor.setAlphaF(0.2);
+        else                                                            barColor.setAlphaF(1.0);
 
-        qreal shape = (document->type == DocumentTypeMarker)?(M_PI/2):(M_PI/4);
-        Global::viewerGL->qglColor(color);
-        if(isTagLastVersion(this))
-            GlRect::drawRoundedRect(viewerBoundingRect.adjusted(7, 7, -75, -7).translated(QPointF(60, 0)), false, shape);
-        GlRect::drawRoundedRect(viewerBoundingRect.adjusted(7, 7, -75, -7).translated(QPointF(60, 0)), true, shape);
+
+        Global::viewerGL->qglColor(barColor);
+        if(hasThumbnail)
+            GlRect::drawRect(thumbnailRect.adjusted(-5, -5, 5, 5));
+        else {
+            qreal shape = (document->type == DocumentTypeMarker)?(M_PI/2):(M_PI/4);
+            if(isTagLastVersion(this))
+                GlRect::drawRoundedRect(viewerBoundingRect.adjusted(7, 7, -75, -7).translated(QPointF(60, 0)), false, shape);
+            GlRect::drawRoundedRect(viewerBoundingRect.adjusted(7, 7, -75, -7).translated(QPointF(60, 0)), true, shape);
+        }
 
 
         //Décompte
         if((Global::timerPlay) && (-5 <= decounter) && (decounter < 0)) {
             Global::viewerGL->qglColor(Global::colorText);
             qreal angleMax = 2*M_PI * -decounter/5, cote = (Global::viewerTagHeight / 2) * 0.6;
-            QRect rect(QPoint(0, 0), QSize(70, Global::viewerTagHeight));
+            QRect rect(QPoint(0, 0), QSize(70, viewerBoundingRect.height()));
             glBegin(GL_TRIANGLE_FAN);
             glVertex2f(rect.center().x(), rect.center().y());
             for(qreal angle = 0 ; angle < angleMax ; angle += 0.1)
                 glVertex2f(rect.center().x() + cote * qCos(-M_PI/2 + angle), rect.center().y() + cote * qSin(-M_PI/2 + angle));
             glEnd();
         }
+        //Temps
         else if((decounter < 0) || (!Global::timerPlay)) {
             Global::viewerGL->qglColor(Global::colorText);
             viewerTimeText.drawText(Global::timeToString(timeStart));
         }
 
-        if(isTagLastVersion(this))  Global::viewerGL->qglColor(Qt::white);
-        else                        Global::viewerGL->qglColor(color);
+
+        //Thumb
+        QPoint textePos(75, 0);
+        if(hasThumbnail) {
+            Global::viewerGL->qglColor(QColor(255, 255, 255, barColor.alpha()));
+            getDocument()->thumbnails.first().drawTexture(thumbnailRect, Global::breathingPics);
+            textePos = thumbnailRect.topRight().toPoint() + QPoint(10, -10);
+        }
+
+        //Texte
+        if((Global::selectedTagHover == this) || ((isTagLastVersion(this) && (!hasThumbnail))))  Global::viewerGL->qglColor(Qt::white);
+        else                                                               Global::viewerGL->qglColor(barColor);
         QString texte = document->getMetadata("Rekall", "Document Name", documentVersion).toString();
         if(type == TagTypeContextualTime)
             texte += QString(" (%1)").arg(Global::timeToString(getDuration()));
-        viewerDocumentText.drawText(texte, QPoint(75, 0));
+        viewerDocumentText.drawText(texte, textePos);
 
         glPopMatrix();
     }

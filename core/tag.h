@@ -42,9 +42,10 @@ public:
 public:
     void test(qreal tS);
     QList<Tag*> historyTags;
+    qreal progression;
 private:
     bool timelineWasInside;
-    qreal progression, progressionDest, decounter;
+    qreal progressionDest, decounter;
     QColor colorDest;
     QList<QString> linkedRenders;
     DocumentBase *document;
@@ -86,6 +87,7 @@ private:
     QRectF  viewerBoundingRect;
 public:
     QPointF viewerPos, viewerDestPos;
+    bool isInProgress;
 public:
     void  setViewerPos(const QPointF _viewerDestPos)  { viewerDestPos = _viewerDestPos;  }
     const QRectF getViewerBoundingRect() const        { return viewerBoundingRect; }

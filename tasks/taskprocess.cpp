@@ -53,13 +53,14 @@ void TaskProcess::run() {
             QString thumbFilename = thumbFilepath + ".jpg";
             if(!QFileInfo(thumbFilename).exists()) {
                 QImage thumbnail(processedDocument.metadata->file.absoluteFilePath());
-                quint16 maxCote = 800;
+                quint16 maxCote = 160;
                 if((thumbnail.width() > maxCote) || (thumbnail.height() > maxCote))
                     QImage(processedDocument.metadata->file.absoluteFilePath()).scaled(QSize(maxCote, maxCote), Qt::KeepAspectRatio, Qt::SmoothTransformation).save(thumbFilename);
             }
-            if(QFileInfo(thumbFilename).exists())
+            if(QFileInfo(thumbFilename).exists()) {
                 processedDocument.metadata->setMetadata("Rekall", "Snapshot", "File", processedDocument.version);
-                //processedDocument.metadata->thumbnails.append(GlRect(thumbFilename));
+                processedDocument.metadata->thumbnails.append(GlRect(thumbFilename));
+            }
         }
 
         //Waveform
@@ -150,7 +151,7 @@ void TaskProcess::run() {
                 for(quint16 thumbIndex = 0 ; thumbIndex < thumbsNumber ; thumbIndex++) {
                     QString thumbFilename = QString(thumbFilepath + "_%1.jpg").arg(thumbIndex+1);
                     if(QFileInfo(thumbFilename).exists())
-                        QImage(thumbFilename).scaled(QSize(320, 240), Qt::KeepAspectRatio, Qt::SmoothTransformation).save(thumbFilename);
+                        QImage(thumbFilename).scaled(QSize(160, 120), Qt::KeepAspectRatio, Qt::SmoothTransformation).save(thumbFilename);
                 }
             }
             //Add to meta

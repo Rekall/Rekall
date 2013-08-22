@@ -26,6 +26,8 @@ qreal        Global::thumbnailSliderStep          = 0.001;
 qreal        Global::tagBlinkTime                 = 2000;
 qreal        Global::breathing                    = 0;
 qreal        Global::breathingDest                = 1;
+qreal        Global::breathingPics                = 0;
+qreal        Global::breathingPicsDest            = 1;
 qreal        Global::breathingFast                = 0;
 qreal        Global::breathingFastDest            = 1;
 QTime        Global::timer;
@@ -69,10 +71,9 @@ Sorting*     Global::tagClusterCriteria = 0;
 Sorting*     Global::tagFilterCriteria  = 0;
 Phases*      Global::phases             = 0;
 WatcherBase* Global::watcher            = 0;
-QMainWindow* Global::mainWindow         = 0;
-Previewer*   Global::previewer          = 0;
-TaskListBase* Global::taskList          = 0;
-FeedListBase* Global::feedList          = 0;
+RekallBase*  Global::mainWindow         = 0;
+TaskListBase*  Global::taskList         = 0;
+FeedListBase*  Global::feedList         = 0;
 
 void Global::seek(qreal _time) {
     time = _time;
@@ -313,7 +314,7 @@ void GlRect::drawTexture(const QRectF &rect, qreal croppingMode) {
         QRectF textureRect = QRectF(0, 0, 1, 1);
         QRectF partialTextureRect = QRectF(0,0,-1,-1);
 
-        if(croppingMode < -3)
+        if(croppingMode <= -3)
             textureRect = QRectF(QPointF(0, 0), targetRect.size());
         else if(croppingMode == -2) {
             textureRect = QRectF(QPointF(0, 0), size);
@@ -326,7 +327,7 @@ void GlRect::drawTexture(const QRectF &rect, qreal croppingMode) {
         else if(croppingMode == -1) {
             textureRect = QRectF(QPointF(0, 0), size);
             if((partialTextureRect.width() > 0) && (partialTextureRect.height() > 0))
-                textureRect = QRectF(QPointF(partialTextureRect.x()     * size.width(), partialTextureRect.y()      * size.width()),
+                textureRect = QRectF(QPointF(partialTextureRect.x()     * size.width(), partialTextureRect.y()      * size.height()),
                                      QSizeF (partialTextureRect.width() * size.width(), partialTextureRect.height() * size.height()));
         }
         else if(croppingMode >= 0) {

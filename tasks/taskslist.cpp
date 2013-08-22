@@ -11,6 +11,8 @@ TasksList::TasksList(QWidget *parent) :
     move(0, 0);
     taskIsRunning = 0;
 
+    Global::taskList = this;
+
     ui->tasks->setItemDelegateForColumn(0, new HtmlDelegate());
 }
 
@@ -62,7 +64,7 @@ void TasksList::nextTask() {
     }
 }
 
-void TasksList::updateList(TaskProcess *task, int feedAction) {
+void TasksList::updateList(TaskProcess *, int) {
     //Global::feedList->addFeed(new FeedItemBase((FeedItemBaseType)feedAction, "Rekall", task->processedDocument.metadata->file.baseName()));
 }
 void TasksList::updateList(TaskProcess *task, const QString &message) {

@@ -96,7 +96,7 @@ QToolBox::tab:selected {
 QToolBox {
 	background-color: 				rgb(60, 60, 60);
 }
-QToolBox QWidget#chutierPage, QToolBox QWidget#feedPage, QToolBox QWidget#infosPage, QToolBox QWidget#conduitePage, QToolBox QWidget#tasksPage, QToolBox QWidget#peoplePage {
+QToolBox QWidget#chutierPage, QToolBox QWidget#feedPage, QToolBox QWidget#infosPage, QToolBox QWidget#conduitePage, QToolBox QWidget#tasksPage, QToolBox QWidget#peoplePage, QToolBox QWidget#previewPage {
 	background-color: 				rgb(40, 45, 45);
 }
 
@@ -346,263 +346,170 @@ QDialogButtonBox QPushButton {
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QSplitter" name="mainSplitter">
+     <widget class="QSplitter" name="conduiteSplitter">
       <property name="orientation">
-       <enum>Qt::Vertical</enum>
+       <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QSplitter" name="fileSplitter">
+      <widget class="QSplitter" name="timelineSplitter">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Vertical</enum>
        </property>
-       <widget class="QToolBox" name="toolBoxLeft">
-        <property name="currentIndex">
-         <number>0</number>
+       <widget class="QSplitter" name="fileSplitter">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="tabSpacing">
-         <number>5</number>
-        </property>
-        <widget class="QWidget" name="chutierPage">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>215</width>
-           <height>258</height>
-          </rect>
+        <widget class="QToolBox" name="toolBoxLeft">
+         <property name="currentIndex">
+          <number>0</number>
          </property>
-         <attribute name="label">
-          <string>FILES</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="UiTreeView" name="chutier" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>100</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="feedPage">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>215</width>
-           <height>258</height>
-          </rect>
+         <property name="tabSpacing">
+          <number>5</number>
          </property>
-         <attribute name="label">
-          <string>EVENTS</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="spacing">
-           <number>0</number>
+         <widget class="QWidget" name="chutierPage">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>155</width>
+            <height>258</height>
+           </rect>
           </property>
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="FeedList" name="feeds" native="true"/>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tasksPage">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>215</width>
-           <height>258</height>
-          </rect>
-         </property>
-         <attribute name="label">
-          <string>PROCESSINGS</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="TasksList" name="tasks" native="true"/>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="peoplePage">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>215</width>
-           <height>258</height>
-          </rect>
-         </property>
-         <attribute name="label">
-          <string>PEOPLE</string>
-         </attribute>
-        </widget>
-       </widget>
-       <widget class="QTabWidget" name="tabs">
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="tabTimeline">
-         <attribute name="title">
-          <string>CAPTATION</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="margin">
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="Player" name="player" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>100</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tabPersons">
-         <attribute name="title">
-          <string>PERSONS</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="margin">
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="QSplitter" name="personsSplitter">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <widget class="QTreeWidget" name="persons">
-             <property name="alternatingRowColors">
-              <bool>true</bool>
-             </property>
-             <property name="iconSize">
+          <attribute name="label">
+           <string>FILES</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="UiTreeView" name="chutier" native="true">
+             <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>100</width>
+               <height>100</height>
               </size>
              </property>
-             <property name="indentation">
-              <number>0</number>
-             </property>
-             <property name="sortingEnabled">
-              <bool>true</bool>
-             </property>
-             <attribute name="headerShowSortIndicator" stdset="0">
-              <bool>true</bool>
-             </attribute>
-             <column>
-              <property name="text">
-               <string>Photo</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Firstname</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Lastname</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Role</string>
-              </property>
-             </column>
             </widget>
-            <widget class="QFrame" name="frame">
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="feedPage">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>155</width>
+            <height>258</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>EVENTS</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="FeedList" name="feeds" native="true"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tasksPage">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>155</width>
+            <height>258</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>PROCESSINGS</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="TasksList" name="tasks" native="true"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="peoplePage">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>155</width>
+            <height>258</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>PEOPLE</string>
+          </attribute>
+         </widget>
+        </widget>
+        <widget class="QTabWidget" name="tabs">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tabTimeline">
+          <attribute name="title">
+           <string>CAPTATION</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="margin">
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="Player" name="player" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>100</height>
+              </size>
              </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tabPersons">
+          <attribute name="title">
+           <string>PERSONS</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="margin">
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QSplitter" name="personsSplitter">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-             <widget class="QLabel" name="personPhoto">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>64</width>
-                <height>64</height>
-               </rect>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>64</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>64</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="scaledContents">
-               <bool>true</bool>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="personLastname">
-              <property name="geometry">
-               <rect>
-                <x>190</x>
-                <y>10</y>
-                <width>101</width>
-                <height>31</height>
-               </rect>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="personFirstame">
-              <property name="geometry">
-               <rect>
-                <x>80</x>
-                <y>10</y>
-                <width>101</width>
-                <height>31</height>
-               </rect>
-              </property>
-             </widget>
-             <widget class="QTreeWidget" name="personInfos">
-              <property name="geometry">
-               <rect>
-                <x>30</x>
-                <y>190</y>
-                <width>500</width>
-                <height>151</height>
-               </rect>
-              </property>
+             <widget class="QTreeWidget" name="persons">
               <property name="alternatingRowColors">
                <bool>true</bool>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
               </property>
               <property name="indentation">
                <number>0</number>
@@ -610,124 +517,226 @@ QDialogButtonBox QPushButton {
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
+              <attribute name="headerShowSortIndicator" stdset="0">
+               <bool>true</bool>
+              </attribute>
               <column>
                <property name="text">
-                <string notr="true">Item</string>
+                <string>Photo</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>Info</string>
+                <string>Firstname</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Lastname</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Role</string>
                </property>
               </column>
              </widget>
+             <widget class="QFrame" name="frame">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <widget class="QLabel" name="personPhoto">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>10</y>
+                 <width>64</width>
+                 <height>64</height>
+                </rect>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>64</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>64</width>
+                 <height>64</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="scaledContents">
+                <bool>true</bool>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="personLastname">
+               <property name="geometry">
+                <rect>
+                 <x>190</x>
+                 <y>10</y>
+                 <width>101</width>
+                 <height>31</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="personFirstame">
+               <property name="geometry">
+                <rect>
+                 <x>80</x>
+                 <y>10</y>
+                 <width>101</width>
+                 <height>31</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QTreeWidget" name="personInfos">
+               <property name="geometry">
+                <rect>
+                 <x>30</x>
+                 <y>190</y>
+                 <width>500</width>
+                 <height>151</height>
+                </rect>
+               </property>
+               <property name="alternatingRowColors">
+                <bool>true</bool>
+               </property>
+               <property name="indentation">
+                <number>0</number>
+               </property>
+               <property name="sortingEnabled">
+                <bool>true</bool>
+               </property>
+               <column>
+                <property name="text">
+                 <string notr="true">Item</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Info</string>
+                </property>
+               </column>
+              </widget>
+             </widget>
             </widget>
-           </widget>
-          </item>
-         </layout>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </widget>
-       <widget class="QToolBox" name="toolBoxRight">
-        <property name="currentIndex">
-         <number>1</number>
+       <widget class="Timeline" name="timeline" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>100</height>
+         </size>
         </property>
-        <property name="tabSpacing">
-         <number>5</number>
-        </property>
-        <widget class="QWidget" name="infosPage">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>215</width>
-           <height>308</height>
-          </rect>
-         </property>
-         <attribute name="label">
-          <string>INFOS</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="margin">
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="QTreeWidget" name="metadata">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>22</height>
-             </size>
-            </property>
-            <property name="alternatingRowColors">
-             <bool>true</bool>
-            </property>
-            <property name="indentation">
-             <number>10</number>
-            </property>
-            <column>
-             <property name="text">
-              <string notr="true">Key</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Value</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSlider" name="metadataSlider">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="conduitePage">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>215</width>
-           <height>308</height>
-          </rect>
-         </property>
-         <attribute name="label">
-          <string>CONDUITE</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="Viewer" name="viewer" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>100</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
        </widget>
       </widget>
-      <widget class="Timeline" name="timeline" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>100</height>
-        </size>
+      <widget class="QToolBox" name="toolBoxRight">
+       <property name="currentIndex">
+        <number>0</number>
        </property>
+       <property name="tabSpacing">
+        <number>5</number>
+       </property>
+       <widget class="QWidget" name="infosPage">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>437</width>
+          <height>461</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>INFOS</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="Previewer" name="preview" native="true"/>
+         </item>
+         <item>
+          <widget class="QTreeWidget" name="metadata">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+           <property name="indentation">
+            <number>10</number>
+           </property>
+           <column>
+            <property name="text">
+             <string notr="true">Key</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Value</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="metadataOpenGps">
+           <property name="text">
+            <string>SHOW GPS LOCATION ON A MAP</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="metadataSlider">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="conduitePage">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>437</width>
+          <height>461</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>CONDUITE</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="Viewer" name="viewer" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -854,6 +863,12 @@ QDialogButtonBox QPushButton {
    <header>tasks/taskslist.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>Previewer</class>
+   <extends>QWidget</extends>
+   <header>gui/previewer.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
@@ -864,8 +879,8 @@ QDialogButtonBox QPushButton {
    <slot>actionMetadata(QTreeWidgetItem*,int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>210</x>
-     <y>89</y>
+     <x>1024</x>
+     <y>240</y>
     </hint>
     <hint type="destinationlabel">
      <x>916</x>
@@ -880,8 +895,8 @@ QDialogButtonBox QPushButton {
    <slot>refreshMetadata()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>222</x>
-     <y>76</y>
+     <x>1024</x>
+     <y>511</y>
     </hint>
     <hint type="destinationlabel">
      <x>69</x>
@@ -896,12 +911,28 @@ QDialogButtonBox QPushButton {
    <slot>refreshPerson()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>272</x>
-     <y>182</y>
+     <x>336</x>
+     <y>97</y>
     </hint>
     <hint type="destinationlabel">
      <x>264</x>
      <y>-98</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>metadataOpenGps</sender>
+   <signal>released()</signal>
+   <receiver>Rekall</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>818</x>
+     <y>477</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1145</x>
+     <y>273</y>
     </hint>
    </hints>
   </connection>

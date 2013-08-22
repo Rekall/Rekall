@@ -472,6 +472,23 @@ const QRectF Project::paintTimeline(bool before) {
         foreach(Document *document, documents)
             foreach(Tag *tag, document->tags)
                 tag->paintTimeline(before);
+
+        //Current tags
+        QList<Tag*> currentTagsWithThumbs, currentTagsWithoutThumbs;
+        foreach(Document *document, documents)
+            foreach(Tag *tag, document->tags)
+                if((tag->getDocument()) && (tag->type == TagTypeContextualTime) && (tag->getDocument()->function == DocumentFunctionContextual) && (0.001 < tag->progression) && (tag->progression < 0.999)) {
+                    if(!tag->getDocument()->thumbnails.count()) currentTagsWithThumbs.append(tag);
+                    else                                        currentTagsWithoutThumbs.append(tag);
+                }
+        //qDebug("------------------------------------");
+        foreach(Tag *tag, currentTagsWithThumbs) {
+            //qDebug("%s", qPrintable(tag->getDocument()->getMetadata("Document Name").toString()));
+        }
+        //qDebug("----");
+        foreach(Tag *tag, currentTagsWithoutThumbs) {
+            //qDebug("%s", qPrintable(tag->getDocument()->getMetadata("Document Name").toString()));
+        }
     }
     return retour;
 }
@@ -502,7 +519,7 @@ const QRectF Project::paintViewer() {
             QRectF tagRect = tag->getViewerBoundingRect();
             tag->setViewerPos(tagSortPosOffset);
 
-            //Drawing
+            //Drawings
             retour = retour.united(tag->paintViewer(tagIndex++));
 
             //Next coordinates

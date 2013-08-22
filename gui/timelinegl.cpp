@@ -66,6 +66,9 @@ void TimelineGL::paintGL() {
     Global::breathingFast = Global::breathingFast + (Global::breathingFastDest - Global::breathingFast) / 10.;
     if((     Global::breathingFast > 0.90) && (Global::breathingFastDest == 1))    Global::breathingFastDest = 0;
     else if((Global::breathingFast < 0.10) && (Global::breathingFastDest == 0))    Global::breathingFastDest = 1;
+    Global::breathingPics = Global::breathingPics + (Global::breathingPicsDest - Global::breathingPics) / 200.;
+    if((     Global::breathingPics > 0.90) && (Global::breathingPicsDest == 1))    Global::breathingPicsDest = 0;
+    else if((Global::breathingPics < 0.10) && (Global::breathingPicsDest == 0))    Global::breathingPicsDest = 1;
 
     if(showLegend > 0.01) {
         //Background

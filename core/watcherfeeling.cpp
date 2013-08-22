@@ -92,7 +92,10 @@ void WatcherFeeling::display(Document *document) {
     if(documents.count() == 1)       ui->label->setText(tr("Something to say about your changes on %1 since last time (%2)?").arg(documents.first()->file.baseName()).arg(Global::dateToString(documents.first()->getMetadata("Document Date/Time").toDateTime())));
     else if(documents.count()  > 1)  ui->label->setText(tr("Something to say about your changes on these %1 since last time?").arg(Global::plurial(documents.count(), "document")));
     else if(documents.count() == 0)  ui->label->setText(tr("Something to say?"));
+
     show();
+    if(!document)
+        raise();
 }
 
 WatcherFeeling::~WatcherFeeling() {

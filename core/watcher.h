@@ -34,6 +34,7 @@ public slots:
     void fileWatcherDirChanged(QString);
     void fileWatcherFileChanged(QString);
     void takeTemporarySnapshot();
+    void trayActivateApp();
     void trayIconToOn(Document *document = 0);
     void trayIconToOff();
     void trayActivated(QSystemTrayIcon::ActivationReason reason);

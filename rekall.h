@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QClipboard>
+#include <QWebView>
+#include <QWebFrame>
+#include <QWebPage>
+#include <QDesktopServices>
 #include "core/watcher.h"
 #include "interfaces/userinfos.h"
 #include "gui/inspector.h"
@@ -20,7 +24,7 @@ namespace Ui {
 class Rekall;
 }
 
-class Rekall : public QMainWindow {
+class Rekall : public RekallBase {
     Q_OBJECT
     
 public:
@@ -36,6 +40,17 @@ private:
     HttpListener *http;
     FileUploadController *httpUpload;
     QSettings *settings;
+    QWebView *gps;
+    QPair<QString, QPixmap> picture;
+public:
+    void setVisbility(bool show);
+
+private slots:
+    void displayMetadata();
+public:
+    void displayDocumentName(const QString &documentName = "");
+    void displayPixmap(const QPair<QString, QPixmap> &_picture);
+    void displayGps(const QPair<QString,QString> &gps);
 
 protected:
     void dragEnterEvent(QDragEnterEvent *);
@@ -47,7 +62,6 @@ private slots:
     void action();
     void actionMetadata(QTreeWidgetItem *item, int col);
     void closeSplash();
-    void displayMetadata();
     void refreshAndLastMetadata();
     void refreshMetadata();
     void refreshPerson();
@@ -58,6 +72,7 @@ private:
     qint32 updateUserInfos;
 protected:
     void timerEvent(QTimerEvent *);
+    void closeEvent(QCloseEvent *);
 
 private:
     Ui::Rekall *ui;

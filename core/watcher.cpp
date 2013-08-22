@@ -10,12 +10,17 @@ Watcher::Watcher(QObject *parent) :
     connect(trayMenu, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
     trayIconToOff();
     QMenu *trayElements = new QMenu(Global::mainWindow);
-    trayElements->addAction(tr("Write a note"), this, SLOT(trayIconToOn()));
+    trayElements->addAction(tr("Show timeline"), this, SLOT(trayActivateApp()));
+    trayElements->addAction(tr("Write a note"),  this, SLOT(trayIconToOn()));
     trayMenu->setContextMenu(trayElements);
     trayMenu->show();
 
     feeling = new WatcherFeeling();
     feeling->setStyleSheet(Global::mainWindow->styleSheet());
+}
+
+void Watcher::trayActivateApp() {
+    Global::mainWindow->setVisbility(!Global::mainWindow->isVisible());
 }
 
 void Watcher::trayIconToOn(Document *document) {
@@ -30,8 +35,8 @@ void Watcher::trayIconToOff() {
 }
 
 void Watcher::trayActivated(QSystemTrayIcon::ActivationReason) {
-    Global::mainWindow->show();
-    Global::mainWindow->raise();
+    //Global::mainWindow->show();
+    //Global::mainWindow->raise();
 }
 
 
