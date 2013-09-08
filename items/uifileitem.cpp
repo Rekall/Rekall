@@ -48,11 +48,13 @@ QVariant UiFileItem::data(int column, int role) const {
             if(column == 2) return filename.isTracked;
             if(column == 3) return openInFinder.variant();
             if(column == 4) return openInOs.variant();
+            if(column == 5) return filename.file.absoluteFilePath();
         }
         else {
             if(column == 1) return filename.isTracked;
             if(column == 2) return openInFinder.variant();
             if(column == 3) return openInOs.variant();
+            if(column == 4) return filename.file.absoluteFilePath();
         }
     }
     return QTreeWidgetItem::data(column, role);
@@ -373,6 +375,9 @@ void UiFileItem::configure(UiTreeView *tree, bool _showDateTime) {
     UiTreeViewOptions col5 =   UiTreeViewOptions(columnIndex++, ""        , "checkboxS", ""           , QHeaderView::Fixed,   30 , 20, 20);
     col5.iconCheckedOn = col5.iconCheckedOff = QPixmap(":/items/res_item_reveal.png");
     tree->configureColumns(col5);
+
+    UiTreeViewOptions col6 =   UiTreeViewOptions(columnIndex++, ""        , ""         ,     ""       , QHeaderView::Fixed,    1 , 20, 20);
+    tree->configureColumns(col6);
 }
 
 

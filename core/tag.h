@@ -28,7 +28,7 @@ class Tag : public QObject {
 
 
 public:
-    explicit Tag(DocumentBase *_document, qint16 _documentVersion);
+    explicit Tag(DocumentBase *_document, qint16 _documentVersion = -1);
 
 
 public:
@@ -40,7 +40,7 @@ public:
 
 
 public:
-    void test(qreal tS);
+    void create(TagType _type, qreal _timeStart, qreal _duration = 10, bool debug = false);
     QList<Tag*> historyTags;
     qreal progression;
 private:

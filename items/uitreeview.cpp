@@ -6,7 +6,7 @@ UiTreeView::UiTreeView(QWidget *parent) :
     ui(new Ui::UiTreeView) {
     ui->setupUi(this);
     currentDocument = 0;
-    setAcceptDrops(true);
+    setAcceptDrops(false);
     connect(ui->view, SIGNAL(dropEvent(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(dropEvent(QTreeWidgetItem*,QTreeWidgetItem*)));
     showNew      (true);
     showRemove   (true);
@@ -160,6 +160,8 @@ void UiTreeView::configureColumns(const UiTreeViewOptions &options) {
     ui->view->setItemDelegateForColumn(options.index, new UiTreeDelegate(options, ui->view->model(), this));
     if(options.width > 0)
         ui->view->setColumnWidth(options.index, options.width);
+    //else if(options.width == 0)
+    //  ui->view->setColumnHidden(options.index, true);
 }
 
 

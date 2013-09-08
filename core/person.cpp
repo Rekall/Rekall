@@ -1,19 +1,20 @@
 #include "person.h"
 
-Person::Person(PersonCard _card, QTreeWidget *parent) :
-    QTreeWidgetItem(parent) {
-    updateCard(_card);
+Person::Person(const PersonCard &card, QObject *parent) :
+    Metadata(parent, true), PersonCard(card), QTreeWidgetItem() {
+    updateCard(*this);
+    needGUIupdate = true;
 }
-void Person::updateCard(PersonCard _card) {
-    card = _card;
-    setIcon(0, QIcon(card.getPhoto()));
-    setText(1, card.getFirstname());
-    setText(2, card.getLastname());
-    setText(3, card.getRole());
+void Person::updateGUI() {
+    if(needGUIupdate) {
+        needGUIupdate = false;
+        setIcon(0, QIcon(QPixmap::fromImage(getPhoto())));
+        setText(1, getFullname());
+    }
 }
 
 
-QList<Person*> Person::fromString(QTreeWidget *parent, const QString &text) {
+QList<Person*> Person::fromString(const QString &text, QObject *parent) {
     QList<Person*> persons;
 
     QList<QString> cards = text.split("END:VCARD");
@@ -29,22 +30,22 @@ QList<Person*> Person::fromString(QTreeWidget *parent, const QString &text) {
                     personCardInfo.first  = PersonCardHeader::fromString(cardInfo.left(i) .split(";", QString::SkipEmptyParts));
                     personCardInfo.second = PersonCardValues::fromString(cardInfo.mid(i+1).split(";", QString::SkipEmptyParts));
                     if((personCardInfo.first.category == "photo") && (personCardInfo.second.count()))
-                        personCardInfo.second.pixmap = QPixmap::fromImage(QImage::fromData(QByteArray::fromBase64(personCardInfo.second.first().toLatin1()), "jpeg"));
-                    personCard.insert(personCardInfo.first.category, personCardInfo);
+                        personCardInfo.second.photo = QImage::fromData(QByteArray::fromBase64(personCardInfo.second.first().toLatin1()), "jpeg");
+                    personCard.append(personCardInfo);
                 }
             }
-            personCard.debug();
+            //personCard.debug();
             persons.append(new Person(personCard, parent));
         }
     }
     return persons;
 }
-QList<Person*> Person::fromFile(QTreeWidget *parent, const QString &file) {
+QList<Person*> Person::fromFile(const QString &file, QObject *parent) {
     QFile f(file);
     QString text;
     if(f.open(QFile::ReadOnly)) {
         text = f.readAll();
         f.close();
     }
-    return fromString(parent, text);
+    return fromString(text, parent);
 }

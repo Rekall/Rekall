@@ -8,8 +8,16 @@ Project::Project(QWidget *parent) :
     timelineFilesMenu = new QMenu(Global::mainWindow);
 }
 
-
-void Project::open(const QDir &dir, const QDir &dirBase) {
+void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
+    foreach(const QFileInfo &file, files) {
+        QDir dir(file.absoluteFilePath());
+        if(file.isFile())
+            dir.cdUp();
+        UiFileItem::syncWith(QFileInfoList() << dir.absolutePath(), view->getTree());
+        open(dir, dir, debug);
+    }
+}
+void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
     foreach(const QFileInfo &file, files) {
         if((file.isFile()) && (UiFileItem::conformFile(file))) {
@@ -19,35 +27,42 @@ void Project::open(const QDir &dir, const QDir &dirBase) {
                 document->chutierItem->setData(1, Qt::EditRole, true);
 
             if(document->updateFile(file))
-                document->createTagBasedOnPrevious();
+                if(debug)
+                    document->createTagBasedOnPrevious();
             document->updateFeed();
 
-            if(file.baseName() == "Plan de salle 2")
-                for(quint16 i = 1 ; i < 10 ; i++) {
-                    if(document->updateFile(file, -1, i))
-                        document->createTagBasedOnPrevious();
-                    document->updateFeed();
+            if(debug) {
+                if(file.baseName() == "Plan de salle 2") {
+                    for(quint16 i = 1 ; i < 10 ; i++) {
+                        if(document->updateFile(file, -1, i))
+                            document->createTagBasedOnPrevious();
+                        document->updateFeed();
+                    }
                 }
+            }
         }
         else if((file.isDir()) && (UiFileItem::conformFile(file)))
-            open(QDir(file.absoluteFilePath() + "/"), dirBase);
+            open(QDir(file.absoluteFilePath() + "/"), dirBase, debug);
     }
 
 
-    for(quint16 i = 1 ; i < 2 ; i++) {
-        Document *document = new Document(this);
-        if(document->updateImport(QString("Marker #%1").arg(i)))
-            document->createTagBasedOnPrevious();
-        document->updateFeed();
-    }
-
-    Tag *previousTag = 0;
-    foreach(Document *document, documents)
-        foreach(Tag *tag, document->tags) {
-            if(Global::alea(0, 100) > 80)
-                tag->linkedTags.append(previousTag);
-            previousTag = tag;
+    if(debug) {
+        for(quint16 i = 1 ; i < 2 ; i++) {
+            Document *document = new Document(this);
+            if(document->updateImport(QString("Marker #%1").arg(i)))
+                document->createTagBasedOnPrevious();
+            document->updateFeed();
         }
+
+        Tag *previousTag = 0;
+        foreach(Document *document, documents) {
+            foreach(Tag *tag, document->tags) {
+                if(Global::alea(0, 100) > 80)
+                    tag->linkedTags.append(previousTag);
+                previousTag = tag;
+            }
+        }
+    }
 
     Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = true;
 }
@@ -483,11 +498,11 @@ const QRectF Project::paintTimeline(bool before) {
                 }
         //qDebug("------------------------------------");
         foreach(Tag *tag, currentTagsWithThumbs) {
-            //qDebug("%s", qPrintable(tag->getDocument()->getMetadata("Document Name").toString()));
+            //qDebug("%s", qPrintable(tag->getDocument()->getMetadata("Rekall", "Document Name").toString()));
         }
         //qDebug("----");
         foreach(Tag *tag, currentTagsWithoutThumbs) {
-            //qDebug("%s", qPrintable(tag->getDocument()->getMetadata("Document Name").toString()));
+            //qDebug("%s", qPrintable(tag->getDocument()->getMetadata("Rekall", "Document Name").toString()));
         }
     }
     return retour;
@@ -582,25 +597,27 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
     foreach(Document *document, documents)
         foreach(Tag *tag, document->tags)
             ok |= tag->mouseTimeline(pos, e, dbl, stay, action);
+
     if(!ok) {
         Global::selectedTag = 0;
         Global::selectedTagHover = 0;
-        if((e->buttons() & Qt::LeftButton) == Qt::LeftButton) {
+        if((e->button() & Qt::LeftButton) == Qt::LeftButton) {
             for(quint16 i = 0 ; i < guiToggles.count() ; i++) {
                 if(guiToggles.at(i).first.contains(pos)) {
                     *guiToggles[i].second = !(*guiToggles[i].second);
                     return true;
                 }
             }
+        }
+        if((e->button() & Qt::RightButton) == Qt::RightButton) {
             for(quint16 i = 0 ; i < guiCategories.count() ; i++) {
                 if(guiCategories.at(i).first.contains(pos)) {
                     timelineFilesMenu->clear();
                     QMapIterator<QString, QList<Tag*> > tagsInClusterIterator(timelineSortTags.value(guiCategories.at(i).second.first).value(guiCategories.at(i).second.second));
                     while(tagsInClusterIterator.hasNext()) {
                         tagsInClusterIterator.next();
-                        foreach(Tag *tag, tagsInClusterIterator.value()) {
+                        foreach(Tag *tag, tagsInClusterIterator.value())
                             tag->timelineFilesAction = timelineFilesMenu->addAction(tag->getDocument()->getMetadata("Rekall", "Document Name").toString());
-                        }
                     }
                     QAction *retour = timelineFilesMenu->exec(QCursor::pos());
                     if(retour) {

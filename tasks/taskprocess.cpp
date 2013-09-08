@@ -162,6 +162,14 @@ void TaskProcess::run() {
                     processedDocument.metadata->thumbnails.append(GlRect(thumbFilename));
             }
         }
+
+        //People
+        if(processedDocument.metadata->type == DocumentTypePeople) {
+            QList<Person*> persons = Person::fromFile(processedDocument.metadata->file.absoluteFilePath());
+            foreach(Person *person, persons)
+                Global::currentProject->addPerson(person);
+        }
+
         processedDocument.metadata->status = DocumentStatusReady;
         emit(updateList(this, FeedItemBaseTypeProcessingEnd));
         emit(updateList(this, tr("<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #AAAAAA'>Finishing analysis of <span style='color: #FFFFFF'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
@@ -172,13 +180,13 @@ void TaskProcess::run() {
 
 
 
-QPair<QString,QString> TaskProcess::launchCommand(const TaskProcessData &processData) {
-    QPair<QString,QString> retour;
+QProcessOutput TaskProcess::launchCommand(const TaskProcessData &processData) {
+    QProcessOutput retour;
     QString fullCommand = processData.command;
     foreach(const QString &argument, processData.arguments)
         fullCommand += " " + argument;
 
-    qDebug("[PROCESS] %s in %s", qPrintable(fullCommand), qPrintable(processData.workingDirectory));
+    //qDebug("[PROCESS] %s in %s", qPrintable(fullCommand), qPrintable(processData.workingDirectory));
     QProcess process;
     process.setWorkingDirectory(processData.workingDirectory);
     process.start(processData.command, processData.arguments);
@@ -192,7 +200,7 @@ QPair<QString,QString> TaskProcess::launchCommand(const TaskProcessData &process
 }
 
 
-void TaskProcessData::parseOutput(const QPair<QString,QString> &result) {
+void TaskProcessData::parseOutput(const QProcessOutput &result) {
     resultCommand = result.first;
     resultOutput  = result.second.split("\n");
 }

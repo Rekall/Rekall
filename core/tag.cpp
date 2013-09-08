@@ -22,37 +22,45 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
     timelineTimeDurationText.setStyle(QSize( 70, Global::timelineTagHeightDest), Qt::AlignCenter,  Global::fontSmall);
 }
 
-void Tag::test(qreal tS) {
+void Tag::create(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
     if(document->function == DocumentFunctionRender) {
-        setType(TagTypeContextualTime, tS);
+        setType(_type, _timeStart);
         Global::renders.insert(document->getMetadata("Rekall", "Document Name").toString(), this);
         playerVideo = new PlayerVideo();
         playerVideo->load(document->file.absoluteFilePath());
-        setTimeEnd(timeStart + Global::aleaF(30, 60));
         //document->setMetadata("Rekall", "Media Offset", Global::aleaF(142, 142), documentVersion);
         document->setMetadata("Rekall", "Timeline thumbnail", "picture", documentVersion);
         connect(&document->renderActive, SIGNAL(triggered(bool)), SLOT(renderActiveChanged()));
+        if(debug)
+            _duration = Global::aleaF(30, 60);
     }
     else {
-        qreal val = Global::alea(0, 100);
-        if(val < 30)      setType(TagTypeContextualTime, tS);
-        else if(val < 50) setType(TagTypeContextualMilestone, tS);
-        else              setType(TagTypeGlobal, 0);
+        if(debug) {
+            qreal val = Global::alea(0, 100);
+            if(val < 30)      setType(TagTypeContextualTime, _timeStart);
+            else if(val < 50) setType(TagTypeContextualMilestone, _timeStart);
+            else              setType(TagTypeGlobal, 0);
+        }
+        else
+            setType(_type, _timeStart);
 
-        if(type == TagTypeContextualTime)
-            setTimeEnd(timeStart + Global::aleaF(2, 8));
-        if(Global::aleaF(0, 1) > 50) {
+        if((debug) && (Global::aleaF(0, 1) > 50)) {
             if(document->type == DocumentTypeImage)
                 document->setMetadata("Rekall", "Timeline thumbnail", "picture", documentVersion);
         }
-        if(Global::aleaF(0, 100) > 80) {
+        if((debug) && (Global::aleaF(0, 100) > 80)) {
             qreal tirage = Global::aleaF(0, 100);
             if(tirage > 66)       linkedRenders << "Captation 1";
             else if(tirage > 33)  linkedRenders << "Captation 2";
             else                  linkedRenders << "Captation 3";
         }
+        if(debug)
+            _duration = Global::aleaF(2, 8);
     }
+    if(type == TagTypeContextualTime)
+        setTimeEnd(timeStart + _duration);
 }
+
 
 void Tag::setType(TagType _type, qreal time) {
     type = _type;
@@ -376,7 +384,7 @@ const QRectF Tag::paintTimeline(bool before) {
             Global::timelineGL->qglColor(Qt::white);
             getDocument()->thumbnails.first().drawTexture(Global::timelineGL->visibleRect);
         }
-        Global::mainWindow->displayDocumentName(QString("%1 (%2)").arg(getDocument()->getMetadata("Document Name").toString()).arg(getDocument()->getMetadata("Document Folder").toString()));
+        Global::mainWindow->displayDocumentName(QString("%1 (%2)").arg(getDocument()->getMetadata("Rekall", "Document Name").toString()).arg(getDocument()->getMetadata("Rekall", "Document Folder").toString()));
         Global::mainWindow->displayPixmap(getDocument()->getThumbnail(documentVersion));
         Global::mainWindow->displayGps(getDocument()->getGps());
     }
@@ -497,23 +505,23 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
     else if(action)
         mouseHover = mouseHoverPreview = false;
 
-    if((action) && (mouseHover) && ((e->buttons() & Qt::LeftButton) == Qt::LeftButton)) {
+    if((action) && (mouseHover) && (((e->button() & Qt::LeftButton) == Qt::LeftButton) || ((e->button() & Qt::RightButton) == Qt::RightButton))) {
         if(Global::selectedTag != this) {
             Global::selectedTag = this;
             Global::selectedTagStartDrag = timelineProgress(pos) * getDuration();
-            if((timelineProgress(pos) < 0.1) && (type == TagTypeContextualTime))
-                Global::selectedTagMode = TagSelectionStart;
-            else if((timelineProgress(pos) > 0.9) && (type == TagTypeContextualTime))
-                Global::selectedTagMode = TagSelectionEnd;
-            else
-                Global::selectedTagMode = TagSelectionMove;
-            Global::viewerGL  ->ensureVisible(viewerPos);
+            if((e->button() & Qt::LeftButton) == Qt::LeftButton) {
+                if((timelineProgress(pos) < 0.1) && (type == TagTypeContextualTime))        Global::selectedTagMode = TagSelectionStart;
+                else if((timelineProgress(pos) > 0.9) && (type == TagTypeContextualTime))   Global::selectedTagMode = TagSelectionEnd;
+                else                                                                        Global::selectedTagMode = TagSelectionMove;
+            }
+            Global::viewerGL->ensureVisible(viewerPos);
         }
         if(document->chutierItem)
             Global::chutier->setCurrentItem(document->chutierItem);
     }
     if((action) && (dbl) && (mouseHover))
         Global::currentProject->askDisplayMetaData();
+
     return mouseHover;
 }
 bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool) {
@@ -524,7 +532,7 @@ bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool) 
     }
     else
         mouseHover = mouseHoverPreview = false;
-    if((mouseHover) && ((e->buttons() & Qt::LeftButton) == Qt::LeftButton)) {
+    if((mouseHover) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
         Global::selectedTag = this;
         Global::selectedTagMode = TagSelectionMove;
         Global::timelineGL->ensureVisible(timelinePos);

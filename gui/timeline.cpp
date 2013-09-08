@@ -123,7 +123,7 @@ const QRectF Timeline::paintViewer() {
 
 
 bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool, bool, bool action) {
-    if((action) && ((e->buttons() & Qt::LeftButton) == Qt::LeftButton)) {
+    if((action) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
         seek(Global::currentProject->getTimelineCursorTime(pos));
         return true;
     }

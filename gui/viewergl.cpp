@@ -87,20 +87,20 @@ void ViewerGL::mouseMoveLong() {
         mouseMove(0, false, true);
 }
 void ViewerGL::mouseMove(QMouseEvent *e, bool dbl, bool stay) {
-    QPointF pos = scroll;
-    if(e)   pos += e->posF();
-    else    pos += mouseTimerPos;
+    QPointF mousePos = scroll;
+    if(e)   mousePos += e->posF();
+    else    mousePos += mouseTimerPos;
     bool action = true;
     if(Global::selectedTag) {
         Tag *selectedTag = (Tag*)Global::selectedTag;
         if(Global::selectedTagMode == TagSelectionMove)
-            selectedTag->moveTo(Global::currentProject->getViewerCursorTime(pos));
+            selectedTag->moveTo(Global::currentProject->getViewerCursorTime(mousePos));
         action = false;
     }
     if(e) {
         bool ok = false;
-        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseViewer(pos, e, dbl, stay, action);
-        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseViewer(pos, e, dbl, stay, action);
+        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseViewer(mousePos, e, dbl, stay, action);
+        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseViewer(mousePos, e, dbl, stay, action);
     }
 }
 void ViewerGL::wheelEvent(QWheelEvent *e) {

@@ -5,6 +5,7 @@ QStringList Metadata::suffixesTypeDoc;
 QStringList Metadata::suffixesTypeImage;
 QStringList Metadata::suffixesTypeAudio;
 QStringList Metadata::suffixesTypePatches;
+QStringList Metadata::suffixesTypePeople;
 
 Metadata::Metadata(QObject *parent, bool createEmpty) :
     QObject(parent) {
@@ -22,6 +23,8 @@ Metadata::Metadata(QObject *parent, bool createEmpty) :
         suffixesTypePatches << "pde" << "maxpat" << "sc" << "pd" << "iannix";
     if(!suffixesTypeVideo.count())
         suffixesTypeVideo << "3g2" << "3gp" << "4xm" << "a64" << "act" << "adf" << "adts" << "adx" << "aea" << "aiff" << "alaw" << "amr" << "anm" << "apc" << "ape" << "asf" << "asf_stream" << "ass" << "au" << "avi" << "avm2" << "avs" << "bethsoftvid" << "bfi" << "bin" << "bink" << "bit" << "bmv" << "c93" << "caf" << "cavsvideo" << "cdg" << "cdxl" << "crc" << "daud" << "dfa" << "dirac" << "dnxhd" << "dsicin" << "dts" << "dv" << "dvd" << "dxa" << "ea" << "ea_cdata" << "eac3" << "f32be" << "f32le" << "f4v" << "f64be" << "f64le" << "ffm" << "ffmetadata" << "film_cpk" << "filmstrip" << "flac" << "flic" << "flv" << "framecrc" << "framemd5" << "g722" << "g723_1" << "g729" << "gif" << "gsm" << "gxf" << "h261" << "h263" << "h264" << "hls" << "applehttp" << "ico" << "idcin" << "idf" << "iff" << "ilbc" << "image2" << "image2pipe" << "ingenient" << "ipmovie" << "ipod" << "ismv" << "iss" << "iv8" << "ivf" << "jacosub" << "jv" << "latm" << "lavfi" << "libmodplug" << "lmlm4" << "loas" << "lxf" << "m4v" << "matroska" << "matroska" << "webm" << "md5" << "mgsts" << "microdvd" << "mjpeg" << "mkvtimestamp_v2" << "mlp" << "mm" << "mmf" << "mov" << "mov" << "mp4" << "3gp" << "mp2"<< "mp4" << "mpc" << "mpc8" << "mpeg" << "mpeg1video" << "mpeg2video" << "mpegts" << "mpegtsraw" << "mpegvideo" << "mpjpeg" << "msnwctcp" << "mtv" << "mulaw" << "mvi" << "mxf" << "mxf_d10" << "mxg" << "nc" << "nsv" << "null" << "nut" << "nuv" << "ogg" << "oma" << "paf" << "pmp" << "psp" << "psxstr" << "pva" << "qcp" << "r3d" << "rawvideo" << "rcv" << "realtext" << "rl2" << "rm" << "roq" << "rpl" << "rso" << "rtp" << "rtsp" << "s16be" << "s16le" << "s24be" << "s24le" << "s32be" << "s32le" << "s8" << "sami" << "sap" << "sbg" << "sdl" << "sdp" << "segment" << "shn" << "siff" << "smjpeg" << "smk" << "smoothstreaming" << "smush" << "sol" << "sox" << "spdif" << "srt" << "stream_segment" << "s" << "subviewer" << "svcd" << "swf" << "thp" << "tiertexseq" << "tmv" << "truehd" << "tta" << "tty" << "txd" << "u16be" << "u16le" << "u24be" << "u24le" << "u32be" << "u32le" << "u8" << "vc1" << "vc1test" << "vcd" << "vmd" << "vob" << "voc" << "vqf" << "w64" << "wav" << "wc3movie" << "webm" << "webvtt" << "wsaud" << "wsvqa" << "wtv" << "wv" << "xa" << "xbin" << "xmv" << "xwma" << "yop" << "yuv4mpegpipe";
+    if(!suffixesTypePeople.count())
+        suffixesTypePeople << "vcf";
 
     if(createEmpty)
         metadatas.append(QMetaDictionnay());
@@ -36,7 +39,6 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     file.refresh();
     type = DocumentTypeFile;
     creation = updateImport(file.baseName(), version);
-
     if(creation) {
         status = DocumentStatusWaiting;
         Global::taskList->addTask(this, TaskProcessTypeMetadata, version);
@@ -84,6 +86,10 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
         type = DocumentTypeFile;
         typeStr = "Patches";
     }
+    else if(suffixesTypePeople.contains(file.suffix().toLower())) {
+        type = DocumentTypePeople;
+        typeStr = "People";
+    }
     else {
         type = DocumentTypeFile;
         typeStr = "Other";
@@ -128,6 +134,69 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
 
     if(name.toLower().contains("captation"))
         function = DocumentFunctionRender;
+
+    return creation;
+}
+
+bool Metadata::updateCard(const PersonCard &card, qint16 version) {
+    bool creation = false;
+    type = DocumentTypePeople;
+    creation = updateImport(card.getFullname(), version);
+    setMetadata("Rekall", "Document Category", "People", version);
+
+    QString previousLabel = "";
+    for(quint16 i = 0 ; i < card.count() ; i++) {
+        const QPair<PersonCardHeader, PersonCardValues> cardInfo = card.at(i);
+        if(cardInfo.first.category != "photo") {
+            QString key = cardInfo.first.toString();
+            QString value = cardInfo.second.toString();
+
+            QStringList keySplitType = key.split("(type=");
+            QStringList keySplitInfo = keySplitType.at(0).split(".");
+
+            QString intitule = keySplitInfo.at(keySplitInfo.count()-1).trimmed();
+            QString intituleDetail;
+            if(keySplitType.count() > 1)
+                intituleDetail = keySplitType[1].split(",").first().remove(")").trimmed().toLower();
+
+            QMap<QString,QString> intituleRemplacements;
+            intituleRemplacements.insert("adr",             "Address");
+            intituleRemplacements.insert("email",           "Email");
+            intituleRemplacements.insert("org",             "Organization");
+            intituleRemplacements.insert("tel",             "Phone Number");
+            intituleRemplacements.insert("title",           "Role");
+            intituleRemplacements.insert("note",            "Note");
+            intituleRemplacements.insert("url",             "URL");
+            intituleRemplacements.insert("bday",            "Birthday");
+            intituleRemplacements.insert("lang",            "Langage");
+            intituleRemplacements.insert("x-socialprofile", "Social Profile");
+            intituleRemplacements.insert("x-abadr",         "");
+            intituleRemplacements.insert("prodid",          "");
+            intituleRemplacements.insert("version",         "");
+            intituleRemplacements.insert("n",               "");
+            intituleRemplacements.insert("fn",              "");
+            intituleRemplacements.insert("impp",            "");
+            intituleRemplacements.insert("uid",             "");
+            intituleRemplacements.insert("x-abuid",         "");
+            intituleRemplacements.insert("x-abshowas",      "");
+            intituleRemplacements.insert("catagories",      "");
+            if(intituleRemplacements.contains(intitule)) intitule = intituleRemplacements.value(intitule);
+
+            if(!intitule.isEmpty()) {
+                if(!previousLabel.isEmpty())        intitule = QString("%1 (%2)").arg(intitule).arg(previousLabel);
+                else if(!intituleDetail.isEmpty())  intitule = QString("%1 (%2)").arg(intitule).arg(intituleDetail);
+                else                                intitule = QString("%1").arg(intitule);
+
+                if(intitule == "x-ablabel")
+                    previousLabel = cardInfo.second.toString().trimmed().remove("_$!<").remove(">!$_").toLower();
+                else {
+                    setMetadata("Contact details", intitule, value.replace("\\n", " ").replace("\n", " ").replace(";", " ").trimmed(), version);
+                    previousLabel.clear();
+                }
+            }
+        }
+    }
+    photo = card.getPhoto();
 
     return creation;
 }
@@ -257,7 +326,9 @@ const MetadataElement Metadata::getCriteriaSortRaw(qint16 version) {
 }
 const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) {
     QPair<QString, QPixmap> retour;
-    if(getMetadata("Rekall", "Snapshot", version).toString() == "Comment")
+    if(!photo.isNull())
+        return qMakePair(QString(), QPixmap::fromImage(photo));
+    else if(getMetadata("Rekall", "Snapshot", version).toString() == "Comment")
         return qMakePair(QString("%1_%2.jpg").arg(Global::cacheFile("comment", file)).arg(version), QPixmap(QString("%1_%2.jpg").arg(Global::cacheFile("comment", file)).arg(version)));
     else if(getMetadata("Rekall", "Snapshot", version).toString() == "Note")
         return qMakePair(QString("%1_%2.jpg").arg(Global::cacheFile("note", getMetadata("Rekall", "Note ID").toString())).arg(version), QPixmap(QString("%1_%2.jpg").arg(Global::cacheFile("note", getMetadata("Rekall", "Note ID").toString())).arg(version)));
@@ -269,7 +340,22 @@ const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) {
         return retour;
 }
 
-const QPair<QString, QString> Metadata::getGps() {
+const QList<QPair<QString, QString> > Metadata::getGps() {
+    if((type == DocumentTypePeople) && (getMetadata().contains("Contact details"))) {
+        QMapIterator<QString, MetadataElement> metaIterator(getMetadata().value("Contact details"));
+        QList<QPair<QString,QString> > gpsList;
+        while(metaIterator.hasNext()) {
+            metaIterator.next();
+            if(metaIterator.key().contains("Address")) {
+                QPair<QString,QString> gpsPeople;
+                gpsPeople.first  = metaIterator.value().toString();
+                gpsPeople.second = metaIterator.key();
+                gpsList << gpsPeople;
+            }
+        }
+        return gpsList;
+    }
+
     QPair<QString,QString> gps;
     gps.first  = getMetadata("GPS Coordinates").toString();
     gps.second = getMetadata("Rekall", "Document Name").toString();
@@ -277,9 +363,7 @@ const QPair<QString, QString> Metadata::getGps() {
         gps.first  = getMetadata("Rekall User Infos", "Location GPS").toString();
         gps.second = getMetadata("Rekall User Infos", "Location Place").toString();
     }
-    if(gps.second.isEmpty())
-        gps.second = getMetadata("Rekall User Infos", "Location Place").toString();
-    return gps;
+    return (QList< QPair<QString,QString> >() << gps);
 }
 
 

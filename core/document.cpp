@@ -32,7 +32,7 @@ void Document::createTagBasedOnPrevious(qint16 _forVersion) {
         }
         foreach(Tag *tag, tagsToDuplicate) {
             Tag *newTag = new Tag(this, forVersion);
-            newTag->test(tag->timeStart);
+            newTag->create(tag->type, tag->timeStart, tag->getDuration());
             newTag->timelinePos     = tag->timelinePos;
             newTag->timelineDestPos = tag->timelineDestPos;
             newTag->viewerPos       = tag->viewerPos;
@@ -50,13 +50,13 @@ void Document::createTagBasedOnPrevious(qint16 _forVersion) {
                 quint16 nb = Global::alea(1, 1);
                 for(quint16 j = 0 ; j < nb ; j++) {
                     Tag *tag = new Tag(this, i);
-                    tag->test(tS + Global::aleaF(-5, 15));
+                    tag->create(TagTypeContextualTime, tS + Global::aleaF(-5, 15), -1, true);
                     tags.append(tag);
                 }
             }
             else {
                 Tag *tag = new Tag(this, forVersion);
-                tag->test(tS);
+                tag->create(TagTypeContextualTime, tS, -1, true);
                 tags.append(tag);
             }
         }
@@ -78,3 +78,4 @@ QDomElement Document::serialize(QDomDocument &xmlDoc) {
 void Document::deserialize(const QDomElement &xmlElement) {
     QString a = xmlElement.attribute("attribut");
 }
+

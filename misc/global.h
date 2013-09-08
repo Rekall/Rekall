@@ -138,6 +138,7 @@ public:
     }
 public:
     virtual void addDocument(void *document) = 0;
+    virtual void addPerson(void* person) = 0;
 };
 class TaskListBase {
 public:
@@ -173,12 +174,16 @@ public:
 
 class RekallBase : public QMainWindow {
 public:
+    QTreeWidget *personsTreeWidget;
+public:
     explicit RekallBase(QWidget *parent = 0) : QMainWindow(parent) {}
 public:
     virtual void setVisbility(bool) = 0;
     virtual void displayDocumentName(const QString &documentName = "") = 0;
     virtual void displayPixmap(const QPair<QString, QPixmap> &_picture) = 0;
-    virtual void displayGps(const QPair<QString,QString> &gps) = 0;
+    virtual void displayGps(const QList< QPair<QString,QString> > &gps) = 0;
+public:
+    virtual bool parseMimeData(const QMimeData *mime, const QString &source, bool test = false) = 0;
 };
 
 

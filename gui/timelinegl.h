@@ -15,6 +15,7 @@ public:
 private:
     qreal showLegend;
     QList<GlText> categories;
+    QMenu *tagMenu;
 
 protected:
     void timerEvent(QTimerEvent *);
@@ -36,7 +37,7 @@ public slots:
 protected:
     void dragEnterEvent(QDragEnterEvent *);
     void dropEvent(QDropEvent *);
-    
+
 signals:
     
 public slots:

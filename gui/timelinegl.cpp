@@ -9,6 +9,8 @@ TimelineGL::TimelineGL(QWidget *parent) :
     showLegend = 0;
     showLegendDest = true;
     connect(&mouseTimer, SIGNAL(timeout()), SLOT(mouseMoveLong()));
+
+    tagMenu = new QMenu(Global::mainWindow);
 }
 
 void TimelineGL::timerEvent(QTimerEvent *) {
@@ -167,37 +169,58 @@ void TimelineGL::mouseMoveLong() {
         mouseMove(0, false, true);
 }
 void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay) {
-    QPointF pos = scroll;
-    if(e)   pos += e->posF();
-    else    pos += mouseTimerPos;
+    QPointF mousePos = scroll;
+    if(e)   mousePos += e->posF();
+    else    mousePos += mouseTimerPos;
     bool action = true;
+
     if(Global::selectedTag) {
         Tag *selectedTag = (Tag*)Global::selectedTag;
-        if(Global::selectedTagMode == TagSelectionStart) {
-            selectedTag->setTimeStart(Global::currentProject->getTimelineCursorTime(pos));
-            setCursor(Qt::SizeHorCursor);
-        }
-        else if(Global::selectedTagMode == TagSelectionEnd) {
-            selectedTag->setTimeEnd(Global::currentProject->getTimelineCursorTime(pos));
-            setCursor(Qt::SizeHorCursor);
+
+        if((e->button() & Qt::RightButton) == Qt::RightButton) {
+            /*
+            tagMenu->clear();
+            QAction *toGlobal = 0, *toContextual = 0;
+            if(selectedTag->type == TagTypeGlobal)  toGlobal     = tagMenu->addAction("Convert to global document");
+            else                                    toContextual = tagMenu->addAction("Convert to contextual document");
+            QAction *retour = tagMenu->exec(QCursor::pos());
+            if(retour) {
+                if(retour == toGlobal) {
+
+                }
+                else if(retour == toContextual) {
+
+                }
+            }
+            */
         }
         else {
-            if(stay) {
-                if(selectedTag->type == TagTypeContextualMilestone) selectedTag->setType(TagTypeContextualTime,      Global::currentProject->getTimelineCursorTime(pos));
-                else if(selectedTag->type == TagTypeContextualTime) selectedTag->setType(TagTypeContextualMilestone, Global::currentProject->getTimelineCursorTime(pos));
-                Global::selectedTagStartDrag = (selectedTag->timeEnd - selectedTag->timeStart) / 2;
+            if(Global::selectedTagMode == TagSelectionStart) {
+                selectedTag->setTimeStart(Global::currentProject->getTimelineCursorTime(mousePos));
+                setCursor(Qt::SizeHorCursor);
             }
-            if((e) && (mouseTimerPos != e->pos())) {
-                selectedTag->moveTo(Global::currentProject->getTimelineCursorTime(pos) - Global::selectedTagStartDrag);
-                setCursor(Qt::ClosedHandCursor);
+            else if(Global::selectedTagMode == TagSelectionEnd) {
+                selectedTag->setTimeEnd(Global::currentProject->getTimelineCursorTime(mousePos));
+                setCursor(Qt::SizeHorCursor);
+            }
+            else {
+                if(stay) {
+                    if(selectedTag->type == TagTypeContextualMilestone) selectedTag->setType(TagTypeContextualTime,      Global::currentProject->getTimelineCursorTime(mousePos));
+                    else if(selectedTag->type == TagTypeContextualTime) selectedTag->setType(TagTypeContextualMilestone, Global::currentProject->getTimelineCursorTime(mousePos));
+                    Global::selectedTagStartDrag = (selectedTag->timeEnd - selectedTag->timeStart) / 2;
+                }
+                if((e) && (mouseTimerPos != e->pos())) {
+                    selectedTag->moveTo(Global::currentProject->getTimelineCursorTime(mousePos) - Global::selectedTagStartDrag);
+                    setCursor(Qt::ClosedHandCursor);
+                }
             }
         }
         action = false;
     }
     if(e) {
         bool ok = false;
-        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseTimeline(pos, e, dbl, stay, action);
-        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseTimeline(pos, e, dbl, stay, action);
+        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseTimeline(mousePos, e, dbl, stay, action);
+        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseTimeline(mousePos, e, dbl, stay, action);
         setCursor(Qt::ArrowCursor);
     }
 }
@@ -208,29 +231,11 @@ void TimelineGL::wheelEvent(QWheelEvent *e) {
 
 
 void TimelineGL::dragEnterEvent(QDragEnterEvent *event) {
-    if(event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist")) {
-        const UiFileItem *file = qobject_cast<const UiFileItem*>(event->mimeData());
-        if(file) {
-            // access myData's data directly (not through QMimeData's API)
-        }
-    }
-    /*
-    foreach(const QString &format, event->mimeData()->formats())
-        qDebug("%s", qPrintable(format));
-    */
-    if (event->mimeData()->hasUrls())
-        event->acceptProposedAction();
+    if(Global::mainWindow->parseMimeData(event->mimeData(), "timeline", true))
+        return event->acceptProposedAction();
 }
-void TimelineGL::dropEvent(QDropEvent *) {
-    /*
-    const QMimeData* mimeData = event->mimeData();
-    if (mimeData->hasUrls()) {
-        QList<QUrl> urlList = mimeData->urls();
-        QStringList files;
-        for(int i = 0; i < urlList.size() && i < 32; ++i)
-            files << urlList.at(i).toLocalFile();;
-        askImport(files);
-        event->acceptProposedAction();
-    }
-    */
+void TimelineGL::dropEvent(QDropEvent *event) {
+    if(Global::mainWindow->parseMimeData(event->mimeData(), "timeline"))
+        return event->acceptProposedAction();
 }
+

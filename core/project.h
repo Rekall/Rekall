@@ -12,15 +12,27 @@ class Project : public ProjectBase {
 
 public:
     explicit Project(QWidget *parent = 0);
-    inline void open(const QDir &dir) { open(dir, dir); }
+    void open(const QFileInfoList &file, UiTreeView *view, bool debug = false);
 private:
-    void open(const QDir &dir, const QDir &dirBase);
+    void open(const QDir &dir, const QDir &dirBase, bool debug = false);
 
 public:
     QList<Document*> documents;
     QList<Person*> persons;
 public:
-    void addDocument(void *document) { documents.append((Document*)document); }
+    void addDocument(void *_document) {
+        Document *document = (Document*)_document;
+        documents.append(document);
+    }
+    void addPerson(void* _person) {
+        Person *person = (Person*)_person;
+        Global::mainWindow->personsTreeWidget->addTopLevelItem(person);
+        persons.append(person);
+    }
+    void addTag(Tag *tag) {
+        Document *document = (Document*)tag->getDocument();
+        document->tags.append(tag);
+    }
 
 private:
     qreal categoryColorOpacity, categoryColorOpacityDest;

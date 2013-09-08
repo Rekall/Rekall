@@ -46,16 +46,15 @@ public:
     void setVisbility(bool show);
 
 private slots:
-    void displayMetadata();
 public:
     void displayDocumentName(const QString &documentName = "");
     void displayPixmap(const QPair<QString, QPixmap> &_picture);
-    void displayGps(const QPair<QString,QString> &gps);
+    void displayGps(const QList<QPair<QString, QString> > &gps);
 
 protected:
     void dragEnterEvent(QDragEnterEvent *);
     void dropEvent(QDropEvent *);
-    bool parseMimeData(const QMimeData *mime, bool test = false);
+    bool parseMimeData(const QMimeData *mime, const QString &source, bool test = false);
 
 private slots:
     void fileUploaded(QString gps, QString filename, QTemporaryFile*);
@@ -64,8 +63,9 @@ private slots:
     void closeSplash();
     void refreshAndLastMetadata();
     void refreshMetadata();
-    void refreshPerson();
     void chutierItemChanged(QTreeWidgetItem*,QTreeWidgetItem*);
+    void personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*);
+    void displayMetadata(Metadata *metadata, QTreeWidget*, QTreeWidgetItem*, QTreeWidgetItem*);
     void showInspector();
 
 private:

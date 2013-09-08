@@ -28,10 +28,6 @@ void UserInfos::update() {
 
     //Weather
     getWeather();
-
-
-    //List
-    debug();
 }
 
 const QString UserInfos::getInfo(const QString &key) {

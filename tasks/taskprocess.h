@@ -8,6 +8,9 @@
 #include <QTreeWidgetItem>
 #include "misc/global.h"
 #include "core/metadata.h"
+#include "core/person.h"
+
+typedef QPair<QString, QString> QProcessOutput;
 
 class TaskProcessData {
 public:
@@ -20,7 +23,7 @@ public:
     QString resultCommand;
     QStringList resultOutput;
 public:
-    void parseOutput(const QPair<QString,QString> &result);
+    void parseOutput(const QProcessOutput &result);
 
 public:
     explicit TaskProcessData() {}
@@ -48,7 +51,7 @@ public:
     TaskProcessData processedDocument;
     bool taskStarted;
 public:
-    static QPair<QString,QString> launchCommand(const TaskProcessData &processData);
+    static QProcessOutput launchCommand(const TaskProcessData &processData);
 
 private:
     void run();
