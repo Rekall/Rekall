@@ -276,7 +276,7 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
     if(item) {
         //Standard operations
         QString prefix0 = "<span style='font-family: Calibri, Arial; font-size: 10px; color: #F5F8FA'>", suffix0 = "</span>";
-        QString prefix1 = "<span style='font-family: Calibri, Arial; font-size: 10px; color: #C8C8C8'>", suffix1 = "</span>";
+        QString prefix1 = "<span style='font-family: Calibri, Arial; font-size: 10px; color: %1'>", suffix1 = "</span>";
         tree->setCurrentItem(item);
         metaIsChanging = true;
         QStringList expandItems;
@@ -310,9 +310,12 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
                 QMapIterator<QString,MetadataElement> ssMetaIterator(metaIterator.value());
                 while(ssMetaIterator.hasNext()) {
                     ssMetaIterator.next();
+                    QString color = "#C8C8C8";
+                    if(ssMetaIterator.key() == "Document Name")
+                        color = metadata->getColor().name();
                     QTreeWidgetItem *item = new QTreeWidgetItem(rootItem, QStringList()
                                                                 << prefix0 + ssMetaIterator.key() + suffix0
-                                                                << prefix1 + ssMetaIterator.value().toString() + suffix1);
+                                                                << prefix1.arg(color) + ssMetaIterator.value().toString() + suffix1);
                     item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
                 }
 

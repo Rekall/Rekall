@@ -46,7 +46,7 @@ void ViewerGL::paintGL() {
     if(format().stencil())  clearFlag |= GL_STENCIL_BUFFER_BIT;
     if(format().depth())    clearFlag |= GL_DEPTH_BUFFER_BIT;
     glClear(clearFlag);
-    qglClearColor(Global::colorBackgroundDark);
+    qglClearColor(Global::colorTextBlack);
 
     drawingBoundingRect = QRectF();
     scroll = scroll + (scrollDest - scroll) / Global::inertie;

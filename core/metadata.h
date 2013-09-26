@@ -147,6 +147,12 @@ public:
     void updateFeed();
     const QPair<QString, QPixmap> getThumbnail(qint16 version = -1);
     const QList< QPair<QString,QString> > getGps();
+    inline const QColor getColor() {
+        if(Global::colorForMeta.contains(getCriteriaColorFormated()))
+            return Global::colorForMeta.value(getCriteriaColorFormated()).first;
+        else
+            return Qt::lightGray;
+    }
 
 
 public:

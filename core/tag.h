@@ -15,12 +15,6 @@ public:
 public:
     UiFileItem *chutierItem;
     UiBool renderActive;
-    inline const QColor getColor() {
-        if(Global::colorForMeta.contains(getCriteriaColorFormated()))
-            return Global::colorForMeta.value(getCriteriaColorFormated()).first;
-        else
-            return Qt::lightGray;
-    }
 };
 
 class Tag : public QObject {

@@ -22,6 +22,9 @@
    </property>
    <item>
     <widget class="QTreeWidget" name="tasks">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
