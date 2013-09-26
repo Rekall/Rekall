@@ -119,8 +119,8 @@ void Project::fireEvents() {
         QMutableMapIterator<QString, QPair<QColor, qreal> > colorForMetaIterator(Global::colorForMeta);
         while(colorForMetaIterator.hasNext()) {
             colorForMetaIterator.next();
-            QColor color;
-            color.setHsvF(0.7 * index / (qreal)(Global::colorForMeta.count()-1), 0.7, 0.7);
+            QColor color = Global::getColorScale(index / (qreal)(Global::colorForMeta.count()-1));;
+            //color.setHsvF(0.7 * index / (qreal)(Global::colorForMeta.count()-1), 0.7, 0.7);
             colorForMetaIterator.setValue(qMakePair(color, colorForMetaIterator.value().second / documentPerColorCount));
             index++;
         }

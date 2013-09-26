@@ -249,6 +249,7 @@ public:
     static qreal getDurationFromString(QString timeStr);
     static QPair<QString,QString> seperateMetadata(const QString &metaline, const QString &separator = QString(":"));
     static QPair<QString, QPair<QString,QString> > seperateMetadataAndGroup(const QString &metaline, const QString &separator = QString(":"));
+    static QColor getColorScale(qreal val);
 
 public:
     static void seek(qreal);

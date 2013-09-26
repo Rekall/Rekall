@@ -5,6 +5,7 @@ Previewer::Previewer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Previewer) {
     ui->setupUi(this);
+    ui->picture->setVisible(false);
 }
 
 Previewer::~Previewer() {
