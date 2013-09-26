@@ -19,7 +19,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void mouseDoubleClickEvent(QMouseEvent *e);
-    void mouseMove(QMouseEvent *, bool, bool);
+    void mouseMove(QMouseEvent *, bool, bool, bool);
     void wheelEvent(QWheelEvent *);
     void leaveEvent(QEvent *);
     void paintGL();

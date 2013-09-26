@@ -45,7 +45,7 @@ void TimelineGL::paintGL() {
     if(format().stencil())  clearFlag |= GL_STENCIL_BUFFER_BIT;
     if(format().depth())    clearFlag |= GL_DEPTH_BUFFER_BIT;
     glClear(clearFlag);
-    qglClearColor(Global::colorBackground);
+    qglClearColor(Global::colorTextBlack);
 
     drawingBoundingRect = QRectF();
     scroll = scroll + (scrollDest - scroll) / Global::inertie;
@@ -144,21 +144,21 @@ void TimelineGL::mousePressEvent(QMouseEvent *e) {
     mouseTimerPos = e->posF();
     mouseTimerOk = true;
     mouseTimer.start(1000);
-    mouseMove(e, false, false);
+    mouseMove(e, false, false, true);
 }
 void TimelineGL::mouseMoveEvent(QMouseEvent *e) {
     mouseTimerOk = false;
     mouseTimer.stop();
-    mouseMove(e, false, false);
+    mouseMove(e, false, false, false);
 }
 void TimelineGL::mouseReleaseEvent(QMouseEvent *e) {
     mouseTimerOk = false;
     mouseTimer.stop();
-    mouseMove(e, false, false);
+    mouseMove(e, false, false, false);
     Global::selectedTag = 0;
 }
 void TimelineGL::mouseDoubleClickEvent(QMouseEvent *e) {
-    mouseMove(e, true, false);
+    mouseMove(e, true, false, true);
 }
 void TimelineGL::leaveEvent(QEvent *) {
     Global::selectedTag      = 0;
@@ -166,9 +166,9 @@ void TimelineGL::leaveEvent(QEvent *) {
 }
 void TimelineGL::mouseMoveLong() {
     if(mouseTimerOk)
-        mouseMove(0, false, true);
+        mouseMove(0, false, true, true);
 }
-void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay) {
+void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
     QPointF mousePos = scroll;
     if(e)   mousePos += e->posF();
     else    mousePos += mouseTimerPos;
@@ -219,8 +219,8 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay) {
     }
     if(e) {
         bool ok = false;
-        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseTimeline(mousePos, e, dbl, stay, action);
-        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseTimeline(mousePos, e, dbl, stay, action);
+        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseTimeline(mousePos, e, dbl, stay, action, press);
+        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseTimeline(mousePos, e, dbl, stay, action, press);
         setCursor(Qt::ArrowCursor);
     }
 }

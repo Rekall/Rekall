@@ -27,8 +27,8 @@ protected:
     void timerEvent(QTimerEvent *);
     const QRectF paintTimeline(bool before = false);
     const QRectF paintViewer();
-    bool mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool);
-    bool mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool);
+    bool mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool);
+    bool mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool);
 
 public slots:
     void action();

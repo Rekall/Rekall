@@ -40,8 +40,8 @@ public:
 public:
     virtual const QRectF paintTimeline(bool before = false) = 0;
     virtual const QRectF paintViewer()   = 0;
-    virtual bool  mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool) = 0;
-    virtual bool  mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool) = 0;
+    virtual bool  mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool) = 0;
+    virtual bool  mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool) = 0;
 };
 
 class GlVideo {
@@ -227,7 +227,7 @@ public:
     static Udp *udp;
     static QFont font, fontSmall, fontLarge;
     static GlVideo *video;
-    static QColor colorAlternateStrong, colorAlternate, colorAlternateBold, colorAlternateInv, colorSelection, colorProgression, colorText, colorTextDark, colorBackground;
+    static QColor colorAlternateStrong, colorAlternate, colorAlternateBold, colorAlternateInv, colorSelection, colorProgression, colorText, colorTextDark, colorBackground, colorBackgroundDark, colorBackgroundMidDark, colorTextBlack;
     static QMap<QString, QPair<QColor, qreal> > colorForMeta;
     static bool timelineSortChanged, viewerSortChanged, eventsSortChanged, metaChanged;
     static WatcherBase *watcher;

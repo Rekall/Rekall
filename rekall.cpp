@@ -30,11 +30,11 @@ Rekall::Rekall(QWidget *parent) :
     http = new HttpListener(settings, httpUpload, this);
     connect(httpUpload, SIGNAL(fileUploaded(QString, QString, QTemporaryFile*)), SLOT(fileUploaded(QString, QString, QTemporaryFile*)), Qt::QueuedConnection);
 
-    Global::font.setFamily("Gotham");
+    Global::font.setFamily("Calibri");
     Global::font.setPixelSize(10);
-    Global::fontSmall.setFamily("Gotham");
+    Global::fontSmall.setFamily("Calibri");
     Global::fontSmall.setPixelSize(9);
-    Global::fontLarge.setFamily("Gotham");
+    Global::fontLarge.setFamily("Calibri");
     Global::fontLarge.setPixelSize(20);
 
     UiFileItem::configure(ui->chutier, false);

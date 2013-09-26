@@ -15,8 +15,8 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QFrame#frameGlobal {
-	background-color: 	rgb(242, 241, 237);
-	border: 					4px solid rgb(186, 185, 182);
+	background-color: 	transparent;
+	border: 					0px solid black;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">

@@ -79,10 +79,8 @@ int main(int argc, char *argv[]) {
     if(argc > indexArgument)
         project = QFileInfo(Global::pathCurrent.absoluteFilePath() + "/" + argv[indexArgument]);
 
-    /*
     if(QFontDatabase::addApplicationFont(Global::pathApplication.absoluteFilePath() + "/Tools/Rekall.ttf"))
         qDebug("Loading Rekall font failed");
-        */
     qsrand(QDateTime::currentDateTime().toTime_t());
 
     Rekall w;

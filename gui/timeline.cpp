@@ -31,6 +31,7 @@ const QRectF Timeline::paintTimeline(bool before) {
     if((0 > Global::thumbnailSlider) || (Global::thumbnailSlider > 1))
         Global::thumbnailSliderStep = -Global::thumbnailSliderStep;
     Global::thumbnailSlider = Global::thumbnailSlider + Global::thumbnailSliderStep;
+    glLineWidth(1);
 
     if(before) {
         //Ticks
@@ -40,14 +41,14 @@ const QRectF Timeline::paintTimeline(bool before) {
             text.setText(Global::timeToString(ticks.count() * Global::timeUnitTick));
             ticks.append(text);
         }
-        Global::timelineGL->qglColor(Global::colorAlternate);
+        Global::timelineGL->qglColor(Global::colorAlternateInv);
         QRectF tickRectOld;
         glBegin(GL_LINES);
         for(quint16 tickIndex = 0 ; tickIndex < ticks.count() ; tickIndex++) {
             QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
             if(!tickRect.intersects(tickRectOld)) {
-                glVertex2f(tickRect.x(), Global::timelineGL->scroll.y());
-                glVertex2f(tickRect.x(), Global::timelineGL->scroll.y() + Global::timelineGL->height());
+                glVertex2f(tickRect.x(), Global::timelineGL->scroll.y() + Global::timelineHeaderSize.height());
+                glVertex2f(tickRect.x(), Global::timelineGL->scroll.y() + Global::timelineHeaderSize.height() + Global::timelineGL->height());
                 tickRectOld = tickRect;
             }
         }
@@ -55,9 +56,9 @@ const QRectF Timeline::paintTimeline(bool before) {
     }
     else {
         //Timetext
-        Global::timelineGL->qglColor(Global::colorAlternateInv);
+        Global::timelineGL->qglColor(Global::colorBackground);
         GlRect::drawRect(QRectF(QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + Global::timelineGL->scroll.x(), Global::timelineGL->scroll.y()), QSizeF(Global::timelineGL->width(), Global::timelineHeaderSize.height())));
-        Global::timelineGL->qglColor(Global::colorText);
+        Global::timelineGL->qglColor(Global::colorTextBlack);
         QRectF tickRectOld;
         for(quint16 tickIndex = 1 ; tickIndex < ticks.count() ; tickIndex++) {
             QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
@@ -73,18 +74,16 @@ const QRectF Timeline::paintTimeline(bool before) {
         QRectF timelineBoundingRect(QPointF(timelinePos.x() + 1, Global::timelineGL->scroll.y()), QSizeF(-50, Global::timelineGL->height()));
 
         glBegin(GL_QUADS);
-        Global::timelineGL->qglColor(QColor(45, 202, 225, 64));    glVertex2f(timelineBoundingRect.topLeft()    .x(), timelineBoundingRect.topLeft()    .y());
-        Global::timelineGL->qglColor(QColor(45, 202, 225, 0));     glVertex2f(timelineBoundingRect.topRight()   .x(), timelineBoundingRect.topRight()   .y());
-        Global::timelineGL->qglColor(QColor(45, 202, 225, 0));     glVertex2f(timelineBoundingRect.bottomRight().x(), timelineBoundingRect.bottomRight().y());
-        Global::timelineGL->qglColor(QColor(45, 202, 225, 64));    glVertex2f(timelineBoundingRect.bottomLeft() .x(), timelineBoundingRect.bottomLeft() .y());
+        Global::timelineGL->qglColor(QColor(50, 221, 255, 64));    glVertex2f(timelineBoundingRect.topLeft()    .x(), timelineBoundingRect.topLeft()    .y());
+        Global::timelineGL->qglColor(QColor(50, 221, 255, 0));     glVertex2f(timelineBoundingRect.topRight()   .x(), timelineBoundingRect.topRight()   .y());
+        Global::timelineGL->qglColor(QColor(50, 221, 255, 0));     glVertex2f(timelineBoundingRect.bottomRight().x(), timelineBoundingRect.bottomRight().y());
+        Global::timelineGL->qglColor(QColor(50, 221, 255, 64));    glVertex2f(timelineBoundingRect.bottomLeft() .x(), timelineBoundingRect.bottomLeft() .y());
         glEnd();
         Global::timelineGL->qglColor(Global::colorProgression);
-        glLineWidth(2);
         glBegin(GL_LINES);
         glVertex2f(timelineBoundingRect.topLeft()    .x(), timelineBoundingRect.topLeft()    .y());
         glVertex2f(timelineBoundingRect.bottomLeft() .x(), timelineBoundingRect.bottomLeft() .y());
         glEnd();
-        glLineWidth(1);
 
         //Current
         glDisable(GL_SCISSOR_TEST);
@@ -122,14 +121,14 @@ const QRectF Timeline::paintViewer() {
 }
 
 
-bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool, bool, bool action) {
+bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool, bool, bool action, bool) {
     if((action) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
         seek(Global::currentProject->getTimelineCursorTime(pos));
         return true;
     }
     return false;
 }
-bool Timeline::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool) {
+bool Timeline::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool, bool) {
     return false;
     if(dbl) {
         seek(Global::currentProject->getViewerCursorTime(pos));

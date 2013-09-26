@@ -46,7 +46,7 @@ void ViewerGL::paintGL() {
     if(format().stencil())  clearFlag |= GL_STENCIL_BUFFER_BIT;
     if(format().depth())    clearFlag |= GL_DEPTH_BUFFER_BIT;
     glClear(clearFlag);
-    qglClearColor(Global::colorBackground);
+    qglClearColor(Global::colorBackgroundDark);
 
     drawingBoundingRect = QRectF();
     scroll = scroll + (scrollDest - scroll) / Global::inertie;
@@ -62,21 +62,21 @@ void ViewerGL::mousePressEvent(QMouseEvent *e) {
     mouseTimerPos = e->posF();
     mouseTimerOk = true;
     mouseTimer.start(1000);
-    mouseMove(e, false, false);
+    mouseMove(e, false, false, true);
 }
 void ViewerGL::mouseMoveEvent(QMouseEvent *e) {
     mouseTimerOk = false;
     mouseTimer.stop();
-    mouseMove(e, false, false);
+    mouseMove(e, false, false, false);
 }
 void ViewerGL::mouseReleaseEvent(QMouseEvent *e) {
     mouseTimerOk = false;
     mouseTimer.stop();
-    mouseMove(e, false, false);
+    mouseMove(e, false, false, false);
     Global::selectedTag = 0;
 }
 void ViewerGL::mouseDoubleClickEvent(QMouseEvent *e) {
-    mouseMove(e, true, false);
+    mouseMove(e, true, false, true);
 }
 void ViewerGL::leaveEvent(QEvent *) {
     Global::selectedTag      = 0;
@@ -84,9 +84,9 @@ void ViewerGL::leaveEvent(QEvent *) {
 }
 void ViewerGL::mouseMoveLong() {
     if(mouseTimerOk)
-        mouseMove(0, false, true);
+        mouseMove(0, false, true, true);
 }
-void ViewerGL::mouseMove(QMouseEvent *e, bool dbl, bool stay) {
+void ViewerGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
     QPointF mousePos = scroll;
     if(e)   mousePos += e->posF();
     else    mousePos += mouseTimerPos;
@@ -99,8 +99,8 @@ void ViewerGL::mouseMove(QMouseEvent *e, bool dbl, bool stay) {
     }
     if(e) {
         bool ok = false;
-        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseViewer(mousePos, e, dbl, stay, action);
-        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseViewer(mousePos, e, dbl, stay, action);
+        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseViewer(mousePos, e, dbl, stay, action, press);
+        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseViewer(mousePos, e, dbl, stay, action, press);
     }
 }
 void ViewerGL::wheelEvent(QWheelEvent *e) {

@@ -79,7 +79,7 @@ public:
     void  setTimelinePos(const QPointF _timelineDestPos)    { timelineDestPos = _timelineDestPos;  }
     const QRectF getTimelineBoundingRect() const            { return timelineBoundingRect; }
     const QRectF paintTimeline(bool before = false);
-    bool  mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool);
+    bool  mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool);
     bool  timelineContains(const QPointF &pos);
     qreal timelineProgress(const QPointF &pos);
 
@@ -92,7 +92,7 @@ public:
     void  setViewerPos(const QPointF _viewerDestPos)  { viewerDestPos = _viewerDestPos;  }
     const QRectF getViewerBoundingRect() const        { return viewerBoundingRect; }
     const QRectF paintViewer(quint16 tagIndex);
-    bool  mouseViewer(const QPointF &, QMouseEvent *, bool, bool, bool);
+    bool  mouseViewer(const QPointF &, QMouseEvent *, bool, bool, bool, bool);
     bool  viewerContains(const QPointF &pos);
     qreal viewerProgress(const QPointF &pos);
 

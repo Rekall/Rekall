@@ -31,7 +31,7 @@ Inspector::Inspector(QWidget *parent) :
     Global::timelineTagHeightDest.setAction(ui->vZoom);
 
     ui->hZoom->setValue(13);
-    ui->vZoom->setValue(10);
+    ui->vZoom->setValue(8);
 }
 
 Inspector::~Inspector() {

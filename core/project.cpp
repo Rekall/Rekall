@@ -308,6 +308,18 @@ const QRectF Project::paintTimeline(bool before) {
             while(clustersInCategoriesIterator.hasNext()) {
                 clustersInCategoriesIterator.next();
 
+                bool drawToggle = false;
+                QMapIterator<QString, QList<Tag*> > tagsInClusterIterator(clustersInCategoriesIterator.value());
+                while(tagsInClusterIterator.hasNext()) {
+                    tagsInClusterIterator.next();
+                    foreach(Tag *tag, tagsInClusterIterator.value()) {
+                        if(tag->getDocument()->function == DocumentFunctionRender) {
+                            drawToggle = true;
+                            break;
+                        }
+                    }
+                }
+
                 QString sorting = clustersInCategoriesIterator.key();
                 if(debug)
                     qDebug("\t\t > [Sorting] %s", qPrintable(sorting));
@@ -319,34 +331,39 @@ const QRectF Project::paintTimeline(bool before) {
                 qreal nbTagsPerCategory = timelineCategoriesRectCache.at(categoryIndex).second;
 
                 //Draw heatmap
+                /*
                 QRectF categoryHeatRect = QRectF(QPointF(tagCategoryRect.left() + tagCategoryRect.width() - 2, tagCategoryRect.top()), QSizeF(Global::timelineNegativeHeaderWidth, tagCategoryRect.height()));
                 if(Global::timelineGL->visibleRect.intersects(categoryHeatRect.translated(QPointF(0, Global::timelineHeaderSize.height())))) {
                     glScissor(Global::timelineHeaderSize.width() - 2, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
                     quint16 val = nbTagsPerCategory * 255. / nbTagsPerCategories;
-                    Global::timelineGL->qglColor(QColor(0, 0, 0, val/2));
+                    if(drawToggle)
+                        Global::timelineGL->qglColor(Global::colorTextBlack);
+                    else
+                        Global::timelineGL->qglColor(QColor(255, 255, 255, val/2));
                     GlRect::drawRect(categoryHeatRect);
                     guiCategories.append(qMakePair(categoryHeatRect.translated(QPointF(0, Global::timelineHeaderSize.height())), qMakePair(phase, sorting)));
                     glScissor(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth, Global::timelineGL->height());
                 }
+                */
 
 
                 //New category
                 qreal yMax = 0;
-                bool drawToggle = false, drawToggleNext = false;
+                bool drawToggleNext = false;
                 nbTagsPerCategory = 0;
                 QString tagCategory;
                 UiBool *drawToggleActive = 0;
 
                 //Draw tags of this categetory
-                QMapIterator<QString, QList<Tag*> > tagsInClusterIterator(clustersInCategoriesIterator.value());
-                while(tagsInClusterIterator.hasNext()) {
-                    tagsInClusterIterator.next();
+                QMapIterator<QString, QList<Tag*> > tagsInClusterIterator2(clustersInCategoriesIterator.value());
+                while(tagsInClusterIterator2.hasNext()) {
+                    tagsInClusterIterator2.next();
 
-                    QString cluster = tagsInClusterIterator.key();
+                    QString cluster = tagsInClusterIterator2.key();
                     if(debug)
-                        qDebug("\t\t\t > [Cluster] %s (%d)", qPrintable(cluster), tagsInClusterIterator.value().count());
+                        qDebug("\t\t\t > [Cluster] %s (%d)", qPrintable(cluster), tagsInClusterIterator2.value().count());
 
-                    foreach(Tag *tag, tagsInClusterIterator.value()) {
+                    foreach(Tag *tag, tagsInClusterIterator2.value()) {
                         QRectF tagRect = tag->getTimelineBoundingRect().translated(tagSortPosOffset);
                         QPointF tagPosOffset;
 
@@ -409,9 +426,15 @@ const QRectF Project::paintTimeline(bool before) {
                 //Draw category background
                 if(Global::timelineGL->visibleRect.intersects(tagCategoryRect.translated(QPointF(0, Global::timelineHeaderSize.height())))) {
                     glDisable(GL_SCISSOR_TEST);
-                    Global::timelineGL->qglColor(Global::colorAlternate);
-                    GlRect::drawRect(tagCategoryRect);
-                    if(categoryIndex % 2) {
+                    if(drawToggle) {
+                        Global::timelineGL->qglColor(Global::colorAlternate);
+                        GlRect::drawRect(tagCategoryRect);
+                        //Global::timelineGL->qglColor(Global::colorBackgroundDark);
+                        //GlRect::drawRect(QRectF(tagCategoryRect.topLeft(), QSizeF(Global::timelineGL->width(), tagCategoryRect.height())));
+                    }
+                    else {
+                        Global::timelineGL->qglColor(Global::colorBackground);
+                        GlRect::drawRect(tagCategoryRect);
                         Global::timelineGL->qglColor(Global::colorAlternate);
                         GlRect::drawRect(QRectF(tagCategoryRect.topLeft(), QSizeF(Global::timelineGL->width(), tagCategoryRect.height())));
                     }
@@ -448,18 +471,20 @@ const QRectF Project::paintTimeline(bool before) {
                 //Super separator si big change of category
                 qreal vSpacing = Global::timelineTagVSpacingSeparator;
                 if(((drawToggle) && (!drawToggleNext)) || ((!drawToggle) && (drawToggleNext)))
-                    vSpacing = Global::timelineTagVSpacingSeparator * 2;
+                    vSpacing = Global::timelineTagVSpacingSeparator;
                 if((!clustersInCategoriesIterator.hasNext()) && (categoriesInPhasesIterator.hasNext()))
-                    vSpacing = Global::timelineTagVSpacingSeparator * 6;
+                    vSpacing = 10;
 
                 //Super category
                 if(vSpacing > Global::timelineTagVSpacingSeparator) {
                     tagCategoryRect = QRectF(QPointF(0, yMax + 2*Global::timelineTagVSpacing+1), QPointF(Global::timelineGL->width(), yMax + vSpacing)).translated(Global::timelineGL->scroll.x(), 0);
 
+                    /*
                     glDisable(GL_SCISSOR_TEST);
-                    Global::timelineGL->qglColor(Global::colorAlternate);
+                    Global::timelineGL->qglColor(Global::colorBackgroundDark);
                     textureStrips.drawTexture(tagCategoryRect, -4);
                     glEnable(GL_SCISSOR_TEST);
+                    */
                 }
 
                 //New offset
@@ -592,11 +617,11 @@ qreal Project::getViewerCursorTime(const QPointF &pos) {
     return time;
 }
 
-bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool stay, bool action) {
+bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool stay, bool action, bool press) {
     bool ok = false;
     foreach(Document *document, documents)
         foreach(Tag *tag, document->tags)
-            ok |= tag->mouseTimeline(pos, e, dbl, stay, action);
+            ok |= tag->mouseTimeline(pos, e, dbl, stay, action, press);
 
     if(!ok) {
         Global::selectedTag = 0;
@@ -604,7 +629,8 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
         if((e->button() & Qt::LeftButton) == Qt::LeftButton) {
             for(quint16 i = 0 ; i < guiToggles.count() ; i++) {
                 if(guiToggles.at(i).first.contains(pos)) {
-                    *guiToggles[i].second = !(*guiToggles[i].second);
+                    if(press)
+                        *guiToggles[i].second = !(*guiToggles[i].second);
                     return true;
                 }
             }
@@ -639,11 +665,11 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
     }
     return ok;
 }
-bool Project::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool stay, bool action) {
+bool Project::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool stay, bool action, bool press) {
     bool ok = false;
     foreach(Document *document, documents)
         foreach(Tag *tag, document->tags)
-            ok |= tag->mouseViewer(pos, e, dbl, stay, action);
+            ok |= tag->mouseViewer(pos, e, dbl, stay, action, press);
     if(!ok) {
         Global::selectedTag = 0;
         Global::selectedTagHover = 0;

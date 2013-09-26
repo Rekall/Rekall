@@ -29,7 +29,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void mouseDoubleClickEvent(QMouseEvent *e);
-    void mouseMove(QMouseEvent *, bool, bool);
+    void mouseMove(QMouseEvent *, bool, bool, bool press);
     void leaveEvent(QEvent *);
 public slots:
     void mouseMoveLong();

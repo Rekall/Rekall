@@ -17,8 +17,8 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
 
     viewerTimeText          .setStyle(QSize( 70, Global::viewerTagHeight), Qt::AlignCenter,    Global::font);
     viewerDocumentText      .setStyle(QSize(500, Global::viewerTagHeight), Qt::AlignVCenter,   Global::font);
-    timelineTimeStartText   .setStyle(QSize( 70, Global::timelineTagHeightDest), Qt::AlignRight,   Global::fontSmall);
-    timelineTimeEndText     .setStyle(QSize( 70, Global::timelineTagHeightDest), Qt::AlignLeft,    Global::fontSmall);
+    timelineTimeStartText   .setStyle(QSize( 70, Global::timelineTagHeightDest), Qt::AlignRight | Qt::AlignVCenter, Global::fontSmall);
+    timelineTimeEndText     .setStyle(QSize( 70, Global::timelineTagHeightDest), Qt::AlignLeft  | Qt::AlignVCenter, Global::fontSmall);
     timelineTimeDurationText.setStyle(QSize( 70, Global::timelineTagHeightDest), Qt::AlignCenter,  Global::fontSmall);
 }
 
@@ -180,8 +180,10 @@ const QRectF Tag::paintTimeline(bool before) {
                     timelineBoundingRect.setHeight((Global::thumbsEach * Global::timeUnit) * document->thumbnails.first().size.height() / document->thumbnails.first().size.width());
 
                 //Strip
-                Global::timelineGL->qglColor(color);
-                GlRect::drawRect(timelineBoundingRect);
+                if(document->function == DocumentFunctionContextual) {
+                    Global::timelineGL->qglColor(color);
+                    GlRect::drawRect(timelineBoundingRect);
+                }
 
                 if((document->type == DocumentTypeVideo) && (document->thumbnails.count())) {
                     //Media offset
@@ -201,12 +203,12 @@ const QRectF Tag::paintTimeline(bool before) {
                     qreal mediaOffset    = document->getMetadata("Rekall", "Media Offset").toDouble() / mediaDuration;
                     qreal sampleMax      = getDuration() / mediaDuration;
 
-                    Global::timelineGL->qglColor(Qt::white);
                     glBegin(GL_LINES);
+                    Global::timelineGL->qglColor(color);
                     for(qreal timeX = 0 ; timeX < timelineBoundingRect.width() ; timeX++) {
                         quint16 waveformIndex = qMin((int)((mediaOffset + timeX/timelineBoundingRect.width()*sampleMax) * document->waveform.count()), document->waveform.count()-1);
                         glVertex2f(timelineBoundingRect.left() + timeX, timelineBoundingRect.center().y() - document->waveform.at(waveformIndex).first  * document->waveform.normalisation * timelineBoundingRect.height()/2);
-                        glVertex2f(timelineBoundingRect.left() + timeX, timelineBoundingRect.center().y() - document->waveform.at(waveformIndex).second * document->waveform.normalisation * timelineBoundingRect.height()/2);
+                        glVertex2f(timelineBoundingRect.left() + timeX, timelineBoundingRect.center().y() - document->waveform.at(waveformIndex).second * document->waveform.normalisation * timelineBoundingRect.height()/2 + 1);
                     }
                     glEnd();
                 }
@@ -237,7 +239,7 @@ const QRectF Tag::paintTimeline(bool before) {
 
                     if(isTagLastVersion(this))
                         Global::timelineGL->qglColor(Qt::white);
-                    textPos = QPoint(timelineBoundingRect.center().x() - timelineTimeDurationText.size.width()/2, 1 + timelineBoundingRect.center().y() - timelineTimeEndText.size.height()/2);
+                    textPos = QPoint(timelineBoundingRect.center().x() - timelineTimeDurationText.size.width()/2, 1 + timelineBoundingRect.center().y() - timelineTimeDurationText.size.height()/2);
                     timelineTimeDurationText.drawText(Global::timeToString(getDuration()), textPos);
                 }
             }
@@ -492,7 +494,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
     return viewerBoundingRect.translated(viewerPos);
 }
 
-bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool action) {
+bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool action, bool) {
     if(timelineContains(pos)) {
         if(action) {
             mouseHover = true;
@@ -524,7 +526,7 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
 
     return mouseHover;
 }
-bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool) {
+bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, bool) {
     if(viewerContains(pos)) {
         mouseHover = true;
         if((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier)
