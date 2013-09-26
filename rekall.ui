@@ -304,7 +304,7 @@ QStatusBar {
             <x>0</x>
             <y>0</y>
             <width>136</width>
-            <height>257</height>
+            <height>260</height>
            </rect>
           </property>
           <attribute name="label">
@@ -334,8 +334,8 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>136</width>
-            <height>257</height>
+            <width>100</width>
+            <height>30</height>
            </rect>
           </property>
           <attribute name="label">
@@ -358,8 +358,8 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>136</width>
-            <height>257</height>
+            <width>100</width>
+            <height>30</height>
            </rect>
           </property>
           <attribute name="label">
@@ -382,8 +382,8 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>136</width>
-            <height>257</height>
+            <width>100</width>
+            <height>30</height>
            </rect>
           </property>
           <attribute name="label">
@@ -522,8 +522,8 @@ QStatusBar {
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>770</width>
-          <height>483</height>
+          <width>100</width>
+          <height>100</height>
          </rect>
         </property>
         <attribute name="label">

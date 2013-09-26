@@ -28,7 +28,7 @@ void Cluster::paintTimeline() {
             else
                 timelineBoundingRect = timelineBoundingRect.united(tagRect);
         }
-        QColor color = Global::colorAlternateBold;
+        QColor color = Global::colorCluster;
         color.setAlphaF(color.alphaF() - Global::breathing/5.);
         Global::timelineGL->qglColor(color);
         GlRect::drawRect(timelineBoundingRect);

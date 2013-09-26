@@ -238,8 +238,8 @@ void Rekall::closeSplash() {
     inspector->show();
     updateGeometry();
     ui->timelineSplitter->setSizes(QList<int>() << ui->timelineSplitter->height() * 0.50 << ui->timelineSplitter->height() * 0.50);
-    ui->fileSplitter->setSizes(QList<int>()     << ui->fileSplitter->width()      * 0.25 << ui->fileSplitter->width()      * 0.75);
-    ui->conduiteSplitter->setSizes(QList<int>() << ui->conduiteSplitter->width()  * 0.75 << ui->conduiteSplitter->width()  * 0.25);
+    ui->fileSplitter->setSizes(QList<int>()     << 200                                   << ui->fileSplitter->width()      - 200);
+    ui->conduiteSplitter->setSizes(QList<int>() << ui->conduiteSplitter->width()  - 290  << 290);
     inspector->move(QDesktopWidget().screenGeometry().topRight() - QPoint(inspector->width(), 0));
     //trayMenu->showMessage("Rekall", "Ready!", QSystemTrayIcon::NoIcon);
 }
@@ -275,8 +275,8 @@ void Rekall::personItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
 void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
     if(item) {
         //Standard operations
-        QString prefix0 = "<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #FFFFFF'>", suffix0 = "</span>";
-        QString prefix1 = "<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #C8C8C8'>", suffix1 = "</span>";
+        QString prefix0 = "<span style='font-family: Calibri, Arial; font-size: 10px; color: #F5F8FA'>", suffix0 = "</span>";
+        QString prefix1 = "<span style='font-family: Calibri, Arial; font-size: 10px; color: #C8C8C8'>", suffix1 = "</span>";
         tree->setCurrentItem(item);
         metaIsChanging = true;
         QStringList expandItems;

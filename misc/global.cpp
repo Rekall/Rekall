@@ -50,10 +50,10 @@ ProjectBase*  Global::currentProject               = 0;
 UserInfosBase* Global::userInfos                = 0;
 
 QColor       Global::colorAlternate               = QColor(255, 255, 255, 12);
-QColor       Global::colorAlternateBold           = QColor(255, 255, 255, 92);
-QColor       Global::colorAlternateStrong         = QColor(255, 255, 255, 128);
-QColor       Global::colorAlternateInv            = QColor(43, 46, 47);
+QColor       Global::colorAlternateStrong         = QColor(0, 0, 0, 128);
+QColor       Global::colorCluster                 = QColor(255, 255, 255, 62);
 
+QColor       Global::colorTicks                   = QColor(43, 46, 47);
 QColor       Global::colorSelection               = QColor(50, 221, 255);
 QColor       Global::colorProgression             = QColor(50, 221, 255);//QColor(45, 202, 225);
 QColor       Global::colorText                    = QColor(245, 248, 250);
@@ -208,7 +208,7 @@ FeedItemBase::FeedItemBase(FeedItemBaseType _action, const QString &_author, con
 }
 void FeedItemBase::update() {
     setIcon(0, icon);
-    setText(0, QString("<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #FFFFFF'>%1 <span style='color: #AAAAAA'>%2</span> %3<span style='color: #AAAAAA'>, %4</span></span>").arg(author).arg(actionStr).arg(object).arg(Global::dateToString(date, false).toLower()));
+    setText(0, QString("<span style='font-family: Calibri, Arial; font-size: 10px; color: #F5F8FA'>%1 <span style='color: #A1A5A7'>%2</span> %3<span style='color: #A1A5A7'>, %4</span></span>").arg(author).arg(actionStr).arg(object).arg(Global::dateToString(date, false).toLower()));
     setToolTip(0, Global::dateToString(date));
 }
 

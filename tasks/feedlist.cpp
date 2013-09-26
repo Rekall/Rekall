@@ -12,7 +12,7 @@ FeedList::FeedList(QWidget *parent) :
     Global::feedList = this;
 
     ui->feeds->setItemDelegateForColumn(0, new HtmlDelegate());
-    QString prefix = "<span style='font-family: Museo Sans, Museo Sans 500, Arial; font-size: 10px; color: #FFFFFF'>", suffix = "</span>";
+    QString prefix = "<span style='font-family: Calibri, Arial; font-size: 10px; color: #F5F8FA'>", suffix = "</span>";
     agoNow     = new QTreeWidgetItem(QStringList() << prefix+"Now"+suffix);
     agoSecs    = new QTreeWidgetItem(QStringList() << prefix+"A few seconds ago"+suffix);
     agoMin     = new QTreeWidgetItem(QStringList() << prefix+"A few minutes ago"+suffix);

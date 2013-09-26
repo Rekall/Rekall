@@ -227,7 +227,7 @@ public:
     static Udp *udp;
     static QFont font, fontSmall, fontLarge;
     static GlVideo *video;
-    static QColor colorAlternateStrong, colorAlternate, colorAlternateBold, colorAlternateInv, colorSelection, colorProgression, colorText, colorTextDark, colorBackground, colorBackgroundDark, colorBackgroundMidDark, colorTextBlack;
+    static QColor colorAlternateStrong, colorAlternate, colorCluster, colorTicks, colorSelection, colorProgression, colorText, colorTextDark, colorBackground, colorBackgroundDark, colorBackgroundMidDark, colorTextBlack;
     static QMap<QString, QPair<QColor, qreal> > colorForMeta;
     static bool timelineSortChanged, viewerSortChanged, eventsSortChanged, metaChanged;
     static WatcherBase *watcher;

@@ -345,13 +345,14 @@ const QRectF Project::paintTimeline(bool before) {
                     glScissor(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth, Global::timelineGL->height());
                 }
                 */
-
+                guiCategories.append(qMakePair(tagCategoryRect.translated(QPointF(0, Global::timelineHeaderSize.height())), qMakePair(phase, sorting)));
 
                 //New category
                 qreal yMax = 0;
                 bool drawToggleNext = false;
                 nbTagsPerCategory = 0;
                 QString tagCategory;
+                bool tagCategoryIsSelected = false;
                 UiBool *drawToggleActive = 0;
 
                 //Draw tags of this categetory
@@ -366,6 +367,9 @@ const QRectF Project::paintTimeline(bool before) {
                     foreach(Tag *tag, tagsInClusterIterator2.value()) {
                         QRectF tagRect = tag->getTimelineBoundingRect().translated(tagSortPosOffset);
                         QPointF tagPosOffset;
+
+                        //Category in selection
+                        tagCategoryIsSelected |= tag->mouseHover;
 
                         //Get info about category and analysis
                         if(tagCategory.isEmpty()) {
@@ -440,7 +444,8 @@ const QRectF Project::paintTimeline(bool before) {
                     }
 
                     //Draw text
-                    Global::timelineGL->qglColor(Global::colorText);
+                    if(tagCategoryIsSelected)   Global::timelineGL->qglColor(Global::colorSelection);
+                    else                        Global::timelineGL->qglColor(Global::colorText);
                     bool textFound = false;
                     if(timelineCategories.count() > 1000)
                         timelineCategories.clear();
@@ -626,16 +631,7 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
     if(!ok) {
         Global::selectedTag = 0;
         Global::selectedTagHover = 0;
-        if((e->button() & Qt::LeftButton) == Qt::LeftButton) {
-            for(quint16 i = 0 ; i < guiToggles.count() ; i++) {
-                if(guiToggles.at(i).first.contains(pos)) {
-                    if(press)
-                        *guiToggles[i].second = !(*guiToggles[i].second);
-                    return true;
-                }
-            }
-        }
-        if((e->button() & Qt::RightButton) == Qt::RightButton) {
+        if((press) && ((e->button() & Qt::RightButton) == Qt::RightButton)) {
             for(quint16 i = 0 ; i < guiCategories.count() ; i++) {
                 if(guiCategories.at(i).first.contains(pos)) {
                     timelineFilesMenu->clear();
@@ -658,6 +654,15 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
                             }
                         }
                     }
+                    return true;
+                }
+            }
+        }
+        if(((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
+            for(quint16 i = 0 ; i < guiToggles.count() ; i++) {
+                if(guiToggles.at(i).first.contains(pos)) {
+                    if(press)
+                        *guiToggles[i].second = !(*guiToggles[i].second);
                     return true;
                 }
             }

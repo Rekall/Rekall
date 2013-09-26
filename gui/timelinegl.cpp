@@ -76,7 +76,7 @@ void TimelineGL::paintGL() {
         //Background
         qreal legendBaseSize = qBound(200., height() * 0.75, 400.);
         QRectF legendRect = QRectF(width() - legendBaseSize * 1.2, height() - showLegend * legendBaseSize, legendBaseSize * 1.2, legendBaseSize);
-        qglColor(Global::colorAlternateStrong);
+        qglColor(QColor(0, 0, 0, 128));
         GlRect::drawRect(legendRect);
 
         //Circles
@@ -177,7 +177,7 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
     if(Global::selectedTag) {
         Tag *selectedTag = (Tag*)Global::selectedTag;
 
-        if((e->button() & Qt::RightButton) == Qt::RightButton) {
+        if((e) && ((e->button() & Qt::RightButton) == Qt::RightButton)) {
             /*
             tagMenu->clear();
             QAction *toGlobal = 0, *toContextual = 0;
