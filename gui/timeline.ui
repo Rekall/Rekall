@@ -54,7 +54,7 @@
           <property name="minimumSize">
            <size>
             <width>40</width>
-            <height>40</height>
+            <height>0</height>
            </size>
           </property>
           <property name="icon">
@@ -68,7 +68,7 @@
           <property name="minimumSize">
            <size>
             <width>40</width>
-            <height>40</height>
+            <height>0</height>
            </size>
           </property>
           <property name="icon">
@@ -82,7 +82,7 @@
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_3">
+         <spacer name="horizontalSpacer_4">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -93,6 +93,77 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="hZoomLabel">
+          <property name="text">
+           <string>TIME STRETCH</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="hZoom">
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>30</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="vZoomLabel">
+          <property name="text">
+           <string>OVERALL SIZE</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="vZoom">
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>30</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="writeNote">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Write a note</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -123,8 +194,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>48</x>
-     <y>33</y>
+     <x>109</x>
+     <y>37</y>
     </hint>
     <hint type="destinationlabel">
      <x>493</x>
@@ -145,6 +216,22 @@
     <hint type="destinationlabel">
      <x>518</x>
      <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>writeNote</sender>
+   <signal>released()</signal>
+   <receiver>Timeline</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>185</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>290</x>
+     <y>406</y>
     </hint>
    </hints>
   </connection>

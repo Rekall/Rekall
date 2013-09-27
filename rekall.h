@@ -67,6 +67,7 @@ private slots:
     void personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*);
     void displayMetadata(Metadata *metadata, QTreeWidget*, QTreeWidgetItem*, QTreeWidgetItem*);
     void showInspector();
+    void showHelp(bool);
 
 private:
     qint32 updateUserInfos;

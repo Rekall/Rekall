@@ -163,15 +163,6 @@ void TaskProcess::run() {
             }
         }
 
-        //Hash
-        QCryptographicHash fileHasher(QCryptographicHash::Sha1);
-        QFile fileToHash(processedDocument.metadata->file.absoluteFilePath());
-        fileToHash.open(QFile::ReadOnly);
-        while(!fileToHash.atEnd())
-            fileHasher.addData(fileToHash.read(8192));
-        processedDocument.metadata->setMetadata("Rekall", "Hash", QString(fileHasher.result().toHex()), processedDocument.version);
-        emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 10px; color: #A1A5A7'>Calculating hash of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
-
         //People
         if(processedDocument.metadata->type == DocumentTypePeople) {
             QList<Person*> persons = Person::fromFile(processedDocument.metadata->file.absoluteFilePath());

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>515</height>
+    <height>565</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -48,6 +48,16 @@
        <number>5</number>
       </property>
       <item>
+       <widget class="QLabel" name="feelingLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This popup helps the documentation process of your artwork. The more you give explanations or clues on your creation process, the more documented your project will be (ie. easiest revivals, better transmission of knowledge…).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Something to say about </string>
@@ -60,19 +70,32 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <property name="spacing">
-         <number>5</number>
+         <number>0</number>
         </property>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <property name="spacing">
-           <number>5</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QLineEdit" name="baseText">
             <property name="placeholderText">
-             <string>Type here a brief info about your modifications</string>
+             <string>Type here a short description</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>1</width>
+              <height>5</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="QLabel" name="moreTextLabel">
@@ -88,53 +111,86 @@
            <widget class="QPlainTextEdit" name="moreText"/>
           </item>
           <item>
-           <widget class="QLabel" name="locationLabel">
-            <property name="text">
-             <string>Where are you?</string>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
             </property>
-            <property name="wordWrap">
-             <bool>true</bool>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>1</width>
+              <height>5</height>
+             </size>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="location">
-            <property name="placeholderText">
-             <string>Type here a description of your place</string>
-            </property>
-           </widget>
+           </spacer>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="locationLabel">
+              <property name="text">
+               <string>Location :  </string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="location">
+              <property name="placeholderText">
+               <string>Where are you?</string>
+              </property>
+             </widget>
+            </item>
             <item>
              <widget class="QLabel" name="weatherIcon">
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>20</height>
+               </size>
+              </property>
               <property name="text">
                <string/>
               </property>
              </widget>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_5">
-              <item>
-               <widget class="QLabel" name="weatherSky">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="weatherTemperature">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QLabel" name="weatherTemperature">
+              <property name="minimumSize">
+               <size>
+                <width>5</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="previewLabel">
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>1</width>
+              <height>5</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="preview2Label">
             <property name="text">
              <string>Here is a snapshot of your work (click to remove)</string>
             </property>
@@ -184,7 +240,7 @@ height:	200px;</string>
             <property name="minimumSize">
              <size>
               <width>60</width>
-              <height>60</height>
+              <height>22</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -206,7 +262,7 @@ height:	200px;</string>
             <property name="minimumSize">
              <size>
               <width>60</width>
-              <height>60</height>
+              <height>22</height>
              </size>
             </property>
             <property name="maximumSize">

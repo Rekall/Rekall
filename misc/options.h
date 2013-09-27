@@ -146,6 +146,7 @@ protected:
     qreal value;
     QSpinBox *spinBox;
     QDoubleSpinBox *doubleSpinBox;
+    QSlider *slider;
 public:
     UiReal(qreal _value = 0);
     UiReal(const UiReal&);
@@ -164,6 +165,7 @@ signals:
 public:
     void setAction(QSpinBox*,       const QString &_settingName = "", bool trigEvent = true, bool changeUi = false);
     void setAction(QDoubleSpinBox*, const QString &_settingName = "", bool trigEvent = true, bool changeUi = false);
+    void setAction(QSlider*,        const QString &_settingName = "", bool trigEvent = true, bool changeUi = false);
     QVariant variant() const {
         return val();
     }

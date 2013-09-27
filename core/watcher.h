@@ -12,7 +12,7 @@
 #include <Carbon/Carbon.h>
 #endif
 
-class Watcher : public QObject, public WatcherBase {
+class Watcher : public WatcherBase {
     Q_OBJECT
 
 public:
@@ -35,6 +35,7 @@ public slots:
     void fileWatcherFileChanged(QString);
     void takeTemporarySnapshot();
     void trayActivateApp();
+    void writeNote();
     void trayIconToOn(Document *document = 0);
     void trayIconToOff();
     void trayActivated(QSystemTrayIcon::ActivationReason reason);

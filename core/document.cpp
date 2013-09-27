@@ -42,15 +42,15 @@ void Document::createTagBasedOnPrevious(qint16 _forVersion) {
         }
     }
     else {
-        qreal tS = Global::aleaF(5, 60);
+        qreal tS = Global::aleaF(5, 180);
         if(function == DocumentFunctionRender)
-            tS = Global::aleaF(0, 10);
+            tS = Global::aleaF(0, 5);
         for(quint16 i = 0 ; i < getMetadataCount() ; i++) {
             if(getMetadataCount() > 1) {
                 quint16 nb = Global::alea(1, 1);
                 for(quint16 j = 0 ; j < nb ; j++) {
                     Tag *tag = new Tag(this, i);
-                    tag->create(TagTypeContextualTime, tS + Global::aleaF(-5, 15), -1, true);
+                    tag->create(TagTypeContextualTime, tS, -1, true);
                     tags.append(tag);
                 }
             }

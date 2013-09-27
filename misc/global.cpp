@@ -31,6 +31,7 @@ qreal        Global::breathingPicsDest            = 1;
 qreal        Global::breathingFast                = 0;
 qreal        Global::breathingFastDest            = 1;
 QTime        Global::timer;
+UiBool       Global::showHelp                     = true;
 bool         Global::timerPlay                    = false;
 void*        Global::selectedTag                  = 0;
 void*        Global::selectedTagHover             = 0;
@@ -189,6 +190,14 @@ QColor Global::getColorScale(qreal val) {
                   colors.at(indexLow).blue()  * (1.-indexFloat) + colors.at(indexSup).blue()  * (indexFloat),
                   colors.at(indexLow).alpha() * (1.-indexFloat) + colors.at(indexSup).alpha() * (indexFloat));
 }
+QString Global::getFileHash(const QFileInfo &file) {
+    QCryptographicHash fileHasher(QCryptographicHash::Sha1);
+    QFile fileToHash(file.absoluteFilePath());
+    fileToHash.open(QFile::ReadOnly);
+    while(!fileToHash.atEnd())
+        fileHasher.addData(fileToHash.read(8192));
+    return QString(fileHasher.result().toHex()).toUpper();
+}
 
 
 FeedItemBase::FeedItemBase(FeedItemBaseType _action, const QString &_author, const QString &_object, const QDateTime &_date) {
@@ -197,23 +206,23 @@ FeedItemBase::FeedItemBase(FeedItemBaseType _action, const QString &_author, con
     object = _object;
     date   = _date;
     if     (action == FeedItemBaseTypeCreation) {
-        icon = QIcon(":/icons/res_tray_icon_color.png");
+        icon = QIcon(":/icons/events/download.gif");
         actionStr = "added";
     }
     else if(action == FeedItemBaseTypeUpdate) {
-        icon = QIcon(":/icons/res_tray_icon_color.png");
+        icon = QIcon(":/icons/events/pencil.gif");
         actionStr = "updated";
     }
     else if(action == FeedItemBaseTypeDelete) {
-        icon = QIcon(":/icons/res_tray_icon_color.png");
+        icon = QIcon(":/icons/events/x.gif");
         actionStr = "removed";
     }
     else if(action == FeedItemBaseTypeProcessingStart) {
-        icon = QIcon(":/icons/res_tray_icon_color.png");
+        icon = QIcon(":/icons/events/bookmark.gif");
         actionStr = "started metadata extraction on";
     }
     else if(action == FeedItemBaseTypeProcessingEnd) {
-        icon = QIcon(":/icons/res_tray_icon_color.png");
+        icon = QIcon(":/icons/events/bookmark.gif");
         actionStr = "finished metadata extraction on";
     }
 }

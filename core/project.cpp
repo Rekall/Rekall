@@ -450,15 +450,15 @@ const QRectF Project::paintTimeline(bool before) {
                     if(timelineCategories.count() > 1000)
                         timelineCategories.clear();
                     foreach(GlText timelineCategory, timelineCategories) {
-                        if((timelineCategory.text == tagCategory) && (timelineCategory.size == tagCategoryRect.size().toSize())) {
-                            timelineCategory.drawText(tagCategoryRect.topLeft().toPoint());
+                        if((timelineCategory.text == tagCategory) && (timelineCategory.size == (tagCategoryRect.size().toSize() - QSize(20, 0)))) {
+                            timelineCategory.drawText(tagCategoryRect.topLeft().toPoint() + QPoint(20, 0));
                             textFound = true;
                         }
                     }
                     if(!textFound) {
                         GlText tagCategoryText;
-                        tagCategoryText.setStyle(tagCategoryRect.size().toSize(), Qt::AlignVCenter, Global::font);
-                        tagCategoryText.drawText(tagCategory, tagCategoryRect.topLeft().toPoint());
+                        tagCategoryText.setStyle(tagCategoryRect.size().toSize() - QSize(20, 0), Qt::AlignVCenter, Global::font);
+                        tagCategoryText.drawText(tagCategory, tagCategoryRect.topLeft().toPoint() + QPoint(20, 0));
                         timelineCategories << tagCategoryText;
                     }
 

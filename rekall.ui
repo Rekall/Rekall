@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QTabWidget, QLabel, QCheckBox, QLineEdit, QPlainTextEdit, QPushButton, QSpinBox, QDoubleSpinBox, QTreeView, QHeaderView, QTabBar, QComboBox, QFrame#globalFrame, QTabBar::tab, QTreeView, QHeaderView, QDockWidget, QStatusBar, QRadioButton, QToolBox, QToolBox::tab {
-	font: 						10px &quot;Calibri&quot;, &quot;Arial&quot;;
+	font: 						11px &quot;Calibri&quot;, &quot;Arial&quot;;
 	padding:					0px;
 	margin:					0px;
 	min-height: 				20px;
@@ -30,6 +30,9 @@ QPushButton, QSpinBox, QDoubleSpinBox, QLineEdit, QPlainTextEdit, QCheckBox::ind
 QSpinBox, QDoubleSpinBox, QLineEdit, QPlainTextEdit, QCheckBox {
 	margin-top: 			4px;
 	margin-bottom: 		4px;
+}
+QPushButton {
+	padding: 3px;
 }
 
 QDialog, QWidget#chutier, QFrame#globalFrame, QWidget#centralwidget, QWidget#player, QWidget#timeline, QWidget#viewer {
@@ -46,7 +49,17 @@ QFrame#globalFrameBlk {
 QLabel, QCheckBox, QRadioButton {
 	color: 						rgb(245, 248, 250);
 }
-
+QLabel#peopleLabel, QLabel#chutierLabel, QLabel#chutierLabel2, QLabel#feedsLabel, QLabel#tasksLabel, QLabel#conduiteLabel, QLabel#previewLabel, QLabel#feelingLabel {
+	font: 		10px;
+	padding: 	5px;
+	color: 		rgb(131, 135, 137);
+}
+QLabel#visibilityLabel, QLabel#filtersLabel, QLabel#label {
+	margin-top:	10px;
+	font: 			bold;
+	border: 		0px solid black;
+	border-top: 	1px solid white;
+} 
 
 
 QTabWidget::pane {
@@ -303,14 +316,14 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>136</width>
-            <height>260</height>
+            <width>259</width>
+            <height>302</height>
            </rect>
           </property>
           <attribute name="label">
            <string>FILES</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout">
+          <layout class="QVBoxLayout" name="verticalLayout" stretch="9999,0,0">
            <property name="spacing">
             <number>0</number>
            </property>
@@ -318,12 +331,25 @@ QStatusBar {
             <number>0</number>
            </property>
            <item>
-            <widget class="UiTreeView" name="chutier" native="true">
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>100</height>
-              </size>
+            <widget class="UiTreeView" name="chutier" native="true"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="chutierLabel">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This file explorer shows the folders synced with Rekall. A synced folder contains main and work-in-progress documents (video, texts, audio, patches, …). &lt;a href=&quot;rekall:addFolder&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#32ddff;&quot;&gt;Add them manually&lt;/span&gt;&lt;/a&gt; or drag-n-drop folders here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="chutierLabel2">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If toggle on the &amp;quot;follow&amp;quot; icon, Rekall will monitor how this file evolves and will create &lt;a href=&quot;rekall:openSettings&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#32ddff;&quot;&gt;automatic backups&lt;/span&gt;&lt;/a&gt;. The goal of theses features is not to monitor all your activity, but only to understand thereafter how you create this masterwork!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -334,20 +360,30 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>30</height>
+            <width>259</width>
+            <height>302</height>
            </rect>
           </property>
           <attribute name="label">
            <string>EVENTS</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,9999">
            <property name="spacing">
             <number>0</number>
            </property>
            <property name="margin">
             <number>0</number>
            </property>
+           <item>
+            <widget class="QLabel" name="feedsLabel">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you share your Rekall project on a network drive or in a Dropbox-like folder, many people can contribute to the project. This log is the summarize of the last interactions of your collaborators.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="FeedList" name="feeds" native="true"/>
            </item>
@@ -358,20 +394,30 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>30</height>
+            <width>259</width>
+            <height>302</height>
            </rect>
           </property>
           <attribute name="label">
            <string>PROCESSINGS</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
+          <layout class="QVBoxLayout" name="verticalLayout_6" stretch="1,9999">
            <property name="spacing">
             <number>0</number>
            </property>
            <property name="margin">
             <number>0</number>
            </property>
+           <item>
+            <widget class="QLabel" name="tasksLabel">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body style=&quot;font-style:normal;&quot;&gt;&lt;p&gt;When you import a document, Rekall generates picture thumbnails of your documents (videos strip, audio waveforms, text previews…) ; this process can take a while. You can see here what is Rekall doing in background and if your computer becomes slow, you can &lt;a href=&quot;rekall:stopTasks&quot; style=&quot; text-decoration: underline; color:#32DDFF;&quot;&gt;stop it immediatly&lt;/a&gt;!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="TasksList" name="tasks" native="true"/>
            </item>
@@ -382,20 +428,46 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>30</height>
+            <width>259</width>
+            <height>302</height>
            </rect>
           </property>
           <attribute name="label">
            <string>PEOPLE</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_8">
+          <layout class="QVBoxLayout" name="verticalLayout_8" stretch="1,0,9999">
            <property name="spacing">
             <number>0</number>
            </property>
            <property name="margin">
             <number>3</number>
            </property>
+           <item>
+            <widget class="QLabel" name="peopleLabel">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Feel free to add all the main stakeholders of the project (performers, technicians, artists…). When all these data are correctly filled up, it might help you in a few years for the revival of your project! Add people through the &lt;a href=&quot;rekall:createContact&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#32ddff;&quot;&gt;contact form&lt;/span&gt;&lt;/a&gt; or drag-n-drop people from your Contact app.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>10</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item>
             <widget class="QTreeWidget" name="persons">
              <property name="focusPolicy">
@@ -464,14 +536,24 @@ QStatusBar {
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>770</width>
-          <height>483</height>
+          <width>637</width>
+          <height>481</height>
          </rect>
         </property>
         <attribute name="label">
          <string>INFOS</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_7">
+        <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,9999,9999,9999,9999">
+         <item>
+          <widget class="QLabel" name="previewLabel">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This panel allows you to view and edit the document properties. When you import a document in Rekall, it automaticaly analyses the available descriptors (metadatas, dates…) and the context of import (who imports, when, where, how…). As all automatic guessing processes, Rekall can make mistakes or imprecisions ; that's why it is important to check and improve these data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="Previewer" name="preview" native="true"/>
          </item>
@@ -531,20 +613,33 @@ QStatusBar {
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>100</height>
+          <width>637</width>
+          <height>481</height>
          </rect>
         </property>
         <attribute name="label">
-         <string>CONDUITE</string>
+         <string>CUES</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
+        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,9999">
          <property name="spacing">
           <number>0</number>
          </property>
          <property name="margin">
           <number>0</number>
          </property>
+         <item>
+          <widget class="QLabel" name="conduiteLabel">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body style=&quot;font-style:normal;&quot;&gt;&lt;p&gt;Here are listed all the cues of the project. By default, all the markers and documents of the timeline will appear in the cue list. As in all the other views of Rekall, you can filter the cues through the &lt;a href=&quot;rekall:openInspector&quot; style=&quot; text-decoration: underline; color:#32DDFF;&quot;&gt;inspector panel&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;Be aware you can also &lt;a href=&quot;rekall:openNetwork&quot; style=&quot; text-decoration: underline; color:#32DDFF;&quot;&gt;synchronize&lt;/a&gt; multiple Rekall each others, allowing you to use Rekall as a real time cue sheet for performers or technical actors of your project.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="Viewer" name="viewer" native="true">
            <property name="minimumSize">

@@ -65,6 +65,11 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     setMetadata("Rekall", "Document Date/Time", getMetadata("File", "File Modification Date/Time", version), version);
     setMetadata("Rekall", "Document Folder", QString(file.absoluteDir().absolutePath() + "/").remove(dirBaseParent.absolutePath() + "/"), version);
 
+    //Hash
+    setMetadata("File", "Hash", Global::getFileHash(file), version);
+
+
+    //Type
     QString typeStr = "";
     if(suffixesTypeDoc.contains(file.suffix().toLower())) {
         type = DocumentTypeDoc;
@@ -337,7 +342,7 @@ const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) {
     else if(thumbnails.count())
         return qMakePair(file.absoluteFilePath(), QPixmap::fromImage(thumbnails.first().image));
     else
-        return retour;
+        return qMakePair(file.absoluteFilePath(), QPixmap(file.absoluteFilePath()));
 }
 
 const QList<QPair<QString, QString> > Metadata::getGps() {

@@ -7,16 +7,19 @@ Inspector::Inspector(QWidget *parent) :
     ui->setupUi(this);
     toolbarButton = 0;
 
-    Global::tagFilterCriteria  = new Sorting(true,  tr("Filtering"), 0, 0);
-    Global::tagSortCriteria    = new Sorting(false, tr("Sorting"),   1, 0);
-    Global::tagColorCriteria   = new Sorting(false, tr("Color"),     2, 0);
-    Global::tagClusterCriteria = new Sorting(false, tr("Cluster"),   0, 0);
+    Global::tagSortCriteria    = new Sorting(false, tr("Categories sorted by"), 1, 0);
+    Global::tagColorCriteria   = new Sorting(false, tr("Colors represent"),     2, 0);
+    Global::tagClusterCriteria = new Sorting(false, tr("Hightlight on"),   0, 0);
+    Global::tagFilterCriteria  = new Sorting(true,  tr("Filter by"), 0, 0);
+    Global::tagFilterCriteria->displayLinked.setAction(ui->history);
+    connect(&Global::tagFilterCriteria->displayLinked, SIGNAL(triggered(bool)), Global::tagFilterCriteria, SLOT(action()));
+
     Global::phases             = new Phases(0);
-    ui->filters->addWidget(Global::phases);
-    ui->filters->addWidget(Global::tagFilterCriteria);
     ui->filters->addWidget(Global::tagSortCriteria);
     ui->filters->addWidget(Global::tagColorCriteria);
     ui->filters->addWidget(Global::tagClusterCriteria);
+    ui->filters->addWidget(Global::phases);
+    //ui->filters->addWidget(Global::tagFilterCriteria);
 
     connect(Global::phases,             SIGNAL(actionned()), SLOT(action()));
     connect(Global::tagFilterCriteria,  SIGNAL(actionned()), SLOT(action()));
@@ -27,11 +30,7 @@ Inspector::Inspector(QWidget *parent) :
     Global::timelineGL->showLegendDest.setAction(ui->legend);
     Global::timelineGL->showLinkedRendersDest.setAction(ui->linkedRenders);
     Global::timelineGL->showLinkedTagsDest   .setAction(ui->linkedTags);
-    Global::timeUnitDest         .setAction(ui->hZoom);
-    Global::timelineTagHeightDest.setAction(ui->vZoom);
-
-    ui->hZoom->setValue(13);
-    ui->vZoom->setValue(8);
+    Global::showHelp.setAction(ui->help);
 }
 
 Inspector::~Inspector() {

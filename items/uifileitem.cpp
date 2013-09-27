@@ -356,24 +356,24 @@ void UiFileItem::configure(UiTreeView *tree, bool _showDateTime) {
 
     tree->getTree()->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
     tree->getTree()->setIndentation(10);
-    tree->getTree()->setHeaderHidden(false);
+    tree->getTree()->setHeaderHidden(true);
 
     quint16 columnIndex = 0;
     tree->configureColumns(    UiTreeViewOptions(columnIndex++, "Filename", "edit"     , "margin:0px;", QHeaderView::Stretch, 410, 20, 20));
     if(showDateTime)
         tree->configureColumns(UiTreeViewOptions(columnIndex++, "Date"    , ""         , ""           , QHeaderView::Fixed,   120, 20, 20));
 
-    UiTreeViewOptions col3 =   UiTreeViewOptions(columnIndex++, "Tracked" , "checkbox",  ""           , QHeaderView::Fixed,   30 , 20, 20);
+    UiTreeViewOptions col3 =   UiTreeViewOptions(columnIndex++, "Tracked" , "checkbox",  ""           , QHeaderView::Fixed,   15 , 20, 20);
     col3.iconCheckedOff = QPixmap(":/items/res_item_tracked_off.png");
     col3.iconCheckedOn  = QPixmap(":/items/res_item_tracked_on.png");
     tree->configureColumns(col3);
 
-    UiTreeViewOptions col4 =   UiTreeViewOptions(columnIndex++, ""        , "checkboxS", ""           , QHeaderView::Fixed,   30 , 20, 20);
+    UiTreeViewOptions col4 =   UiTreeViewOptions(columnIndex++, ""        , "checkboxS", ""           , QHeaderView::Fixed,   15 , 20, 20);
     col4.iconCheckedOn = col4.iconCheckedOff = QPixmap(":/items/res_item_reveal.png");
     tree->configureColumns(col4);
 
-    UiTreeViewOptions col5 =   UiTreeViewOptions(columnIndex++, ""        , "checkboxS", ""           , QHeaderView::Fixed,   30 , 20, 20);
-    col5.iconCheckedOn = col5.iconCheckedOff = QPixmap(":/items/res_item_reveal.png");
+    UiTreeViewOptions col5 =   UiTreeViewOptions(columnIndex++, ""        , "checkboxS", ""           , QHeaderView::Fixed,   15 , 20, 20);
+    col5.iconCheckedOn = col5.iconCheckedOff = QPixmap(":/items/res_item_open.png");
     tree->configureColumns(col5);
 
     UiTreeViewOptions col6 =   UiTreeViewOptions(columnIndex++, ""        , ""         ,     ""       , QHeaderView::Fixed,    1 , 20, 20);

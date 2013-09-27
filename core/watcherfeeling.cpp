@@ -75,15 +75,12 @@ void WatcherFeeling::display(Document *document) {
         if(!Global::userInfos->getInfo("Weather (verbose)").isEmpty()) {
             ui->weatherTemperature->setVisible(true);
             ui->weatherIcon->setVisible(true);
-            ui->weatherSky->setVisible(true);
             ui->weatherTemperature->setText(QString("%1°C").arg(Global::userInfos->getInfo("Weather Temperature")));
-            ui->weatherSky        ->setText(Global::userInfos->getInfo("Weather Sky"));
             ui->weatherIcon->setPixmap(QPixmap(":/weather/weather/" + Global::userInfos->getInfo("Weather Sky Icon") + ".png"));
         }
         else {
             ui->weatherTemperature->setVisible(false);
             ui->weatherIcon->setVisible(false);
-            ui->weatherSky->setVisible(false);
         }
         ui->preview->setChecked(true);
         ui->preview->setIcon(QPixmap::fromImage(Global::temporaryScreenshot));
@@ -92,6 +89,8 @@ void WatcherFeeling::display(Document *document) {
     if(documents.count() == 1)       ui->label->setText(tr("Something to say about your changes on %1 since last time (%2)?").arg(documents.first()->file.baseName()).arg(Global::dateToString(documents.first()->getMetadata("Rekall", "Document Date/Time").toDateTime())));
     else if(documents.count()  > 1)  ui->label->setText(tr("Something to say about your changes on these %1 since last time?").arg(Global::plurial(documents.count(), "document")));
     else if(documents.count() == 0)  ui->label->setText(tr("Something to say?"));
+
+    ui->feelingLabel->setVisible(Global::showHelp);
 
     show();
     if(!document)

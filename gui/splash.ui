@@ -27,8 +27,8 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QLabel {
-	font: 	12px &quot;Gotham&quot;;
-	color: 	rgba(255, 255, 255, 128);
+	font: 	12px &quot;Calibri&quot;, &quot;Arial&quot;;
+	color: 	rgb(131, 135, 137);
 }
 </string>
   </property>
@@ -57,7 +57,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="../icons/Rekall.qrc">:/spash/splash-0.jpg</pixmap>
+    <pixmap resource="../icons/Rekall.qrc">:/misc/splash.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="version">

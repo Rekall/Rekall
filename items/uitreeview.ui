@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>533</width>
-    <height>542</height>
+    <width>269</width>
+    <height>98</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@ QPushButton#actionDuplicate, QPushButton#actionAddRoot, QPushButton#actionSave {
 	width:  				70px;
 }</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="99,1">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -43,7 +43,7 @@ QPushButton#actionDuplicate, QPushButton#actionAddRoot, QPushButton#actionSave {
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="editTriggers">
-      <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+      <set>QAbstractItemView::EditKeyPressed</set>
      </property>
      <property name="tabKeyNavigation">
       <bool>true</bool>
@@ -98,7 +98,7 @@ QPushButton#actionDuplicate, QPushButton#actionAddRoot, QPushButton#actionSave {
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
-         <height>20</height>
+         <height>0</height>
         </size>
        </property>
       </spacer>

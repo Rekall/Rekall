@@ -1,7 +1,7 @@
 #include "watcher.h"
 
 Watcher::Watcher(QObject *parent) :
-    QObject(parent) {
+    WatcherBase(parent) {
     watcher = new QFileSystemWatcher(this);
 
     trayIconOff = QIcon(":/icons/res_tray_icon_black.png");
@@ -11,7 +11,7 @@ Watcher::Watcher(QObject *parent) :
     trayIconToOff();
     QMenu *trayElements = new QMenu(Global::mainWindow);
     trayElements->addAction(tr("Show timeline"), this, SLOT(trayActivateApp()));
-    trayElements->addAction(tr("Write a note"),  this, SLOT(trayIconToOn()));
+    trayElements->addAction(tr("Write a note"),  this, SLOT(writeNote()));
     trayMenu->setContextMenu(trayElements);
     trayMenu->show();
 
@@ -23,6 +23,9 @@ void Watcher::trayActivateApp() {
     Global::mainWindow->setVisbility(!Global::mainWindow->isVisible());
 }
 
+void Watcher::writeNote() {
+    trayIconToOn();
+}
 void Watcher::trayIconToOn(Document *document) {
     if(!document)
         takeTemporarySnapshot();
@@ -100,8 +103,10 @@ void Watcher::fileWatcherFileChanged(QString file) {
     if(watcherTracking.contains(file)) {
         Document *document = ((Project*)Global::currentProject)->getDocument(file);
         if(document) {
-            takeTemporarySnapshot();
-            trayIconToOn(document);
+            if(document->getMetadata("File", "Hash").toString() != Global::getFileHash(file)) {
+                takeTemporarySnapshot();
+                trayIconToOn(document);
+            }
         }
     }
 }

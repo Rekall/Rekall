@@ -8,6 +8,11 @@ Timeline::Timeline(QWidget *parent) :
     Global::timeline = this;
     startTimer(40);
     ticksWidth = 50;
+
+    Global::timeUnitDest         .setAction(ui->hZoom);
+    Global::timelineTagHeightDest.setAction(ui->vZoom);
+    ui->hZoom->setValue(13);
+    ui->vZoom->setValue(8);
 }
 
 Timeline::~Timeline() {
@@ -166,4 +171,5 @@ void Timeline::actionPlay() {
 void Timeline::action() {
     if(sender() == ui->playButton)       Global::play(ui->playButton->isChecked());
     else if(sender() == ui->ffButton)    seek(0);
+    else if(sender() == ui->writeNote)   Global::watcher->writeNote();
 }

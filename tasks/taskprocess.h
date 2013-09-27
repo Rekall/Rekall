@@ -6,7 +6,6 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QTreeWidgetItem>
-#include <QCryptographicHash>
 #include "misc/global.h"
 #include "core/metadata.h"
 #include "core/person.h"

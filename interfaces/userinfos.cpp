@@ -60,7 +60,7 @@ void UserInfos::getWeatherFinished(QNetworkReply *reply) {
         while(!noeud.isNull()) {
             QDomElement noeudElement = noeud.toElement();
             if(noeudElement.tagName() == "temperature")
-                setInfo("Weather Temperature", noeudElement.attribute("value"));
+                setInfo("Weather Temperature", QString::number(qFloor(noeudElement.attribute("value").toDouble())));
             else if(noeudElement.tagName() == "weather") {
                 weatherOk = true;
                 QString weatherSky  = noeudElement.attribute("value");

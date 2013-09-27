@@ -10,12 +10,8 @@ Sorting::Sorting(bool _isFilter, const QString &title, quint16 index, QWidget *p
     ui->title->setText(title);
     ui->filter->setCurrentIndex(index);
     action();
-    if(isFilter) {
-        ui->stackedWidget->setCurrentIndex(1);
-        displayLinked.setAction(ui->history);
-    }
-    else
-        ui->stackedWidget->setCurrentIndex(0);
+    if(isFilter)    ui->stackedWidget->setCurrentIndex(1);
+    else            ui->stackedWidget->setCurrentIndex(0);
 }
 
 void Sorting::setTagname(const QString &_tagName) {
@@ -30,7 +26,11 @@ void Sorting::setTagname(const QString &_tagName) {
 
 void Sorting::action() {
     if(!isFilter) {
-        QStringList sortSplit = ui->filter->currentText().split("|");
+        QString filterText = ui->filter->itemData(ui->filter->currentIndex()).toString();
+        if(filterText.isEmpty())
+            filterText = ui->filter->currentText();
+
+        QStringList sortSplit = filterText.split("|");
         if(sortSplit.count()) {
             setTagname(sortSplit.first().trimmed());
             if(sortSplit.count() > 1) {

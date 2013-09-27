@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <QMouseEvent>
 #include <QProcessEnvironment>
+#include <QCryptographicHash>
 #include <QDateTime>
 #include <QGLWidget>
 #include <QTreeWidget>
@@ -116,15 +117,17 @@ typedef QList<GlRect> Thumbnails;
 
 
 
-class WatcherBase {
+class WatcherBase : public QObject {
 public:
     QFileSystemWatcher *watcher;
 public:
+    explicit WatcherBase(QObject *parent = 0) : QObject(parent) {}
     virtual void sync  (const QString &file, bool inTracker = false) = 0;
     virtual void unsync(const QString &file, bool inTracker = false) = 0;
 public slots:
     virtual void fileWatcherDirChanged(QString) = 0;
     virtual void fileWatcherFileChanged(QString) = 0;
+    virtual void writeNote() = 0;
 };
 
 enum TaskProcessType { TaskProcessTypeProcess, TaskProcessTypeMetadata };
@@ -208,6 +211,7 @@ public:
     static QTreeWidget *chutier;
     static qreal timeUnit, timeUnitTick;
     static UiReal timeUnitDest, timelineTagHeightDest;
+    static UiBool showHelp;
     static qreal timelineTagHeight, timelineTagVSpacing, timelineTagVSpacingSeparator, timelineTagThumbHeight;
     static qreal viewerTagHeight, timelineNegativeHeaderWidth;
     static QSizeF timelineHeaderSize;
@@ -250,6 +254,7 @@ public:
     static QPair<QString,QString> seperateMetadata(const QString &metaline, const QString &separator = QString(":"));
     static QPair<QString, QPair<QString,QString> > seperateMetadataAndGroup(const QString &metaline, const QString &separator = QString(":"));
     static QColor getColorScale(qreal val);
+    static QString getFileHash(const QFileInfo &file);
 
 public:
     static void seek(qreal);

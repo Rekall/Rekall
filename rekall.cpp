@@ -50,6 +50,7 @@ Rekall::Rekall(QWidget *parent) :
     connect(ui->actionInspector, SIGNAL(triggered()), SLOT(showInspector()));
     connect(ui->actionSave, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionPaste, SIGNAL(triggered()), SLOT(action()));
+    connect(&Global::showHelp, SIGNAL(triggered(bool)), SLOT(showHelp(bool)));
 
     ui->metadata->setColumnWidth(0, 135);
     ui->metadataSlider->setVisible(false);
@@ -57,7 +58,9 @@ Rekall::Rekall(QWidget *parent) :
     ui->metadata->setItemDelegateForColumn(1, new HtmlDelegate());
 
     ui->chutier->showNew(false);
-    ui->chutier->showImport(true);
+    ui->chutier->showImport(false);
+    ui->chutier->showRemove(false);
+    ui->chutier->showDuplicate(false);
     connect(ui->chutier->getTree(), SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(chutierItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
     connect(ui->actionPlay, SIGNAL(triggered()), ui->timeline, SLOT(actionPlay()));
     connect(ui->actionRewind, SIGNAL(triggered()), ui->timeline, SLOT(actionRewind()));
@@ -238,8 +241,8 @@ void Rekall::closeSplash() {
     inspector->show();
     updateGeometry();
     ui->timelineSplitter->setSizes(QList<int>() << ui->timelineSplitter->height() * 0.50 << ui->timelineSplitter->height() * 0.50);
-    ui->fileSplitter->setSizes(QList<int>()     << 200                                   << ui->fileSplitter->width()      - 200);
-    ui->conduiteSplitter->setSizes(QList<int>() << ui->conduiteSplitter->width()  - 290  << 290);
+    ui->fileSplitter->setSizes(QList<int>()     << 300                                   << ui->fileSplitter->width()      - 300);
+    ui->conduiteSplitter->setSizes(QList<int>() << ui->conduiteSplitter->width()  - 300  << 300);
     inspector->move(QDesktopWidget().screenGeometry().topRight() - QPoint(inspector->width(), 0));
     //trayMenu->showMessage("Rekall", "Ready!", QSystemTrayIcon::NoIcon);
 }
@@ -361,6 +364,15 @@ void Rekall::showInspector() {
     inspector->toolbarButton = ui->actionInspector;
     if(inspector->isVisible())   inspector->close();
     else                         inspector->show();
+}
+void Rekall::showHelp(bool visible) {
+    ui->chutierLabel->setVisible(visible);
+    ui->chutierLabel2->setVisible(visible);
+    ui->tasksLabel->setVisible(visible);
+    ui->feedsLabel->setVisible(visible);
+    ui->peopleLabel->setVisible(visible);
+    ui->previewLabel->setVisible(visible);
+    ui->conduiteLabel->setVisible(visible);
 }
 
 void Rekall::timerEvent(QTimerEvent *) {

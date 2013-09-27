@@ -111,7 +111,7 @@ void TimelineGL::paintGL() {
             angleStep = 2*M_PI * colorForMetaIteratorText.value().second * showLegend;
             angle += angleStep/2;
 
-            QString tagCategory = colorForMetaIteratorText.key().toUpper();
+            QString tagCategory = QString("%1 (%2%)").arg(colorForMetaIteratorText.key().toUpper()).arg(qFloor(colorForMetaIteratorText.value().second * 100));
             QPoint pt(qCos(angle) * legendBaseSize/2, qSin(angle) * legendBaseSize/2);
 
             QColor color = Qt::white;

@@ -32,13 +32,13 @@ void Tag::create(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
         document->setMetadata("Rekall", "Timeline thumbnail", "picture", documentVersion);
         connect(&document->renderActive, SIGNAL(triggered(bool)), SLOT(renderActiveChanged()));
         if(debug)
-            _duration = Global::aleaF(30, 60);
+            _duration = Global::aleaF(140, 180);
     }
     else {
         if(debug) {
             qreal val = Global::alea(0, 100);
-            if(val < 30)      setType(TagTypeContextualTime, _timeStart);
-            else if(val < 50) setType(TagTypeContextualMilestone, _timeStart);
+            if(val < 50)      setType(TagTypeContextualTime, _timeStart);
+            else if(val < 75) setType(TagTypeContextualMilestone, _timeStart);
             else              setType(TagTypeGlobal, 0);
         }
         else
@@ -55,7 +55,7 @@ void Tag::create(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
             else                  linkedRenders << "Captation 3";
         }
         if(debug)
-            _duration = Global::aleaF(2, 8);
+            _duration = Global::aleaF(2, 20);
     }
     if(type == TagTypeContextualTime)
         setTimeEnd(timeStart + _duration);
@@ -482,8 +482,8 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         }
 
         //Texte
-        if((Global::selectedTagHover == this) || ((isTagLastVersion(this) && (!hasThumbnail))))  Global::viewerGL->qglColor(Qt::white);
-        else                                                               Global::viewerGL->qglColor(barColor);
+        if((Global::selectedTagHover == this) || ((isTagLastVersion(this) && (!hasThumbnail))))  Global::viewerGL->qglColor(Qt::black);
+        else                                                                                     Global::viewerGL->qglColor(barColor);
         QString texte = document->getMetadata("Rekall", "Document Name", documentVersion).toString();
         if(type == TagTypeContextualTime)
             texte += QString(" (%1)").arg(Global::timeToString(getDuration()));
