@@ -20,7 +20,7 @@ public:
     bool isFilter, asNumber, asDate, sortAscending;
     UiBool displayLinked;
     QString tagName;
-    qint16 left;
+    qint16 left, leftLength;
 
 
 private:

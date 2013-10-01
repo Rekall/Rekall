@@ -120,6 +120,8 @@ void Project::fireEvents() {
         while(colorForMetaIterator.hasNext()) {
             colorForMetaIterator.next();
             QColor color = Global::getColorScale(index / (qreal)(Global::colorForMeta.count()-1));;
+            if(Global::colorForMeta.count() == 7)
+                color = Global::getColorScale((index+1)*100);
             //color.setHsvF(0.7 * index / (qreal)(Global::colorForMeta.count()-1), 0.7, 0.7);
             colorForMetaIterator.setValue(qMakePair(color, colorForMetaIterator.value().second / documentPerColorCount));
             index++;

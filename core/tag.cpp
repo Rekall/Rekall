@@ -32,13 +32,13 @@ void Tag::create(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
         document->setMetadata("Rekall", "Timeline thumbnail", "picture", documentVersion);
         connect(&document->renderActive, SIGNAL(triggered(bool)), SLOT(renderActiveChanged()));
         if(debug)
-            _duration = Global::aleaF(140, 180);
+            _duration = Global::aleaF(50, 180);
     }
     else {
         if(debug) {
             qreal val = Global::alea(0, 100);
             if(val < 50)      setType(TagTypeContextualTime, _timeStart);
-            else if(val < 75) setType(TagTypeContextualMilestone, _timeStart);
+            else if(val < 80) setType(TagTypeContextualMilestone, _timeStart);
             else              setType(TagTypeGlobal, 0);
         }
         else
@@ -54,8 +54,12 @@ void Tag::create(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
             else if(tirage > 33)  linkedRenders << "Captation 2";
             else                  linkedRenders << "Captation 3";
         }
-        if(debug)
-            _duration = Global::aleaF(2, 20);
+        if(debug) {
+            qreal tirage = Global::aleaF(0, 100);
+            if(tirage > 50)       _duration = Global::aleaF( 2,  5);
+            else if(tirage > 10)  _duration = Global::aleaF( 5, 12);
+            else                  _duration = Global::aleaF(12, 25);
+        }
     }
     if(type == TagTypeContextualTime)
         setTimeEnd(timeStart + _duration);

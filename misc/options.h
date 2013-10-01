@@ -247,7 +247,10 @@ public:
     MetadataElement(const MetadataElement&);
     MetadataElement& operator= (const MetadataElement &_value);
     const QString&   toString()             const { return string; }
-    const QString    toString(quint16 left) const { return string.left(left); }
+    const QString    toString(qint16 left, qint16 leftLength) const {
+        if((left >= 0) && (leftLength > 0))    return string.mid(left, leftLength);
+        else                                   return string;
+    }
     qreal            toDouble()             const { return string.toDouble(); }
     const QDateTime& toDateTime()           const { return date; }
     inline bool isString()                  const { return type == MetadataElementTypeString; }

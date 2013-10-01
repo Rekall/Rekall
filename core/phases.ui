@@ -42,12 +42,12 @@
       <number>999999</number>
      </property>
      <property name="value">
-      <number>30</number>
+      <number>60</number>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="guess">
      <property name="text">
       <string>Guess</string>
      </property>
@@ -58,7 +58,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>pushButton</sender>
+   <sender>guess</sender>
    <signal>released()</signal>
    <receiver>Phases</receiver>
    <slot>action()</slot>

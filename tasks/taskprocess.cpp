@@ -186,7 +186,7 @@ QProcessOutput TaskProcess::launchCommand(const TaskProcessData &processData) {
     foreach(const QString &argument, processData.arguments)
         fullCommand += " " + argument;
 
-    //qDebug("[PROCESS] %s in %s", qPrintable(fullCommand), qPrintable(processData.workingDirectory));
+    qDebug("[PROCESS] %s in %s", qPrintable(fullCommand), qPrintable(processData.workingDirectory));
     QProcess process;
     process.setWorkingDirectory(processData.workingDirectory);
     process.start(processData.command, processData.arguments);
@@ -195,7 +195,7 @@ QProcessOutput TaskProcess::launchCommand(const TaskProcessData &processData) {
     retour.second += process.readAllStandardOutput().trimmed();
     retour.second += process.readAllStandardError().trimmed();
     retour.first = fullCommand;
-    //qDebug("[PROCESS] => %s", qPrintable(retour.second));
+    qDebug("[PROCESS] => %s", qPrintable(retour.second));
     return retour;
 }
 

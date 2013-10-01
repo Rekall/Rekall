@@ -182,14 +182,25 @@ QPair<QString, QPair<QString,QString> > Global::seperateMetadataAndGroup(const Q
 
 QColor Global::getColorScale(qreal val) {
     QList<QColor> colors;
-    colors << QColor(255,84,79) << QColor(181,134,118) << QColor(255,147,102) << QColor(255,234,136) << QColor(166,204,91) << QColor(74,201,159) << QColor(102,206,226) << QColor(123,144,206) << QColor(229,149,205) << QColor(226,226,226);
-    qreal indexFloat = val * (colors.count()-1);
-    quint16 indexLow = qFloor(indexFloat), indexSup = qMin(indexLow+1, colors.count()-1); indexFloat = indexFloat - indexLow;
-    return QColor(colors.at(indexLow).red()   * (1.-indexFloat) + colors.at(indexSup).red()   * (indexFloat),
-                  colors.at(indexLow).green() * (1.-indexFloat) + colors.at(indexSup).green() * (indexFloat),
-                  colors.at(indexLow).blue()  * (1.-indexFloat) + colors.at(indexSup).blue()  * (indexFloat),
-                  colors.at(indexLow).alpha() * (1.-indexFloat) + colors.at(indexSup).alpha() * (indexFloat));
+    if(val>=100) {
+        colors << QColor(102,206,226) << QColor(255,84,79) << QColor(229,149,205) << QColor(255,147,102) << QColor(166,204,91) << QColor(181,134,118) << QColor(255,234,136);
+        val = (val/100)-1;
+        return QColor(colors.at(val).red(),
+                      colors.at(val).green(),
+                      colors.at(val).blue(),
+                      colors.at(val).alpha());
+    }
+    else {
+        colors << QColor(229,149,205) << QColor(123,144,206) << QColor(102,206,226) << QColor(74,201,159) << QColor(166,204,91) << QColor(255,234,136) << QColor(255,147,102) << QColor(181,134,118) << QColor(255,84,79);
+        qreal indexFloat = val * (colors.count()-1);
+        quint16 indexLow = qFloor(indexFloat), indexSup = qMin(indexLow+1, colors.count()-1); indexFloat = indexFloat - indexLow;
+        return QColor(colors.at(indexLow).red()   * (1.-indexFloat) + colors.at(indexSup).red()   * (indexFloat),
+                      colors.at(indexLow).green() * (1.-indexFloat) + colors.at(indexSup).green() * (indexFloat),
+                      colors.at(indexLow).blue()  * (1.-indexFloat) + colors.at(indexSup).blue()  * (indexFloat),
+                      colors.at(indexLow).alpha() * (1.-indexFloat) + colors.at(indexSup).alpha() * (indexFloat));
+    }
 }
+
 QString Global::getFileHash(const QFileInfo &file) {
     QCryptographicHash fileHasher(QCryptographicHash::Sha1);
     QFile fileToHash(file.absoluteFilePath());

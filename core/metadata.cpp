@@ -22,7 +22,7 @@ Metadata::Metadata(QObject *parent, bool createEmpty) :
     if(!suffixesTypePatches.count())
         suffixesTypePatches << "pde" << "maxpat" << "sc" << "pd" << "iannix";
     if(!suffixesTypeVideo.count())
-        suffixesTypeVideo << "3g2" << "3gp" << "4xm" << "a64" << "act" << "adf" << "adts" << "adx" << "aea" << "aiff" << "alaw" << "amr" << "anm" << "apc" << "ape" << "asf" << "asf_stream" << "ass" << "au" << "avi" << "avm2" << "avs" << "bethsoftvid" << "bfi" << "bin" << "bink" << "bit" << "bmv" << "c93" << "caf" << "cavsvideo" << "cdg" << "cdxl" << "crc" << "daud" << "dfa" << "dirac" << "dnxhd" << "dsicin" << "dts" << "dv" << "dvd" << "dxa" << "ea" << "ea_cdata" << "eac3" << "f32be" << "f32le" << "f4v" << "f64be" << "f64le" << "ffm" << "ffmetadata" << "film_cpk" << "filmstrip" << "flac" << "flic" << "flv" << "framecrc" << "framemd5" << "g722" << "g723_1" << "g729" << "gif" << "gsm" << "gxf" << "h261" << "h263" << "h264" << "hls" << "applehttp" << "ico" << "idcin" << "idf" << "iff" << "ilbc" << "image2" << "image2pipe" << "ingenient" << "ipmovie" << "ipod" << "ismv" << "iss" << "iv8" << "ivf" << "jacosub" << "jv" << "latm" << "lavfi" << "libmodplug" << "lmlm4" << "loas" << "lxf" << "m4v" << "matroska" << "matroska" << "webm" << "md5" << "mgsts" << "microdvd" << "mjpeg" << "mkvtimestamp_v2" << "mlp" << "mm" << "mmf" << "mov" << "mov" << "mp4" << "3gp" << "mp2"<< "mp4" << "mpc" << "mpc8" << "mpeg" << "mpeg1video" << "mpeg2video" << "mpegts" << "mpegtsraw" << "mpegvideo" << "mpjpeg" << "msnwctcp" << "mtv" << "mulaw" << "mvi" << "mxf" << "mxf_d10" << "mxg" << "nc" << "nsv" << "null" << "nut" << "nuv" << "ogg" << "oma" << "paf" << "pmp" << "psp" << "psxstr" << "pva" << "qcp" << "r3d" << "rawvideo" << "rcv" << "realtext" << "rl2" << "rm" << "roq" << "rpl" << "rso" << "rtp" << "rtsp" << "s16be" << "s16le" << "s24be" << "s24le" << "s32be" << "s32le" << "s8" << "sami" << "sap" << "sbg" << "sdl" << "sdp" << "segment" << "shn" << "siff" << "smjpeg" << "smk" << "smoothstreaming" << "smush" << "sol" << "sox" << "spdif" << "srt" << "stream_segment" << "s" << "subviewer" << "svcd" << "swf" << "thp" << "tiertexseq" << "tmv" << "truehd" << "tta" << "tty" << "txd" << "u16be" << "u16le" << "u24be" << "u24le" << "u32be" << "u32le" << "u8" << "vc1" << "vc1test" << "vcd" << "vmd" << "vob" << "voc" << "vqf" << "w64" << "wav" << "wc3movie" << "webm" << "webvtt" << "wsaud" << "wsvqa" << "wtv" << "wv" << "xa" << "xbin" << "xmv" << "xwma" << "yop" << "yuv4mpegpipe";
+        suffixesTypeVideo << "3g2" << "3gp" << "4xm" << "a64" << "act" << "adf" << "adts" << "adx" << "aea" << "aiff" << "alaw" << "amr" << "anm" << "apc" << "ape" << "asf" << "asf_stream" << "ass" << "au" << "avi" << "avm2" << "avs" << "bethsoftvid" << "bfi" << "bin" << "bink" << "bit" << "bmv" << "c93" << "caf" << "cavsvideo" << "cdg" << "cdxl" << "crc" << "daud" << "dfa" << "dirac" << "dnxhd" << "dsicin" << "dts" << "dv" << "dvd" << "dxa" << "ea" << "ea_cdata" << "eac3" << "f32be" << "f32le" << "f4v" << "f64be" << "f64le" << "ffm" << "ffmetadata" << "film_cpk" << "filmstrip" << "flac" << "flic" << "flv" << "framecrc" << "framemd5" << "g722" << "g723_1" << "g729" << "gif" << "gsm" << "gxf" << "h261" << "h263" << "h264" << "hls" << "applehttp" << "ico" << "idcin" << "idf" << "iff" << "ilbc" << "image2" << "image2pipe" << "ingenient" << "ipmovie" << "ipod" << "ismv" << "iss" << "iv8" << "ivf" << "jacosub" << "jv" << "latm" << "lavfi" << "libmodplug" << "lmlm4" << "loas" << "lxf" << "m4v" << "matroska" << "matroska" << "webm" << "md5" << "mgsts" << "microdvd" << "mjpeg" << "mkvtimestamp_v2" << "mlp" << "mm" << "mmf" << "mov" << "mp4" << "3gp" << "mp2"<< "mp4" << "mpc" << "mpc8" << "mpeg" << "mpeg1video" << "mpeg2video" << "mpegts" << "mpegtsraw" << "mpegvideo" << "mpjpeg" << "msnwctcp" << "mtv" << "mulaw" << "mvi" << "mxf" << "mxf_d10" << "mxg" << "nc" << "nsv" << "null" << "nut" << "nuv" << "ogg" << "oma" << "paf" << "pmp" << "psp" << "psxstr" << "pva" << "qcp" << "r3d" << "rawvideo" << "rcv" << "realtext" << "rl2" << "rm" << "roq" << "rpl" << "rso" << "rtp" << "rtsp" << "s16be" << "s16le" << "s24be" << "s24le" << "s32be" << "s32le" << "s8" << "sami" << "sap" << "sbg" << "sdl" << "sdp" << "segment" << "shn" << "siff" << "smjpeg" << "smk" << "smoothstreaming" << "smush" << "sol" << "sox" << "spdif" << "srt" << "stream_segment" << "s" << "subviewer" << "svcd" << "swf" << "thp" << "tiertexseq" << "tmv" << "truehd" << "tta" << "tty" << "txd" << "u16be" << "u16le" << "u24be" << "u24le" << "u32be" << "u32le" << "u8" << "vc1" << "vc1test" << "vcd" << "vmd" << "vob" << "voc" << "vqf" << "w64" << "wav" << "wc3movie" << "webm" << "webvtt" << "wsaud" << "wsvqa" << "wtv" << "wv" << "xa" << "xbin" << "xmv" << "xwma" << "yop" << "yuv4mpegpipe";
     if(!suffixesTypePeople.count())
         suffixesTypePeople << "vcf";
 
@@ -39,10 +39,6 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     file.refresh();
     type = DocumentTypeFile;
     creation = updateImport(file.baseName(), version);
-    if(creation) {
-        status = DocumentStatusWaiting;
-        Global::taskList->addTask(this, TaskProcessTypeMetadata, version);
-    }
 
     QFileInfoList filesContext = file.absoluteDir().entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
     QString fileContextVerbose = "";
@@ -103,9 +99,9 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
         typeStr = "Recording";
     setMetadata("Rekall", "Document Category", typeStr, version);
 
-    QString documentTags;
+    QString documentKeywords;
     if(typeStr != "Other")
-        documentTags += typeStr.toLower() + ", ";
+        documentKeywords += typeStr.toLower() + ", ";
     QStringList fileTags = QDir(Global::pathDocuments.absoluteFilePath() + "/").relativeFilePath(file.absoluteFilePath()).remove(file.suffix()).toLower().replace("-", " ").replace("_", " ").split("/", QString::SkipEmptyParts);
     QStringList forbiddenTags = QStringList() << ".." << "rekall";
     foreach(const QString &fileTag, fileTags) {
@@ -113,11 +109,16 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
         foreach(QString tag, tags) {
             tag = tag.trimmed();
             if((tag.length() > 2) && (!forbiddenTags.contains(tag)))
-                documentTags += tag + ", ";
+                documentKeywords += tag + ", ";
         }
     }
-    documentTags.chop(2);
-    setMetadata("Rekall", "Document Tags", documentTags, version);
+    documentKeywords.chop(2);
+
+    setMetadata("Rekall", "Document Keywords", documentKeywords, version);
+    if(creation) {
+        status = DocumentStatusWaiting;
+        Global::taskList->addTask(this, TaskProcessTypeMetadata, version);
+    }
 
     return creation;
 }
@@ -311,20 +312,20 @@ const QString Metadata::getCriteriaClusterFormated(qint16 version) {
     return Global::tagClusterCriteria->getCriteriaFormated(getCriteriaCluster(version));
 }
 const QString Metadata::getCriteriaColor(qint16 version) {
-    return getMetadata(Global::tagColorCriteria->tagName, version).toString(Global::tagColorCriteria->left);
+    return getMetadata(Global::tagColorCriteria->tagName, version).toString(Global::tagColorCriteria->left, Global::tagColorCriteria->leftLength);
 }
 const QString Metadata::getCriteriaSort(qint16 version) {
     if(function == DocumentFunctionRender) {
         if(Global::tagSortCriteria->asDate)
-            return getMetadata(Global::tagSortCriteria->tagName, version).toString(Global::tagSortCriteria->left) + "\n" + getMetadata("Rekall", "Document Name", version).toString();
+            return getMetadata(Global::tagSortCriteria->tagName, version).toString(Global::tagSortCriteria->left, Global::tagSortCriteria->leftLength) + "\n" + getMetadata("Rekall", "Document Name", version).toString();
         else
             return "\n" + getMetadata("Rekall", "Document Name", version).toString();
     }
     else
-        return getMetadata(Global::tagSortCriteria->tagName, version).toString(Global::tagSortCriteria->left);
+        return getMetadata(Global::tagSortCriteria->tagName, version).toString(Global::tagSortCriteria->left, Global::tagSortCriteria->leftLength);
 }
 const QString Metadata::getCriteriaCluster(qint16 version) {
-    return getMetadata(Global::tagClusterCriteria->tagName, version).toString(Global::tagClusterCriteria->left);
+    return getMetadata(Global::tagClusterCriteria->tagName, version).toString(Global::tagClusterCriteria->left, Global::tagClusterCriteria->leftLength);
 }
 const MetadataElement Metadata::getCriteriaSortRaw(qint16 version) {
     return getMetadata(Global::tagSortCriteria->tagName, version);

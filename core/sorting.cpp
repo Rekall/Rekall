@@ -8,15 +8,27 @@ Sorting::Sorting(bool _isFilter, const QString &title, quint16 index, QWidget *p
     regexp.setPatternSyntax(QRegExp::Wildcard);
     ui->setupUi(this);
     ui->title->setText(title);
-    ui->filter->setCurrentIndex(index);
     action();
     if(isFilter)    ui->stackedWidget->setCurrentIndex(1);
     else            ui->stackedWidget->setCurrentIndex(0);
+
+    ui->filter->addItem("", "");
+    ui->filter->addItem("documents date (year)",  "Document Date/Time | 0,4");
+    ui->filter->addItem("documents date (month)", "Document Date/Time | 0,7");
+    ui->filter->addItem("documents date (day)",   "Document Date/Time | 0,10");  // 1234:67:90 23:56:89
+    ui->filter->addItem("documents time (hours)", "Document Date/Time | 11,2");  // 9876:43:10 87:54:21
+    ui->filter->addItem("documents type",         "Document Category");
+    ui->filter->addItem("documents keywords",     "Document Keywords");
+    ui->filter->addItem("documents fullname",     "Document Name");
+    ui->filter->addItem("documents first letter", "Document Name | 1");
+    ui->filter->addItem("users names",            "Import User Name");
+    ui->filter->setCurrentIndex(index);
 }
 
 void Sorting::setTagname(const QString &_tagName) {
     tagName       = _tagName;
-    left          = -1;
+    left          = 0;
+    leftLength    = -1;
     asNumber      = false;
     displayLinked = false;
     sortAscending = true;
@@ -43,7 +55,10 @@ void Sorting::action() {
                     leftPart.chop(1);
                     asNumber = true;
                 }
-                left = leftPart.toDouble();
+                QStringList lefts = leftPart.split(",");
+                left = lefts.at(0).toDouble();
+                if(lefts.count() > 1)
+                    leftLength = lefts.at(1).toDouble();
             }
         }
     }
@@ -65,7 +80,8 @@ const QString Sorting::getCriteriaFormated(const QString &_criteria) {
             return criteriaFormatedCache.value(criteria);
         else {
             QString retour;
-            if(     criteria.length() <= 5)   retour = tr("%1's").arg(criteria.left(4), -4, '0');
+            if(     criteria.length() <= 3)   retour = criteria;
+            else if(criteria.length() <= 4)   retour = tr("%1's").arg(criteria.left(4), -4, '0');
             else if(criteria.length() <= 8)   retour = QDateTime::fromString(criteria, QString("yyyy:MM:dd hh:mm:ss").left(criteria.length())).toString("MMMM yyyy");
             else if(criteria.length() <= 11)  retour = QDateTime::fromString(criteria, QString("yyyy:MM:dd hh:mm:ss").left(criteria.length())).toString("dddd dd MMMM yyyy");
             else if(criteria.length() <= 13)  retour = QDateTime::fromString(criteria, QString("yyyy:MM:dd hh:mm:ss").left(criteria.length())).toString("dddd dd MMMM yyyy, hh") + "h";
@@ -75,7 +91,7 @@ const QString Sorting::getCriteriaFormated(const QString &_criteria) {
             return retour + suffix;
         }
     }
-    else if(left >= 0)
+    else if(leftLength > 0)
         return criteria + suffix + "...";
     return criteria + suffix;
 }
@@ -130,6 +146,7 @@ QDomElement Sorting::serialize(QDomDocument &xmlDoc) {
     xmlData.setAttribute("displayLinked", displayLinked);
     xmlData.setAttribute("tagName",       tagName);
     xmlData.setAttribute("left",          left);
+    xmlData.setAttribute("leftLength",    leftLength);
     return xmlData;
 }
 void Sorting::deserialize(const QDomElement &xmlElement) {

@@ -42,7 +42,7 @@ void Document::createTagBasedOnPrevious(qint16 _forVersion) {
         }
     }
     else {
-        qreal tS = Global::aleaF(5, 180);
+        qreal tS = Global::aleaF(5, 120);
         if(function == DocumentFunctionRender)
             tS = Global::aleaF(0, 5);
         for(quint16 i = 0 ; i < getMetadataCount() ; i++) {

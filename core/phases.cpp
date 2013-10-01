@@ -9,6 +9,7 @@ Phases::Phases(QWidget *parent) :
     needCalulation = true;
 
     phasesByDaysTo.setAction(ui->daysTo);
+    ui->guess->setVisible(false);
 }
 
 Phases::~Phases() {
@@ -29,7 +30,7 @@ void Phases::analyse() {
             oldDate = startingDate = currentDate;
 
         if(oldDate.daysTo(currentDate) > phasesByDaysTo) {
-            phasesByDate.insert(currentDate, QString("Phase %1 : %2 to %3").arg(index).arg(startingDate.toString("yyyy:MM:dd hh:mm:ss")).arg(currentDate.toString("yyyy:MM:dd hh:mm:ss")));
+            phasesByDate.insert(currentDate, QString("Phase %1 : %2 to %3").arg(index, 4, 10, QChar('0')).arg(startingDate.toString("yyyy:MM:dd hh:mm:ss")).arg(currentDate.toString("yyyy:MM:dd hh:mm:ss")));
             index++;
             startingDate = currentDate;
         }
@@ -37,7 +38,7 @@ void Phases::analyse() {
         firstElement = false;
     }
     currentDate = currentDate.addSecs(1);
-    phasesByDate.insert(currentDate, QString("Phase %1 : after %2").arg(index).arg(currentDate.toString("yyyy:MM:dd hh:mm:ss")));
+    phasesByDate.insert(currentDate, QString("Phase %1 : after %2").arg(index, 4, 10, QChar('0')).arg(currentDate.toString("yyyy:MM:dd hh:mm:ss")));
 }
 
 const QString Phases::getPhaseFor(const MetadataElement &value) {

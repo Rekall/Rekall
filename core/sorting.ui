@@ -69,51 +69,6 @@
          <property name="editable">
           <bool>true</bool>
          </property>
-         <item>
-          <property name="text">
-           <string/>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Document Date/Time | 10</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Document Category</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Document Tags</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Document Date/Time | 7</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Document Name</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Document Name | 1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Import User Name</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Document Date/Time</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item row="1" column="0" colspan="2">

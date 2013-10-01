@@ -7,14 +7,14 @@ Inspector::Inspector(QWidget *parent) :
     ui->setupUi(this);
     toolbarButton = 0;
 
-    Global::tagSortCriteria    = new Sorting(false, tr("Categories sorted by"), 1, 0);
-    Global::tagColorCriteria   = new Sorting(false, tr("Colors represent"),     2, 0);
+    Global::tagSortCriteria    = new Sorting(false, tr("Categories sorted by"), 2, 0);
+    Global::tagColorCriteria   = new Sorting(false, tr("Colors represent"),     5, 0);
     Global::tagClusterCriteria = new Sorting(false, tr("Hightlight on"),   0, 0);
     Global::tagFilterCriteria  = new Sorting(true,  tr("Filter by"), 0, 0);
     Global::tagFilterCriteria->displayLinked.setAction(ui->history);
     connect(&Global::tagFilterCriteria->displayLinked, SIGNAL(triggered(bool)), Global::tagFilterCriteria, SLOT(action()));
 
-    Global::phases             = new Phases(0);
+    Global::phases = new Phases(0);
     ui->filters->addWidget(Global::tagSortCriteria);
     ui->filters->addWidget(Global::tagColorCriteria);
     ui->filters->addWidget(Global::tagClusterCriteria);
