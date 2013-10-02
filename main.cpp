@@ -55,7 +55,25 @@ int main(int argc, char *argv[]) {
     Global::pathDocuments   = QFileInfo(QStandardPaths::DocumentsLocation + "/Rekall");
 #endif
     Global::pathApplication = QFileInfo(pathApplicationDir.absolutePath());
-    Global::pathCurrent     = QFileInfo(QDir::currentPath() + "/Project");
+
+    //Create basic workspace
+    QDir().mkpath(Global::pathDocuments.absoluteFilePath() + "/");
+
+    QFileInfo defaultProject = QFileInfo(Global::pathDocuments.absoluteFilePath() + "/Empty project");
+    QFileInfoList projects = QDir(Global::pathDocuments.absoluteFilePath() + "/").entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+    if(projects.count()) {
+        if((projects.contains(defaultProject)) && (projects.count() > 1))
+            projects.removeOne(defaultProject);
+        Global::pathCurrent = projects.first();
+    }
+    else {
+        QDir().mkpath(defaultProject.absoluteFilePath());
+        QFile file(Global::pathDocuments.absoluteFilePath() + "/Empty project/Drop files here.txt");
+        file.open(QFile::WriteOnly);
+        file.close();
+        Global::pathCurrent = QFileInfo(Global::pathDocuments.absoluteFilePath() + "/Empty project");
+    }
+
     if(Global::pathApplication.absoluteFilePath().endsWith("/Rekall-build"))
         Global::pathApplication = QFileInfo(Global::pathApplication.absoluteFilePath().remove("-build"));
     if(Global::pathApplication.absoluteFilePath().endsWith("/Rekall-debug"))
