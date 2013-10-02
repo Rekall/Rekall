@@ -45,9 +45,15 @@ int main(int argc, char *argv[]) {
 
     QDir pathApplicationDir = QDir(QCoreApplication::applicationDirPath()).absolutePath();
 #ifdef Q_OS_MAC
-    pathApplicationDir.cdUp();
-    pathApplicationDir.cdUp();
-    pathApplicationDir.cdUp();
+    if((pathApplicationDir.absolutePath().contains("/Rekall-build")) || (pathApplicationDir.absolutePath().contains("/Rekall-debug"))) {
+        pathApplicationDir.cdUp();
+        pathApplicationDir.cdUp();
+        pathApplicationDir.cdUp();
+    }
+    else {
+        pathApplicationDir.cdUp();
+        pathApplicationDir.cd("Resources");
+    }
 #endif
 #ifdef QT4
     Global::pathDocuments   = QFileInfo(QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + "/Rekall");
@@ -74,9 +80,9 @@ int main(int argc, char *argv[]) {
         Global::pathCurrent = QFileInfo(Global::pathDocuments.absoluteFilePath() + "/Empty project");
     }
 
-    if(Global::pathApplication.absoluteFilePath().endsWith("/Rekall-build"))
+    if(Global::pathApplication.absoluteFilePath().contains("/Rekall-build"))
         Global::pathApplication = QFileInfo(Global::pathApplication.absoluteFilePath().remove("-build"));
-    if(Global::pathApplication.absoluteFilePath().endsWith("/Rekall-debug"))
+    if(Global::pathApplication.absoluteFilePath().contains("/Rekall-debug"))
         Global::pathApplication = QFileInfo(Global::pathApplication.absoluteFilePath().remove("-debug"));
 
     qDebug("Pathes");

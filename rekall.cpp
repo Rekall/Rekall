@@ -25,7 +25,7 @@ Rekall::Rekall(QWidget *parent) :
     Global::chutier = ui->chutier->getTree();
     Global::udp = new Udp(0, 5678);
     httpUpload = new FileUploadController();
-    settings = new QSettings("rekall.ini", QSettings::IniFormat, this);
+    settings = new QSettings(Global::pathApplication.absoluteFilePath() + "/Rekall.ini", QSettings::IniFormat, this);
     settings->beginGroup("listener");
     http = new HttpListener(settings, httpUpload, this);
     connect(httpUpload, SIGNAL(fileUploaded(QString, QString, QTemporaryFile*)), SLOT(fileUploaded(QString, QString, QTemporaryFile*)), Qt::QueuedConnection);
