@@ -132,7 +132,14 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     if(!file.exists())
         setMetadata("Rekall", "Document Category",  "Marker", version);
     setMetadata("Rekall", "Document Name",         name, version);
-    setMetadata("Rekall", "Document Author",       Global::userInfos->getInfo("User Name"), version);
+    //setMetadata("Rekall", "Document Author",       Global::userInfos->getInfo("User Name"), version);
+    quint16 tirage = Global::alea(0, 100);
+    if(tirage < 10)        setMetadata("Rekall", "Document Author", "Julie Valero",         version);
+    else if(tirage < 20)   setMetadata("Rekall", "Document Author", "Alexandros Markeas",   version);
+    else if(tirage < 30)   setMetadata("Rekall", "Document Author", "Pierre Nouvel",        version);
+    else if(tirage < 50)   setMetadata("Rekall", "Document Author", "Jean-François Peyret", version);
+    else if(tirage < 70)   setMetadata("Rekall", "Document Author", "Agnès de Cayeux",      version);
+    else                   setMetadata("Rekall", "Document Author", "Thierry Coduys",       version);
     setMetadata("Rekall", "Document Date/Time",    QDateTime::currentDateTime(), version);
     setMetadata("Rekall", "Import Date/Time",      QDateTime::currentDateTime(), version);
     setMetadata(Global::userInfos->getInfos());

@@ -225,8 +225,8 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
     }
 }
 void TimelineGL::wheelEvent(QWheelEvent *e) {
-    if(e->pos().x() < Global::timelineHeaderSize.width())  scrollTo(QPointF(scrollDest.x(), scrollDest.y() - e->delta() / 2.));
-    else                                                   scrollTo(QPointF(scrollDest.x() - e->delta() / 2., scrollDest.y()));
+    if(e->orientation() == Qt::Horizontal)  scrollTo(QPointF(scrollDest.x() - e->delta() / 2., scrollDest.y()));
+    else                                    scrollTo(QPointF(scrollDest.x(), scrollDest.y() - e->delta() / 2.));
 }
 
 

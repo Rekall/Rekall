@@ -104,6 +104,13 @@ void UiTreeView::askOpen() {
             }
         }
     }
+    else {
+        foreach(QTreeWidgetItem *item, ui->view->selectedItems()) {
+            UiSyncItem *syncItem = (UiSyncItem*)item;
+            if(syncItem)
+                syncItem->askForOpen(syncItem);
+        }
+    }
 }
 void UiTreeView::askNewRoot() {
     QList<UiSyncItem*> items = getSelection();

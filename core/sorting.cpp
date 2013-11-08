@@ -21,7 +21,7 @@ Sorting::Sorting(bool _isFilter, const QString &title, quint16 index, QWidget *p
     ui->filter->addItem("documents keywords",     "Document Keywords");
     ui->filter->addItem("documents fullname",     "Document Name");
     ui->filter->addItem("documents first letter", "Document Name | 1");
-    ui->filter->addItem("users names",            "Import User Name");
+    ui->filter->addItem("users names",            "Document Author");
     ui->filter->setCurrentIndex(index);
 }
 

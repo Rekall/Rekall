@@ -75,7 +75,7 @@ public:
     explicit PersonCard() : QList< QPair<PersonCardHeader, PersonCardValues> > ()                      {                    }
     explicit PersonCard(const PersonCard &card) : QList< QPair<PersonCardHeader, PersonCardValues> >() {    *this = card;   }
     inline bool check(const QString &category, quint16 count = 0)         const { return ((containsCategory(category)) && (valueCategory(category).second.count() > count));  }
-    inline const PersonCardValues& getRow(const QString &category)        const { return valueCategory(category).second; }
+    inline const PersonCardValues getRow(const QString &category)         const { return valueCategory(category).second; }
     inline const QString& get(const QString &category, quint16 index = 0) const { return valueCategory(category).second.at(index); }
 
 public:
