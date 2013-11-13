@@ -354,7 +354,7 @@ void UiFileItem::configure(UiTreeView *tree, bool _showDateTime) {
     iconFile     = QIcon(":/items/res_item_file.png");
     showDateTime = _showDateTime;
 
-    tree->getTree()->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
+    //tree->getTree()->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
     tree->getTree()->setIndentation(10);
     tree->getTree()->setHeaderHidden(true);
 

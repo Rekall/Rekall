@@ -3,13 +3,14 @@
 ViewerGL::ViewerGL(QWidget *parent) :
     GlWidget(QGLFormat(QGL::DoubleBuffer | QGL::DirectRendering | QGL::SampleBuffers), parent) {
     Global::viewerGL = this;
-    startTimer(20);
+    startTimer(40);
     setMouseTracking(true);
     connect(&mouseTimer, SIGNAL(timeout()), SLOT(mouseMoveLong()));
 }
 
 void ViewerGL::timerEvent(QTimerEvent *) {
-    updateGL();
+    if(glReady)
+        updateGL();
 }
 
 void ViewerGL::initializeGL() {
@@ -41,6 +42,8 @@ void ViewerGL::resizeGL(int, int) {
 }
 
 void ViewerGL::paintGL() {
+    glReady = true;
+
     //Efface
     GLbitfield clearFlag = GL_COLOR_BUFFER_BIT;
     if(format().stencil())  clearFlag |= GL_STENCIL_BUFFER_BIT;
@@ -80,7 +83,7 @@ void ViewerGL::mouseDoubleClickEvent(QMouseEvent *e) {
 }
 void ViewerGL::leaveEvent(QEvent *) {
     Global::selectedTag      = 0;
-    Global::selectedTagHover = 0;
+    //Global::selectedTagHover = 0;
 }
 void ViewerGL::mouseMoveLong() {
     if(mouseTimerOk)

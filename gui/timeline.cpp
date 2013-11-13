@@ -135,6 +135,8 @@ const QRectF Timeline::paintViewer() {
 bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool, bool, bool action, bool) {
     if((action) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
         seek(Global::currentProject->getTimelineCursorTime(pos));
+        Global::selectedTag = 0;
+        Global::selectedTagHover = 0;
         return true;
     }
     return false;
@@ -143,6 +145,8 @@ bool Timeline::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bo
     return false;
     if(dbl) {
         seek(Global::currentProject->getViewerCursorTime(pos));
+        Global::selectedTag = 0;
+        Global::selectedTagHover = 0;
         return true;
     }
 }

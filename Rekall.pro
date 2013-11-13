@@ -19,13 +19,10 @@ contains(QT_VERSION, "^4.*") {
 TARGET    = Rekall
 TEMPLATE  = app
 
-SOURCES  += main.cpp \
-    gui/playervideo.cpp
-HEADERS  += tasks/taskslist.h   tasks/feedlist.h   tasks/taskprocess.h \
-    gui/playervideo.h
+SOURCES  += main.cpp
+HEADERS  += tasks/taskslist.h   tasks/feedlist.h   tasks/taskprocess.h
 SOURCES  += tasks/taskslist.cpp tasks/feedlist.cpp tasks/taskprocess.cpp
-FORMS    += tasks/taskslist.ui  tasks/feedlist.ui \
-    gui/playervideo.ui
+FORMS    += tasks/taskslist.ui  tasks/feedlist.ui
 
 HEADERS  += core/watcherfeeling.h   core/watcher.h
 SOURCES  += core/watcherfeeling.cpp core/watcher.cpp
@@ -39,9 +36,9 @@ HEADERS  += core/sorting.h   core/phases.h   core/metadata.h   core/project.h   
 SOURCES  += core/sorting.cpp core/phases.cpp core/metadata.cpp core/project.cpp core/document.cpp core/tag.cpp core/cluster.cpp
 FORMS    += core/sorting.ui  core/phases.ui
 
-HEADERS  += gui/inspector.h   gui/timeline.h   gui/previewer.h   gui/timelinegl.h
-SOURCES  += gui/inspector.cpp gui/timeline.cpp gui/previewer.cpp gui/timelinegl.cpp
-FORMS    += gui/inspector.ui  gui/timeline.ui  gui/previewer.ui
+HEADERS  += gui/inspector.h   gui/timeline.h   gui/previewer.h   gui/playervideo.h   gui/timelinegl.h
+SOURCES  += gui/inspector.cpp gui/timeline.cpp gui/previewer.cpp gui/playervideo.cpp gui/timelinegl.cpp
+FORMS    += gui/inspector.ui  gui/timeline.ui  gui/previewer.ui  gui/playervideo.ui
 
 HEADERS  += gui/player.h   gui/viewer.h   gui/viewergl.h
 SOURCES  += gui/player.cpp gui/viewer.cpp gui/viewergl.cpp

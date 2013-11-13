@@ -77,9 +77,8 @@ public:
     bool  timelineContains(const QPointF &pos);
     qreal timelineProgress(const QPointF &pos);
 
-private:
-    QRectF  viewerBoundingRect;
 public:
+    QRectF  viewerBoundingRect;
     QPointF viewerPos, viewerDestPos;
     bool isInProgress;
 public:

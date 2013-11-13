@@ -61,9 +61,6 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     setMetadata("Rekall", "Document Date/Time", getMetadata("File", "File Modification Date/Time", version), version);
     setMetadata("Rekall", "Document Folder", QString(file.absoluteDir().absolutePath() + "/").remove(dirBaseParent.absolutePath() + "/"), version);
 
-    //Hash
-    setMetadata("File", "Hash", Global::getFileHash(file), version);
-
 
     //Type
     QString typeStr = "";

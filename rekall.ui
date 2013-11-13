@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QTabWidget, QLabel, QCheckBox, QLineEdit, QPlainTextEdit, QPushButton, QSpinBox, QDoubleSpinBox, QTreeView, QHeaderView, QTabBar, QComboBox, QFrame#globalFrame, QTabBar::tab, QTreeView, QHeaderView, QDockWidget, QStatusBar, QRadioButton, QToolBox, QToolBox::tab {
-	font: 						11px &quot;Calibri&quot;, &quot;Arial&quot;;
+	font: 						12px &quot;Calibri&quot;, &quot;Arial&quot;;
 	padding:					0px;
 	margin:					0px;
 	min-height: 				20px;
@@ -50,7 +50,7 @@ QLabel, QCheckBox, QRadioButton {
 	color: 						rgb(245, 248, 250);
 }
 QLabel#peopleLabel, QLabel#chutierLabel, QLabel#chutierLabel2, QLabel#feedsLabel, QLabel#tasksLabel, QLabel#conduiteLabel, QLabel#previewLabel, QLabel#feelingLabel {
-	font: 		10px;
+	font: 		11px;
 	padding: 	5px;
 	color: 		rgb(131, 135, 137);
 }
@@ -129,7 +129,7 @@ QHeaderView::section {
 	background: 							rgb(56, 61, 63);
 	border: 									0px solid transparent;
 	border-bottom: 						1px solid rgb(41, 44, 45);
-	font: 										9px;
+	font: 										10px;
 }
 QTreeView::item {
 	min-height: 		20px;
@@ -288,7 +288,16 @@ QStatusBar {
     <property name="spacing">
      <number>0</number>
     </property>
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item>
@@ -316,8 +325,8 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>259</width>
-            <height>302</height>
+            <width>263</width>
+            <height>304</height>
            </rect>
           </property>
           <attribute name="label">
@@ -327,7 +336,16 @@ QStatusBar {
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -360,8 +378,8 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>259</width>
-            <height>302</height>
+            <width>100</width>
+            <height>178</height>
            </rect>
           </property>
           <attribute name="label">
@@ -371,7 +389,16 @@ QStatusBar {
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -394,8 +421,8 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>259</width>
-            <height>302</height>
+            <width>100</width>
+            <height>248</height>
            </rect>
           </property>
           <attribute name="label">
@@ -405,7 +432,16 @@ QStatusBar {
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -428,8 +464,8 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>259</width>
-            <height>302</height>
+            <width>100</width>
+            <height>484</height>
            </rect>
           </property>
           <attribute name="label">
@@ -439,7 +475,16 @@ QStatusBar {
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>3</number>
+           </property>
+           <property name="rightMargin">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
             <number>3</number>
            </property>
            <item>
@@ -536,8 +581,8 @@ QStatusBar {
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>637</width>
-          <height>481</height>
+          <width>633</width>
+          <height>479</height>
          </rect>
         </property>
         <attribute name="label">
@@ -569,13 +614,19 @@ QStatusBar {
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="editTriggers">
-            <set>QAbstractItemView::NoEditTriggers</set>
+            <set>QAbstractItemView::DoubleClicked</set>
            </property>
            <property name="alternatingRowColors">
             <bool>false</bool>
            </property>
            <property name="indentation">
             <number>10</number>
+           </property>
+           <property name="animated">
+            <bool>true</bool>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
            </property>
            <attribute name="headerVisible">
             <bool>false</bool>
@@ -613,8 +664,8 @@ QStatusBar {
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>637</width>
-          <height>481</height>
+          <width>100</width>
+          <height>449</height>
          </rect>
         </property>
         <attribute name="label">
@@ -624,7 +675,16 @@ QStatusBar {
          <property name="spacing">
           <number>0</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -794,8 +854,8 @@ QStatusBar {
    <slot>actionMetadata(QTreeWidgetItem*,int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1024</x>
-     <y>240</y>
+     <x>1036</x>
+     <y>298</y>
     </hint>
     <hint type="destinationlabel">
      <x>916</x>
@@ -842,8 +902,8 @@ QStatusBar {
    <slot>personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>52</x>
-     <y>289</y>
+     <x>50</x>
+     <y>332</y>
     </hint>
     <hint type="destinationlabel">
      <x>-71</x>

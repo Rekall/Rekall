@@ -155,7 +155,7 @@ const QRectF Tag::paintTimeline(bool before) {
         QColor colorDestTmp = (Global::selectedTagHover == this)?(Global::colorSelection):(document->getColor());
         if(getDocument()->status == DocumentStatusWaiting)
             colorDestTmp.setAlphaF(0.1);
-        if(getDocument()->status == DocumentStatusProcessing)
+        if((getDocument()->status == DocumentStatusProcessing) || (Global::selectedTagHover == this))
             colorDestTmp.setAlphaF(Global::breathingFast);
 
         if(!((colorDestTmp.red() == 0) && (colorDestTmp.green() == 0) && (colorDestTmp.blue() == 0)))
@@ -500,7 +500,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
 
 bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool action, bool) {
     if(timelineContains(pos)) {
-        if(action) {
+        if((action) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
             mouseHover = true;
             if((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier)
                 mouseHoverPreview = true;
@@ -541,7 +541,7 @@ bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, 
     if((mouseHover) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
         Global::selectedTag = this;
         Global::selectedTagMode = TagSelectionMove;
-        Global::timelineGL->ensureVisible(timelinePos);
+        Global::timelineGL->ensureVisible(timelineBoundingRect.translated(timelineDestPos).topLeft());
         if(document->chutierItem)
             Global::chutier->setCurrentItem(document->chutierItem);
     }

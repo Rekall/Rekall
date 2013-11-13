@@ -3,7 +3,7 @@
 TimelineGL::TimelineGL(QWidget *parent) :
     GlWidget(QGLFormat(QGL::DoubleBuffer | QGL::DirectRendering | QGL::SampleBuffers), parent) {
     Global::timelineGL = this;
-    startTimer(20);
+    startTimer(40);
     setMouseTracking(true);
     setAcceptDrops(true);
     showLegend = 0;
@@ -14,7 +14,8 @@ TimelineGL::TimelineGL(QWidget *parent) :
 }
 
 void TimelineGL::timerEvent(QTimerEvent *) {
-    updateGL();
+    if(glReady)
+        updateGL();
 }
 
 void TimelineGL::initializeGL() {
@@ -40,6 +41,8 @@ void TimelineGL::resizeGL(int, int) {
 }
 
 void TimelineGL::paintGL() {
+    glReady = true;
+
     //Efface
     GLbitfield clearFlag = GL_COLOR_BUFFER_BIT;
     if(format().stencil())  clearFlag |= GL_STENCIL_BUFFER_BIT;
@@ -162,7 +165,7 @@ void TimelineGL::mouseDoubleClickEvent(QMouseEvent *e) {
 }
 void TimelineGL::leaveEvent(QEvent *) {
     Global::selectedTag      = 0;
-    Global::selectedTagHover = 0;
+    //Global::selectedTagHover = 0;
 }
 void TimelineGL::mouseMoveLong() {
     if(mouseTimerOk)

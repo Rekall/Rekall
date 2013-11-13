@@ -8,6 +8,7 @@
 #include <QWebFrame>
 #include <QWebPage>
 #include <QDesktopServices>
+#include <QInputDialog>
 #include "core/watcher.h"
 #include "interfaces/userinfos.h"
 #include "gui/inspector.h"
@@ -59,6 +60,7 @@ protected:
 private slots:
     void fileUploaded(QString gps, QString filename, QTemporaryFile*);
     void action();
+    void actionMetadata();
     void actionMetadata(QTreeWidgetItem *item, int col);
     void closeSplash();
     void refreshAndLastMetadata();

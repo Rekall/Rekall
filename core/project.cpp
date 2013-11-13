@@ -372,6 +372,8 @@ const QRectF Project::paintTimeline(bool before) {
 
                         //Category in selection
                         tagCategoryIsSelected |= tag->mouseHover;
+                        tagCategoryIsSelected |= (tag == Global::selectedTagHover);
+                        tagCategoryIsSelected |= (tag == Global::selectedTag);
 
                         //Get info about category and analysis
                         if(tagCategory.isEmpty()) {
@@ -441,7 +443,8 @@ const QRectF Project::paintTimeline(bool before) {
                     else {
                         Global::timelineGL->qglColor(Global::colorBackground);
                         GlRect::drawRect(tagCategoryRect);
-                        Global::timelineGL->qglColor(Global::colorAlternate);
+                        if(categoryIndex%2) Global::timelineGL->qglColor(Global::colorAlternate);
+                        else                Global::timelineGL->qglColor(Global::colorAlternate2);
                         GlRect::drawRect(QRectF(tagCategoryRect.topLeft(), QSizeF(Global::timelineGL->width(), tagCategoryRect.height())));
                     }
 
@@ -476,9 +479,9 @@ const QRectF Project::paintTimeline(bool before) {
                     glEnable(GL_SCISSOR_TEST);
                 }
                 //Super separator si big change of category
-                qreal vSpacing = Global::timelineTagVSpacingSeparator;
+                qreal vSpacing = Global::timelineTagVSpacingSeparator+1;
                 if(((drawToggle) && (!drawToggleNext)) || ((!drawToggle) && (drawToggleNext)))
-                    vSpacing = Global::timelineTagVSpacingSeparator;
+                    vSpacing = Global::timelineTagVSpacingSeparator+1;
                 if((!clustersInCategoriesIterator.hasNext()) && (categoriesInPhasesIterator.hasNext()))
                     vSpacing = 10;
 
@@ -632,7 +635,7 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
 
     if(!ok) {
         Global::selectedTag = 0;
-        Global::selectedTagHover = 0;
+        //Global::selectedTagHover = 0;
         if((press) && ((e->button() & Qt::RightButton) == Qt::RightButton)) {
             for(quint16 i = 0 ; i < guiCategories.count() ; i++) {
                 if(guiCategories.at(i).first.contains(pos)) {

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>269</width>
-    <height>98</height>
+    <height>99</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,16 @@ QPushButton#actionDuplicate, QPushButton#actionAddRoot, QPushButton#actionSave {
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -43,7 +52,7 @@ QPushButton#actionDuplicate, QPushButton#actionAddRoot, QPushButton#actionSave {
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="editTriggers">
-      <set>QAbstractItemView::EditKeyPressed</set>
+      <set>QAbstractItemView::NoEditTriggers</set>
      </property>
      <property name="tabKeyNavigation">
       <bool>true</bool>

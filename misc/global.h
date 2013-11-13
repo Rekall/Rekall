@@ -61,6 +61,7 @@ public:
         showLinkedTagsDest = showLinkedRendersDest = showLegendDest = false;
         mouseTimer.setSingleShot(true);
         mouseTimerOk = false;
+        glReady = false;
     }
 public:
     QTimer mouseTimer;
@@ -70,6 +71,8 @@ public:
     QPointF scroll, scrollDest;
     UiBool showLegendDest, showLinkedRendersDest, showLinkedTagsDest;
     qreal showLinkedRenders, showLinkedTags;
+protected:
+    bool glReady;
 public:
     void ensureVisible(const QPointF &point, qreal ratio = 0.5);
     void scrollTo(const QPointF &point);
@@ -229,9 +232,9 @@ public:
     static TagSelection selectedTagMode;
     static qreal inertie;
     static Udp *udp;
-    static QFont font, fontSmall, fontLarge;
+    static QFont font, fontSmall;
     static GlVideo *video;
-    static QColor colorAlternateStrong, colorAlternate, colorCluster, colorTicks, colorSelection, colorProgression, colorText, colorTextDark, colorBackground, colorBackgroundDark, colorBackgroundMidDark, colorTextBlack;
+    static QColor colorAlternateStrong, colorAlternate, colorAlternate2, colorCluster, colorTicks, colorSelection, colorProgression, colorText, colorTextDark, colorBackground, colorBackgroundDark, colorBackgroundMidDark, colorTextBlack;
     static QMap<QString, QPair<QColor, qreal> > colorForMeta;
     static bool timelineSortChanged, viewerSortChanged, eventsSortChanged, metaChanged;
     static WatcherBase *watcher;
@@ -279,9 +282,19 @@ public:
 
 
 class HtmlDelegate : public QStyledItemDelegate {
+private:
+    bool editable;
+public:
+    explicit HtmlDelegate(bool _editable = false, QObject *parent = 0);
 protected:
-    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
-    QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+protected:
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
 };
 
 

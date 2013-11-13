@@ -44,19 +44,19 @@ qreal        Global::inertie                      = 5;
 Udp*         Global::udp                          = 0;
 QFont        Global::font;
 QFont        Global::fontSmall;
-QFont        Global::fontLarge;
 GlVideo*     Global::video                        = 0;
 QTreeWidget*  Global::chutier                      = 0;
 ProjectBase*  Global::currentProject               = 0;
 UserInfosBase* Global::userInfos                = 0;
 
 QColor       Global::colorAlternate               = QColor(255, 255, 255, 12);
+QColor       Global::colorAlternate2              = QColor(255, 255, 255,  8);
 QColor       Global::colorAlternateStrong         = QColor(0, 0, 0, 128);
 QColor       Global::colorCluster                 = QColor(255, 255, 255, 62);
 
 QColor       Global::colorTicks                   = QColor(43, 46, 47);
-QColor       Global::colorSelection               = QColor(50, 221, 255);
-QColor       Global::colorProgression             = QColor(50, 221, 255);//QColor(45, 202, 225);
+QColor       Global::colorSelection               = QColor(45, 202, 225);//QColor(50, 221, 255);
+QColor       Global::colorProgression             = QColor(45, 202, 225);//QColor(45, 202, 225);
 QColor       Global::colorText                    = QColor(245, 248, 250);
 QColor       Global::colorTextDark                = Global::colorText.darker(120);
 QColor       Global::colorTextBlack               = QColor(45, 50, 53);
@@ -239,7 +239,7 @@ FeedItemBase::FeedItemBase(FeedItemBaseType _action, const QString &_author, con
 }
 void FeedItemBase::update() {
     setIcon(0, icon);
-    setText(0, QString("<span style='font-family: Calibri, Arial; font-size: 10px; color: #F5F8FA'>%1 <span style='color: #A1A5A7'>%2</span> %3<span style='color: #A1A5A7'>, %4</span></span>").arg(author).arg(actionStr).arg(object).arg(Global::dateToString(date, false).toLower()));
+    setText(0, QString("<span style='font-family: Calibri, Arial; font-size: 11px; color: #F5F8FA'>%1 <span style='color: #A1A5A7'>%2</span> %3<span style='color: #A1A5A7'>, %4</span></span>").arg(author).arg(actionStr).arg(object).arg(Global::dateToString(date, false).toLower()));
     setToolTip(0, Global::dateToString(date));
 }
 
@@ -248,7 +248,7 @@ void FeedItemBase::update() {
 
 void GlWidget::ensureVisible(const QPointF &point, qreal ratio) {
     QRectF rect(QPointF(0, 0), size());
-    if(!rect.translated(scroll).contains(point)) {
+    if(!rect.translated(scrollDest).contains(point)) {
         QPointF pseudoCenter = rect.topLeft() + QPointF(rect.width() * ratio, rect.height() * ratio);
         if(point.y() >= 0)  scrollTo(QPointF(scrollDest.x(), point.y() - pseudoCenter.y()));
         if(point.x() >= 0)  scrollTo(QPointF(point.x() - pseudoCenter.x(), scrollDest.y()));
@@ -438,7 +438,10 @@ void GlRect::drawRect(const QRectF &rect, qreal roundPrecision, const QRectF &te
 
 
 
-
+HtmlDelegate::HtmlDelegate(bool _editable, QObject *parent) :
+    QStyledItemDelegate(parent) {
+    editable = _editable;
+}
 void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     QStyleOptionViewItemV4 optionV4 = option;
     initStyleOption(&optionV4, index);
@@ -474,4 +477,32 @@ QSize HtmlDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
     doc.setHtml(optionV4.text);
     doc.setTextWidth(optionV4.rect.width());
     return QSize(doc.idealWidth(), doc.size().height());
+}
+QWidget *HtmlDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
+    if(!editable)
+        return 0;
+    QLineEdit *editor = new QLineEdit(parent);
+    //editor->setStyleSheet();
+    return editor;
+}
+
+void HtmlDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+    QString data   = index.model()->data(index, Qt::EditRole).toString().remove(QRegExp("<[^>]*>")).trimmed();
+    QString prefix = index.model()->data(index, Qt::EditRole).toString();
+    prefix = prefix.left(prefix.indexOf(data));
+    (static_cast<QLineEdit*>(editor))->setWindowTitle(prefix);
+    (static_cast<QLineEdit*>(editor))->setText(data);
+}
+
+void HtmlDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
+    model->setData(index, (static_cast<QLineEdit*>(editor))->windowTitle() + (static_cast<QLineEdit*>(editor))->text() + "</span>", Qt::EditRole);
+}
+
+void HtmlDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &) const {
+    if(editor)
+        editor->setGeometry(option.rect);
+}
+
+bool HtmlDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) {
+    return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
