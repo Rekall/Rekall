@@ -295,14 +295,14 @@ const QRectF Project::paintTimeline(bool before) {
         bool debug = false;
         QList<QRectF> zones;
         quint16 categoryIndex = 0;
-        QPointF tagSortPosOffset = QPointF(0, Global::timelineTagVSpacingSeparator), categoryStart = QPointF(0, 0);
+        QPointF tagSortPosOffset = QPointF(0, Global::timelineTagVSpacingSeparator), categoryStart = QPointF(0, 0), phaseStart = QPointF(0, 0);
         guiToggles.clear();
         guiCategories.clear();
         QMapIterator<QString, QMap<QString, QMap<QString, QList<Tag*> > > > categoriesInPhasesIterator(timelineSortTags);
         while(categoriesInPhasesIterator.hasNext()) {
             categoriesInPhasesIterator.next();
 
-            QString phase = categoriesInPhasesIterator.key();
+            QString phase = Global::phases->getVerbosePhaseFor(categoriesInPhasesIterator.key());
             if(debug)
                 qDebug("\t > [Phase] %s", qPrintable(phase));
 
@@ -350,7 +350,7 @@ const QRectF Project::paintTimeline(bool before) {
                 guiCategories.append(qMakePair(tagCategoryRect.translated(QPointF(0, Global::timelineHeaderSize.height())), qMakePair(phase, sorting)));
 
                 //New category
-                qreal yMax = 0;
+                qreal yCategoryMax = 0;
                 bool drawToggleNext = false;
                 nbTagsPerCategory = 0;
                 QString tagCategory;
@@ -421,13 +421,13 @@ const QRectF Project::paintTimeline(bool before) {
                         //Drawing
                         retour = retour.united(tag->paintTimeline(before));
                         zones.append(tagRect);
-                        yMax = qMax(yMax, tagRect.bottom());
+                        yCategoryMax = qMax(yCategoryMax, tagRect.bottom());
                         nbTagsPerCategory++;
                     }
                 }
 
                 //Extract category name and rect, store it for caching
-                tagCategoryRect = QRectF(categoryStart, QPointF(Global::timelineHeaderSize.width(), yMax + Global::timelineTagVSpacingSeparator)).translated(Global::timelineGL->scroll.x(), 0);
+                tagCategoryRect = QRectF(categoryStart, QPointF(Global::timelineHeaderSize.width(), yCategoryMax + Global::timelineTagVSpacingSeparator)).translated(Global::timelineGL->scroll.x(), 0);
                 timelineCategoriesRectCache[categoryIndex] = qMakePair(tagCategoryRect, nbTagsPerCategory);
                 tagCategoryRect.setWidth(tagCategoryRect.width() - 2);
 
@@ -444,7 +444,7 @@ const QRectF Project::paintTimeline(bool before) {
                         Global::timelineGL->qglColor(Global::colorBackground);
                         GlRect::drawRect(tagCategoryRect);
                         if(categoryIndex%2) Global::timelineGL->qglColor(Global::colorAlternate);
-                        else                Global::timelineGL->qglColor(Global::colorAlternate2);
+                        else                Global::timelineGL->qglColor(Global::colorAlternateLight);
                         GlRect::drawRect(QRectF(tagCategoryRect.topLeft(), QSizeF(Global::timelineGL->width(), tagCategoryRect.height())));
                     }
 
@@ -487,7 +487,7 @@ const QRectF Project::paintTimeline(bool before) {
 
                 //Super category
                 if(vSpacing > Global::timelineTagVSpacingSeparator) {
-                    tagCategoryRect = QRectF(QPointF(0, yMax + 2*Global::timelineTagVSpacing+1), QPointF(Global::timelineGL->width(), yMax + vSpacing)).translated(Global::timelineGL->scroll.x(), 0);
+                    tagCategoryRect = QRectF(QPointF(0, yCategoryMax + 2*Global::timelineTagVSpacing+1), QPointF(Global::timelineGL->width(), yCategoryMax + vSpacing)).translated(Global::timelineGL->scroll.x(), 0);
 
                     /*
                     glDisable(GL_SCISSOR_TEST);
@@ -498,10 +498,38 @@ const QRectF Project::paintTimeline(bool before) {
                 }
 
                 //New offset
-                tagSortPosOffset.setY(yMax + vSpacing + Global::timelineTagVSpacingSeparator);
-                categoryStart   .setY(yMax + vSpacing);
+                tagSortPosOffset.setY(yCategoryMax + vSpacing + Global::timelineTagVSpacingSeparator);
+                categoryStart   .setY(yCategoryMax + vSpacing);
                 categoryIndex++;
             }
+            QRectF phaseRect = QRectF(phaseStart, QPointF(12, categoryStart.y() - Global::timelineTagVSpacingSeparator)).translated(Global::timelineGL->scroll.x(), 0);
+            glDisable(GL_SCISSOR_TEST);
+            Global::timelineGL->qglColor(Global::colorAlternateMore);
+            GlRect::drawRect(phaseRect);
+
+            Global::timelineGL->qglColor(Qt::white);
+            glPushMatrix();
+            QSize tagPhaseTextSize(phaseRect.size().height(), phaseRect.size().width());
+            glTranslatef(phaseRect.bottomLeft().x(), phaseRect.bottomLeft().y(), 0);
+            glRotatef(-90, 0, 0, 1);
+            bool textFound = false;
+            if(timelinePhases.count() > 1000)
+                timelinePhases.clear();
+            foreach(GlText timelinePhase, timelinePhases) {
+                if((timelinePhase.text == phase) && (timelinePhase.size == tagPhaseTextSize)) {
+                    timelinePhase.drawText();
+                    textFound = true;
+                }
+            }
+            if(!textFound) {
+                GlText tagPhaseText;
+                tagPhaseText.setStyle(tagPhaseTextSize, Qt::AlignCenter, Global::font);
+                tagPhaseText.drawText(phase);
+                timelinePhases << tagPhaseText;
+            }
+            glPopMatrix();
+            glEnable(GL_SCISSOR_TEST);
+            phaseStart.setY(categoryStart.y());
         }
 
         //Drawing clusters

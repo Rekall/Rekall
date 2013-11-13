@@ -94,7 +94,7 @@ public:
     void setStyle(const QSize &_size, int _alignement, const QFont &_font);
     void setText(const QString &text);
     void drawText(const QString &text,const QPoint &pos = QPoint(0, 0));
-    void drawText(const QPoint &pos);
+    void drawText(const QPoint &pos = QPoint(0, 0));
 };
 
 class GlRect {
@@ -234,7 +234,7 @@ public:
     static Udp *udp;
     static QFont font, fontSmall;
     static GlVideo *video;
-    static QColor colorAlternateStrong, colorAlternate, colorAlternate2, colorCluster, colorTicks, colorSelection, colorProgression, colorText, colorTextDark, colorBackground, colorBackgroundDark, colorBackgroundMidDark, colorTextBlack;
+    static QColor colorAlternateStrong, colorAlternate, colorAlternateLight, colorAlternateMore, colorCluster, colorTicks, colorSelection, colorProgression, colorText, colorTextDark, colorBackground, colorBackgroundDark, colorBackgroundMidDark, colorTextBlack;
     static QMap<QString, QPair<QColor, qreal> > colorForMeta;
     static bool timelineSortChanged, viewerSortChanged, eventsSortChanged, metaChanged;
     static WatcherBase *watcher;

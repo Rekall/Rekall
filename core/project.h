@@ -44,7 +44,7 @@ public:
 public:
     qreal nbTagsPerCategories;
     QMap< QPair<QString, QString>, Cluster*> timelineClusters;
-    QList<GlText> timelineCategories;
+    QList<GlText> timelineCategories, timelinePhases;
     QList< QPair<QRectF, UiBool*> > guiToggles;
     QList< QPair<QRectF, QPair<QString, QString> > > guiCategories;
     GlRect textureStrips;

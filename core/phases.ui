@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>459</width>
-    <height>37</height>
+    <width>380</width>
+    <height>161</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,38 +19,48 @@
 }
 </string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
-   <property name="spacing">
-    <number>5</number>
-   </property>
-   <property name="margin">
-    <number>0</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="daysToLabel">
-     <property name="text">
-      <string>Working phases spaced by more than</string>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
+     <widget class="QLabel" name="daysToLabel">
+      <property name="text">
+       <string>Working phases spaced by more than</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="daysTo">
+      <property name="suffix">
+       <string> days</string>
+      </property>
+      <property name="maximum">
+       <number>999999</number>
+      </property>
+      <property name="value">
+       <number>60</number>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
-    <widget class="QSpinBox" name="daysTo">
-     <property name="suffix">
-      <string> days</string>
+    <widget class="QTreeWidget" name="names">
+     <property name="indentation">
+      <number>0</number>
      </property>
-     <property name="maximum">
-      <number>999999</number>
+     <property name="animated">
+      <bool>true</bool>
      </property>
-     <property name="value">
-      <number>60</number>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="guess">
-     <property name="text">
-      <string>Guess</string>
-     </property>
+     <column>
+      <property name="text">
+       <string>Phase name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Documents before…</string>
+      </property>
+     </column>
     </widget>
    </item>
   </layout>
@@ -58,30 +68,14 @@
  <resources/>
  <connections>
   <connection>
-   <sender>guess</sender>
-   <signal>released()</signal>
-   <receiver>Phases</receiver>
-   <slot>action()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>105</x>
-     <y>22</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>314</x>
-     <y>23</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>daysTo</sender>
    <signal>valueChanged(int)</signal>
    <receiver>Phases</receiver>
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>115</x>
-     <y>63</y>
+     <x>367</x>
+     <y>30</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -89,8 +83,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>names</sender>
+   <signal>itemChanged(QTreeWidgetItem*,int)</signal>
+   <receiver>Phases</receiver>
+   <slot>actionNames()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>198</x>
+     <y>108</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>333</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>action()</slot>
+  <slot>actionNames()</slot>
  </slots>
 </ui>

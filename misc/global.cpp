@@ -50,7 +50,8 @@ ProjectBase*  Global::currentProject               = 0;
 UserInfosBase* Global::userInfos                = 0;
 
 QColor       Global::colorAlternate               = QColor(255, 255, 255, 12);
-QColor       Global::colorAlternate2              = QColor(255, 255, 255,  8);
+QColor       Global::colorAlternateLight          = QColor(255, 255, 255,  8);
+QColor       Global::colorAlternateMore           = QColor(255, 255, 255, 30);
 QColor       Global::colorAlternateStrong         = QColor(0, 0, 0, 128);
 QColor       Global::colorCluster                 = QColor(255, 255, 255, 62);
 

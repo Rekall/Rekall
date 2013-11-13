@@ -9,17 +9,28 @@ namespace Ui {
 class Phases;
 }
 
+class Phase : public QTreeWidgetItem {
+public:
+    explicit Phase(QTreeWidget *parent, const QDateTime &date, const QString &name);
+public:
+    void setDateAndName(const QDateTime &date, const QString &name);
+    inline const QDateTime getDate() const {
+        return QDateTime::fromString(getDateStr(), "yyyy/MM/dd hh:mm:ss");
+    }
+    inline const QString getDateStr() const {
+        return text(1);
+    }
+    inline const QString getName() const {
+        return text(0);
+    }
+};
+
 class Phases : public QWidget {
     Q_OBJECT
     
 public:
     explicit Phases(QWidget *parent = 0);
     ~Phases();
-
-
-public:
-    QMap<QDateTime, QString> phasesByDate;
-
 
 public:
     UiReal phasesByDaysTo;
@@ -31,6 +42,7 @@ public:
 
 public:
     const QString getPhaseFor(const MetadataElement &value);
+    const QString getVerbosePhaseFor(const QString &phaseId);
 
 public:
     QDomElement serialize(QDomDocument &xmlDoc);
@@ -38,6 +50,7 @@ public:
 
 public slots:
     void action();
+    void actionNames();
 signals:
     void actionned();
 
