@@ -3,7 +3,7 @@
 TimelineGL::TimelineGL(QWidget *parent) :
     GlWidget(QGLFormat(QGL::DoubleBuffer | QGL::DirectRendering | QGL::SampleBuffers), parent) {
     Global::timelineGL = this;
-    startTimer(40);
+    startTimer(20);
     setMouseTracking(true);
     setAcceptDrops(true);
     showLegend = 0;
@@ -158,14 +158,14 @@ void TimelineGL::mouseReleaseEvent(QMouseEvent *e) {
     mouseTimerOk = false;
     mouseTimer.stop();
     mouseMove(e, false, false, false);
-    Global::selectedTag = 0;
+    Global::selectedTagInAction = 0;
 }
 void TimelineGL::mouseDoubleClickEvent(QMouseEvent *e) {
     mouseMove(e, true, false, true);
 }
 void TimelineGL::leaveEvent(QEvent *) {
-    Global::selectedTag      = 0;
-    //Global::selectedTagHover = 0;
+    Global::selectedTagInAction = 0;
+    Global::selectedTagHover    = 0;
 }
 void TimelineGL::mouseMoveLong() {
     if(mouseTimerOk)
@@ -176,9 +176,12 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
     if(e)   mousePos += e->posF();
     else    mousePos += mouseTimerPos;
     bool action = true;
+    QCursor cursor = Qt::ArrowCursor;
 
-    if(Global::selectedTag) {
-        Tag *selectedTag = (Tag*)Global::selectedTag;
+    if(Global::selectedTagHover)
+        cursor = Qt::PointingHandCursor;
+    if(Global::selectedTagInAction) {
+        Tag *selectedTag = (Tag*)Global::selectedTagInAction;
 
         if((e) && ((e->button() & Qt::RightButton) == Qt::RightButton)) {
             /*
@@ -200,11 +203,11 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
         else {
             if(Global::selectedTagMode == TagSelectionStart) {
                 selectedTag->setTimeStart(Global::currentProject->getTimelineCursorTime(mousePos));
-                setCursor(Qt::SizeHorCursor);
+                cursor = Qt::SizeHorCursor;
             }
             else if(Global::selectedTagMode == TagSelectionEnd) {
                 selectedTag->setTimeEnd(Global::currentProject->getTimelineCursorTime(mousePos));
-                setCursor(Qt::SizeHorCursor);
+                cursor = Qt::SizeHorCursor;
             }
             else {
                 if(stay) {
@@ -214,7 +217,7 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
                 }
                 if((e) && (mouseTimerPos != e->pos())) {
                     selectedTag->moveTo(Global::currentProject->getTimelineCursorTime(mousePos) - Global::selectedTagStartDrag);
-                    setCursor(Qt::ClosedHandCursor);
+                    cursor = Qt::ClosedHandCursor;
                 }
             }
         }
@@ -224,11 +227,8 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
         bool ok = false;
         if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseTimeline(mousePos, e, dbl, stay, action, press);
         if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseTimeline(mousePos, e, dbl, stay, action, press);
-        //setCursor(Qt::ArrowCursor);
     }
-
-    //if(Global::selectedTag) setCursor(Qt::PointingHandCursor);
-    //else                    setCursor(Qt::ArrowCursor);
+    setCursor(cursor);
 }
 void TimelineGL::wheelEvent(QWheelEvent *e) {
     if(e->orientation() == Qt::Horizontal)  scrollTo(QPointF(scrollDest.x() - e->delta() / 2., scrollDest.y()));

@@ -13,7 +13,7 @@ class Phase : public QTreeWidgetItem {
 public:
     explicit Phase(QTreeWidget *parent, const QDateTime &date, const QString &name);
 public:
-    void setDateAndName(const QDateTime &date, const QString &name);
+    void setValues(const QDateTime &date, const QString &name);
     inline const QDateTime getDate() const {
         return QDateTime::fromString(getDateStr(), "yyyy/MM/dd hh:mm:ss");
     }

@@ -3,7 +3,7 @@
 ViewerGL::ViewerGL(QWidget *parent) :
     GlWidget(QGLFormat(QGL::DoubleBuffer | QGL::DirectRendering | QGL::SampleBuffers), parent) {
     Global::viewerGL = this;
-    startTimer(40);
+    startTimer(20);
     setMouseTracking(true);
     connect(&mouseTimer, SIGNAL(timeout()), SLOT(mouseMoveLong()));
 }
@@ -76,14 +76,14 @@ void ViewerGL::mouseReleaseEvent(QMouseEvent *e) {
     mouseTimerOk = false;
     mouseTimer.stop();
     mouseMove(e, false, false, false);
-    Global::selectedTag = 0;
+    Global::selectedTagInAction = 0;
 }
 void ViewerGL::mouseDoubleClickEvent(QMouseEvent *e) {
     mouseMove(e, true, false, true);
 }
 void ViewerGL::leaveEvent(QEvent *) {
-    Global::selectedTag      = 0;
-    //Global::selectedTagHover = 0;
+    Global::selectedTagInAction = 0;
+    Global::selectedTagHover    = 0;
 }
 void ViewerGL::mouseMoveLong() {
     if(mouseTimerOk)
@@ -94,8 +94,8 @@ void ViewerGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
     if(e)   mousePos += e->posF();
     else    mousePos += mouseTimerPos;
     bool action = true;
-    if(Global::selectedTag) {
-        Tag *selectedTag = (Tag*)Global::selectedTag;
+    if(Global::selectedTagInAction) {
+        Tag *selectedTag = (Tag*)Global::selectedTagInAction;
         if(Global::selectedTagMode == TagSelectionMove)
             selectedTag->moveTo(Global::currentProject->getViewerCursorTime(mousePos));
         action = false;

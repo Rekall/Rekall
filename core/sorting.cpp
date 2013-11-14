@@ -13,15 +13,15 @@ Sorting::Sorting(bool _isFilter, const QString &title, quint16 index, QWidget *p
     else            ui->stackedWidget->setCurrentIndex(0);
 
     ui->filter->addItem("", "");
-    ui->filter->addItem("documents date (year)",  "Document Date/Time | 0,4");
-    ui->filter->addItem("documents date (month)", "Document Date/Time | 0,7");
-    ui->filter->addItem("documents date (day)",   "Document Date/Time | 0,10");  // 1234:67:90 23:56:89
-    ui->filter->addItem("documents time (hours)", "Document Date/Time | 11,2");  // 9876:43:10 87:54:21
-    ui->filter->addItem("documents type",         "Document Category");
-    ui->filter->addItem("documents keywords",     "Document Keywords");
-    ui->filter->addItem("documents fullname",     "Document Name");
-    ui->filter->addItem("documents first letter", "Document Name | 1");
-    ui->filter->addItem("users names",            "Document Author");
+    ui->filter->addItem("documents date (year)",  "Date/Time | 0,4");
+    ui->filter->addItem("documents date (month)", "Date/Time | 0,7");
+    ui->filter->addItem("documents date (day)",   "Date/Time | 0,10");  // 1234:67:90 23:56:89
+    ui->filter->addItem("documents time (hours)", "Date/Time | 11,2");  // 9876:43:10 87:54:21
+    ui->filter->addItem("documents type",         "Category");
+    ui->filter->addItem("documents keywords",     "Keywords");
+    ui->filter->addItem("documents fullname",     "Name");
+    ui->filter->addItem("documents first letter", "Name | 1");
+    ui->filter->addItem("users names",            "Author");
     ui->filter->setCurrentIndex(index);
 }
 

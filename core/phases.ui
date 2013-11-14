@@ -58,7 +58,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Documents before…</string>
+       <string>Key date</string>
       </property>
      </column>
     </widget>

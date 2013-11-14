@@ -273,7 +273,7 @@ void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
         currentDocument = currentProject->getDocumentAndSelect(((UiFileItem*)item)->filename.file.absoluteFilePath());
         displayMetadata(currentDocument, ui->chutier->getTree(), item, itemB);
 
-        if((currentDocument) && (!Global::selectedTag)) {
+        if((currentDocument) && (!Global::selectedTagInAction)) {
             foreach(Tag *tag, currentDocument->tags) {
                 if(tag->getDocumentVersion() == ui->metadataSlider->value()) {
                     Global::timelineGL->ensureVisible(tag->timelineBoundingRect.translated(tag->timelineDestPos).topLeft());
@@ -316,10 +316,10 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
         QTreeWidgetItem *metadataRootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + tr("Details") + metadataSuffix);
         metadataRootItem->setFlags(Qt::ItemIsEnabled);
 
-        if(!metadata->getMetadata("Rekall", "Document Folder").toString().isEmpty())
-            ui->toolBoxRight->setItemText(0, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Document Name").toString()).arg(metadata->getMetadata("Rekall", "Document Folder").toString()));
+        if(!metadata->getMetadata("Rekall", "Folder").toString().isEmpty())
+            ui->toolBoxRight->setItemText(0, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
         else
-            ui->toolBoxRight->setItemText(0, tr("INFOS — %1").arg(metadata->getMetadata("Rekall", "Document Name").toString()));
+            ui->toolBoxRight->setItemText(0, tr("INFOS — %1").arg(metadata->getMetadata("Rekall", "Name").toString()));
 
         //Versions
         ui->metadataSlider->setMaximum(metadata->getMetadataCountM());
@@ -345,7 +345,7 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
             while(ssMetaIterator.hasNext()) {
                 ssMetaIterator.next();
                 QString color = "#C8C8C8";
-                if(ssMetaIterator.key() == "Document Name")
+                if(ssMetaIterator.key() == "Name")
                     color = metadata->getColor().name();
                 QTreeWidgetItem *item = new QTreeWidgetItem(rootItem, QStringList()
                                                             << metadataPrefix0 + ssMetaIterator.key() + metadataSuffix
@@ -356,7 +356,7 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
             if(expandItems.contains(metaIteratorKey))    ui->metadata->expandItem(rootItem);
             else                                         ui->metadata->collapseItem(rootItem);
         }
-        displayDocumentName(QString("%1 (%2)").arg(metadata->getMetadata("Rekall", "Document Name").toString()).arg(metadata->getMetadata("Rekall", "Document Folder").toString()));
+        displayDocumentName(QString("%1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
         displayPixmap(metadata->getThumbnail(ui->metadataSlider->value()));
         displayGps(metadata->getGps());
     }

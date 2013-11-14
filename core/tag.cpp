@@ -26,7 +26,7 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
 void Tag::create(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
     if(document->function == DocumentFunctionRender) {
         setType(_type, _timeStart);
-        Global::renders.insert(document->getMetadata("Rekall", "Document Name").toString(), this);
+        Global::renders.insert(document->getMetadata("Rekall", "Name").toString(), this);
         playerVideo = new PlayerVideo();
         playerVideo->load(document->file.absoluteFilePath());
         //document->setMetadata("Rekall", "Media Offset", Global::aleaF(142, 142), documentVersion);
@@ -116,13 +116,13 @@ void Tag::fireEvents() {
     qreal progressionAbs = progressAbs(Global::time);
     if(((0. <= progressionAbs) && (progressionAbs <= 1.)) && (!timelineWasInside)) {
         timelineWasInside = true;
-        Global::udp->send("127.0.0.1", 57120, "/transport", QList<QVariant>() << document->getMetadata("Rekall", "Document Name", documentVersion).toString() << timeStart << timeEnd << 1.);
+        Global::udp->send("127.0.0.1", 57120, "/transport", QList<QVariant>() << document->getMetadata("Rekall", "Name", documentVersion).toString() << timeStart << timeEnd << 1.);
         blinkTime = Global::tagBlinkTime;
         document->renderActive = document->renderActive.val();
     }
     else if(((0. > progressionAbs) || (progressionAbs > 1.)) && (timelineWasInside)) {
         timelineWasInside = false;
-        Global::udp->send("127.0.0.1", 57120, "/transport", QList<QVariant>() << document->getMetadata("Rekall", "Document Name", documentVersion).toString() << timeStart << timeEnd << 0.);
+        Global::udp->send("127.0.0.1", 57120, "/transport", QList<QVariant>() << document->getMetadata("Rekall", "Name", documentVersion).toString() << timeStart << timeEnd << 0.);
         document->renderActive = document->renderActive.val();
     }
 }
@@ -154,10 +154,10 @@ const QRectF Tag::paintTimeline(bool before) {
         if(timelineBoundingRect.width() < timelineBoundingRect.height())
             timelineBoundingRect.adjust(-(timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0, (timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0);
 
-        QColor colorDestTmp = (Global::selectedTagHover == this)?(Global::colorSelection):(document->getColor());
+        QColor colorDestTmp = (Global::selectedTag == this)?(Global::colorSelection):(document->getColor());
         if(getDocument()->status == DocumentStatusWaiting)
             colorDestTmp.setAlphaF(0.1);
-        if((getDocument()->status == DocumentStatusProcessing) || (Global::selectedTagHover == this))
+        if((getDocument()->status == DocumentStatusProcessing) || (Global::selectedTag == this))
             colorDestTmp.setAlphaF(Global::breathingFast);
 
         if(!((colorDestTmp.red() == 0) && (colorDestTmp.green() == 0) && (colorDestTmp.blue() == 0)))
@@ -234,7 +234,7 @@ const QRectF Tag::paintTimeline(bool before) {
                 GlRect::drawRoundedRect(timelineBoundingRect.adjusted(1, 1, -1, -1), true, shape);
             }
             //Text
-            if((Global::selectedTagHover == this) && (type != TagTypeGlobal)) {
+            if((Global::selectedTag == this) && (type != TagTypeGlobal)) {
                 QPoint textPos;
                 Global::timelineGL->qglColor(color);
 
@@ -370,8 +370,8 @@ const QRectF Tag::paintTimeline(bool before) {
         }
 
         //Snapping
-        if((Global::selectedTagHoverSnapped >= 0) && (Global::selectedTagHoverSnap == this) && (Global::selectedTag)) {
-            Tag *snappedTag = (Tag*)Global::selectedTag;
+        if((Global::selectedTagHoverSnapped >= 0) && (Global::selectedTagHover == this) && (Global::selectedTagInAction)) {
+            Tag *snappedTag = (Tag*)Global::selectedTagInAction;
             qint16 pos = Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + Global::timeUnit * Global::selectedTagHoverSnapped - timelinePos.x();
 
             Global::timelineGL->qglColor(Global::colorAlternateStrong);
@@ -406,9 +406,16 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         glPushMatrix();
         glTranslatef(qRound(viewerPos.x()), qRound(viewerPos.y()), 0);
 
+        glTranslatef(qRound(viewerBoundingRect.center().x()), qRound(viewerBoundingRect.center().y()), 0);
+        glScalef(timelineScale, timelineScale, 1);
+        glTranslatef(-qRound(viewerBoundingRect.center().x()), -qRound(viewerBoundingRect.center().y()), 0);
+
         //Selection
-        if(Global::selectedTagHover == this) {
-            Global::viewerGL->qglColor(Global::colorSelection);
+        if(Global::selectedTag == this) {
+            QColor color = Global::colorSelection;
+            if((getDocument()->status == DocumentStatusProcessing) || (Global::selectedTag == this))
+                color.setAlphaF(Global::breathingFast);
+            Global::viewerGL->qglColor(color);
             GlRect::drawRect(viewerBoundingRect);
         }
 
@@ -479,9 +486,9 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         }
 
         //Texte
-        if((Global::selectedTagHover == this) || ((isTagLastVersion(this) && (!hasThumbnail))))  Global::viewerGL->qglColor(Qt::black);
+        if((Global::selectedTag == this) || ((isTagLastVersion(this) && (!hasThumbnail))))  Global::viewerGL->qglColor(Qt::black);
         else                                                                                     Global::viewerGL->qglColor(barColor);
-        QString texte = document->getMetadata("Rekall", "Document Name", documentVersion).toString();
+        QString texte = document->getMetadata("Rekall", "Name", documentVersion).toString();
         if(type == TagTypeContextualTime)
             texte += QString(" (%1)").arg(Global::timeToString(getDuration()));
         viewerDocumentText.drawText(texte, textePos);
@@ -495,25 +502,25 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
     if(timelineContains(pos)) {
         if((action) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
             mouseHover = true;
-            Global::selectedTagHover = this;
+            Global::selectedTag = this;
         }
-        if(!Global::selectedTagHover)
+        if(!Global::selectedTag)
             Global::mainWindow->refreshMetadata(this, false);
-        Global::selectedTagHoverSnap = this;
+        Global::selectedTagHover = this;
     }
     else if(action)
         mouseHover = false;
 
     if((action) && (mouseHover) && (((e->button() & Qt::LeftButton) == Qt::LeftButton) || ((e->button() & Qt::RightButton) == Qt::RightButton))) {
-        if(Global::selectedTag != this) {
-            Global::selectedTag = this;
+        if(Global::selectedTagInAction != this) {
+            Global::selectedTagInAction = this;
             Global::selectedTagStartDrag = timelineProgress(pos) * getDuration();
             if((e->button() & Qt::LeftButton) == Qt::LeftButton) {
                 if((timelineProgress(pos) < 0.1) && (type == TagTypeContextualTime))        Global::selectedTagMode = TagSelectionStart;
                 else if((timelineProgress(pos) > 0.9) && (type == TagTypeContextualTime))   Global::selectedTagMode = TagSelectionEnd;
                 else                                                                        Global::selectedTagMode = TagSelectionMove;
             }
-            Global::viewerGL->ensureVisible(viewerPos);
+            //Global::viewerGL->ensureVisible(viewerPos);
         }
         if(document->chutierItem)
             Global::chutier->setCurrentItem(document->chutierItem);
@@ -521,7 +528,7 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
     if((action) && (dbl) && (mouseHover)) {
         if(document->chutierItem) {
             document->chutierItem->fileShowInOS();
-            timelineScale = 2;
+            timelineScale = 3;
             timelineDestScale = 1;
         }
     }
@@ -529,20 +536,26 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
     return mouseHover;
 }
 bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, bool) {
-    if(viewerContains(pos)) {
-        mouseHover = true;
-    }
-    else
-        mouseHover = false;
+    if(viewerContains(pos)) mouseHover = true;
+    else                    mouseHover = false;
+
     if((mouseHover) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
+        Global::timeline->seek(timeStart, false);
         Global::selectedTag = this;
-        Global::selectedTagMode = TagSelectionMove;
-        Global::timelineGL->ensureVisible(timelineBoundingRect.translated(timelineDestPos).topLeft());
-        if(document->chutierItem)
-            Global::chutier->setCurrentItem(document->chutierItem);
+        Global::selectedTagInAction = 0;
+        if(!Global::selectedTag)
+            Global::mainWindow->refreshMetadata(this, true);
     }
     if(mouseHover)
         Global::selectedTagHover = this;
+    if((dbl) && (mouseHover)) {
+        if(document->chutierItem) {
+            document->chutierItem->fileShowInOS();
+            timelineScale = 3;
+            timelineDestScale = 1;
+        }
+    }
+
     return mouseHover;
 }
 
@@ -672,7 +685,7 @@ QDomElement Tag::serialize(QDomDocument &xmlDoc) {
         QDomElement linkedTagsXml = xmlDoc.createElement("linkedTags");
         foreach(Tag *linkedTag, linkedTags) {
             QDomElement linkedTagXml = xmlDoc.createElement("linkedTag");
-            linkedTagXml.setAttribute("TODO", "TODO");
+            linkedTagXml.setAttribute("documentVersion", linkedTag->documentVersion);
             linkedTagsXml.appendChild(linkedTagXml);
         }
         xmlData.appendChild(linkedTagsXml);

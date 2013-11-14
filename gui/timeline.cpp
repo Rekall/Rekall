@@ -135,8 +135,8 @@ const QRectF Timeline::paintViewer() {
 bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool, bool, bool action, bool) {
     if((action) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
         seek(Global::currentProject->getTimelineCursorTime(pos));
+        Global::selectedTagInAction = 0;
         Global::selectedTag = 0;
-        Global::selectedTagHover = 0;
         return true;
     }
     return false;
@@ -145,13 +145,13 @@ bool Timeline::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bo
     return false;
     if(dbl) {
         seek(Global::currentProject->getViewerCursorTime(pos));
+        Global::selectedTagInAction = 0;
         Global::selectedTag = 0;
-        Global::selectedTagHover = 0;
         return true;
     }
 }
 
-void Timeline::seek(qreal time) {
+void Timeline::seek(qreal time, bool ensureVisible) {
     Global::seek(time);
     qreal oldInertie = Global::inertie;
     Global::inertie = 1;
@@ -160,8 +160,10 @@ void Timeline::seek(qreal time) {
     //paintViewer();
     //paintTimeline();
     Global::inertie = oldInertie;
-    Global::timelineGL->ensureVisible(QPointF(timelinePosDest.x(), -1));
-    Global::viewerGL  ->ensureVisible(QPointF(-1, viewerPosDest.y()), 0.8);
+    if(ensureVisible) {
+        Global::timelineGL->ensureVisible(QPointF(timelinePosDest.x(), -1));
+        Global::viewerGL  ->ensureVisible(QPointF(-1, viewerPosDest.y()), 0.8);
+    }
 }
 
 

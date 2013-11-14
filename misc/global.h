@@ -31,6 +31,7 @@ typedef QMap<QString, QMetaMap > QMetaDictionnay;
 class GlDrawable {
 public:
     virtual void fireEvents()         {}
+    virtual void seek(qreal, bool = true) {}
     virtual qreal totalTime() const   { return 0.; }
 public:
     virtual QPointF getTimelineCursorPos (qreal)           { return QPointF(); }
@@ -222,7 +223,7 @@ public:
     static QTime timer;
     static Sorting *tagSortCriteria, *tagColorCriteria, *tagClusterCriteria, *tagFilterCriteria;
     static Phases *phases;
-    static void *selectedTag, *selectedTagHover, *selectedTagHoverSnap;
+    static void *selectedTagInAction, *selectedTag, *selectedTagHover;
     static qreal selectedTagHoverSnapped;
     static QMap<QString,void*> renders;
     static qreal selectedTagStartDrag;

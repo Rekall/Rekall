@@ -58,8 +58,8 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     //setMetadata("Rekall", "File context",                fileContextVerbose,      version);
     if(falseInfoForTest > 0)    setMetadata("File", "File Modification Date/Time", file.lastModified().addMonths(falseInfoForTest), version);
     else                        setMetadata("File", "File Modification Date/Time", file.lastModified(), version);
-    setMetadata("Rekall", "Document Date/Time", getMetadata("File", "File Modification Date/Time", version), version);
-    setMetadata("Rekall", "Document Folder", QString(file.absoluteDir().absolutePath() + "/").remove(dirBaseParent.absolutePath() + "/"), version);
+    setMetadata("Rekall", "Date/Time", getMetadata("File", "File Modification Date/Time", version), version);
+    setMetadata("Rekall", "Folder", QString(file.absoluteDir().absolutePath() + "/").remove(dirBaseParent.absolutePath() + "/"), version);
 
 
     //Type
@@ -94,7 +94,7 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     }
     if(function == DocumentFunctionRender)
         typeStr = "Recording";
-    setMetadata("Rekall", "Document Category", typeStr, version);
+    setMetadata("Rekall", "Category", typeStr, version);
 
     QString documentKeywords;
     if(typeStr != "Other")
@@ -111,7 +111,7 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     }
     documentKeywords.chop(2);
 
-    setMetadata("Rekall", "Document Keywords", documentKeywords, version);
+    setMetadata("Rekall", "Keywords", documentKeywords, version);
     if(creation) {
         status = DocumentStatusWaiting;
         Global::taskList->addTask(this, TaskProcessTypeMetadata, version);
@@ -127,20 +127,20 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     }
 
     if(!file.exists())
-        setMetadata("Rekall", "Document Category",  "Marker", version);
-    setMetadata("Rekall", "Document Name",         name, version);
-    //setMetadata("Rekall", "Document Author",       Global::userInfos->getInfo("User Name"), version);
+        setMetadata("Rekall", "Category",  "Marker", version);
+    setMetadata("Rekall", "Name",         name, version);
+    //setMetadata("Rekall", "Author",       Global::userInfos->getInfo("User Name"), version);
     quint16 tirage = Global::alea(0, 100);
-    if(tirage < 10)        setMetadata("Rekall", "Document Author", "Julie Valero",         version);
-    else if(tirage < 20)   setMetadata("Rekall", "Document Author", "Alexandros Markeas",   version);
-    else if(tirage < 30)   setMetadata("Rekall", "Document Author", "Pierre Nouvel",        version);
-    else if(tirage < 50)   setMetadata("Rekall", "Document Author", "Jean-François Peyret", version);
-    else if(tirage < 70)   setMetadata("Rekall", "Document Author", "Agnès de Cayeux",      version);
-    else                   setMetadata("Rekall", "Document Author", "Thierry Coduys",       version);
-    setMetadata("Rekall", "Document Date/Time",    QDateTime::currentDateTime(), version);
+    if(tirage < 10)        setMetadata("Rekall", "Author", "Julie Valero",         version);
+    else if(tirage < 20)   setMetadata("Rekall", "Author", "Alexandros Markeas",   version);
+    else if(tirage < 30)   setMetadata("Rekall", "Author", "Pierre Nouvel",        version);
+    else if(tirage < 50)   setMetadata("Rekall", "Author", "Jean-François Peyret", version);
+    else if(tirage < 70)   setMetadata("Rekall", "Author", "Agnès de Cayeux",      version);
+    else                   setMetadata("Rekall", "Author", "Thierry Coduys",       version);
+    setMetadata("Rekall", "Date/Time",    QDateTime::currentDateTime(), version);
     setMetadata("Rekall", "Import Date/Time",      QDateTime::currentDateTime(), version);
     setMetadata(Global::userInfos->getInfos());
-    //setMetadata("Rekall", "Document Danger", version);
+    //setMetadata("Rekall", "Danger", version);
 
     if(name.toLower().contains("captation"))
         function = DocumentFunctionRender;
@@ -152,7 +152,7 @@ bool Metadata::updateCard(const PersonCard &card, qint16 version) {
     bool creation = false;
     type = DocumentTypePeople;
     creation = updateImport(card.getFullname(), version);
-    setMetadata("Rekall", "Document Category", "People", version);
+    setMetadata("Rekall", "Category", "People", version);
 
     QString previousLabel = "";
     for(quint16 i = 0 ; i < card.count() ; i++) {
@@ -217,7 +217,7 @@ void Metadata::updateFeed() {
         feedAction = FeedItemBaseTypeUpdate;
     Global::feedList->addFeed(new FeedItemBase(feedAction,
                                                getMetadata("Rekall User Infos", "User Name").toString(),
-                                               getMetadata("Rekall", "Document Name").toString(),
+                                               getMetadata("Rekall", "Name").toString(),
                                                getMetadata("Rekall", "Import Date/Time").toDateTime()));
 }
 
@@ -321,9 +321,9 @@ const QString Metadata::getCriteriaColor(qint16 version) {
 const QString Metadata::getCriteriaSort(qint16 version) {
     if(function == DocumentFunctionRender) {
         if(Global::tagSortCriteria->asDate)
-            return getMetadata(Global::tagSortCriteria->tagName, version).toString(Global::tagSortCriteria->left, Global::tagSortCriteria->leftLength) + "\n" + getMetadata("Rekall", "Document Name", version).toString();
+            return getMetadata(Global::tagSortCriteria->tagName, version).toString(Global::tagSortCriteria->left, Global::tagSortCriteria->leftLength) + "\n" + getMetadata("Rekall", "Name", version).toString();
         else
-            return "\n" + getMetadata("Rekall", "Document Name", version).toString();
+            return "\n" + getMetadata("Rekall", "Name", version).toString();
     }
     else
         return getMetadata(Global::tagSortCriteria->tagName, version).toString(Global::tagSortCriteria->left, Global::tagSortCriteria->leftLength);
@@ -368,7 +368,7 @@ const QList<QPair<QString, QString> > Metadata::getGps() {
 
     QPair<QString,QString> gps;
     gps.first  = getMetadata("GPS Coordinates").toString();
-    gps.second = getMetadata("Rekall", "Document Name").toString();
+    gps.second = getMetadata("Rekall", "Name").toString();
     if(gps.first.isEmpty()) {
         gps.first  = getMetadata("Rekall User Infos", "Location GPS").toString();
         gps.second = getMetadata("Rekall User Infos", "Location Place").toString();

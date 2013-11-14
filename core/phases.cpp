@@ -3,9 +3,13 @@
 
 Phase::Phase(QTreeWidget *parent, const QDateTime &date, const QString &name)
     : QTreeWidgetItem(parent) {
-    setText(0, name);
-    setText(1, date.toString("yyyy/MM/dd hh:mm:ss"));
     setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    setValues(date, name);
+}
+void Phase::setValues(const QDateTime &date, const QString &name) {
+    if(!name.isEmpty())
+        setText(0, name);
+    setText(1, date.toString("yyyy/MM/dd hh:mm:ss"));
 }
 
 Phases::Phases(QWidget *parent) :
@@ -22,7 +26,8 @@ Phases::~Phases() {
 }
 
 void Phases::analyse() {
-    ui->names->clear();
+    //ui->names->clear();
+
     QDateTime oldDate, startingDate, currentDate;
     quint16 index = 0;
     bool firstElement = true;
@@ -34,7 +39,8 @@ void Phases::analyse() {
             oldDate = startingDate = currentDate;
 
         if(oldDate.daysTo(currentDate) > phasesByDaysTo) {
-            new Phase(ui->names, currentDate, QString("#%1").arg(index+1));
+            if(index < ui->names->topLevelItemCount())  ((Phase*)(ui->names->topLevelItem(index)))->setValues(currentDate, "");
+            else                                        new Phase(ui->names, currentDate, QString("#%1").arg(index+1));
             index++;
             startingDate = currentDate;
         }
@@ -42,20 +48,25 @@ void Phases::analyse() {
         firstElement = false;
     }
     currentDate = currentDate.addSecs(1);
-
-    new Phase(ui->names, currentDate, QString("#%1").arg(index+1));
+    if(index < ui->names->topLevelItemCount())  ((Phase*)(ui->names->topLevelItem(index)))->setValues(currentDate, "");
+    else                                        new Phase(ui->names, currentDate, QString("#%1").arg(index+1));
     needCalulation = false;
+
+    while(ui->names->topLevelItemCount() >= index)
+        delete ui->names->topLevelItem(ui->names->topLevelItemCount()-1);
     action();
 }
 
 const QString Phases::getPhaseFor(const MetadataElement &value) {
     QString phaseForValue;
     if(value.isDate()) {
-        for(quint16 i = 0 ; i < ui->names->topLevelItemCount() ; i++) {
+        quint16 i;
+        for(i = 0 ; i < ui->names->topLevelItemCount() ; i++) {
             Phase *phase = (Phase*)ui->names->topLevelItem(i);
             if(value.toDateTime() < phase->getDate())
                 return QString("%1").arg(i, 4, 10, QChar('0'));
         }
+        return QString("%1").arg(i-1, 4, 10, QChar('0'));
     }
     return phaseForValue;
 }
