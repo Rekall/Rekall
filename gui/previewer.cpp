@@ -33,3 +33,7 @@ void Previewer::displayPixmap(const QPair<QString, QPixmap> &_picture) {
         ui->picture->setVisible(false);
     resizeEvent(0);
 }
+
+void Previewer::action() {
+    QDesktopServices::openUrl(QUrl::fromLocalFile(picture.first));
+}

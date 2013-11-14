@@ -17,7 +17,16 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -32,13 +41,22 @@
       <property name="spacing">
        <number>0</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
        <widget class="QStackedWidget" name="type">
         <widget class="QWidget" name="page">
-         <widget class="QLabel" name="picture">
+         <widget class="PreviewerLabel" name="picture">
           <property name="geometry">
            <rect>
             <x>40</x>
@@ -46,6 +64,9 @@
             <width>161</width>
             <height>111</height>
            </rect>
+          </property>
+          <property name="toolTip">
+           <string>Double-click to open</string>
           </property>
           <property name="styleSheet">
            <string notr="true">border: 5px solid white;</string>
@@ -65,8 +86,35 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PreviewerLabel</class>
+   <extends>QLabel</extends>
+   <header>gui/previewerlabel.h</header>
+   <slots>
+    <signal>mouseDoubleClick()</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>picture</sender>
+   <signal>mouseDoubleClick()</signal>
+   <receiver>Previewer</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>116</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>237</x>
+     <y>409</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
  <slots>
   <slot>action()</slot>
  </slots>

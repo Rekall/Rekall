@@ -70,7 +70,6 @@ public:
     QPointF getViewerCursorPos  (qreal);
     qreal   getTimelineCursorTime(const QPointF &);
     qreal   getViewerCursorTime  (const QPointF &);
-    void askDisplayMetaData() { emit(displayMetaData()); }
 
 public:
     QDomElement serialize(QDomDocument &xmlDoc);
@@ -78,7 +77,6 @@ public:
     void save();
 
 signals:
-    void displayMetaData();
     void refreshMetadata();
 };
 

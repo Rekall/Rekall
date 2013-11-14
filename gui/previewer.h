@@ -2,6 +2,8 @@
 #define PREVIEWER_H
 
 #include <QWidget>
+#include <QUrl>
+#include <QDesktopServices>
 
 namespace Ui {
 class Previewer;
@@ -16,6 +18,9 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *);
+
+private slots:
+    void action();
 
 private:
     QPair<QString, QPixmap> picture;

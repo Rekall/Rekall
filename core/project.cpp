@@ -552,6 +552,7 @@ const QRectF Project::paintTimeline(bool before) {
                 tag->paintTimeline(before);
 
         //Current tags
+        /*
         QList<Tag*> currentTagsWithThumbs, currentTagsWithoutThumbs;
         foreach(Document *document, documents)
             foreach(Tag *tag, document->tags)
@@ -567,6 +568,7 @@ const QRectF Project::paintTimeline(bool before) {
         foreach(Tag *tag, currentTagsWithoutThumbs) {
             //qDebug("%s", qPrintable(tag->getDocument()->getMetadata("Rekall", "Document Name").toString()));
         }
+        */
     }
     return retour;
 }

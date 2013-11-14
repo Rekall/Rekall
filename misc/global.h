@@ -31,7 +31,6 @@ typedef QMap<QString, QMetaMap > QMetaDictionnay;
 class GlDrawable {
 public:
     virtual void fireEvents()         {}
-    virtual void askDisplayMetaData() {}
     virtual qreal totalTime() const   { return 0.; }
 public:
     virtual QPointF getTimelineCursorPos (qreal)           { return QPointF(); }
@@ -185,9 +184,7 @@ public:
     explicit RekallBase(QWidget *parent = 0) : QMainWindow(parent) {}
 public:
     virtual void setVisbility(bool) = 0;
-    virtual void displayDocumentName(const QString &documentName = "") = 0;
-    virtual void displayPixmap(const QPair<QString, QPixmap> &_picture) = 0;
-    virtual void displayGps(const QList< QPair<QString,QString> > &gps) = 0;
+    virtual void refreshMetadata(void *_tag, bool inChutier) = 0;
 public:
     virtual bool parseMimeData(const QMimeData *mime, const QString &source, bool test = false) = 0;
 };

@@ -41,7 +41,6 @@ Rekall::Rekall(QWidget *parent) :
 
     currentProject = new Project(this);
     Global::currentProject = currentProject;
-    connect(currentProject, SIGNAL(displayMetaData()), SLOT(refreshMetadata()));
     connect(currentProject, SIGNAL(refreshMetadata()), SLOT(refreshAndLastMetadata()));
 
     inspector = new Inspector(this);
@@ -101,9 +100,9 @@ void Rekall::fileUploaded(QString gpsCoord, QString filename, QTemporaryFile *fi
         QPair<QString, QPixmap> picture;
         picture.first = file->fileName();
         picture.second = QPixmap(file->fileName());
-        Global::mainWindow->displayDocumentName(tr("Imported file"));
-        Global::mainWindow->displayPixmap(picture);
-        Global::mainWindow->displayGps(QList< QPair<QString,QString> >() << qMakePair(gpsCoord, tr("Imported file")));
+        displayDocumentName(tr("Imported file"));
+        displayPixmap(picture);
+        displayGps(QList< QPair<QString,QString> >() << qMakePair(gpsCoord, tr("Imported file")));
     }
 }
 
@@ -284,79 +283,84 @@ void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
         }
     }
 }
+void Rekall::refreshMetadata(void *_tag, bool inChutier) {
+    Tag *tag = (Tag*)_tag;
+    if(inChutier)   chutierItemChanged(ui->chutier->getTree()->currentItem(), ui->chutier->getTree()->currentItem());
+    else            displayMetadata(tag->getDocument(), ui->chutier->getTree(), 0, 0);
+}
+
 void Rekall::personItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
     if(item)
         displayMetadata((Person*)item, ui->chutier->getTree(), item, itemB);
 }
 void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
-    if(item) {
-        //Standard operations
+    //Standard operations
+    if((tree) && (item))
         tree->setCurrentItem(item);
-        metaIsChanging = true;
-        QStringList expandItems;
+    metaIsChanging = true;
+    QStringList expandItems;
 
-        QString metadataPrefix0 = "<span style='font-family: Calibri, Arial; font-size: 11px; color: #F5F8FA'>";
-        QString metadataPrefix1 = "<span style='font-family: Calibri, Arial; font-size: 11px; color: %1'>";
-        QString metadataSuffix = "</span>";
+    QString metadataPrefix0 = "<span style='font-family: Calibri, Arial; font-size: 11px; color: #F5F8FA'>";
+    QString metadataPrefix1 = "<span style='font-family: Calibri, Arial; font-size: 11px; color: %1'>";
+    QString metadataSuffix = "</span>";
 
-        for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++)
-            if(ui->metadata->topLevelItem(i)->isExpanded())
-                expandItems << ui->metadata->topLevelItem(i)->text(0).remove(QRegExp("<[^>]*>")).trimmed();
-        if(expandItems.count() == 0)
-            expandItems << tr("General") << "Contact details";
+    for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++)
+        if(ui->metadata->topLevelItem(i)->isExpanded())
+            expandItems << ui->metadata->topLevelItem(i)->text(0).remove(QRegExp("<[^>]*>")).trimmed();
+    if(expandItems.count() == 0)
+        expandItems << tr("General") << "Contact details";
 
-        if(metadata) {
-            ui->metadata->clear();
+    if(metadata) {
+        ui->metadata->clear();
 
-            QTreeWidgetItem *metadataRootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + tr("Details") + metadataSuffix);
-            metadataRootItem->setFlags(Qt::ItemIsEnabled);
+        QTreeWidgetItem *metadataRootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + tr("Details") + metadataSuffix);
+        metadataRootItem->setFlags(Qt::ItemIsEnabled);
 
-            if(!metadata->getMetadata("Rekall", "Document Folder").toString().isEmpty())
-                ui->toolBoxRight->setItemText(0, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Document Name").toString()).arg(metadata->getMetadata("Rekall", "Document Folder").toString()));
-            else
-                ui->toolBoxRight->setItemText(0, tr("INFOS — %1").arg(metadata->getMetadata("Rekall", "Document Name").toString()));
+        if(!metadata->getMetadata("Rekall", "Document Folder").toString().isEmpty())
+            ui->toolBoxRight->setItemText(0, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Document Name").toString()).arg(metadata->getMetadata("Rekall", "Document Folder").toString()));
+        else
+            ui->toolBoxRight->setItemText(0, tr("INFOS — %1").arg(metadata->getMetadata("Rekall", "Document Name").toString()));
 
-            //Versions
-            ui->metadataSlider->setMaximum(metadata->getMetadataCountM());
-            if(item != itemB)
-                ui->metadataSlider->setValue(metadata->getMetadataCountM());
-            if(metadata->getMetadataCount() > 1) ui->metadataSlider->setVisible(true);
-            else                                 ui->metadataSlider->setVisible(false);
+        //Versions
+        ui->metadataSlider->setMaximum(metadata->getMetadataCountM());
+        if(item != itemB)
+            ui->metadataSlider->setValue(metadata->getMetadataCountM());
+        if(metadata->getMetadataCount() > 1) ui->metadataSlider->setVisible(true);
+        else                                 ui->metadataSlider->setVisible(false);
 
-            //Sum up
-            QMapIterator<QString, QMetaMap> metaIterator(metadata->getMetadata(ui->metadataSlider->value()));
-            while(metaIterator.hasNext()) {
-                metaIterator.next();
-                QTreeWidgetItem *rootItem = 0;
-                QString metaIteratorKey = metaIterator.key();
-                if(metaIteratorKey == "Rekall")
-                    metaIteratorKey = tr("General");
+        //Sum up
+        QMapIterator<QString, QMetaMap> metaIterator(metadata->getMetadata(ui->metadataSlider->value()));
+        while(metaIterator.hasNext()) {
+            metaIterator.next();
+            QTreeWidgetItem *rootItem = 0;
+            QString metaIteratorKey = metaIterator.key();
+            if(metaIteratorKey == "Rekall")
+                metaIteratorKey = tr("General");
 
-                if(metaIteratorKey == tr("General"))  rootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + tr("General") + metadataSuffix);
-                else                                  rootItem = new QTreeWidgetItem(metadataRootItem, QStringList() << metadataPrefix0 + metaIteratorKey + metadataSuffix);
-                rootItem->setFlags(Qt::ItemIsEnabled);
+            if(metaIteratorKey == tr("General"))  rootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + tr("General") + metadataSuffix);
+            else                                  rootItem = new QTreeWidgetItem(metadataRootItem, QStringList() << metadataPrefix0 + metaIteratorKey + metadataSuffix);
+            rootItem->setFlags(Qt::ItemIsEnabled);
 
-                QMapIterator<QString,MetadataElement> ssMetaIterator(metaIterator.value());
-                while(ssMetaIterator.hasNext()) {
-                    ssMetaIterator.next();
-                    QString color = "#C8C8C8";
-                    if(ssMetaIterator.key() == "Document Name")
-                        color = metadata->getColor().name();
-                    QTreeWidgetItem *item = new QTreeWidgetItem(rootItem, QStringList()
-                                                                << metadataPrefix0 + ssMetaIterator.key() + metadataSuffix
-                                                                << metadataPrefix1.arg(color) + ssMetaIterator.value().toString() + metadataSuffix);
-                    item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-                }
-
-                if(expandItems.contains(metaIteratorKey))    ui->metadata->expandItem(rootItem);
-                else                                         ui->metadata->collapseItem(rootItem);
+            QMapIterator<QString,MetadataElement> ssMetaIterator(metaIterator.value());
+            while(ssMetaIterator.hasNext()) {
+                ssMetaIterator.next();
+                QString color = "#C8C8C8";
+                if(ssMetaIterator.key() == "Document Name")
+                    color = metadata->getColor().name();
+                QTreeWidgetItem *item = new QTreeWidgetItem(rootItem, QStringList()
+                                                            << metadataPrefix0 + ssMetaIterator.key() + metadataSuffix
+                                                            << metadataPrefix1.arg(color) + ssMetaIterator.value().toString() + metadataSuffix);
+                item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
             }
-            Global::mainWindow->displayDocumentName(QString("%1 (%2)").arg(metadata->getMetadata("Rekall", "Document Name").toString()).arg(metadata->getMetadata("Rekall", "Document Folder").toString()));
-            Global::mainWindow->displayPixmap(metadata->getThumbnail(ui->metadataSlider->value()));
-            Global::mainWindow->displayGps(metadata->getGps());
+
+            if(expandItems.contains(metaIteratorKey))    ui->metadata->expandItem(rootItem);
+            else                                         ui->metadata->collapseItem(rootItem);
         }
-        metaIsChanging = false;
+        displayDocumentName(QString("%1 (%2)").arg(metadata->getMetadata("Rekall", "Document Name").toString()).arg(metadata->getMetadata("Rekall", "Document Folder").toString()));
+        displayPixmap(metadata->getThumbnail(ui->metadataSlider->value()));
+        displayGps(metadata->getGps());
     }
+    metaIsChanging = false;
 }
 void Rekall::displayDocumentName(const QString &documentName) {
     gps->setWindowTitle(tr("Location — %1").arg(documentName));

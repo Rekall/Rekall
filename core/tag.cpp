@@ -9,11 +9,12 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
     progression       = progressionDest = decounter = 0;
     isInProgress      = false;
     mouseHover        = false;
-    mouseHoverPreview = false;
     breathing         = false;
     blinkTime         = 0;
     timelineFilesAction = 0;
     timeStart = timeEnd = 0;
+    timelineScale = 0;
+    timelineDestScale = 1;
 
     viewerTimeText          .setStyle(QSize( 70, Global::viewerTagHeight), Qt::AlignCenter,    Global::font);
     viewerDocumentText      .setStyle(QSize(500, Global::viewerTagHeight), Qt::AlignVCenter,   Global::font);
@@ -142,7 +143,8 @@ void Tag::renderActiveChanged() {
 
 const QRectF Tag::paintTimeline(bool before) {
     if(before) {
-        timelinePos = timelinePos + (timelineDestPos - timelinePos) / Global::inertie;
+        timelineScale = timelineScale + (timelineDestScale - timelineScale) / Global::inertie;
+        timelinePos   = timelinePos + (timelineDestPos - timelinePos) / Global::inertie;
         if(type == TagTypeGlobal)   timelineBoundingRect = QRectF(QPointF(Global::timelineGL->scroll.x()-Global::timelineNegativeHeaderWidth, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration() * Global::timeUnit), Global::timelineTagHeight));
         else                        timelineBoundingRect = QRectF(QPointF(timeStart * Global::timeUnit, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration() * Global::timeUnit), Global::timelineTagHeight));
 
@@ -168,12 +170,14 @@ const QRectF Tag::paintTimeline(bool before) {
             color = color.lighter(100 + (1-Global::breathing)*15);
 
 
-
         glPushMatrix();
         if(type == TagTypeGlobal)
             glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
-
         glTranslatef(qRound(timelinePos.x()), qRound(timelinePos.y()), 0);
+
+        glTranslatef(qRound(timelineBoundingRect.center().x()), qRound(timelineBoundingRect.center().y()), 0);
+        glScalef(timelineScale, timelineScale, 1);
+        glTranslatef(-qRound(timelineBoundingRect.center().x()), -qRound(timelineBoundingRect.center().y()), 0);
 
         //Drawing
         if(Global::timelineGL->visibleRect.intersects(timelineBoundingRect.translated(timelinePos + QPointF(0, Global::timelineHeaderSize.height())))) {
@@ -383,17 +387,6 @@ const QRectF Tag::paintTimeline(bool before) {
         glScissor(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth, Global::timelineGL->height());
         glPopMatrix();
     }
-    else if(mouseHoverPreview) {
-        if((getDocument()->type == DocumentTypeImage) && (getDocument()->thumbnails.count())) {
-            Global::timelineGL->qglColor(Global::colorAlternateStrong);
-            GlRect::drawRect(Global::timelineGL->visibleRect);
-            Global::timelineGL->qglColor(Qt::white);
-            getDocument()->thumbnails.first().drawTexture(Global::timelineGL->visibleRect);
-        }
-        Global::mainWindow->displayDocumentName(QString("%1 (%2)").arg(getDocument()->getMetadata("Rekall", "Document Name").toString()).arg(getDocument()->getMetadata("Rekall", "Document Folder").toString()));
-        Global::mainWindow->displayPixmap(getDocument()->getThumbnail(documentVersion));
-        Global::mainWindow->displayGps(getDocument()->getGps());
-    }
     return timelineBoundingRect.translated(timelinePos);
 }
 
@@ -502,14 +495,14 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
     if(timelineContains(pos)) {
         if((action) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
             mouseHover = true;
-            if((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier)
-                mouseHoverPreview = true;
             Global::selectedTagHover = this;
         }
+        if(!Global::selectedTagHover)
+            Global::mainWindow->refreshMetadata(this, false);
         Global::selectedTagHoverSnap = this;
     }
     else if(action)
-        mouseHover = mouseHoverPreview = false;
+        mouseHover = false;
 
     if((action) && (mouseHover) && (((e->button() & Qt::LeftButton) == Qt::LeftButton) || ((e->button() & Qt::RightButton) == Qt::RightButton))) {
         if(Global::selectedTag != this) {
@@ -525,19 +518,22 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
         if(document->chutierItem)
             Global::chutier->setCurrentItem(document->chutierItem);
     }
-    if((action) && (dbl) && (mouseHover))
-        Global::currentProject->askDisplayMetaData();
+    if((action) && (dbl) && (mouseHover)) {
+        if(document->chutierItem) {
+            document->chutierItem->fileShowInOS();
+            timelineScale = 2;
+            timelineDestScale = 1;
+        }
+    }
 
     return mouseHover;
 }
 bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, bool) {
     if(viewerContains(pos)) {
         mouseHover = true;
-        if((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier)
-            mouseHoverPreview = true;
     }
     else
-        mouseHover = mouseHoverPreview = false;
+        mouseHover = false;
     if((mouseHover) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
         Global::selectedTag = this;
         Global::selectedTagMode = TagSelectionMove;
@@ -545,8 +541,6 @@ bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, 
         if(document->chutierItem)
             Global::chutier->setCurrentItem(document->chutierItem);
     }
-    if((dbl) && (mouseHover))
-        Global::currentProject->askDisplayMetaData();
     if(mouseHover)
         Global::selectedTagHover = this;
     return mouseHover;

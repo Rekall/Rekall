@@ -45,7 +45,7 @@ private:
     DocumentBase *document;
 public:
     QColor color;
-    bool  mouseHover, mouseHoverPreview, breathing;
+    bool  mouseHover, breathing;
     bool  contains(qreal time) const;
     qreal progress(qreal time) const;
     qreal progressAbs(qreal time) const;
@@ -69,6 +69,7 @@ private slots:
 public:
     QRectF  timelineBoundingRect;
     QPointF timelinePos, timelineDestPos;
+    qreal   timelineScale, timelineDestScale;
 public:
     void  setTimelinePos(const QPointF _timelineDestPos)    { timelineDestPos = _timelineDestPos;  }
     const QRectF getTimelineBoundingRect() const            { return timelineBoundingRect; }

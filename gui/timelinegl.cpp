@@ -224,8 +224,11 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
         bool ok = false;
         if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseTimeline(mousePos, e, dbl, stay, action, press);
         if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseTimeline(mousePos, e, dbl, stay, action, press);
-        setCursor(Qt::ArrowCursor);
+        //setCursor(Qt::ArrowCursor);
     }
+
+    //if(Global::selectedTag) setCursor(Qt::PointingHandCursor);
+    //else                    setCursor(Qt::ArrowCursor);
 }
 void TimelineGL::wheelEvent(QWheelEvent *e) {
     if(e->orientation() == Qt::Horizontal)  scrollTo(QPointF(scrollDest.x() - e->delta() / 2., scrollDest.y()));

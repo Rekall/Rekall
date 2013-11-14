@@ -19,8 +19,10 @@ contains(QT_VERSION, "^4.*") {
 TARGET    = Rekall
 TEMPLATE  = app
 
-SOURCES  += main.cpp
-HEADERS  += tasks/taskslist.h   tasks/feedlist.h   tasks/taskprocess.h
+SOURCES  += main.cpp \
+    gui/previewerlabel.cpp
+HEADERS  += tasks/taskslist.h   tasks/feedlist.h   tasks/taskprocess.h \
+    gui/previewerlabel.h
 SOURCES  += tasks/taskslist.cpp tasks/feedlist.cpp tasks/taskprocess.cpp
 FORMS    += tasks/taskslist.ui  tasks/feedlist.ui
 

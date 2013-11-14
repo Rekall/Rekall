@@ -51,6 +51,7 @@ public:
     void displayDocumentName(const QString &documentName = "");
     void displayPixmap(const QPair<QString, QPixmap> &_picture);
     void displayGps(const QList<QPair<QString, QString> > &gps);
+    void refreshMetadata(void *_tag, bool inChutier);
 
 protected:
     void dragEnterEvent(QDragEnterEvent *);
