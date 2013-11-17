@@ -43,9 +43,41 @@ Rekall::Rekall(QWidget *parent) :
     Global::currentProject = currentProject;
     connect(currentProject, SIGNAL(refreshMetadata()), SLOT(refreshAndLastMetadata()));
 
-    inspector = new Inspector(this);
-    inspector->toolbarButton = ui->actionInspector;
-    connect(ui->actionInspector, SIGNAL(triggered()), SLOT(showInspector()));
+    Global::timelineGL->showLinkedRendersDest.setAction(ui->linkedRenders);
+    Global::timelineGL->showLinkedTagsDest   .setAction(ui->linkedTags);
+    Global::showHelp.setAction(ui->help);
+
+    Global::phases             = new Phases(0);
+    Global::tagFilterCriteria  = new Sorting(true,  tr("Filter rules"),     0, 0);
+    Global::tagSortCriteria    = new Sorting(false, tr("Sorting rules"),    2, 0);
+    Global::tagColorCriteria   = new Sorting(false, tr("Color rules"),      5, 0);
+    Global::tagClusterCriteria = new Sorting(false, tr("Hightlight rules"), 6, 0);
+    //Global::tagFilterCriteria->displayLinked.setAction(ui->history);
+    connect(&Global::tagFilterCriteria->displayLinked, SIGNAL(triggered(bool)), Global::tagFilterCriteria, SLOT(action()));
+
+    Global::phases            ->setStyleSheet(styleSheet());
+    Global::tagFilterCriteria ->setStyleSheet(styleSheet());
+    Global::tagSortCriteria   ->setStyleSheet(styleSheet());
+    Global::tagColorCriteria  ->setStyleSheet(styleSheet());
+    Global::tagClusterCriteria->setStyleSheet(styleSheet());
+
+    connect(Global::phases,             SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::tagFilterCriteria,  SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::tagSortCriteria,    SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::tagColorCriteria,   SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::tagClusterCriteria, SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+
+    connect(Global::phases,             SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::tagFilterCriteria,  SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::tagSortCriteria,    SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::tagColorCriteria,   SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::tagClusterCriteria, SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    Global::tagFilterCriteria ->action();
+    Global::tagSortCriteria   ->action();
+    Global::tagColorCriteria  ->action();
+    Global::tagClusterCriteria->action();
+
+
     connect(ui->actionSave, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionPaste, SIGNAL(triggered()), SLOT(action()));
     connect(&Global::showHelp, SIGNAL(triggered(bool)), SLOT(showHelp(bool)));
@@ -250,12 +282,10 @@ void Rekall::actionMetadata(QTreeWidgetItem *item, int) {
 void Rekall::closeSplash() {
     splash->close();
     showMaximized();
-    inspector->show();
     updateGeometry();
     ui->timelineSplitter->setSizes(QList<int>() << ui->timelineSplitter->height() * 0.50 << ui->timelineSplitter->height() * 0.50);
     ui->fileSplitter->setSizes(QList<int>()     << 300                                   << ui->fileSplitter->width()      - 300);
     ui->conduiteSplitter->setSizes(QList<int>() << ui->conduiteSplitter->width()  - 300  << 300);
-    inspector->move(QDesktopWidget().screenGeometry().topRight() - QPoint(inspector->width(), 0));
     //trayMenu->showMessage("Rekall", "Ready!", QSystemTrayIcon::NoIcon);
 }
 
@@ -317,9 +347,9 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
         metadataRootItem->setFlags(Qt::ItemIsEnabled);
 
         if(!metadata->getMetadata("Rekall", "Folder").toString().isEmpty())
-            ui->toolBoxRight->setItemText(0, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
+            ui->toolBoxRight->setItemText(2, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
         else
-            ui->toolBoxRight->setItemText(0, tr("INFOS — %1").arg(metadata->getMetadata("Rekall", "Name").toString()));
+            ui->toolBoxRight->setItemText(2, tr("INFOS — %1").arg(metadata->getMetadata("Rekall", "Name").toString()));
 
         //Versions
         ui->metadataSlider->setMaximum(metadata->getMetadataCountM());
@@ -390,11 +420,6 @@ void Rekall::displayGps(const QList< QPair<QString,QString> > &gpsCoords) {
 
 
 
-void Rekall::showInspector() {
-    inspector->toolbarButton = ui->actionInspector;
-    if(inspector->isVisible())   inspector->close();
-    else                         inspector->show();
-}
 void Rekall::showHelp(bool visible) {
     ui->chutierLabel->setVisible(visible);
     ui->chutierLabel2->setVisible(visible);
@@ -425,7 +450,6 @@ void Rekall::timerEvent(QTimerEvent *) {
 }
 
 void Rekall::closeEvent(QCloseEvent *) {
-    inspector->hide();
     /*
 #ifdef Q_OS_MAC
         ProcessSerialNumber psn;
@@ -445,7 +469,6 @@ void Rekall::setVisbility(bool sh) {
 #endif
 */
         show();
-        inspector->show();
         raise();
     }
     else {

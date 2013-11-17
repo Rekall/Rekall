@@ -33,6 +33,14 @@ public:
         else                return !val;
     }
 
+protected:
+    void showEvent(QShowEvent *);
+    void closeEvent(QCloseEvent *);
+    void hideEvent(QHideEvent *);
+signals:
+    void displayed(bool);
+
+
 private:
     QHash<QString,QString> criteriaFormatedCache;
 public:
@@ -46,9 +54,9 @@ public:
     void deserialize(const QDomElement &xmlElement);
 
 signals:
-    void actionned();
+    void actionned(QString,QString);
 
-private slots:
+public slots:
     void action();
 
 private:

@@ -40,6 +40,13 @@ public:
     void addToMetaElements(const MetadataElement &value) { metaElements.insert(value.toString(), value); }
     void analyse();
 
+protected:
+    void showEvent(QShowEvent *);
+    void closeEvent(QCloseEvent *);
+    void hideEvent(QHideEvent *);
+signals:
+    void displayed(bool);
+
 public:
     const QString getPhaseFor(const MetadataElement &value);
     const QString getVerbosePhaseFor(const QString &phaseId);
@@ -52,7 +59,7 @@ public slots:
     void action();
     void actionNames();
 signals:
-    void actionned();
+    void actionned(QString,QString);
 
 private:
     Ui::Phases *ui;

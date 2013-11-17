@@ -46,6 +46,8 @@ void TaskProcess::run() {
                         processedDocument.metadata->setMetadata("Rekall", "Media Duration", duration, processedDocument.version);
                     }
                 }
+                if(meta.second.first.toLower().contains("author"))
+                    processedDocument.metadata->setMetadata("Rekall", "Author", meta.second.second, processedDocument.version);
             }
         }
 

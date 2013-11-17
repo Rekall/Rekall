@@ -34,9 +34,6 @@
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
@@ -46,6 +43,11 @@
      <attribute name="headerVisible">
       <bool>false</bool>
      </attribute>
+     <column>
+      <property name="text">
+       <string notr="true">1</string>
+      </property>
+     </column>
     </widget>
    </item>
   </layout>

@@ -11,7 +11,6 @@
 #include <QInputDialog>
 #include "core/watcher.h"
 #include "interfaces/userinfos.h"
-#include "gui/inspector.h"
 #include "items/uifileitem.h"
 #include "gui/splash.h"
 #include "gui/timeline.h"
@@ -35,7 +34,6 @@ public:
 private:
     Splash *splash;
     Project *currentProject;
-    Inspector *inspector;
     bool metaIsChanging, openProject;
     Document *currentDocument;
     HttpListener *http;
@@ -69,7 +67,6 @@ private slots:
     void chutierItemChanged(QTreeWidgetItem*,QTreeWidgetItem*);
     void personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*);
     void displayMetadata(Metadata *metadata, QTreeWidget*, QTreeWidgetItem*, QTreeWidgetItem*);
-    void showInspector();
     void showHelp(bool);
 
 private:

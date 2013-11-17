@@ -32,6 +32,8 @@ protected:
 
 public slots:
     void action();
+    void actionDisplayed(bool);
+    void actionChanged(QString,QString);
     void actionRewind();
     void actionPlay();
 

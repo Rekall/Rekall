@@ -9,8 +9,9 @@ Timeline::Timeline(QWidget *parent) :
     startTimer(40);
     ticksWidth = 50;
 
-    Global::timeUnitDest         .setAction(ui->hZoom);
-    Global::timelineTagHeightDest.setAction(ui->vZoom);
+    Global::timelineGL->showLegendDest.setAction(ui->legend);
+    Global::timeUnitDest              .setAction(ui->hZoom);
+    Global::timelineTagHeightDest     .setAction(ui->vZoom);
     ui->hZoom->setValue(13);
     ui->vZoom->setValue(8);
 }
@@ -178,4 +179,58 @@ void Timeline::action() {
     if(sender() == ui->playButton)       Global::play(ui->playButton->isChecked());
     else if(sender() == ui->ffButton)    seek(0);
     else if(sender() == ui->writeNote)   Global::watcher->writeNote();
+    else if(sender() == ui->filterBy) {
+        Global::tagFilterCriteria->move(ui->filterBy->parentWidget()->mapToGlobal(ui->filterBy->pos()) + QPoint(0, -Global::tagFilterCriteria->height()));
+        if(ui->filterBy->isChecked())   Global::tagFilterCriteria->show();
+        else                            Global::tagFilterCriteria->hide();
+    }
+    else if(sender() == ui->sortBy) {
+        Global::tagSortCriteria->move(ui->sortBy->parentWidget()->mapToGlobal(ui->sortBy->pos()) + QPoint(0, -Global::tagSortCriteria->height()));
+        if(ui->sortBy->isChecked()) Global::tagSortCriteria->show();
+        else                        Global::tagSortCriteria->hide();
+    }
+    else if(sender() == ui->colorBy) {
+        Global::tagColorCriteria->move(ui->colorBy->parentWidget()->mapToGlobal(ui->colorBy->pos()) + QPoint(0, -Global::tagColorCriteria->height()));
+        if(ui->colorBy->isChecked()) Global::tagColorCriteria->show();
+        else                         Global::tagColorCriteria->hide();
+    }
+    else if(sender() == ui->clusterBy) {
+        Global::tagClusterCriteria->move(ui->clusterBy->parentWidget()->mapToGlobal(ui->clusterBy->pos()) + QPoint(0, -Global::tagClusterCriteria->height()));
+        if(ui->clusterBy->isChecked())  Global::tagClusterCriteria->show();
+        else                            Global::tagClusterCriteria->hide();
+    }
+    else if(sender() == ui->phaseBy) {
+        Global::phases->move(ui->phaseBy->parentWidget()->mapToGlobal(ui->phaseBy->pos()) + QPoint(0, -Global::phases->height()));
+        if(ui->phaseBy->isChecked())  Global::phases->show();
+        else                          Global::phases->hide();
+    }
+}
+void Timeline::actionDisplayed(bool val) {
+    if(sender() == Global::tagFilterCriteria)
+        ui->filterBy->setChecked(val);
+    else if(sender() == Global::tagSortCriteria)
+        ui->sortBy->setChecked(val);
+    else if(sender() == Global::tagColorCriteria)
+        ui->colorBy->setChecked(val);
+    else if(sender() == Global::tagClusterCriteria)
+        ui->clusterBy->setChecked(val);
+    else if(sender() == Global::phases)
+        ui->phaseBy->setChecked(val);
+}
+void Timeline::actionChanged(QString text, QString text2) {
+    if(sender() == Global::tagFilterCriteria)
+        ui->filterBy->setText(tr("FILTERS"));
+    else if(sender() == Global::tagSortCriteria)
+        ui->sortBy->setText(tr("SORTING").arg(text));
+    else if(sender() == Global::tagColorCriteria)
+        ui->colorBy->setText(tr("COLORS").arg(text));
+    else if(sender() == Global::tagClusterCriteria) {
+        if(text2.isEmpty())  ui->clusterBy->setText(tr("NO HIGHLIGHT"));
+        else                 ui->clusterBy->setText(tr("HIGHLIGHT: %1").arg(text2));
+    }
+    else if(sender() == Global::phases)
+        ui->phaseBy->setText(tr("PHASES").arg(text));
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    Global::timelineGL->scrollTo();
+    Global::viewerGL  ->scrollTo();
 }

@@ -2,7 +2,7 @@
 #include "ui_phases.h"
 
 Phase::Phase(QTreeWidget *parent, const QDateTime &date, const QString &name)
-    : QTreeWidgetItem(parent) {
+    : QTreeWidgetItem(parent, Qt::FramelessWindowHint) {
     setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     setValues(date, name);
 }
@@ -13,7 +13,7 @@ void Phase::setValues(const QDateTime &date, const QString &name) {
 }
 
 Phases::Phases(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
     ui(new Ui::Phases) {
     ui->setupUi(this);
 
@@ -25,7 +25,18 @@ Phases::~Phases() {
     delete ui;
 }
 
+void Phases::showEvent(QShowEvent *) {
+    emit(displayed(true));
+}
+void Phases::closeEvent(QCloseEvent *) {
+    emit(displayed(false));
+}
+void Phases::hideEvent(QHideEvent *) {
+    emit(displayed(false));
+}
+
 void Phases::analyse() {
+    qDebug("ANALYSE ?");
     //ui->names->clear();
 
     QDateTime oldDate, startingDate, currentDate;
@@ -50,11 +61,13 @@ void Phases::analyse() {
     currentDate = currentDate.addSecs(1);
     if(index < ui->names->topLevelItemCount())  ((Phase*)(ui->names->topLevelItem(index)))->setValues(currentDate, "");
     else                                        new Phase(ui->names, currentDate, QString("#%1").arg(index+1));
-    needCalulation = false;
 
     while(ui->names->topLevelItemCount() >= index)
         delete ui->names->topLevelItem(ui->names->topLevelItemCount()-1);
-    action();
+    //action();
+
+    ui->names->sortByColumn(1, Qt::AscendingOrder);
+    needCalulation = false;
 }
 
 const QString Phases::getPhaseFor(const MetadataElement &value) {
@@ -82,8 +95,7 @@ void Phases::actionNames() {
     ui->names->sortByColumn(1, Qt::AscendingOrder);
 }
 void Phases::action() {
-    ui->names->sortByColumn(1, Qt::AscendingOrder);
-    emit(actionned());
+    emit(actionned(QString::number(ui->daysTo->value()), ""));
     needCalulation = true;
 }
 

@@ -17,7 +17,7 @@ void Player::load(void *_tag) {
     if(!tags.contains(tag)) {
         if(tag->playerVideo)
             tags.append(tag);
-        tag->playerVideo->setParent(ui->globalFrameBlk);
+        tag->playerVideo->setParent(ui->globalFramePlayer);
 
         tag->playerVideo->setVisible(true);
         play(Global::timerPlay);

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1049</width>
-    <height>557</height>
+    <width>801</width>
+    <height>467</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,15 +35,11 @@ QPushButton {
 	padding: 3px;
 }
 
-QDialog, QWidget#chutier, QFrame#globalFrame, QWidget#centralwidget, QWidget#player, QWidget#timeline, QWidget#viewer {
+QFrame#globalFrame, QDialog, QWidget#chutier, QWidget#centralwidget {
 	background-color: 	rgb(56, 61, 63);
-	border:						0px solid black;
+	border: 					0px solid black;
 }
 
-QFrame#globalFrameBlk {
-	background-color: 	rgb(0, 0, 0);
-	border:						0px solid black;
-}
 
 
 QLabel, QCheckBox, QRadioButton {
@@ -96,20 +92,59 @@ QTabBar::tab:disabled {
 }
 
 
+QToolBox {
+	border:									0px solid black;
+}
 QToolBox::tab {
 	background-color: 				rgb(41, 44, 45);
 	color: 									rgb(194, 198, 198);
+	border:									0px solid black;
+	border-left:							5px solid rgb(114, 118, 118);
 }
-QToolBox::tab:selected {
+QToolBox#toolBoxLeft::tab {
+	color: 									rgb(255,147,102);
+	border-left:							5px solid rgb(255,147,102);
+}
+QToolBox#toolBoxLeft::tab:selected {
+	color:									white;
+	background-color: 				rgb(255,147,102);
+	border-left:							5px solid rgb(255,147,102);
+}
+QToolBox#toolBoxRight::tab {
+	color:									rgb(166,204,91);
+	border-left:							5px solid rgb(166,204,91);
+}
+QToolBox#toolBoxRight::tab:selected {
+	color:									white;
+	background-color: 				rgb(166,204,91);
+	border-left:							5px solid rgb(166,204,91);
+}
+QToolBox#toolBoxLeft::tab:disabled, QToolBox#toolBoxRight::tab:disabled {
+	color:									rgb(56, 61, 63);
+	border-left:							5px solid rgb(56, 61, 63);
+}
+QToolBox QWidget#chutierPage, QToolBox QWidget#feedPage, QToolBox QWidget#infosPage, QToolBox QWidget#conduitePage, QToolBox QWidget#tasksPage, QToolBox QWidget#peoplePage, QToolBox QWidget#previewPage, QToolBox QWidget#filtersPage {
+	border:									0px solid black;
 	background-color: 				rgb(56, 61, 63);
 }
-QToolBox::tab:disabled {
-	background-color: 				rgb(41, 44, 45);
-	color: 									rgb(56, 61, 63);
+QFrame#frameGlobalTimeline, QWidget#timeline {
+	border:									0px solid black;
+	background-color: 				rgb(101, 105, 107);
 }
-QToolBox QWidget#chutierPage, QToolBox QWidget#feedPage, QToolBox QWidget#infosPage, QToolBox QWidget#conduitePage, QToolBox QWidget#tasksPage, QToolBox QWidget#peoplePage, QToolBox QWidget#previewPage {
-	background-color: 				rgb(56, 61, 63);
+QFrame#frameGlobalViewer, QWidget#viewer, QFrame#globalFramePlayer, QWidget#player {
+	border:									0px solid black;
+	background-color: 				rgb(0, 0, 0);
 }
+QFrame#globalFrameSorting {
+	border:									0px solid black;
+	background-color: 				rgb(255,84,79);
+}
+QFrame#globalFramePhases {
+	border:									0px solid black;
+	background-color: 				rgb(255,84,79);
+}
+
+
 
 
 QTreeView {
@@ -154,7 +189,7 @@ QPushButton:hover {
 	background-color: 	rgb(21, 91, 143);
 }
 QPushButton::checked, QPushButton:pressed, QCheckBox::indicator:checked, QTreeView::indicator:checked, QRadioButton::indicator:checked {
-	background-color: 	rgb(0, 187, 255);
+	background-color: 	rgb(45, 202, 225);
 }
 
 
@@ -191,6 +226,7 @@ QComboBox {
 	background:			rgb(242, 241, 237);
 	color: 					black;
 	margin-left: 		3px;
+	margin-right: 		3px;
 	border-radius: 	3px;
 	selection-color: 	black;
 	padding-left: 		5px;
@@ -244,18 +280,18 @@ QSlider::handle:horizontal {
 	margin-top: 			-4px;
 	margin-bottom: 		-4px;
 	border: 					0px solid black;
-	background-color: 	rgb(0, 187, 250);
+	background-color: 	rgb(45, 202, 225);
 }
 
 
-QSplitter::handle {
-	background: 	rgb(56, 61, 63);
-}
-QSplitter::handle:pressed {
-	background: 	rgb(50, 221, 255);
- }
-QSplitter::handle:horizontal	 	{	width: 	4px; }
-QSplitter::handle:vertical     		{	height:	4px; }
+QSplitter#conduiteSplitter::handle 				{		background: 	rgba(166,204,91,   30);	}
+QSplitter#conduiteSplitter::handle:pressed 	{		background: 	rgb(166,204,91);				}
+QSplitter#fileSplitter::handle 						{		background: 	rgba(255,147,102, 30);	}
+QSplitter#fileSplitter::handle:pressed 			{		background: 	rgb(255,147,102);			}
+QSplitter#timelineSplitter::handle 				{		background: 	rgb(71, 77, 79);				}
+QSplitter#timelineSplitter::handle:pressed 	{		background: 	rgb(226,226,226);			}
+QSplitter::handle:horizontal	 						{		width: 	4px; 											}
+QSplitter::handle:vertical     							{		height:	4px; 											}
 
 QDockWidget {
 }
@@ -281,7 +317,64 @@ QStatusBar {
 	border-top: 				1px solid rgb(50, 50, 50);
 	background-color: 	rgb(30, 30, 30);
 }
-</string>
+
+
+
+QFrame#frameGlobalTimeline QPushButton {
+	border:						2px solid black;
+	border-color:			rgb(74,201,159);
+	background-color:	rgb(74,201,159);
+	padding:					0px;
+	padding-left: 			4px;
+	padding-right: 		4px;
+	margin:					0px;
+	height:						20px;
+	min-height:				20px;
+	max-height:				20px;
+}
+QFrame#frameGlobalTimeline QPushButton:checked, QFrame#frameGlobalTimeline QPushButton:pressed {
+	border-color:			rgb(255,84,79);
+	background-color:	rgb(255,84,79);
+}
+QFrame#frameGlobalTimeline QPushButton:hover {
+	border-color:			rgb(226,226,226);
+}
+QFrame#frameGlobalTimeline QSlider::handle:horizontal {
+	background-color: 	rgb(74,201,159);
+}
+QFrame#frameGlobalTimeline QPushButton#ffButton, QFrame#frameGlobalTimeline QPushButton#playButton {
+	padding: 					0px;
+	margin:					0px;
+	width:						30px;
+	height:						30px;
+	min-width:				30px;
+	min-height:				30px;
+	max-width:				30px;
+	max-height:				30px;
+	border-radius:			17px;
+}
+QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineFilters, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineZoom, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineMisc {
+	background: 			transparent;
+	border:						0px solid black;
+}
+QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineZoom, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineMisc {
+	border-left:				5px solid rgb(45, 50, 53);
+}
+QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
+	background:				rgb(45, 50, 53);
+}
+
+
+
+QFrame#globalFrameSorting QLineEdit, QFrame#globalFrameSorting QComboBox, QFrame#globalFramePhases QLineEdit, QFrame#globalFramePhases QComboBox {
+	color:						white;
+	border: 					0px solid black;
+	background: 			rgba(255, 255, 255, 100);
+}
+QFrame#globalFrameSorting QComboBox::drop-down, QFrame#globalFramePhases QComboBox::drop-down {
+	background: 			rgba(255, 255, 255, 100);
+    image: 						url(:/icons/res_icon_down.png);
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -325,8 +418,8 @@ QStatusBar {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>263</width>
-            <height>304</height>
+            <width>200</width>
+            <height>237</height>
            </rect>
           </property>
           <attribute name="label">
@@ -571,18 +664,145 @@ QStatusBar {
       </widget>
       <widget class="QToolBox" name="toolBoxRight">
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="tabSpacing">
-        <number>5</number>
+        <number>0</number>
        </property>
+       <widget class="QWidget" name="conduitePage">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>100</width>
+          <height>449</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>CUES</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,9999">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="conduiteLabel">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body style=&quot;font-style:normal;&quot;&gt;&lt;p&gt;Here are listed all the cues of the project. By default, all the markers and documents of the timeline will appear in the cue list. As in all the other views of Rekall, you can filter the cues through the &lt;a href=&quot;rekall:openInspector&quot; style=&quot; text-decoration: underline; color:#32DDFF;&quot;&gt;inspector panel&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;Be aware you can also &lt;a href=&quot;rekall:openNetwork&quot; style=&quot; text-decoration: underline; color:#32DDFF;&quot;&gt;synchronize&lt;/a&gt; multiple Rekall each others, allowing you to use Rekall as a real time cue sheet for performers or technical actors of your project.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Viewer" name="viewer" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="filtersPage">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>227</width>
+          <height>132</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>DISPLAY OPTIONS</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <property name="leftMargin">
+          <number>12</number>
+         </property>
+         <property name="topMargin">
+          <number>12</number>
+         </property>
+         <property name="rightMargin">
+          <number>12</number>
+         </property>
+         <property name="bottomMargin">
+          <number>12</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="help">
+           <property name="text">
+            <string>Show help labels in interface</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="history">
+           <property name="text">
+            <string>Show document modifications history</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="linkedTags">
+           <property name="text">
+            <string>Show relationship betweend documents</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="linkedRenders">
+           <property name="text">
+            <string>Show recording links with documents</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
        <widget class="QWidget" name="infosPage">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>633</width>
-          <height>479</height>
+          <width>483</width>
+          <height>376</height>
          </rect>
         </property>
         <attribute name="label">
@@ -659,59 +879,6 @@ QStatusBar {
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="conduitePage">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>100</width>
-          <height>449</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>CUES</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,9999">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="conduiteLabel">
-           <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body style=&quot;font-style:normal;&quot;&gt;&lt;p&gt;Here are listed all the cues of the project. By default, all the markers and documents of the timeline will appear in the cue list. As in all the other views of Rekall, you can filter the cues through the &lt;a href=&quot;rekall:openInspector&quot; style=&quot; text-decoration: underline; color:#32DDFF;&quot;&gt;inspector panel&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;Be aware you can also &lt;a href=&quot;rekall:openNetwork&quot; style=&quot; text-decoration: underline; color:#32DDFF;&quot;&gt;synchronize&lt;/a&gt; multiple Rekall each others, allowing you to use Rekall as a real time cue sheet for performers or technical actors of your project.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="Viewer" name="viewer" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>100</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
       </widget>
      </widget>
     </item>
@@ -722,7 +889,7 @@ QStatusBar {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1049</width>
+     <width>801</width>
      <height>22</height>
     </rect>
    </property>
@@ -732,12 +899,6 @@ QStatusBar {
     </property>
     <addaction name="actionPlay"/>
     <addaction name="actionRewind"/>
-   </widget>
-   <widget class="QMenu" name="menuWindow">
-    <property name="title">
-     <string>Window</string>
-    </property>
-    <addaction name="actionInspector"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -754,7 +915,6 @@ QStatusBar {
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuPlayback"/>
-   <addaction name="menuWindow"/>
   </widget>
   <action name="actionPlay">
    <property name="text">
@@ -855,7 +1015,7 @@ QStatusBar {
    <hints>
     <hint type="sourcelabel">
      <x>1036</x>
-     <y>298</y>
+     <y>388</y>
     </hint>
     <hint type="destinationlabel">
      <x>916</x>
@@ -870,8 +1030,8 @@ QStatusBar {
    <slot>refreshMetadata()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1024</x>
-     <y>511</y>
+     <x>1036</x>
+     <y>548</y>
     </hint>
     <hint type="destinationlabel">
      <x>69</x>
@@ -886,8 +1046,8 @@ QStatusBar {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>818</x>
-     <y>477</y>
+     <x>1042</x>
+     <y>529</y>
     </hint>
     <hint type="destinationlabel">
      <x>1145</x>
@@ -902,8 +1062,8 @@ QStatusBar {
    <slot>personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>50</x>
-     <y>332</y>
+     <x>49</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
      <x>-71</x>

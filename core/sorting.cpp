@@ -2,13 +2,14 @@
 #include "ui_sorting.h"
 
 Sorting::Sorting(bool _isFilter, const QString &title, quint16 index, QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
     ui(new Ui::Sorting) {
+
     isFilter = _isFilter;
     regexp.setPatternSyntax(QRegExp::Wildcard);
     ui->setupUi(this);
     ui->title->setText(title);
-    action();
+    setWindowTitle(title);
     if(isFilter)    ui->stackedWidget->setCurrentIndex(1);
     else            ui->stackedWidget->setCurrentIndex(0);
 
@@ -23,6 +24,16 @@ Sorting::Sorting(bool _isFilter, const QString &title, quint16 index, QWidget *p
     ui->filter->addItem("documents first letter", "Name | 1");
     ui->filter->addItem("users names",            "Author");
     ui->filter->setCurrentIndex(index);
+}
+
+void Sorting::showEvent(QShowEvent *) {
+    emit(displayed(true));
+}
+void Sorting::closeEvent(QCloseEvent *) {
+    emit(displayed(false));
+}
+void Sorting::hideEvent(QHideEvent *) {
+    emit(displayed(false));
 }
 
 void Sorting::setTagname(const QString &_tagName) {
@@ -62,7 +73,7 @@ void Sorting::action() {
             }
         }
     }
-    emit(actionned());
+    emit(actionned(ui->filter->currentText(), ui->matches->text()));
 }
 
 const QString Sorting::getCriteriaFormated(const QString &_criteria) {
