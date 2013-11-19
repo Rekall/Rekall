@@ -41,7 +41,7 @@ void TimelineGL::resizeGL(int, int) {
 }
 
 void TimelineGL::paintGL() {
-    glReady = true;
+    Global::viewerGL->glReady = glReady = true;
 
     //Efface
     GLbitfield clearFlag = GL_COLOR_BUFFER_BIT;

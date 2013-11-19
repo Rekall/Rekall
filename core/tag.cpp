@@ -384,7 +384,7 @@ const QRectF Tag::paintTimeline(bool before) {
             glDisable(GL_LINE_STIPPLE);
         }
 
-        glScissor(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth, Global::timelineGL->height());
+        glScissor(Global::timelineHeaderSize.width() /*+ Global::timelineNegativeHeaderWidth*/, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width()/* - Global::timelineNegativeHeaderWidth*/, Global::timelineGL->height());
         glPopMatrix();
     }
     return timelineBoundingRect.translated(timelinePos);
@@ -540,7 +540,7 @@ bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, 
     else                    mouseHover = false;
 
     if((mouseHover) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
-        Global::timeline->seek(timeStart, false);
+        Global::timeline->seek(timeStart, true, false);
         Global::selectedTag = this;
         Global::selectedTagInAction = 0;
         if(!Global::selectedTag)

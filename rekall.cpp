@@ -23,9 +23,9 @@ Rekall::Rekall(QWidget *parent) :
 
     Global::chutier = ui->chutier->getTree();
     Global::udp = new Udp(0, 5678);
+    settings = new QSettings(Global::pathApplication.absoluteFilePath() + "/Rekall.ini", QSettings::IniFormat, this);
     if(false) {
         httpUpload = new FileUploadController();
-        settings = new QSettings(Global::pathApplication.absoluteFilePath() + "/Rekall.ini", QSettings::IniFormat, this);
         settings->beginGroup("listener");
         http = new HttpListener(settings, httpUpload, this);
         connect(httpUpload, SIGNAL(fileUploaded(QString, QString, QTemporaryFile*)), SLOT(fileUploaded(QString, QString, QTemporaryFile*)), Qt::QueuedConnection);
@@ -234,7 +234,7 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
             */
             foreach(Document *droppedDocument, droppedDocuments) {
                 Tag *tag = new Tag(droppedDocument);
-                tag->create(TagTypeContextualTime, currentProject->getTimelineCursorTime(Global::timelineGL->mapFromGlobal(QCursor::pos())), 10);
+                tag->create(TagTypeContextualTime, currentProject->getTimelineCursorTime(Global::timelineGL->mapFromGlobal(QCursor::pos()) + Global::timelineGL->scroll), 10);
                 currentProject->addTag(tag);
                 Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = true;
                 if(droppedDocument->chutierItem)

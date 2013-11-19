@@ -211,9 +211,9 @@ const QRectF Project::paintTimeline(bool before) {
 
                     //Add to timeline if displayable
                     if(tag->isAcceptableWithSortFilters()) {
-                        QString phase   = Global::phases->getPhaseFor(Tag::getCriteriaSortRaw(tag));
-                        QString sorting = Tag::getCriteriaSort(tag);
-                        QString cluster = Tag::getCriteriaCluster(tag);
+                        QString phase   = Global::phases->getPhaseFor(Tag::getCriteriaSortRaw(tag)).toLower();
+                        QString sorting = Tag::getCriteriaSort(tag).toLower();
+                        QString cluster = Tag::getCriteriaCluster(tag).toLower();
                         if((!cluster.isEmpty()) && (tag->isAcceptableWithClusterFilters()) && (!Global::tagClusterCriteria->getMatchName().isEmpty())) {
                             cluster = tag->getAcceptableWithClusterFilters();
                             QPair<QString,QString> key = qMakePair(sorting, cluster);
@@ -292,7 +292,7 @@ const QRectF Project::paintTimeline(bool before) {
 
 
         //Drawing tags and categories
-        bool debug = false;
+        bool debug = false; //DEBUG
         QList<QRectF> zones;
         quint16 categoryIndex = 0;
         QPointF tagSortPosOffset = QPointF(0, Global::timelineTagVSpacingSeparator), categoryStart = QPointF(0, 0), phaseStart = QPointF(0, 0);
@@ -304,7 +304,7 @@ const QRectF Project::paintTimeline(bool before) {
 
             QString phase = Global::phases->getVerbosePhaseFor(categoriesInPhasesIterator.key());
             if(debug)
-                qDebug("\t > [Phase] %s", qPrintable(phase));
+                qDebug("\t > [Phase] %s (%d)", qPrintable(phase), phase.length());
 
             QMapIterator<QString, QMap<QString, QList<Tag*> > > clustersInCategoriesIterator(categoriesInPhasesIterator.value());
             while(clustersInCategoriesIterator.hasNext()) {
@@ -324,7 +324,7 @@ const QRectF Project::paintTimeline(bool before) {
 
                 QString sorting = clustersInCategoriesIterator.key();
                 if(debug)
-                    qDebug("\t\t > [Sorting] %s", qPrintable(sorting));
+                    qDebug("\t\t > [Sorting] %s (%d)", qPrintable(sorting), sorting.length());
 
                 //Caching extraction for heatmap
                 while(timelineCategoriesRectCache.count() <= categoryIndex)
@@ -364,7 +364,7 @@ const QRectF Project::paintTimeline(bool before) {
 
                     QString cluster = tagsInClusterIterator2.key();
                     if(debug)
-                        qDebug("\t\t\t > [Cluster] %s (%d)", qPrintable(cluster), tagsInClusterIterator2.value().count());
+                        qDebug("\t\t\t > [Cluster] %s (%d) (%d)", qPrintable(cluster), cluster.length(), tagsInClusterIterator2.value().count());
 
                     foreach(Tag *tag, tagsInClusterIterator2.value()) {
                         QRectF tagRect = tag->getTimelineBoundingRect().translated(tagSortPosOffset);

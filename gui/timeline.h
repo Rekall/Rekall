@@ -22,7 +22,7 @@ private:
     qreal ticksWidth;
     GlText timeText;
 private:
-    void seek(qreal _time, bool ensureVisible = true);
+    void seek(qreal _time, bool forceVisibleTimeline = false, bool forceVisibleViewer = false);
 protected:
     void timerEvent(QTimerEvent *);
     const QRectF paintTimeline(bool before = false);

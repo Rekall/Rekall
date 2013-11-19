@@ -31,7 +31,7 @@ typedef QMap<QString, QMetaMap > QMetaDictionnay;
 class GlDrawable {
 public:
     virtual void fireEvents()         {}
-    virtual void seek(qreal, bool = true) {}
+    virtual void seek(qreal, bool = false, bool = false) {}
     virtual qreal totalTime() const   { return 0.; }
 public:
     virtual QPointF getTimelineCursorPos (qreal)           { return QPointF(); }
@@ -71,7 +71,6 @@ public:
     QPointF scroll, scrollDest;
     UiBool showLegendDest, showLinkedRendersDest, showLinkedTagsDest;
     qreal showLinkedRenders, showLinkedTags;
-protected:
     bool glReady;
 public:
     void ensureVisible(const QPointF &point, qreal ratio = 0.5);

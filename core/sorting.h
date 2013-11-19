@@ -19,7 +19,7 @@ public:
 public:
     bool isFilter, asNumber, asDate, sortAscending;
     UiBool displayLinked;
-    QString tagName;
+    QString tagName, tagNameCategory;
     qint16 left, leftLength;
 
 

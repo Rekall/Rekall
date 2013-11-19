@@ -14,15 +14,15 @@ Sorting::Sorting(bool _isFilter, const QString &title, quint16 index, QWidget *p
     else            ui->stackedWidget->setCurrentIndex(0);
 
     ui->filter->addItem("", "");
-    ui->filter->addItem("documents date (year)",  "Date/Time | 0,4");
-    ui->filter->addItem("documents date (month)", "Date/Time | 0,7");
-    ui->filter->addItem("documents date (day)",   "Date/Time | 0,10");  // 1234:67:90 23:56:89
-    ui->filter->addItem("documents time (hours)", "Date/Time | 11,2");  // 9876:43:10 87:54:21
-    ui->filter->addItem("documents type",         "Category");
-    ui->filter->addItem("documents keywords",     "Keywords");
-    ui->filter->addItem("documents fullname",     "Name");
-    ui->filter->addItem("documents first letter", "Name | 1");
-    ui->filter->addItem("users names",            "Author");
+    ui->filter->addItem("Date (year)",  "Rekall->Date/Time | 0,4");
+    ui->filter->addItem("Date (month)", "Rekall->Date/Time | 0,7");
+    ui->filter->addItem("Date (day)",   "Rekall->Date/Time | 0,10");  // 1234:67:90 23:56:89
+    ui->filter->addItem("Time (hours)", "Rekall->Date/Time | 11,2");  // 9876:43:10 87:54:21
+    ui->filter->addItem("Type",         "Rekall->Type");
+    ui->filter->addItem("Authors",      "Rekall->Author");
+    ui->filter->addItem("Keywords",     "Rekall->Keywords");
+    ui->filter->addItem("Fullname",     "Rekall->Name");
+    ui->filter->addItem("First letter (name)", "Rekall->Name | 1");
     ui->filter->setCurrentIndex(index);
 }
 
@@ -37,14 +37,18 @@ void Sorting::hideEvent(QHideEvent *) {
 }
 
 void Sorting::setTagname(const QString &_tagName) {
-    tagName       = _tagName;
-    left          = 0;
-    leftLength    = -1;
-    asNumber      = false;
-    displayLinked = false;
-    sortAscending = true;
-    if((tagName.toLower().contains("date")) || (tagName.toLower().contains("time")))    asDate = true;
-    else                                                                                asDate = false;
+    QStringList tagNames = _tagName.split("->");
+    if(tagNames.count()) {
+        tagName       = tagNames.last();
+        if(tagNames.count() > 1)
+            tagNameCategory = tagNames.first();
+        leftLength    = -1;
+        asNumber      = false;
+        displayLinked = false;
+        sortAscending = true;
+        if((tagName.toLower().contains("date")) || (tagName.toLower().contains("time")))    asDate = true;
+        else                                                                                asDate = false;
+    }
 }
 
 void Sorting::action() {
@@ -150,14 +154,15 @@ Sorting::~Sorting() {
 
 QDomElement Sorting::serialize(QDomDocument &xmlDoc) {
     QDomElement xmlData = xmlDoc.createElement("sorting");
-    xmlData.setAttribute("isFilter",      isFilter);
-    xmlData.setAttribute("asNumber",      asNumber);
-    xmlData.setAttribute("asDate",        asDate);
-    xmlData.setAttribute("sortAscending", sortAscending);
-    xmlData.setAttribute("displayLinked", displayLinked);
-    xmlData.setAttribute("tagName",       tagName);
-    xmlData.setAttribute("left",          left);
-    xmlData.setAttribute("leftLength",    leftLength);
+    xmlData.setAttribute("isFilter",        isFilter);
+    xmlData.setAttribute("asNumber",        asNumber);
+    xmlData.setAttribute("asDate",          asDate);
+    xmlData.setAttribute("sortAscending",   sortAscending);
+    xmlData.setAttribute("displayLinked",   displayLinked);
+    xmlData.setAttribute("tagNameCategory", tagNameCategory);
+    xmlData.setAttribute("tagName",         tagName);
+    xmlData.setAttribute("left",            left);
+    xmlData.setAttribute("leftLength",      leftLength);
     return xmlData;
 }
 void Sorting::deserialize(const QDomElement &xmlElement) {
