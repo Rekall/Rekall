@@ -41,7 +41,12 @@ void TimelineGL::resizeGL(int, int) {
 }
 
 void TimelineGL::paintGL() {
-    Global::viewerGL->glReady = glReady = true;
+    glReady = true;
+
+    if(!Global::viewerGL->glReady) {
+        Global::viewerSortChanged = true;
+        Global::viewerGL->glReady = true;
+    }
 
     //Efface
     GLbitfield clearFlag = GL_COLOR_BUFFER_BIT;
@@ -53,7 +58,7 @@ void TimelineGL::paintGL() {
     drawingBoundingRect = QRectF();
     scroll = scroll + (scrollDest - scroll) / Global::inertie;
     visibleRect = QRectF(scroll, size());
-    glScissor(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0, width() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth, height());
+    glScissor(Global::timelineHeaderSize.width(), 0, width() - Global::timelineHeaderSize.width(), height());
     glPushMatrix();
     glTranslatef(qRound(-scroll.x()), qRound(-scroll.y()), 0);
     if(Global::timeline)        drawingBoundingRect = drawingBoundingRect.united(Global::timeline      ->paintTimeline(true));

@@ -35,7 +35,7 @@ public:
 
 public:
     void create(TagType _type, qreal _timeStart, qreal _duration = 10, bool debug = false);
-    QList<Tag*> historyTags;
+    QList<Tag*> historyTags, hashTags;
     qreal progression;
 private:
     bool timelineWasInside;

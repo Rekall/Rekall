@@ -51,7 +51,7 @@ const QRectF Timeline::paintTimeline(bool before) {
         QRectF tickRectOld;
         glBegin(GL_LINES);
         for(quint16 tickIndex = 0 ; tickIndex < ticks.count() ; tickIndex++) {
-            QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
+            QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
             if(!tickRect.intersects(tickRectOld)) {
                 glVertex2f(tickRect.x(), Global::timelineGL->scroll.y() + Global::timelineHeaderSize.height());
                 glVertex2f(tickRect.x(), Global::timelineGL->scroll.y() + Global::timelineHeaderSize.height() + Global::timelineGL->height());
@@ -63,11 +63,11 @@ const QRectF Timeline::paintTimeline(bool before) {
     else {
         //Timetext
         Global::timelineGL->qglColor(Global::colorBackground);
-        GlRect::drawRect(QRectF(QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + Global::timelineGL->scroll.x(), Global::timelineGL->scroll.y()), QSizeF(Global::timelineGL->width(), Global::timelineHeaderSize.height())));
+        GlRect::drawRect(QRectF(QPointF(Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timelineGL->scroll.x(), Global::timelineGL->scroll.y()), QSizeF(Global::timelineGL->width(), Global::timelineHeaderSize.height())));
         Global::timelineGL->qglColor(Global::colorTextBlack);
         QRectF tickRectOld;
         for(quint16 tickIndex = 1 ; tickIndex < ticks.count() ; tickIndex++) {
-            QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
+            QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
             if(!tickRect.intersects(tickRectOld)) {
                 ticks[tickIndex].drawText((tickRect.topLeft() + QPointF(-ticksWidth/2, Global::timelineGL->scroll.y())).toPoint());
                 tickRectOld = tickRect;
@@ -98,7 +98,6 @@ const QRectF Timeline::paintTimeline(bool before) {
         glEnd();
 
         //Current
-        glDisable(GL_SCISSOR_TEST);
         QRectF timeTextRect(QPointF(timelineBoundingRect.topLeft().x() - timeText.size.width()/2, timelineBoundingRect.topLeft().y() + (Global::timelineHeaderSize.height()/2-timeText.size.height()/2)), timeText.size);
         Global::timelineGL->qglColor(Global::colorProgression);
         GlRect::drawRoundedRect(timeTextRect, false);
@@ -106,14 +105,6 @@ const QRectF Timeline::paintTimeline(bool before) {
         Global::timelineGL->qglColor(Qt::white);
         timeText.setStyle(QSize(50, Global::timelineTagHeight*1.2), Qt::AlignCenter, Global::font);
         timeText.drawText(Global::timeToString(Global::time), timeTextRect.topLeft().toPoint());
-
-        //Play/pause buttons
-        /*
-        Global::timelineGL->qglColor(Global::colorProgression);
-        QRectF playButtonRect(QPointF(Global::timelineHeaderSize.height(), 0), QSizeF(Global::timelineHeaderSize.height(), Global::timelineHeaderSize.height()));
-        GlRect::drawRoundedRect(playButtonRect, false);
-        GlRect::drawRoundedRect(playButtonRect, true);
-        */
 
         if(Global::timerPlay)
             Global::timelineGL->ensureVisible(QPointF(timelinePos.x(), -1));
@@ -132,10 +123,17 @@ const QRectF Timeline::paintViewer() {
     return viewerBoundingRect;
 }
 
-
-bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool, bool, bool action, bool) {
+bool Timeline::jumpTo() {
+    bool ok = false;
+    qreal time = Global::stringToTime(QInputDialog::getText(0, tr("Jump to…"), tr("Jump to specific timecode"), QLineEdit::Normal, Global::timeToString(Global::time), &ok));
+    if(ok)
+        seek(time, true, true);
+    return ok;
+}
+bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool action, bool) {
     if((action) && ((e->button() & Qt::LeftButton) == Qt::LeftButton)) {
-        seek(Global::currentProject->getTimelineCursorTime(pos), false, true);
+        if(dbl) jumpTo();
+        else    seek(Global::currentProject->getTimelineCursorTime(pos), false, true);
         Global::selectedTagInAction = 0;
         Global::selectedTag = 0;
         return true;
@@ -216,8 +214,10 @@ void Timeline::actionDisplayed(bool val) {
         ui->phaseBy->setChecked(val);
 }
 void Timeline::actionChanged(QString text, QString text2) {
-    if(sender() == Global::tagFilterCriteria)
-        ui->filterBy->setText(tr("FILTERS"));
+    if(sender() == Global::tagFilterCriteria) {
+        if(text2.isEmpty())  ui->filterBy->setText(tr("NO FILTERS"));
+        else                 ui->filterBy->setText(tr("FILTER: %1").arg(text2));
+    }
     else if(sender() == Global::tagSortCriteria)
         ui->sortBy->setText(tr("SORTING").arg(text));
     else if(sender() == Global::tagColorCriteria)

@@ -46,14 +46,14 @@ Rekall::Rekall(QWidget *parent) :
     Global::timelineGL->showLinkedRendersDest.setAction(ui->linkedRenders);
     Global::timelineGL->showLinkedTagsDest   .setAction(ui->linkedTags);
     Global::showHelp.setAction(ui->help);
+    Global::timelineGL->showHistory.setAction(ui->history);
+    connect(&Global::timelineGL->showHistory, SIGNAL(triggered(bool)), SLOT(action()));
 
     Global::phases             = new Phases(0);
-    Global::tagFilterCriteria  = new Sorting(true,  tr("Filter rules"),     0, 0);
-    Global::tagSortCriteria    = new Sorting(false, tr("Sorting rules"),    2, 0);
-    Global::tagColorCriteria   = new Sorting(false, tr("Color rules"),      5, 0);
-    Global::tagClusterCriteria = new Sorting(false, tr("Hightlight rules"), 6, 0);
-    //Global::tagFilterCriteria->displayLinked.setAction(ui->history);
-    connect(&Global::tagFilterCriteria->displayLinked, SIGNAL(triggered(bool)), Global::tagFilterCriteria, SLOT(action()));
+    Global::tagFilterCriteria  = new Sorting(tr("Filter rules"),     6);
+    Global::tagSortCriteria    = new Sorting(tr("Sorting rules"),    2);
+    Global::tagColorCriteria   = new Sorting(tr("Color rules"),      5);
+    Global::tagClusterCriteria = new Sorting(tr("Hightlight rules"), 7);
 
     Global::phases            ->setStyleSheet(styleSheet());
     Global::tagFilterCriteria ->setStyleSheet(styleSheet());
@@ -251,6 +251,7 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
 
 
 void Rekall::action() {
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
     if(sender() == ui->actionSave)
         currentProject->save();
     else if(sender() == ui->actionPaste)
@@ -264,7 +265,7 @@ void Rekall::actionMetadata() {
         QString key      = ui->metadata->currentItem()->text(0).remove(QRegExp("<[^>]*>")).trimmed();
         QString value    = ui->metadata->currentItem()->text(1).remove(QRegExp("<[^>]*>")).trimmed();
         QString category = ui->metadata->currentItem()->parent()->text(0).remove(QRegExp("<[^>]*>")).trimmed();
-        if(category == tr("General"))   category = "Rekall";
+        if(category == "General")   category = "Rekall";
         currentDocument->setMetadata(category, key, value, ui->metadataSlider->value());
         Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = true;
     }
@@ -334,17 +335,26 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
     QString metadataPrefix1 = "<span style='font-family: Calibri, Arial; font-size: 11px; color: %1'>";
     QString metadataSuffix = "</span>";
 
-    for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++)
+
+    for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++) {
         if(ui->metadata->topLevelItem(i)->isExpanded())
             expandItems << ui->metadata->topLevelItem(i)->text(0).remove(QRegExp("<[^>]*>")).trimmed();
+        for(quint16 j = 0 ; j < ui->metadata->topLevelItem(i)->childCount() ; j++) {
+            if(ui->metadata->topLevelItem(i)->child(j)->isExpanded())
+                expandItems << ui->metadata->topLevelItem(i)->child(j)->text(0).remove(QRegExp("<[^>]*>")).trimmed();
+        }
+    }
     if(expandItems.count() == 0)
-        expandItems << tr("General") << "Contact details";
+        expandItems << "General" << "Contact details";
+
 
     if(metadata) {
         ui->metadata->clear();
 
         QTreeWidgetItem *metadataRootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + tr("Details") + metadataSuffix);
         metadataRootItem->setFlags(Qt::ItemIsEnabled);
+        if(expandItems.contains("Details"))
+            ui->metadata->expandItem(metadataRootItem);
 
         if(!metadata->getMetadata("Rekall", "Folder").toString().isEmpty())
             ui->toolBoxRight->setItemText(2, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
@@ -365,10 +375,10 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
             QTreeWidgetItem *rootItem = 0;
             QString metaIteratorKey = metaIterator.key();
             if(metaIteratorKey == "Rekall")
-                metaIteratorKey = tr("General");
+                metaIteratorKey = "General";
 
-            if(metaIteratorKey == tr("General"))  rootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + tr("General") + metadataSuffix);
-            else                                  rootItem = new QTreeWidgetItem(metadataRootItem, QStringList() << metadataPrefix0 + metaIteratorKey + metadataSuffix);
+            if(metaIteratorKey == "General")  rootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + "General" + metadataSuffix);
+            else                              rootItem = new QTreeWidgetItem(metadataRootItem, QStringList() << metadataPrefix0 + metaIteratorKey + metadataSuffix);
             rootItem->setFlags(Qt::ItemIsEnabled);
 
             QMapIterator<QString,MetadataElement> ssMetaIterator(metaIterator.value());
@@ -386,6 +396,7 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
             if(expandItems.contains(metaIteratorKey))    ui->metadata->expandItem(rootItem);
             else                                         ui->metadata->collapseItem(rootItem);
         }
+
         displayDocumentName(QString("%1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
         displayPixmap(metadata->getThumbnail(ui->metadataSlider->value()));
         displayGps(metadata->getGps());

@@ -1,17 +1,14 @@
 #include "sorting.h"
 #include "ui_sorting.h"
 
-Sorting::Sorting(bool _isFilter, const QString &title, quint16 index, QWidget *parent) :
+Sorting::Sorting(const QString &title, quint16 index, QWidget *parent) :
     QWidget(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
     ui(new Ui::Sorting) {
 
-    isFilter = _isFilter;
     regexp.setPatternSyntax(QRegExp::Wildcard);
     ui->setupUi(this);
     ui->title->setText(title);
     setWindowTitle(title);
-    if(isFilter)    ui->stackedWidget->setCurrentIndex(1);
-    else            ui->stackedWidget->setCurrentIndex(0);
 
     ui->filter->addItem("", "");
     ui->filter->addItem("Date (year)",  "Rekall->Date/Time | 0,4");
@@ -37,28 +34,31 @@ void Sorting::hideEvent(QHideEvent *) {
 }
 
 void Sorting::setTagname(const QString &_tagName) {
-    QStringList tagNames = _tagName.split("->");
-    if(tagNames.count()) {
-        tagName       = tagNames.last();
-        if(tagNames.count() > 1)
-            tagNameCategory = tagNames.first();
-        leftLength    = -1;
-        asNumber      = false;
-        displayLinked = false;
-        sortAscending = true;
-        if((tagName.toLower().contains("date")) || (tagName.toLower().contains("time")))    asDate = true;
-        else                                                                                asDate = false;
+    if(_tagName.count()) {
+        QStringList tagNames = _tagName.split("->");
+        if(tagNames.count()) {
+            tagName       = tagNames.last();
+            if(tagNames.count() > 1)
+                tagNameCategory = tagNames.first();
+            leftLength    = -1;
+            asNumber      = false;
+            sortAscending = true;
+            if((tagName.toLower().contains("date")) || (tagName.toLower().contains("time")))    asDate = true;
+            else                                                                                asDate = false;
+        }
     }
+    else
+        tagName = "";
 }
 
 void Sorting::action() {
-    if(!isFilter) {
+    if(ui->filter->count()) {
         QString filterText = ui->filter->itemData(ui->filter->currentIndex()).toString();
         if(filterText.isEmpty())
             filterText = ui->filter->currentText();
 
-        QStringList sortSplit = filterText.split("|");
-        if(sortSplit.count()) {
+        if(filterText.count()) {
+            QStringList sortSplit = filterText.split("|");
             setTagname(sortSplit.first().trimmed());
             if(sortSplit.count() > 1) {
                 QString leftPart = sortSplit.at(1);
@@ -154,11 +154,9 @@ Sorting::~Sorting() {
 
 QDomElement Sorting::serialize(QDomDocument &xmlDoc) {
     QDomElement xmlData = xmlDoc.createElement("sorting");
-    xmlData.setAttribute("isFilter",        isFilter);
     xmlData.setAttribute("asNumber",        asNumber);
     xmlData.setAttribute("asDate",          asDate);
     xmlData.setAttribute("sortAscending",   sortAscending);
-    xmlData.setAttribute("displayLinked",   displayLinked);
     xmlData.setAttribute("tagNameCategory", tagNameCategory);
     xmlData.setAttribute("tagName",         tagName);
     xmlData.setAttribute("left",            left);

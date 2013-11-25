@@ -69,7 +69,7 @@ public:
     bool mouseTimerOk;
     QRectF drawingBoundingRect, visibleRect;
     QPointF scroll, scrollDest;
-    UiBool showLegendDest, showLinkedRendersDest, showLinkedTagsDest;
+    UiBool showLegendDest, showLinkedRendersDest, showLinkedTagsDest, showHistory;
     qreal showLinkedRenders, showLinkedTags;
     bool glReady;
 public:
@@ -213,7 +213,7 @@ public:
     static UiReal timeUnitDest, timelineTagHeightDest;
     static UiBool showHelp;
     static qreal timelineTagHeight, timelineTagVSpacing, timelineTagVSpacingSeparator, timelineTagThumbHeight;
-    static qreal viewerTagHeight, timelineNegativeHeaderWidth;
+    static qreal viewerTagHeight, timelineGlobalDocsWidth;
     static QSizeF timelineHeaderSize;
     static bool  timerPlay;
     static qreal time, thumbnailSlider, thumbnailSliderStep;
@@ -241,6 +241,7 @@ public:
 
 public:
     static const QString timeToString(qreal time);
+    static qreal stringToTime(const QString &timeStr);
     static const QString dateToString(const QDateTime &date, bool addExactTime = true);
     static const QString plurial(qint16 value, const QString &text);
     static const QString cacheFile(const QString &type, const QFileInfo &file) {

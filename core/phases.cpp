@@ -36,7 +36,6 @@ void Phases::hideEvent(QHideEvent *) {
 }
 
 void Phases::analyse() {
-    qDebug("ANALYSE ?");
     //ui->names->clear();
 
     QDateTime oldDate, startingDate, currentDate;
@@ -62,7 +61,7 @@ void Phases::analyse() {
     if(index < ui->names->topLevelItemCount())  ((Phase*)(ui->names->topLevelItem(index)))->setValues(currentDate, "");
     else                                        new Phase(ui->names, currentDate, QString("#%1").arg(index+1));
 
-    while(ui->names->topLevelItemCount() >= index)
+    while(ui->names->topLevelItemCount() > index)
         delete ui->names->topLevelItem(ui->names->topLevelItemCount()-1);
     //action();
 

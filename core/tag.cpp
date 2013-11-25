@@ -145,7 +145,7 @@ const QRectF Tag::paintTimeline(bool before) {
     if(before) {
         timelineScale = timelineScale + (timelineDestScale - timelineScale) / Global::inertie;
         timelinePos   = timelinePos + (timelineDestPos - timelinePos) / Global::inertie;
-        if(type == TagTypeGlobal)   timelineBoundingRect = QRectF(QPointF(Global::timelineGL->scroll.x()-Global::timelineNegativeHeaderWidth, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration() * Global::timeUnit), Global::timelineTagHeight));
+        if(type == TagTypeGlobal)   timelineBoundingRect = QRectF(QPointF(Global::timelineGL->scroll.x()-Global::timelineGlobalDocsWidth, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration() * Global::timeUnit), Global::timelineTagHeight));
         else                        timelineBoundingRect = QRectF(QPointF(timeStart * Global::timeUnit, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration() * Global::timeUnit), Global::timelineTagHeight));
 
         bool isLargeTag = (document->getMetadata("Rekall", "Timeline thumbnail").toString() == "picture");
@@ -169,10 +169,7 @@ const QRectF Tag::paintTimeline(bool before) {
         if(breathing)
             color = color.lighter(100 + (1-Global::breathing)*15);
 
-
         glPushMatrix();
-        if(type == TagTypeGlobal)
-            glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
         glTranslatef(qRound(timelinePos.x()), qRound(timelinePos.y()), 0);
 
         glTranslatef(qRound(timelineBoundingRect.center().x()), qRound(timelineBoundingRect.center().y()), 0);
@@ -225,14 +222,27 @@ const QRectF Tag::paintTimeline(bool before) {
                     document->thumbnails.first().drawTexture(timelineBoundingRect, Global::thumbnailSlider);
                 }
             }
+            else if(document->type == DocumentTypeMarker) {
+                //Bar
+                Global::timelineGL->qglColor(color);
+                if((type == TagTypeContextualMilestone) || (type == TagTypeGlobal)) {
+                    timelineBoundingRect.setWidth(3);
+                    GlRect::drawRect(timelineBoundingRect);
+                }
+                else {
+                    GlRect::drawRect(QRectF(timelineBoundingRect.topLeft(),  QSizeF( 3, timelineBoundingRect.height())));
+                    GlRect::drawRect(QRectF(timelineBoundingRect.topRight(), QSizeF(-3, timelineBoundingRect.height())));
+                    GlRect::drawRect(QRectF(timelineBoundingRect.topLeft() + QPointF(0, timelineBoundingRect.height() / 2 - 1), QSizeF(timelineBoundingRect.width(), 2)));
+                }
+            }
             else {
                 //Bar
-                qreal shape = (document->type == DocumentTypeMarker)?(M_PI/2):(M_PI/4);
                 Global::timelineGL->qglColor(color);
                 if(isTagLastVersion(this))
-                    GlRect::drawRoundedRect(timelineBoundingRect.adjusted(1, 1, -1, -1), false, shape);
-                GlRect::drawRoundedRect(timelineBoundingRect.adjusted(1, 1, -1, -1), true, shape);
+                    GlRect::drawRoundedRect(timelineBoundingRect.adjusted(1, 1, -1, -1), false, M_PI/4);
+                GlRect::drawRoundedRect(timelineBoundingRect.adjusted(1, 1, -1, -1), true, M_PI/4);
             }
+
             //Text
             if((Global::selectedTag == this) && (type != TagTypeGlobal)) {
                 QPoint textPos;
@@ -254,14 +264,10 @@ const QRectF Tag::paintTimeline(bool before) {
         }
 
 
-        glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
-
-
         //History tags
         if(historyTags.count()) {
             QColor colorAlpha = color;
-            colorAlpha.setAlphaF(0.4);
-            Global::timelineGL->qglColor(colorAlpha);
+
             //Anchors
             QPointF historyChordBegCtr = timelineBoundingRect.center();
             QPointF historyChordBegTop(timelineBoundingRect.center().x(), timelineBoundingRect.top()    + 1);
@@ -272,14 +278,19 @@ const QRectF Tag::paintTimeline(bool before) {
                 if((historyTag == this) || (!historyTag))
                     continue;
 
+                //Color
+                if(((historyTag->type == TagTypeGlobal) && (type != TagTypeGlobal)) || ((type == TagTypeGlobal) && (historyTag->type != TagTypeGlobal)))    colorAlpha.setAlphaF(0.1);
+                else                                                                                                                                        colorAlpha.setAlphaF(0.4);
+                Global::timelineGL->qglColor(colorAlpha);
+
                 //Anchors
                 QPointF historyChordEndCtr = historyTag->timelineBoundingRect.center() - timelinePos + historyTag->timelinePos;
                 QPointF historyChordEndTop = QPointF(historyChordEndCtr.x(), historyTag->timelineBoundingRect.top()    + 1 - timelinePos.y() + historyTag->timelinePos.y());
                 QPointF historyChordEndBtm = QPointF(historyChordEndCtr.x(), historyTag->timelineBoundingRect.bottom() - 1 - timelinePos.y() + historyTag->timelinePos.y());
 
-                QPointF historyChordBeg, historyChordEnd;
-                if(historyChordEndCtr.y() < historyChordBegCtr.y())    { historyChordBeg = historyChordBegTop;   historyChordEnd = historyChordEndBtm;   }
-                else                                                  { historyChordBeg = historyChordBegBtm;   historyChordEnd = historyChordEndTop;   }
+                QPointF historyChordBeg = historyChordBegCtr, historyChordEnd = historyChordEndCtr;
+                if(     historyChordEndCtr.y() < historyChordBegCtr.y())   { historyChordBeg = historyChordBegTop;   historyChordEnd = historyChordEndBtm;   }
+                else if(historyChordEndCtr.y() > historyChordBegCtr.y())   { historyChordBeg = historyChordBegBtm;   historyChordEnd = historyChordEndTop;   }
                 historyChordPts[0][0] = historyChordBeg.x(); historyChordPts[0][1] = historyChordBeg.y();
                 historyChordPts[1][0] = historyChordBeg.x(); historyChordPts[1][1] = historyChordBeg.y() + (historyChordEnd.y() - historyChordBeg.y()) * 0.66;
                 historyChordPts[2][0] = historyChordEnd.x(); historyChordPts[2][1] = historyChordEnd.y() + (historyChordBeg.y() - historyChordEnd.y()) * 0.66;
@@ -293,6 +304,57 @@ const QRectF Tag::paintTimeline(bool before) {
                 glDisable(GL_MAP1_VERTEX_3);
             }
             glLineWidth(1);
+        }
+
+        //Hash tags
+        if(hashTags.count()) {
+            QColor colorAlpha = color;
+
+            //Anchors
+            QPointF hashChordBegCtr = timelineBoundingRect.center();
+            QPointF hashChordBegTop(timelineBoundingRect.center().x(), timelineBoundingRect.top()    + 1);
+            QPointF hashChordBegBtm(timelineBoundingRect.center().x(), timelineBoundingRect.bottom() - 1);
+            GLfloat hashChordPts[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+            glLineWidth(1);
+            glLineStipple(5, 0xAAAA);
+            glEnable(GL_LINE_STIPPLE);
+            foreach(Tag *hashTag, hashTags) {
+                if((hashTag == this) || (!hashTag))
+                    continue;
+
+                //Color
+                if(((hashTag->type == TagTypeGlobal) && (type != TagTypeGlobal)) || ((type == TagTypeGlobal) && (hashTag->type != TagTypeGlobal)))
+                    colorAlpha.setAlphaF(0.1);
+                else
+                    colorAlpha.setAlphaF(0.4);
+                Global::timelineGL->qglColor(colorAlpha);
+
+
+                //Anchors
+                QPointF hashChordEndCtr = hashTag->timelineBoundingRect.center() - timelinePos + hashTag->timelinePos;
+                QPointF hashChordEndTop = QPointF(hashChordEndCtr.x(), hashTag->timelineBoundingRect.top()    + 1 - timelinePos.y() + hashTag->timelinePos.y());
+                QPointF hashChordEndBtm = QPointF(hashChordEndCtr.x(), hashTag->timelineBoundingRect.bottom() - 1 - timelinePos.y() + hashTag->timelinePos.y());
+
+                QPointF hashChordBeg = hashChordBegCtr, hashChordEnd = hashChordEndCtr;
+                /*
+                if(hashChordEndCtr.y() == hashChordBegCtr.y())      { hashChordBeg = hashChordBegCtr;   hashChordEnd = hashChordEndCtr;   }
+                else if(hashChordEndCtr.y() < hashChordBegCtr.y())  { hashChordBeg = hashChordBegTop;   hashChordEnd = hashChordEndBtm;   }
+                else                                                { hashChordBeg = hashChordBegBtm;   hashChordEnd = hashChordEndTop;   }
+                */
+                hashChordPts[0][0] = hashChordBeg.x(); hashChordPts[0][1] = hashChordBeg.y();
+                hashChordPts[1][0] = hashChordBeg.x(); hashChordPts[1][1] = hashChordBeg.y() + (hashChordEnd.y() - hashChordBeg.y()) * 0.66;
+                hashChordPts[2][0] = hashChordEnd.x(); hashChordPts[2][1] = hashChordEnd.y() + (hashChordBeg.y() - hashChordEnd.y()) * 0.66;
+                hashChordPts[3][0] = hashChordEnd.x(); hashChordPts[3][1] = hashChordEnd.y();
+                glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &hashChordPts[0][0]);
+                glEnable(GL_MAP1_VERTEX_3);
+                glBegin(GL_LINE_STRIP);
+                for(qreal t = 0 ; t <= 1.05; t += 0.05)
+                    glEvalCoord1f(t);
+                glEnd();
+                glDisable(GL_MAP1_VERTEX_3);
+            }
+            glLineWidth(1);
+            glDisable(GL_LINE_STIPPLE);
         }
 
 
@@ -372,7 +434,7 @@ const QRectF Tag::paintTimeline(bool before) {
         //Snapping
         if((Global::selectedTagHoverSnapped >= 0) && (Global::selectedTagHover == this) && (Global::selectedTagInAction)) {
             Tag *snappedTag = (Tag*)Global::selectedTagInAction;
-            qint16 pos = Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + Global::timeUnit * Global::selectedTagHoverSnapped - timelinePos.x();
+            qint16 pos = Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * Global::selectedTagHoverSnapped - timelinePos.x();
 
             Global::timelineGL->qglColor(Global::colorAlternateStrong);
             glLineStipple(5, 0xAAAA);
@@ -383,8 +445,6 @@ const QRectF Tag::paintTimeline(bool before) {
             glEnd();
             glDisable(GL_LINE_STIPPLE);
         }
-
-        glScissor(Global::timelineHeaderSize.width() /*+ Global::timelineNegativeHeaderWidth*/, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width()/* - Global::timelineNegativeHeaderWidth*/, Global::timelineGL->height());
         glPopMatrix();
     }
     return timelineBoundingRect.translated(timelinePos);
@@ -427,19 +487,33 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
 
         //Progression
         isInProgress = false;
+        bool isBlinking = false;
         QRectF progressionRect(viewerBoundingRect.topLeft(), QSizeF(viewerBoundingRect.width(), 5));
         if((type == TagTypeContextualMilestone) && (blinkTime)) {
             isInProgress = true;
             blinkTime = qMax(0., blinkTime-20);
             if(qFloor(blinkTime / 250) % 2) {
-                Global::viewerGL->qglColor(Global::colorProgression);
-                GlRect::drawRect(progressionRect);
+                if(document->type == DocumentTypeMarker) {
+                    isBlinking = true;
+                    Global::viewerGL->qglColor(color);
+                    GlRect::drawRect(viewerBoundingRect);
+                }
+                else {
+                    Global::viewerGL->qglColor(Global::colorProgression);
+                    GlRect::drawRect(progressionRect);
+                }
             }
         }
         else if((0.001 < progression) && (progression < 0.999)) {
             isInProgress = true;
-            Global::viewerGL->qglColor(Global::colorProgression);
-            GlRect::drawRect(QRectF(progressionRect.topLeft(), QSizeF(progressionRect.width() * progression, progressionRect.height())));
+            if(document->type == DocumentTypeMarker) {
+                Global::viewerGL->qglColor(color);
+                GlRect::drawRect(QRectF(progressionRect.topLeft(), QSizeF(progressionRect.width() * progression, viewerBoundingRect.height())));
+            }
+            else {
+                Global::viewerGL->qglColor(Global::colorProgression);
+                GlRect::drawRect(QRectF(progressionRect.topLeft(), QSizeF(progressionRect.width() * progression, progressionRect.height())));
+            }
         }
 
         //Bar
@@ -451,11 +525,12 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         Global::viewerGL->qglColor(barColor);
         if(hasThumbnail)
             GlRect::drawRect(thumbnailRect.adjusted(-5, -5, 5, 5));
+        else if(document->type == DocumentTypeMarker)
+            GlRect::drawRect(QRectF(viewerBoundingRect.topLeft(), QSizeF(5, viewerBoundingRect.height())));
         else {
-            qreal shape = (document->type == DocumentTypeMarker)?(M_PI/2):(M_PI/4);
             if(isTagLastVersion(this))
-                GlRect::drawRoundedRect(viewerBoundingRect.adjusted(7, 7, -75, -7).translated(QPointF(60, 0)), false, shape);
-            GlRect::drawRoundedRect(viewerBoundingRect.adjusted(7, 7, -75, -7).translated(QPointF(60, 0)), true, shape);
+                GlRect::drawRoundedRect(viewerBoundingRect.adjusted(7, 7, -75, -7).translated(QPointF(60, 0)), false, M_PI/4);
+            GlRect::drawRoundedRect(viewerBoundingRect.adjusted(7, 7, -75, -7).translated(QPointF(60, 0)), true, M_PI/4);
         }
 
 
@@ -486,8 +561,9 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         }
 
         //Texte
-        if((Global::selectedTag == this) || ((isTagLastVersion(this) && (!hasThumbnail))))  Global::viewerGL->qglColor(Qt::black);
-        else                                                                                     Global::viewerGL->qglColor(barColor);
+        if((isBlinking) || (isInProgress))                                                                                                  Global::viewerGL->qglColor(Qt::white);
+        else if(((Global::selectedTag == this) || ((isTagLastVersion(this) && (!hasThumbnail)))) && (document->type != DocumentTypeMarker)) Global::viewerGL->qglColor(Qt::black);
+        else                                                                                                                                Global::viewerGL->qglColor(barColor);
         QString texte = document->getMetadata("Rekall", "Name", documentVersion).toString();
         if(type == TagTypeContextualTime)
             texte += QString(" (%1)").arg(Global::timeToString(getDuration()));
@@ -585,8 +661,8 @@ void Tag::snapTime(qreal *time) {
 
 
 bool Tag::isAcceptableWithFilters() {
-    return (   Global::tagFilterCriteria->displayLinked) ||
-            ((!Global::tagFilterCriteria->displayLinked) && (isTagLastVersion(this)));
+    return (   Global::timelineGL->showHistory) ||
+            ((!Global::timelineGL->showHistory) && (isTagLastVersion(this)));
 }
 bool Tag::isAcceptableWithSortFilters() {
     return (isAcceptableWithFilters()) && (getDocument()->isAcceptableWithSortFilters(documentVersion));

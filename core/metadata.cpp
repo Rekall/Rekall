@@ -126,7 +126,7 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     }
 
     if(!file.exists())
-        setMetadata("Rekall", "Type",  "Marker", version);
+        setMetadata("Rekall", "Type",  "Cue", version);
     setMetadata("Rekall", "Name",         name, version);
     setMetadata("Rekall", "Author",       Global::userInfos->getInfo("User Name"), version);
     quint16 tirage = Global::alea(0, 100);
@@ -292,10 +292,10 @@ void Metadata::setMetadata(const QMetaDictionnay &metaDictionnay) {
 
 
 bool Metadata::isAcceptableWithSortFilters(qint16 version) {
-    return (function == DocumentFunctionRender) || (Global::tagSortCriteria->isAcceptableWithFilters(getCriteriaSort(version)));
+    return (function == DocumentFunctionRender) || ((Global::tagSortCriteria->isAcceptableWithFilters(getCriteriaSort(version))) && (Global::tagFilterCriteria->isAcceptableWithFilters(getCriteriaFilter(version))));
 }
 bool Metadata::isAcceptableWithColorFilters(qint16 version) {
-    return (function == DocumentFunctionRender) || (Global::tagColorCriteria->isAcceptableWithFilters(getCriteriaColor(version)));
+    return ((function == DocumentFunctionContextual) && (Global::tagColorCriteria->isAcceptableWithFilters(getCriteriaColor(version)))) && (Global::tagFilterCriteria->isAcceptableWithFilters(getCriteriaFilter(version)));
 }
 bool Metadata::isAcceptableWithClusterFilters(qint16 version) {
     return Global::tagClusterCriteria->isAcceptableWithFilters(getCriteriaCluster(version));
@@ -307,18 +307,27 @@ const QString Metadata::getAcceptableWithClusterFilters(qint16 version) {
 
 
 
-const QString Metadata::getCriteriaSortFormated(qint16 version) {
-    return Global::tagSortCriteria->getCriteriaFormated(getCriteriaSort(version));
-}
-const QString Metadata::getCriteriaColorFormated(qint16 version) {
-    return Global::tagColorCriteria->getCriteriaFormated(getCriteriaColor(version));
-}
-const QString Metadata::getCriteriaClusterFormated(qint16 version) {
-    return Global::tagClusterCriteria->getCriteriaFormated(getCriteriaCluster(version));
-}
 const QString Metadata::getCriteriaColor(qint16 version) {
+    if(function == DocumentFunctionRender) return "";
     return getMetadata(Global::tagColorCriteria->tagNameCategory, Global::tagColorCriteria->tagName, version).toString(Global::tagColorCriteria->left, Global::tagColorCriteria->leftLength);
 }
+const QString Metadata::getCriteriaColorFormated(qint16 version) {
+    if(function == DocumentFunctionRender) return "";
+    return Global::tagColorCriteria->getCriteriaFormated(getCriteriaColor(version));
+}
+const QString Metadata::getCriteriaCluster(qint16 version) {
+    if(function == DocumentFunctionRender) return "";
+    return getMetadata(Global::tagClusterCriteria->tagNameCategory, Global::tagClusterCriteria->tagName, version).toString(Global::tagClusterCriteria->left, Global::tagClusterCriteria->leftLength);
+}
+const QString Metadata::getCriteriaClusterFormated(qint16 version) {
+    if(function == DocumentFunctionRender) return "";
+    return Global::tagClusterCriteria->getCriteriaFormated(getCriteriaCluster(version));
+}
+const QString Metadata::getCriteriaFilter(qint16 version) {
+    if(function == DocumentFunctionRender) return "";
+    return getMetadata(Global::tagFilterCriteria->tagNameCategory, Global::tagFilterCriteria->tagName, version).toString(Global::tagFilterCriteria->left, Global::tagFilterCriteria->leftLength);
+}
+
 const QString Metadata::getCriteriaSort(qint16 version) {
     if(function == DocumentFunctionRender) {
         if(Global::tagSortCriteria->asDate)
@@ -329,12 +338,13 @@ const QString Metadata::getCriteriaSort(qint16 version) {
     else
         return getMetadata(Global::tagSortCriteria->tagNameCategory, Global::tagSortCriteria->tagName, version).toString(Global::tagSortCriteria->left, Global::tagSortCriteria->leftLength);
 }
-const QString Metadata::getCriteriaCluster(qint16 version) {
-    return getMetadata(Global::tagClusterCriteria->tagNameCategory, Global::tagClusterCriteria->tagName, version).toString(Global::tagClusterCriteria->left, Global::tagClusterCriteria->leftLength);
+const QString Metadata::getCriteriaSortFormated(qint16 version) {
+    return Global::tagSortCriteria->getCriteriaFormated(getCriteriaSort(version));
 }
 const MetadataElement Metadata::getCriteriaSortRaw(qint16 version) {
     return getMetadata(Global::tagSortCriteria->tagNameCategory, Global::tagSortCriteria->tagName, version);
 }
+
 const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) {
     QPair<QString, QPixmap> retour;
     if(!photo.isNull())

@@ -12,13 +12,12 @@ class Sorting : public QWidget {
     Q_OBJECT
     
 public:
-    explicit Sorting(bool filter, const QString &title, quint16 index = 0, QWidget *parent = 0);
+    explicit Sorting(const QString &title, quint16 index = 0, QWidget *parent = 0);
     ~Sorting();
 
 
 public:
-    bool isFilter, asNumber, asDate, sortAscending;
-    UiBool displayLinked;
+    bool asNumber, asDate, sortAscending;
     QString tagName, tagNameCategory;
     qint16 left, leftLength;
 

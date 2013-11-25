@@ -18,7 +18,7 @@ qreal        Global::timelineTagThumbHeight       = 40;
 qreal        Global::timelineTagVSpacing          = 2;
 qreal        Global::timelineTagVSpacingSeparator = 5;
 QSizeF       Global::timelineHeaderSize           = QSizeF(240, 15);
-qreal        Global::timelineNegativeHeaderWidth  = 35;
+qreal        Global::timelineGlobalDocsWidth  = 35;
 qreal        Global::viewerTagHeight              = 30;
 qreal        Global::time                         = 0;
 qreal        Global::thumbnailSlider              = 0;
@@ -33,9 +33,9 @@ qreal        Global::breathingFastDest            = 1;
 QTime        Global::timer;
 UiBool       Global::showHelp                     = true;
 bool         Global::timerPlay                    = false;
-void*        Global::selectedTagInAction                  = 0;
-void*        Global::selectedTag             = 0;
-void*        Global::selectedTagHover         = 0;
+void*        Global::selectedTagInAction          = 0;
+void*        Global::selectedTag                  = 0;
+void*        Global::selectedTagHover             = 0;
 qreal        Global::selectedTagHoverSnapped      = -1;
 QMap<QString,void*> Global::renders;
 TagSelection Global::selectedTagMode              = TagSelectionMove;
@@ -45,9 +45,9 @@ Udp*         Global::udp                          = 0;
 QFont        Global::font;
 QFont        Global::fontSmall;
 GlVideo*     Global::video                        = 0;
-QTreeWidget*  Global::chutier                      = 0;
-ProjectBase*  Global::currentProject               = 0;
-UserInfosBase* Global::userInfos                = 0;
+QTreeWidget*   Global::chutier                    = 0;
+ProjectBase*   Global::currentProject             = 0;
+UserInfosBase* Global::userInfos                  = 0;
 
 QColor       Global::colorAlternate               = QColor(255, 255, 255, 12);
 QColor       Global::colorAlternateLight          = QColor(255, 255, 255,  8);
@@ -108,6 +108,16 @@ const QString Global::timeToString(qreal time) {
 
     return timeStr;
 }
+qreal Global::stringToTime(const QString &timeStr) {
+    qreal time = 0;
+    if(timeStr.count()) {
+        QStringList timeParts = timeStr.split(":");
+        if(timeParts.count() > 1)
+            time = timeParts.last().toDouble() + timeParts.at(timeParts.count() - 2).toDouble() * 60;
+    }
+    return time;
+}
+
 const QString Global::dateToString(const QDateTime &date, bool addExactTime) {
     quint16 daysTo   = date.daysTo(QDateTime::currentDateTime());
     quint16 secsTo   = date.secsTo(QDateTime::currentDateTime());

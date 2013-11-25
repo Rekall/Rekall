@@ -2,6 +2,7 @@
 #define TIMELINE_H
 
 #include <QWidget>
+#include <QInputDialog>
 #include "gui/timelinegl.h"
 
 namespace Ui {
@@ -29,6 +30,8 @@ protected:
     const QRectF paintViewer();
     bool mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool);
     bool mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool);
+public:
+    bool jumpTo();
 
 public slots:
     void action();

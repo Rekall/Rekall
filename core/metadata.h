@@ -150,8 +150,10 @@ public:
     inline const QColor getColor() {
         if(Global::colorForMeta.contains(getCriteriaColorFormated()))
             return Global::colorForMeta.value(getCriteriaColorFormated()).first;
+        else if(function == DocumentFunctionRender)
+            return QColor(226, 226, 226);
         else
-            return Qt::lightGray;
+            return QColor(226, 226, 226, 46);
     }
 
 
@@ -174,12 +176,13 @@ public:
     void setMetadata(const QMetaDictionnay &metaDictionnay);
 public:
     const QString getCriteriaSort(qint16 version = -1);
-    const QString getCriteriaCluster(qint16 version = -1);
-    const MetadataElement getCriteriaSortRaw(qint16 version);
-    const QString getCriteriaColor(qint16 version = -1);
     const QString getCriteriaSortFormated(qint16 version = -1);
-    const QString getCriteriaColorFormated(qint16 version = -1);
+    const MetadataElement getCriteriaSortRaw(qint16 version);
+    const QString getCriteriaCluster(qint16 version = -1);
     const QString getCriteriaClusterFormated(qint16 version = -1);
+    const QString getCriteriaColor(qint16 version = -1);
+    const QString getCriteriaColorFormated(qint16 version = -1);
+    const QString getCriteriaFilter(qint16 version = -1);
     bool isAcceptableWithSortFilters(qint16 version = -1);
     bool isAcceptableWithColorFilters(qint16 version = -1);
     bool isAcceptableWithClusterFilters(qint16 version = -1);

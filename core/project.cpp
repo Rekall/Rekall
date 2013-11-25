@@ -32,7 +32,7 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
             document->updateFeed();
 
             if(debug) {
-                if(file.baseName() == "Plan de salle 2") {
+                if(file.baseName() == "NxSimoneMorphing") {
                     for(quint16 i = 1 ; i < 10 ; i++) {
                         if(document->updateFile(file, -1, i))
                             document->createTagBasedOnPrevious();
@@ -110,7 +110,7 @@ void Project::fireEvents() {
             QString colorKey = document->getCriteriaColorFormated();
             if((document->isAcceptableWithColorFilters()) && (document->isAcceptableWithSortFilters())) {
                 if(!Global::colorForMeta.contains(colorKey))
-                    Global::colorForMeta[colorKey] = QPair<QColor, qreal>(Qt::black, 0);
+                    Global::colorForMeta[colorKey] = QPair<QColor, qreal>(Qt::white, 0);
                 Global::colorForMeta.insert(colorKey, QPair<QColor, qreal>(Global::colorForMeta.value(colorKey).first, Global::colorForMeta.value(colorKey).second + 1));
                 documentPerColorCount++;
             }
@@ -119,7 +119,7 @@ void Project::fireEvents() {
         QMutableMapIterator<QString, QPair<QColor, qreal> > colorForMetaIterator(Global::colorForMeta);
         while(colorForMetaIterator.hasNext()) {
             colorForMetaIterator.next();
-            QColor color = Global::getColorScale(index / (qreal)(Global::colorForMeta.count()-1));;
+            QColor color = Global::getColorScale(index / (qreal)(Global::colorForMeta.count()));
             if(Global::colorForMeta.count() == 7)
                 color = Global::getColorScale((index+1)*100);
             //color.setHsvF(0.7 * index / (qreal)(Global::colorForMeta.count()-1), 0.7, 0.7);
@@ -146,7 +146,7 @@ void Project::fireEvents() {
 
     //Opacity
     if((Global::selectedTag) && (Global::timelineGL->showLegendDest))  categoryColorOpacityDest = 0.3;
-    else                                                                    categoryColorOpacityDest = 1;
+    else                                                               categoryColorOpacityDest = 1;
     categoryColorOpacity = categoryColorOpacity + (categoryColorOpacityDest - categoryColorOpacity) / Global::inertie;
     QMutableMapIterator<QString, QPair<QColor, qreal> > colorForMetaIterator(Global::colorForMeta);
     while(colorForMetaIterator.hasNext()) {
@@ -187,7 +187,7 @@ const QRectF Project::paintTimeline(bool before) {
             }
 
             //Find phases
-            if(Global::phases->needCalulation) {
+            if((Global::tagSortCriteria->asDate) && (Global::phases->needCalulation)) {
                 Global::phases->metaElements.clear();
                 foreach(Document *document, documents)
                     foreach(Tag *tag, document->tags)
@@ -208,6 +208,7 @@ const QRectF Project::paintTimeline(bool before) {
 
                     //Resets histry
                     tag->historyTags.clear();
+                    tag->hashTags.clear();
 
                     //Add to timeline if displayable
                     if(tag->isAcceptableWithSortFilters()) {
@@ -226,28 +227,51 @@ const QRectF Project::paintTimeline(bool before) {
                     }
                 }
 
-                //History tags
-                if(Global::tagFilterCriteria->displayLinked) {
-                    if(Global::tagSortCriteria->asDate) {
-                        //Sort by version number
-                        QList<Tag*> historyTagsVersionBefore;
-                        for(quint16 version = 0 ; version < document->getMetadataCount() ; version++) {
-                            QList<Tag*> historyTagsVersionNow;
-                            foreach(Tag* tag, documentHistoryTags) {
-                                if(tag->getDocumentVersion() == version) {
-                                    tag->historyTags = historyTagsVersionBefore;
-                                    historyTagsVersionNow.append(tag);
-                                }
+                //More histories with hash detection
+                QList<Tag*> hashTags;
+                QString documentHash = document->getMetadata("File", "Hash").toString();
+                if(!documentHash.isEmpty())
+                    foreach(Document *documentHashSearch, documents)
+                        if((document != documentHashSearch) && (documentHash == documentHashSearch->getMetadata("File", "Hash").toString())) {
+                            foreach(Tag *tagHashToAdd, documentHashSearch->tags) {
+                                bool okAddTag = true;
+                                foreach(Tag *tag, document->tags)
+                                    if(tagHashToAdd->hashTags.contains(tag)) {
+                                        okAddTag = false;
+                                        break;
+                                    }
+                                if(okAddTag)
+                                    hashTags.append(tagHashToAdd);
                             }
-                            historyTagsVersionBefore = historyTagsVersionNow;
+                        }
+
+                //History tags
+                if(Global::timelineGL->showHistory) {
+                    if(documentHistoryTags.count()) {
+                        if(Global::tagSortCriteria->asDate) {
+                            //Sort by version number
+                            QList<Tag*> historyTagsVersionBefore;
+                            for(quint16 version = 0 ; version < document->getMetadataCount() ; version++) {
+                                QList<Tag*> historyTagsVersionNow;
+                                foreach(Tag* tag, documentHistoryTags) {
+                                    if(tag->getDocumentVersion() == version) {
+                                        tag->historyTags = historyTagsVersionBefore;
+                                        historyTagsVersionNow.append(tag);
+                                    }
+                                }
+                                historyTagsVersionBefore = historyTagsVersionNow;
+                            }
+                        }
+                        else {
+                            //Add history tags to last version tag
+                            foreach(Tag* tag, documentHistoryTags)
+                                if(Tag::isTagLastVersion(tag))
+                                    tag->historyTags = documentHistoryTags;
                         }
                     }
-                    else {
-                        //Add history tags to last version tag
-                        foreach(Tag* tag, documentHistoryTags)
-                            if(Tag::isTagLastVersion(tag))
-                                tag->historyTags = documentHistoryTags;
-                    }
+                    //Add history tags to last version tag
+                    foreach(Tag* tag, document->tags)
+                        tag->hashTags.append(hashTags);
                 }
             }
 
@@ -336,7 +360,7 @@ const QRectF Project::paintTimeline(bool before) {
                 /*
                 QRectF categoryHeatRect = QRectF(QPointF(tagCategoryRect.left() + tagCategoryRect.width() - 2, tagCategoryRect.top()), QSizeF(Global::timelineNegativeHeaderWidth, tagCategoryRect.height()));
                 if(Global::timelineGL->visibleRect.intersects(categoryHeatRect.translated(QPointF(0, Global::timelineHeaderSize.height())))) {
-                    glScissor(Global::timelineHeaderSize.width() - 2, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
+                    gllScissor(Global::timelineHeaderSize.width() - 2, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
                     quint16 val = nbTagsPerCategory * 255. / nbTagsPerCategories;
                     if(drawToggle)
                         Global::timelineGL->qglColor(Global::colorTextBlack);
@@ -344,7 +368,7 @@ const QRectF Project::paintTimeline(bool before) {
                         Global::timelineGL->qglColor(QColor(255, 255, 255, val/2));
                     GlRect::drawRect(categoryHeatRect);
                     guiCategories.append(qMakePair(categoryHeatRect.translated(QPointF(0, Global::timelineHeaderSize.height())), qMakePair(phase, sorting)));
-                    glScissor(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth, Global::timelineGL->height());
+                    gllScissor(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth, Global::timelineGL->height());
                 }
                 */
                 guiCategories.append(qMakePair(tagCategoryRect.translated(QPointF(0, Global::timelineHeaderSize.height())), qMakePair(phase, sorting)));
@@ -401,7 +425,7 @@ const QRectF Project::paintTimeline(bool before) {
                             }
                             if(!tagZoneIntersection) {
                                 if(tag->type == TagTypeGlobal) {
-                                    if(tagPosOffset.x() < Global::timelineNegativeHeaderWidth-2*Global::timelineTagHeight) {
+                                    if(tagPosOffset.x() < Global::timelineGlobalDocsWidth-2*Global::timelineTagHeight) {
                                         tagPosOffset +=   QPointF(Global::timelineTagHeight, 0);
                                         tagRect.translate(QPointF(Global::timelineTagHeight, 0));
                                     }
@@ -416,7 +440,7 @@ const QRectF Project::paintTimeline(bool before) {
                                 }
                             }
                             else
-                                tag->setTimelinePos(tagPosOffset + tagSortPosOffset + QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0));
+                                tag->setTimelinePos(tagPosOffset + tagSortPosOffset + QPointF(Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth, 0));
                         }
                         //Drawing
                         retour = retour.united(tag->paintTimeline(before));
@@ -433,7 +457,7 @@ const QRectF Project::paintTimeline(bool before) {
 
                 //Draw category background
                 if(Global::timelineGL->visibleRect.intersects(tagCategoryRect.translated(QPointF(0, Global::timelineHeaderSize.height())))) {
-                    glDisable(GL_SCISSOR_TEST);
+                    glScissor(0, 0, Global::timelineGL->width(), Global::timelineGL->height() - Global::timelineHeaderSize.height());
                     if(drawToggle) {
                         Global::timelineGL->qglColor(Global::colorAlternate);
                         GlRect::drawRect(tagCategoryRect);
@@ -476,7 +500,7 @@ const QRectF Project::paintTimeline(bool before) {
                         GlRect::drawRoundedRect(toggleRect, true);
                         guiToggles.append(qMakePair(toggleRect.translated(QPointF(0, Global::timelineHeaderSize.height())), drawToggleActive));
                     }
-                    glEnable(GL_SCISSOR_TEST);
+                    glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height() - Global::timelineHeaderSize.height());
                 }
                 //Super separator si big change of category
                 qreal vSpacing = Global::timelineTagVSpacingSeparator+1;
@@ -502,45 +526,46 @@ const QRectF Project::paintTimeline(bool before) {
                 categoryStart   .setY(yCategoryMax + vSpacing);
                 categoryIndex++;
             }
-            QRectF phaseRect = QRectF(phaseStart, QPointF(12, categoryStart.y() - Global::timelineTagVSpacingSeparator)).translated(Global::timelineGL->scroll.x(), 0);
-            glDisable(GL_SCISSOR_TEST);
-            Global::timelineGL->qglColor(Global::colorAlternateMore);
-            GlRect::drawRect(phaseRect);
 
-            Global::timelineGL->qglColor(Qt::white);
-            glPushMatrix();
-            QSize tagPhaseTextSize(phaseRect.size().height(), phaseRect.size().width());
-            glTranslatef(phaseRect.bottomLeft().x(), phaseRect.bottomLeft().y(), 0);
-            glRotatef(-90, 0, 0, 1);
-            bool textFound = false;
-            if(timelinePhases.count() > 1000)
-                timelinePhases.clear();
-            foreach(GlText timelinePhase, timelinePhases) {
-                if((timelinePhase.text == phase) && (timelinePhase.size == tagPhaseTextSize)) {
-                    timelinePhase.drawText();
-                    textFound = true;
+            if(Global::tagSortCriteria->asDate) {
+                QRectF phaseRect = QRectF(phaseStart, QPointF(12, categoryStart.y() - Global::timelineTagVSpacingSeparator)).translated(Global::timelineGL->scroll.x(), 0);
+                glScissor(0, 0, Global::timelineGL->width(), Global::timelineGL->height() - Global::timelineHeaderSize.height());
+                Global::timelineGL->qglColor(Global::colorAlternateMore);
+                GlRect::drawRect(phaseRect);
+
+                Global::timelineGL->qglColor(Qt::white);
+                glPushMatrix();
+                QSize tagPhaseTextSize(phaseRect.size().height(), phaseRect.size().width());
+                glTranslatef(phaseRect.bottomLeft().x(), phaseRect.bottomLeft().y(), 0);
+                glRotatef(-90, 0, 0, 1);
+                bool textFound = false;
+                if(timelinePhases.count() > 1000)
+                    timelinePhases.clear();
+                foreach(GlText timelinePhase, timelinePhases) {
+                    if((timelinePhase.text == phase) && (timelinePhase.size == tagPhaseTextSize)) {
+                        timelinePhase.drawText();
+                        textFound = true;
+                    }
                 }
+                if(!textFound) {
+                    GlText tagPhaseText;
+                    tagPhaseText.setStyle(tagPhaseTextSize, Qt::AlignCenter, Global::font);
+                    tagPhaseText.drawText(phase);
+                    timelinePhases << tagPhaseText;
+                }
+                glPopMatrix();
+                glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height() - Global::timelineHeaderSize.height());
             }
-            if(!textFound) {
-                GlText tagPhaseText;
-                tagPhaseText.setStyle(tagPhaseTextSize, Qt::AlignCenter, Global::font);
-                tagPhaseText.drawText(phase);
-                timelinePhases << tagPhaseText;
-            }
-            glPopMatrix();
-            glEnable(GL_SCISSOR_TEST);
             phaseStart.setY(categoryStart.y());
         }
 
         //Drawing clusters
         if(!Global::tagClusterCriteria->tagName.isEmpty()) {
-            glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
             QMapIterator<QPair<QString, QString>, Cluster*> timelineClustersIterator(timelineClusters);
             while(timelineClustersIterator.hasNext()) {
                 timelineClustersIterator.next();
                 timelineClustersIterator.value()->paintTimeline();
             }
-            glScissor(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth, 0, Global::timelineGL->width() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth, Global::timelineGL->height());
         }
 
         glPopMatrix();
@@ -570,6 +595,7 @@ const QRectF Project::paintTimeline(bool before) {
         }
         */
     }
+    glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
     return retour;
 }
 
@@ -613,10 +639,10 @@ const QRectF Project::paintViewer() {
 
 QPointF Project::getTimelineCursorPos(qreal time) {
     //Linear cursor
-    return QPointF(Global::timelineHeaderSize.width() + Global::timelineNegativeHeaderWidth + Global::timeUnit * time, 0);
+    return QPointF(Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * time, 0);
 }
 qreal Project::getTimelineCursorTime(const QPointF &pos) {
-    qreal cursorTime = qMax(0., (pos.x() - Global::timelineHeaderSize.width() - Global::timelineNegativeHeaderWidth) / Global::timeUnit);
+    qreal cursorTime = qMax(0., (pos.x() - Global::timelineHeaderSize.width() - Global::timelineGlobalDocsWidth) / Global::timeUnit);
     Global::selectedTagHoverSnapped = -1;
     if((Global::selectedTagHover) && (Global::selectedTagHover != Global::selectedTagInAction))
         ((Tag*)Global::selectedTagHover)->snapTime(&cursorTime);
