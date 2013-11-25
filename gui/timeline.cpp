@@ -215,19 +215,19 @@ void Timeline::actionDisplayed(bool val) {
 }
 void Timeline::actionChanged(QString text, QString text2) {
     if(sender() == Global::tagFilterCriteria) {
-        if(text2.isEmpty())  ui->filterBy->setText(tr("NO FILTERS"));
+        if(text2.isEmpty())  ui->filterBy->setText(tr("NO FILTER"));
         else                 ui->filterBy->setText(tr("FILTER: %1").arg(text2));
     }
     else if(sender() == Global::tagSortCriteria)
-        ui->sortBy->setText(tr("SORTING").arg(text));
+        ui->sortBy->setText(tr("SORTING"));//.arg(text));
     else if(sender() == Global::tagColorCriteria)
-        ui->colorBy->setText(tr("COLORS").arg(text));
+        ui->colorBy->setText(tr("COLORS"));//.arg(text));
     else if(sender() == Global::tagClusterCriteria) {
         if(text2.isEmpty())  ui->clusterBy->setText(tr("NO HIGHLIGHT"));
         else                 ui->clusterBy->setText(tr("HIGHLIGHT: %1").arg(text2));
     }
     else if(sender() == Global::phases)
-        ui->phaseBy->setText(tr("PHASES").arg(text));
+        ui->phaseBy->setText(tr("PHASES"));//.arg(text));
     Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
     Global::timelineGL->scrollTo();
     Global::viewerGL  ->scrollTo();

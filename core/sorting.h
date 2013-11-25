@@ -20,6 +20,7 @@ public:
     bool asNumber, asDate, sortAscending;
     QString tagName, tagNameCategory;
     qint16 left, leftLength;
+    bool isUpdating;
 
 
 private:
@@ -49,6 +50,11 @@ public:
     const QString getMatchName() const;
 
 public:
+    void startCheckChange();
+    void addCheck(const QString &check, const QString &value);
+    bool isChecked(const QString &check) const;
+
+public:
     QDomElement serialize(QDomDocument &xmlDoc);
     void deserialize(const QDomElement &xmlElement);
 
@@ -57,6 +63,7 @@ signals:
 
 public slots:
     void action();
+    void actionSelection();
 
 private:
     Ui::Sorting *ui;

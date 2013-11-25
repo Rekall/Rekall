@@ -21,6 +21,10 @@ Sorting::Sorting(const QString &title, quint16 index, QWidget *parent) :
     ui->filter->addItem("Fullname",     "Rekall->Name");
     ui->filter->addItem("First letter (name)", "Rekall->Name | 1");
     ui->filter->setCurrentIndex(index);
+    ui->checks->setColumnWidth(0, 150);
+    ui->checks->sortByColumn(1, Qt::AscendingOrder);
+    isUpdating = false;
+    actionSelection();
 }
 
 void Sorting::showEvent(QShowEvent *) {
@@ -52,32 +56,66 @@ void Sorting::setTagname(const QString &_tagName) {
 }
 
 void Sorting::action() {
-    if(ui->filter->count()) {
-        QString filterText = ui->filter->itemData(ui->filter->currentIndex()).toString();
-        if(filterText.isEmpty())
-            filterText = ui->filter->currentText();
+    if(isUpdating)
+        return;
 
-        if(filterText.count()) {
-            QStringList sortSplit = filterText.split("|");
-            setTagname(sortSplit.first().trimmed());
-            if(sortSplit.count() > 1) {
-                QString leftPart = sortSplit.at(1);
-                if(leftPart.endsWith("d")) {
-                    leftPart.chop(1);
-                    sortAscending = false;
+    if((sender() == ui->checkAll) || (sender() == ui->uncheckAll) || (sender() == ui->invertAll)) {
+        QList<QTreeWidgetItem*> items;
+        if(ui->checks->selectedItems().count() > 1)
+            items = ui->checks->selectedItems();
+        else {
+            for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++)
+                if(!ui->checks->topLevelItem(i)->isHidden())
+                    items << ui->checks->topLevelItem(i);
+        }
+        foreach(QTreeWidgetItem *item, items) {
+            if(     (sender() == ui->checkAll)   && (item->checkState(0) == Qt::Unchecked))
+                item->setCheckState(0, Qt::Checked);
+            else if((sender() == ui->uncheckAll) && (item->checkState(0) == Qt::Checked))
+                item->setCheckState(0, Qt::Unchecked);
+            else if((sender() == ui->invertAll)  && (item->checkState(0) == Qt::Checked))
+                item->setCheckState(0, Qt::Unchecked);
+            else if((sender() == ui->invertAll)  && (item->checkState(0) == Qt::Unchecked))
+                item->setCheckState(0, Qt::Checked);
+        }
+    }
+    else {
+        if(ui->filter->count()) {
+            QString filterText = ui->filter->itemData(ui->filter->currentIndex()).toString();
+            if(filterText.isEmpty())
+                filterText = ui->filter->currentText();
+
+            if(filterText.count()) {
+                QStringList sortSplit = filterText.split("|");
+                setTagname(sortSplit.first().trimmed());
+                if(sortSplit.count() > 1) {
+                    QString leftPart = sortSplit.at(1);
+                    if(leftPart.endsWith("d")) {
+                        leftPart.chop(1);
+                        sortAscending = false;
+                    }
+                    if(leftPart.endsWith("f")) {
+                        leftPart.chop(1);
+                        asNumber = true;
+                    }
+                    QStringList lefts = leftPart.split(",");
+                    left = lefts.at(0).toDouble();
+                    if(lefts.count() > 1)
+                        leftLength = lefts.at(1).toDouble();
                 }
-                if(leftPart.endsWith("f")) {
-                    leftPart.chop(1);
-                    asNumber = true;
-                }
-                QStringList lefts = leftPart.split(",");
-                left = lefts.at(0).toDouble();
-                if(lefts.count() > 1)
-                    leftLength = lefts.at(1).toDouble();
             }
         }
     }
     emit(actionned(ui->filter->currentText(), ui->matches->text()));
+}
+void Sorting::actionSelection() {
+    QString suffix = "all";
+    if(ui->checks->selectedItems().count() > 1)
+        suffix = "selection";
+
+    ui->checkAll  ->setText(tr("Select %1").arg(suffix));
+    ui->uncheckAll->setText(tr("Unselect %1").arg(suffix));
+    ui->invertAll ->setText(tr("Invert %1").arg(suffix));
 }
 
 const QString Sorting::getCriteriaFormated(const QString &_criteria) {
@@ -148,6 +186,43 @@ const QString Sorting::getMatchName() const {
 
 Sorting::~Sorting() {
     delete ui;
+}
+
+void Sorting::startCheckChange() {
+    qDebug("%s", qPrintable(this->windowTitle()));
+    isUpdating = true;
+    for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
+        if(!ui->checks->topLevelItem(i)->isHidden())
+            ui->checks->topLevelItem(i)->setHidden(true);
+    }
+    isUpdating = false;
+}
+void Sorting::addCheck(const QString &check, const QString &value) {
+    isUpdating = true;
+    for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
+        if(ui->checks->topLevelItem(i)->text(0) == check) {
+            if(ui->checks->topLevelItem(i)->isHidden())         ui->checks->topLevelItem(i)->setHidden(false);
+            if(ui->checks->topLevelItem(i)->text(1) != value)   ui->checks->topLevelItem(i)->setText(1, value);
+            isUpdating = false;
+            return;
+        }
+    }
+
+    QTreeWidgetItem *checkItem = new QTreeWidgetItem(ui->checks, QStringList() << check << value);
+    checkItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
+    checkItem->setCheckState(0, Qt::Checked);
+    isUpdating = false;
+}
+bool Sorting::isChecked(const QString &check) const {
+    for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
+        if(ui->checks->topLevelItem(i)->text(0) == check) {
+            if(ui->checks->topLevelItem(i)->checkState(0) == Qt::Checked)
+                return true;
+            else
+                return false;
+        }
+    }
+    return false;
 }
 
 

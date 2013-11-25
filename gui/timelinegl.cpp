@@ -183,6 +183,32 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
     bool action = true;
     QCursor cursor = Qt::ArrowCursor;
 
+    //Légende
+    /*
+    if(showLegend > 0.01) {
+        qreal legendBaseSize = qBound(200., height() * 0.75, 400.);
+        QRectF legendRect = QRectF(width() - legendBaseSize * 1.2, height() - showLegend * legendBaseSize, legendBaseSize * 1.2, legendBaseSize);
+        legendBaseSize *= 0.8;
+        //glTranslatef(qRound(legendRect.center().x()), qRound(legendRect.center().y()), 0);
+        qreal angle = -M_PI/2, angleStep = 0;
+        QMapIterator<QString, QPair<QColor, qreal> > colorForMetaIterator(Global::colorForMeta);
+        while(colorForMetaIterator.hasNext()) {
+            colorForMetaIterator.next();
+            angleStep = 2 * M_PI * colorForMetaIterator.value().second * showLegend;
+
+            qreal legendRadiusL = legendBaseSize;
+            qreal legendRadiusS = legendBaseSize * 0.8;
+
+            qglColor(colorForMetaIterator.value().first);
+            for(qreal angleSmooth = angle ; angleSmooth <= angle + angleStep ; angleSmooth += 0.01) {
+                glVertex2f(qCos(angleSmooth) * legendRadiusL/2, qSin(angleSmooth) * legendRadiusL/2);
+                glVertex2f(qCos(angleSmooth) * legendRadiusS/2, qSin(angleSmooth) * legendRadiusS/2);
+            }
+            angle += angleStep;
+        }
+    }
+    */
+
     if(Global::selectedTagHover)
         cursor = Qt::PointingHandCursor;
     if(Global::selectedTagInAction) {
