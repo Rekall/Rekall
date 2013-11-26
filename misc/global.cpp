@@ -53,7 +53,7 @@ QColor       Global::colorAlternate               = QColor(255, 255, 255, 12);
 QColor       Global::colorAlternateLight          = QColor(255, 255, 255,  8);
 QColor       Global::colorAlternateMore           = QColor(255, 255, 255, 30);
 QColor       Global::colorAlternateStrong         = QColor(0, 0, 0, 128);
-QColor       Global::colorCluster                 = QColor(255, 255, 255, 62);
+QColor       Global::colorCluster                 = QColor(255, 255, 255, 100);
 
 QColor       Global::colorTicks                   = QColor(43, 46, 47);
 QColor       Global::colorSelection               = QColor(45, 202, 225);//QColor(50, 221, 255);

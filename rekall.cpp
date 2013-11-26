@@ -47,14 +47,17 @@ Rekall::Rekall(QWidget *parent) :
     Global::tagFilterCriteria  = new Sorting(tr("Filter rules"),     6);
     Global::tagSortCriteria    = new Sorting(tr("Sorting rules"),    2);
     Global::tagColorCriteria   = new Sorting(tr("Color rules"),      5);
-    Global::tagClusterCriteria = new Sorting(tr("Hightlight rules"), 7);
+    Global::tagClusterCriteria = new Sorting(tr("Hightlight rules"), 7, true);
 
-    Global::phases               ->setStyleSheet(styleSheet());
-    Global::tagFilterCriteria    ->setStyleSheet(styleSheet());
-    Global::tagSortCriteria      ->setStyleSheet(styleSheet());
-    Global::tagColorCriteria     ->setStyleSheet(styleSheet());
-    Global::tagClusterCriteria   ->setStyleSheet(styleSheet());
-    ui->timeline->timelineControl->setStyleSheet(styleSheet());
+    QString styleAdditionnal = "QWidget#Sorting, QWidget#Phases, QWidget#TimelineControl { background-color: transparent;}";
+    Global::tagFilterCriteria    ->setStyleSheet(styleSheet() + styleAdditionnal);
+    Global::tagSortCriteria      ->setStyleSheet(styleSheet() + styleAdditionnal);
+    Global::tagColorCriteria     ->setStyleSheet(styleSheet() + styleAdditionnal);
+    Global::tagClusterCriteria   ->setStyleSheet(styleSheet() + styleAdditionnal);
+    Global::phases               ->setStyleSheet(styleSheet() + styleAdditionnal);
+    Global::phases               ->setStyleSheet2(Global::tagFilterCriteria->styleSheet2());
+    ui->timeline->timelineControl->setStyleSheet(styleSheet() + styleAdditionnal);
+    ui->timeline->timelineControl->setStyleSheet2(Global::tagFilterCriteria->styleSheet2());
 
     connect(Global::phases,                SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(Global::tagFilterCriteria,     SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));

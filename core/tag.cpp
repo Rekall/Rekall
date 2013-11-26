@@ -275,7 +275,7 @@ const QRectF Tag::paintTimeline(bool before) {
             GLfloat historyChordPts[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
             glLineWidth(2);
             foreach(Tag *historyTag, historyTags) {
-                if((historyTag == this) || (!historyTag) || (!historyTag->isAcceptableWithSortFilters()))
+                if((historyTag == this) || (!historyTag) || (!historyTag->isAcceptableWithSortFilters(true)))
                     continue;
 
                 //Color
@@ -319,7 +319,7 @@ const QRectF Tag::paintTimeline(bool before) {
             glLineStipple(5, 0xAAAA);
             glEnable(GL_LINE_STIPPLE);
             foreach(Tag *hashTag, hashTags) {
-                if((hashTag == this) || (!hashTag) || (!hashTag->isAcceptableWithSortFilters()))
+                if((hashTag == this) || (!hashTag) || (!hashTag->isAcceptableWithSortFilters(true)))
                     continue;
 
                 //Color
@@ -660,18 +660,18 @@ void Tag::snapTime(qreal *time) {
 }
 
 
-bool Tag::isAcceptableWithFilters() {
+bool Tag::tagHistoryFilters() {
     return (   Global::timelineGL->showHistory) ||
             ((!Global::timelineGL->showHistory) && (isTagLastVersion(this)));
 }
-bool Tag::isAcceptableWithSortFilters() {
-    return (isAcceptableWithFilters()) && (getDocument()->isAcceptableWithSortFilters(documentVersion));
+bool Tag::isAcceptableWithSortFilters(bool strongCheck) {
+    return (tagHistoryFilters()) && (getDocument()->isAcceptableWithSortFilters(strongCheck, documentVersion));
 }
-bool Tag::isAcceptableWithColorFilters() {
-    return (isAcceptableWithFilters()) && (getDocument()->isAcceptableWithColorFilters(documentVersion));
+bool Tag::isAcceptableWithColorFilters(bool strongCheck) {
+    return (tagHistoryFilters()) && (getDocument()->isAcceptableWithColorFilters(strongCheck, documentVersion));
 }
-bool Tag::isAcceptableWithClusterFilters() {
-    return (isAcceptableWithFilters()) && (getDocument()->isAcceptableWithClusterFilters(documentVersion));
+bool Tag::isAcceptableWithClusterFilters(bool strongCheck) {
+    return (tagHistoryFilters()) && (getDocument()->isAcceptableWithClusterFilters(strongCheck, documentVersion));
 }
 const QString Tag::getAcceptableWithClusterFilters() {
     return getDocument()->getAcceptableWithClusterFilters(documentVersion);
@@ -697,6 +697,15 @@ const QString Tag::getCriteriaCluster(Tag *tag) {
 const MetadataElement Tag::getCriteriaSortRaw(Tag *tag) {
     return tag->document->getCriteriaSortRaw(tag->documentVersion);
 }
+const QString Tag::getCriteriaFilter(Tag *tag) {
+    if(!tag)    return "";
+    return tag->document->getCriteriaFilter(tag->documentVersion);
+}
+const QString Tag::getCriteriaFilterFormated(Tag *tag) {
+    if(!tag)    return "";
+    return tag->document->getCriteriaFilterFormated(tag->documentVersion);
+}
+
 
 const QString Tag::getCriteriaSortFormated(Tag *tag) {
     if(!tag)    return "";

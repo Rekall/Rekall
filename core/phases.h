@@ -40,6 +40,9 @@ public:
     void addToMetaElements(const MetadataElement &value) { metaElements.insert(value.toString(), value); }
     void analyse();
 
+public:
+    const QString styleSheet2() const;
+    void setStyleSheet2(const QString &str);
 protected:
     void showEvent(QShowEvent *);
     void closeEvent(QCloseEvent *);

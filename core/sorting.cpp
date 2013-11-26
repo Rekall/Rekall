@@ -1,7 +1,7 @@
 #include "sorting.h"
 #include "ui_sorting.h"
 
-Sorting::Sorting(const QString &title, quint16 index, QWidget *parent) :
+Sorting::Sorting(const QString &title, quint16 index, bool _needWord, QWidget *parent) :
     QWidget(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
     ui(new Ui::Sorting) {
 
@@ -9,6 +9,7 @@ Sorting::Sorting(const QString &title, quint16 index, QWidget *parent) :
     ui->setupUi(this);
     ui->title->setText(title);
     setWindowTitle(title);
+    needWord = _needWord;
 
     ui->filter->addItem("", "");
     ui->filter->addItem("Date (year)",  "Rekall->Date/Time | 0,4");
@@ -17,12 +18,11 @@ Sorting::Sorting(const QString &title, quint16 index, QWidget *parent) :
     ui->filter->addItem("Time (hours)", "Rekall->Date/Time | 11,2");  // 9876:43:10 87:54:21
     ui->filter->addItem("Type",         "Rekall->Type");
     ui->filter->addItem("Authors",      "Rekall->Author");
-    ui->filter->addItem("Keywords",     "Rekall->Keywords");
+    ui->filter->addItem("All Keywords", "Rekall->All");
     ui->filter->addItem("Fullname",     "Rekall->Name");
     ui->filter->addItem("First letter (name)", "Rekall->Name | 1");
     ui->filter->setCurrentIndex(index);
-    ui->checks->setColumnWidth(0, 150);
-    ui->checks->sortByColumn(1, Qt::AscendingOrder);
+    ui->checks->sortByColumn(0, Qt::AscendingOrder);
     isUpdating = false;
     actionSelection();
 }
@@ -36,6 +36,14 @@ void Sorting::closeEvent(QCloseEvent *) {
 void Sorting::hideEvent(QHideEvent *) {
     emit(displayed(false));
 }
+const QString Sorting::styleSheet2() const {
+    return styleSheet() + ui->globalFrameRed->styleSheet();
+}
+void Sorting::setStyleSheet2(const QString &str) {
+    ui->globalFrameRed->setStyleSheet(str);
+}
+
+
 
 void Sorting::setTagname(const QString &_tagName) {
     if(_tagName.count()) {
@@ -56,6 +64,13 @@ void Sorting::setTagname(const QString &_tagName) {
 }
 
 void Sorting::action() {
+    if(needWord) {
+        bool needWordValue = !(ui->matches->text().isEmpty());
+        ui->checks    ->setVisible(needWordValue);
+        ui->checkAll  ->setVisible(needWordValue);
+        ui->invertAll ->setVisible(needWordValue);
+        ui->uncheckAll->setVisible(needWordValue);
+    }
     if(isUpdating)
         return;
 
@@ -106,15 +121,20 @@ void Sorting::action() {
             }
         }
     }
-    emit(actionned(ui->filter->currentText(), ui->matches->text()));
+
+    QString text2 = ui->matches->text();
+    for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++)
+        if((!ui->checks->topLevelItem(i)->isHidden()) && (ui->checks->topLevelItem(i)->checkState(0) == Qt::Unchecked))
+            text2 = ui->filter->currentText();
+    emit(actionned(ui->filter->currentText(), text2));
 }
 void Sorting::actionSelection() {
     QString suffix = "all";
     if(ui->checks->selectedItems().count() > 1)
         suffix = "selection";
 
-    ui->checkAll  ->setText(tr("Select %1").arg(suffix));
-    ui->uncheckAll->setText(tr("Unselect %1").arg(suffix));
+    ui->checkAll  ->setText(tr("Check %1").arg(suffix));
+    ui->uncheckAll->setText(tr("Uncheck %1").arg(suffix));
     ui->invertAll ->setText(tr("Invert %1").arg(suffix));
 }
 
@@ -148,7 +168,13 @@ const QString Sorting::getCriteriaFormated(const QString &_criteria) {
         return criteria + suffix + "...";
     return criteria + suffix;
 }
-bool Sorting::isAcceptableWithFilters(const QString &_criteria) {
+bool Sorting::isAcceptable(bool strongCheck, const QString &_criteria) {
+    if(strongCheck) {
+        for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
+            if((ui->checks->topLevelItem(i)->checkState(0) == Qt::Unchecked) && (ui->checks->topLevelItem(i)->text(0) == _criteria))
+                return false;
+        }
+    }
     if(!ui->matches->text().isEmpty()) {
         QStringList matches = ui->matches->text().toLower().split(",", QString::SkipEmptyParts);
         foreach(const QString &match, matches) {
@@ -188,21 +214,29 @@ Sorting::~Sorting() {
     delete ui;
 }
 
-void Sorting::startCheckChange() {
+void Sorting::addCheckStart() {
     qDebug("%s", qPrintable(this->windowTitle()));
     isUpdating = true;
     for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
         if(!ui->checks->topLevelItem(i)->isHidden())
             ui->checks->topLevelItem(i)->setHidden(true);
     }
+    ui->checks->setColumnHidden(1, true);
     isUpdating = false;
 }
 void Sorting::addCheck(const QString &check, const QString &value) {
+    if(check.isEmpty())
+        return;
+
     isUpdating = true;
     for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
         if(ui->checks->topLevelItem(i)->text(0) == check) {
             if(ui->checks->topLevelItem(i)->isHidden())         ui->checks->topLevelItem(i)->setHidden(false);
             if(ui->checks->topLevelItem(i)->text(1) != value)   ui->checks->topLevelItem(i)->setText(1, value);
+            if(!value.isEmpty()) {
+                ui->checks->setColumnHidden(1, false);
+                ui->checks->setColumnWidth(0, 150);
+            }
             isUpdating = false;
             return;
         }
@@ -211,20 +245,12 @@ void Sorting::addCheck(const QString &check, const QString &value) {
     QTreeWidgetItem *checkItem = new QTreeWidgetItem(ui->checks, QStringList() << check << value);
     checkItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
     checkItem->setCheckState(0, Qt::Checked);
+    if(!value.isEmpty()) {
+        ui->checks->setColumnHidden(1, false);
+        ui->checks->setColumnWidth(0, 150);
+    }
     isUpdating = false;
 }
-bool Sorting::isChecked(const QString &check) const {
-    for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
-        if(ui->checks->topLevelItem(i)->text(0) == check) {
-            if(ui->checks->topLevelItem(i)->checkState(0) == Qt::Checked)
-                return true;
-            else
-                return false;
-        }
-    }
-    return false;
-}
-
 
 
 QDomElement Sorting::serialize(QDomDocument &xmlDoc) {

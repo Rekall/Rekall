@@ -69,7 +69,7 @@ public:
     bool mouseTimerOk;
     QRectF drawingBoundingRect, visibleRect;
     QPointF scroll, scrollDest;
-    UiBool showLegendDest, showLinkedRendersDest, showLinkedTagsDest, showHistory;
+    UiBool showLegendDest, showLinkedRendersDest, showLinkedTagsDest, showHistory, showHash;
     qreal showLinkedRenders, showLinkedTags;
     bool glReady;
 public:

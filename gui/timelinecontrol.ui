@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>291</width>
-    <height>200</height>
+    <width>340</width>
+    <height>287</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="globalFrameTimelineControl">
+    <widget class="QFrame" name="globalFrameRed">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -40,6 +40,18 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>12</number>
+      </property>
+      <property name="topMargin">
+       <number>12</number>
+      </property>
+      <property name="rightMargin">
+       <number>12</number>
+      </property>
+      <property name="bottomMargin">
+       <number>12</number>
       </property>
       <item>
        <widget class="QCheckBox" name="help">
@@ -55,6 +67,13 @@
        <widget class="QCheckBox" name="history">
         <property name="text">
          <string>Show document modifications history</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="hash">
+        <property name="text">
+         <string>Reveal duplicate documents</string>
         </property>
        </widget>
       </item>
@@ -140,6 +159,22 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>25</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

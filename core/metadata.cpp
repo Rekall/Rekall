@@ -95,9 +95,7 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
         typeStr = "Recording";
     setMetadata("Rekall", "Type", typeStr, version);
 
-    QString documentKeywords;
-    if(typeStr != "Other")
-        documentKeywords += typeStr.toLower() + ", ";
+    QStringList documentKeywords;
     QStringList fileTags = QDir(Global::pathDocuments.absoluteFilePath() + "/").relativeFilePath(file.absoluteFilePath()).remove(file.suffix()).toLower().replace("-", " ").replace("_", " ").split("/", QString::SkipEmptyParts);
     QStringList forbiddenTags = QStringList() << ".." << "rekall";
     foreach(const QString &fileTag, fileTags) {
@@ -105,12 +103,11 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
         foreach(QString tag, tags) {
             tag = tag.trimmed();
             if((tag.length() > 2) && (!forbiddenTags.contains(tag)))
-                documentKeywords += tag + ", ";
+                documentKeywords << tag;
         }
     }
-    documentKeywords.chop(2);
+    addKeyword(documentKeywords, version);
 
-    setMetadata("Rekall", "Keywords", documentKeywords, version);
     if(creation) {
         status = DocumentStatusWaiting;
         Global::taskList->addTask(this, TaskProcessTypeMetadata, version);
@@ -210,6 +207,21 @@ bool Metadata::updateCard(const PersonCard &card, qint16 version) {
     return creation;
 }
 
+void Metadata::addKeyword(const QStringList &keywords, qint16 version, const QString &key, const QString &category) {
+    QStringList documentKeywords = getMetadata(category, key, version).toString().split(",", QString::SkipEmptyParts);
+    documentKeywords << keywords;
+    documentKeywords.removeDuplicates();
+    QString documentKeywordsStr;
+    foreach(const QString &documentKeyword, documentKeywords)
+        documentKeywordsStr += documentKeyword.trimmed().toLower() + ", ";
+    documentKeywordsStr.chop(2);
+    setMetadata(category, key, documentKeywordsStr, version);
+}
+void Metadata::addKeyword(const QString &keyword, qint16 version, const QString &key, const QString &category) {
+    addKeyword(QStringList() << keyword, version, key, category);
+}
+
+
 void Metadata::updateFeed() {
     FeedItemBaseType feedAction = FeedItemBaseTypeCreation;
     if(getMetadataCount() > 1)
@@ -243,8 +255,21 @@ const MetadataElement Metadata::getMetadata(const QString &category, const QStri
     MetadataElement retour;
     metadataMutex.lock();
     if(metadatas.count()) {
-        if((getMetadata(version).contains(category)) && (getMetadata(version).value(category).contains(key)))
-            retour = getMetadata(version).value(category).value(key);
+        if(key == "All") {
+            QString retourStr;
+            QMapIterator<QString, MetadataElement> metaIterator(getMetadata(version).value(category));
+            while(metaIterator.hasNext()) {
+                metaIterator.next();
+                if(!metaIterator.value().toString().isEmpty())
+                    retourStr += metaIterator.value().toString().trimmed().toLower() + ", ";
+            }
+            retourStr.chop(2);
+            retour = retourStr;
+        }
+        else {
+            if((getMetadata(version).contains(category)) && (getMetadata(version).value(category).contains(key)))
+                retour = getMetadata(version).value(category).value(key);
+        }
     }
     metadataMutex.unlock();
     return retour;
@@ -291,15 +316,24 @@ void Metadata::setMetadata(const QMetaDictionnay &metaDictionnay) {
 
 
 
-bool Metadata::isAcceptableWithSortFilters(qint16 version) {
-    return (function == DocumentFunctionRender) || ((Global::tagSortCriteria->isAcceptableWithFilters(getCriteriaSort(version))) && (Global::tagFilterCriteria->isAcceptableWithFilters(getCriteriaFilter(version))));
+bool Metadata::isAcceptableWithSortFilters(bool strongCheck, qint16 version) {
+    return (function == DocumentFunctionRender) ||
+            ((   Global::tagFilterCriteria->isAcceptable(true, getCriteriaFilter(version)))
+             && (Global::tagSortCriteria  ->isAcceptable(strongCheck, getCriteriaSort(version))));
 }
-bool Metadata::isAcceptableWithColorFilters(qint16 version) {
-    return ((function == DocumentFunctionContextual) && (Global::tagColorCriteria->isAcceptableWithFilters(getCriteriaColor(version)))) && (Global::tagFilterCriteria->isAcceptableWithFilters(getCriteriaFilter(version)));
+bool Metadata::isAcceptableWithColorFilters(bool strongCheck, qint16 version) {
+    return (function == DocumentFunctionContextual)
+            && (Global::tagFilterCriteria->isAcceptable(true, getCriteriaFilter(version)))
+            && (Global::tagSortCriteria  ->isAcceptable(true, getCriteriaSort(version)))
+            && (Global::tagColorCriteria ->isAcceptable(strongCheck, getCriteriaColor(version)));
 }
-bool Metadata::isAcceptableWithClusterFilters(qint16 version) {
-    return Global::tagClusterCriteria->isAcceptableWithFilters(getCriteriaCluster(version));
+bool Metadata::isAcceptableWithClusterFilters(bool strongCheck, qint16 version) {
+    return (    Global::tagFilterCriteria ->isAcceptable(true, getCriteriaFilter(version)))
+            && (Global::tagSortCriteria   ->isAcceptable(true, getCriteriaSort(version)))
+            && (Global::tagClusterCriteria->isAcceptable(strongCheck, getCriteriaCluster(version)));
 }
+
+
 const QString Metadata::getAcceptableWithClusterFilters(qint16 version) {
     return Global::tagClusterCriteria->getAcceptableWithFilters(getCriteriaCluster(version));
 }
@@ -326,6 +360,10 @@ const QString Metadata::getCriteriaClusterFormated(qint16 version) {
 const QString Metadata::getCriteriaFilter(qint16 version) {
     if(function == DocumentFunctionRender) return "";
     return getMetadata(Global::tagFilterCriteria->tagNameCategory, Global::tagFilterCriteria->tagName, version).toString(Global::tagFilterCriteria->left, Global::tagFilterCriteria->leftLength);
+}
+const QString Metadata::getCriteriaFilterFormated(qint16 version) {
+    if(function == DocumentFunctionRender) return "";
+    return Global::tagFilterCriteria->getCriteriaFormated(getCriteriaFilter(version));
 }
 
 const QString Metadata::getCriteriaSort(qint16 version) {

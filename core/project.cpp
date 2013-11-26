@@ -104,24 +104,25 @@ void Project::fireEvents() {
 
     //Gather and set color information
     if(Global::eventsSortChanged) {
-        Global::tagColorCriteria->startCheckChange();
+        Global::tagColorCriteria->addCheckStart();
         Global::colorForMeta.clear();
         qreal documentPerColorCount = 0;
         foreach(Document *document, documents) {
             QString colorKey = document->getCriteriaColorFormated();
             if(!colorKey.isEmpty()) {
-                if((document->isAcceptableWithColorFilters()) && (document->isAcceptableWithSortFilters())) {
+                if(document->isAcceptableWithColorFilters(false))
                     Global::tagColorCriteria->addCheck(colorKey, "");
-                    if(Global::tagColorCriteria->isChecked(colorKey)) {
-                        if(!Global::colorForMeta.contains(colorKey))
-                            Global::colorForMeta[colorKey] = QPair<QColor, qreal>(Qt::white, 0);
-                        Global::colorForMeta.insert(colorKey, QPair<QColor, qreal>(Global::colorForMeta.value(colorKey).first, Global::colorForMeta.value(colorKey).second + 1));
-                        documentPerColorCount++;
-                    }
+                if(document->isAcceptableWithColorFilters(true)) {
+                    if(!Global::colorForMeta.contains(colorKey))
+                        Global::colorForMeta[colorKey] = QPair<QColor, qreal>(Qt::white, 0);
+                    Global::colorForMeta.insert(colorKey, QPair<QColor, qreal>(Global::colorForMeta.value(colorKey).first, Global::colorForMeta.value(colorKey).second + 1));
+                    documentPerColorCount++;
+
                 }
             }
         }
 
+        //Color
         qreal index = 0;
         QMutableMapIterator<QString, QPair<QColor, qreal> > colorForMetaIterator(Global::colorForMeta);
         while(colorForMetaIterator.hasNext()) {
@@ -134,15 +135,29 @@ void Project::fireEvents() {
             index++;
         }
 
-
+        //Events
         eventsTags.clear();
         foreach(Document *document, documents)
             foreach(Tag *tag, document->tags)
-                if(tag->isAcceptableWithSortFilters())
+                if(tag->isAcceptableWithSortFilters(true))
                     eventsTags.append(tag);
-
-        //Sorting criteria
+        //Sorting events
         qSort(eventsTags.begin(), eventsTags.end(), Tag::sortEvents);
+
+        //Filters
+        Global::tagFilterCriteria->addCheckStart();
+        foreach(Document *document, documents)
+            foreach(Tag *tag, document->tags)
+                if(tag->isAcceptableWithSortFilters(false))
+                    Global::tagFilterCriteria->addCheck(tag->getCriteriaFilter(tag));
+
+        //Highlight
+        Global::tagClusterCriteria->addCheckStart();
+        foreach(Document *document, documents)
+            foreach(Tag *tag, document->tags)
+                if(tag->isAcceptableWithClusterFilters(false))
+                    Global::tagClusterCriteria->addCheck(tag->getCriteriaCluster(tag));
+
 
         Global::eventsSortChanged = false;
     }
@@ -199,13 +214,13 @@ const QRectF Project::paintTimeline(bool before) {
                 Global::phases->metaElements.clear();
                 foreach(Document *document, documents)
                     foreach(Tag *tag, document->tags)
-                        if(tag->isAcceptableWithSortFilters())
+                        if(tag->isAcceptableWithSortFilters(true))
                             Global::phases->addToMetaElements(Tag::getCriteriaSortRaw(tag));
                 Global::phases->analyse();
             }
 
             //Browse documents
-            Global::tagSortCriteria->startCheckChange();
+            Global::tagSortCriteria->addCheckStart();
             foreach(Document *document, documents) {
                 QList<Tag*> documentHistoryTags;
 
@@ -220,24 +235,26 @@ const QRectF Project::paintTimeline(bool before) {
                     tag->hashTags.clear();
 
                     //Add to timeline if displayable
-                    if(tag->isAcceptableWithSortFilters()) {
-                        QString phase          = Global::phases->getPhaseFor(Tag::getCriteriaSortRaw(tag)).toLower();
+                    if(tag->isAcceptableWithSortFilters(false)) {
                         QString sorting        = Tag::getCriteriaSort(tag).toLower();
                         QString sortingVerbose = Tag::getCriteriaSortFormated(tag);
-                        QString cluster        = Tag::getCriteriaCluster(tag).toLower();
-                        if((!cluster.isEmpty()) && (tag->isAcceptableWithClusterFilters()) && (!Global::tagClusterCriteria->getMatchName().isEmpty())) {
-                            cluster = tag->getAcceptableWithClusterFilters();
-                            QPair<QString,QString> key = qMakePair(sorting, cluster);
-                            if(!timelineClusters.contains(key))
-                                timelineClusters.insert(key, new Cluster(this));
-                            timelineClusters[key]->add(tag);
-                            clustersToLink[cluster][sorting] = timelineClusters.value(key);
+                        if(tag->isAcceptableWithSortFilters(true)) {
+                            QString phase          = Global::phases->getPhaseFor(Tag::getCriteriaSortRaw(tag)).toLower();
+                            QString cluster        = Tag::getCriteriaCluster(tag).toLower();
+                            if((!cluster.isEmpty()) && (tag->isAcceptableWithClusterFilters(true)) && (!Global::tagClusterCriteria->getMatchName().isEmpty())) {
+                                cluster = tag->getAcceptableWithClusterFilters();
+                                QPair<QString,QString> key = qMakePair(sorting, cluster);
+                                if(!timelineClusters.contains(key))
+                                    timelineClusters.insert(key, new Cluster(this));
+                                timelineClusters[key]->add(tag);
+                                clustersToLink[cluster][sorting] = timelineClusters.value(key);
+                            }
+                            timelineSortTags[phase][sorting][cluster].append(tag);
                         }
                         if(tag->getDocument()->function != DocumentFunctionRender)
-                            Global::tagSortCriteria->addCheck(sortingVerbose, sorting);
-                        if((tag->getDocument()->function == DocumentFunctionRender) || (Global::tagSortCriteria->isChecked(sortingVerbose)))
-                            timelineSortTags[phase][sorting][cluster].append(tag);
+                            Global::tagSortCriteria->addCheck(sorting, sortingVerbose);
                     }
+
                 }
 
                 //More histories with hash detection
@@ -282,10 +299,11 @@ const QRectF Project::paintTimeline(bool before) {
                                     tag->historyTags = documentHistoryTags;
                         }
                     }
-                    //Add history tags to last version tag
+                }
+                //Add hash tags
+                if(Global::timelineGL->showHash)
                     foreach(Tag* tag, document->tags)
                         tag->hashTags.append(hashTags);
-                }
             }
 
             //Sort clusters
@@ -621,8 +639,8 @@ const QRectF Project::paintViewer() {
             viewerTags.clear();
             foreach(Document *document, documents)
                 foreach(Tag *tag, document->tags)
-                    if(tag->isAcceptableWithSortFilters())
-                        if((tag->getDocument()->function != DocumentFunctionRender) && (tag->type != TagTypeGlobal) && (Global::tagSortCriteria->isChecked(Tag::getCriteriaSortFormated(tag))))
+                    if(tag->isAcceptableWithSortFilters(true))
+                        if((tag->getDocument()->function != DocumentFunctionRender) && (tag->type != TagTypeGlobal))
                             viewerTags.append(tag);
 
             //Sorting criteria

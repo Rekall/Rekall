@@ -26,6 +26,7 @@
     </qresource>
     <qresource prefix="/textures">
         <file>res_texture_strips.png</file>
+        <file>res_bulle.png</file>
     </qresource>
     <qresource prefix="/weather">
         <file>weather/01d.png</file>

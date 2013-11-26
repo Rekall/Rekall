@@ -6,15 +6,352 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>335</width>
-    <height>261</height>
+    <width>340</width>
+    <height>287</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">s</string>
+   <string notr="true">QTabWidget, QLabel, QCheckBox, QLineEdit, QPlainTextEdit, QPushButton, QSpinBox, QDoubleSpinBox, QTreeView, QHeaderView, QTabBar, QComboBox, QFrame#globalFrame, QTabBar::tab, QTreeView, QHeaderView, QDockWidget, QStatusBar, QRadioButton, QToolBox, QToolBox::tab {
+	font: 						12px &quot;Calibri&quot;, &quot;Arial&quot;;
+	padding:					0px;
+	margin:					0px;
+	min-height: 				20px;
+	color: 						rgb(245, 248, 250);
+	border: 					0px solid black;
+}
+QPushButton, QSpinBox, QDoubleSpinBox, QLineEdit, QPlainTextEdit, QCheckBox::indicator, QRadioButton::indicator, QTreeView::indicator, QComboBox, QTreeView, QHeaderView {
+	border: 					1px solid rgb(55, 55, 55);
+	border-radius: 		2px;
+	background-color: 	rgb(71, 77, 79);
+}
+QSpinBox, QDoubleSpinBox, QLineEdit, QPlainTextEdit, QCheckBox {
+	margin-top: 			4px;
+	margin-bottom: 		4px;
+}
+QPushButton {
+	padding: 3px;
+}
+
+QFrame#globalFrame, QDialog, QWidget#chutier, QWidget#centralwidget {
+	background-color: 	rgb(56, 61, 63);
+	border: 					0px solid black;
+}
+
+
+
+QLabel, QCheckBox, QRadioButton {
+	color: 						rgb(245, 248, 250);
+}
+QLabel#peopleLabel, QLabel#chutierLabel, QLabel#chutierLabel2, QLabel#feedsLabel, QLabel#tasksLabel, QLabel#conduiteLabel, QLabel#previewLabel, QLabel#feelingLabel {
+	font: 		11px;
+	padding: 	5px;
+	color: 		rgb(131, 135, 137);
+}
+QLabel#visibilityLabel, QLabel#filtersLabel, QLabel#label {
+	margin-top:	10px;
+	font: 			bold;
+	border: 		0px solid black;
+	border-top: 	1px solid white;
+} 
+
+
+QTabWidget::pane {
+	border: 					1px solid rgb(50, 50, 50);
+}
+QTabWidget::tab-bar {
+	left: 							0px;
+}
+QTabWidget#tab {
+	color: red;
+}
+QTabBar::tab {
+	min-height: 							25px; /* FIX IN SS-TAB */
+	background-color: 				rgb(110, 110, 110);
+	color: 									rgb(220, 220, 220);
+    border-top-left-radius: 		4px;
+    border-top-right-radius: 	4px;
+	margin-right:						2px;
+	padding-left: 						5px;
+	padding-right:						5px;
+}
+QTabBar::tab:selected {
+	background-color: 				rgb(242, 241, 237);
+	color: 									black;
+}
+QTabBar::tab:hover {
+	color: 									black;
+}
+QTabBar::tab:!selected {
+    margin-top: 						2px;
+}
+QTabBar::tab:disabled {
+	color: 									gray;
+}
+
+
+QToolBox {
+	border:									0px solid black;
+}
+QToolBox::tab {
+	background-color: 				rgb(41, 44, 45);
+	color: 									rgb(194, 198, 198);
+	border:									0px solid black;
+	border-left:							5px solid rgb(114, 118, 118);
+}
+QToolBox#toolBoxLeft::tab {
+	color: 									rgb(255,147,102);
+	border-left:							5px solid rgb(255,147,102);
+}
+QToolBox#toolBoxLeft::tab:selected {
+	color:									white;
+	background-color: 				rgb(255,147,102);
+	border-left:							5px solid rgb(255,147,102);
+}
+QToolBox#toolBoxRight::tab {
+	color:									rgb(166,204,91);
+	border-left:							5px solid rgb(166,204,91);
+}
+QToolBox#toolBoxRight::tab:selected {
+	color:									white;
+	background-color: 				rgb(166,204,91);
+	border-left:							5px solid rgb(166,204,91);
+}
+QToolBox#toolBoxLeft::tab:disabled, QToolBox#toolBoxRight::tab:disabled {
+	color:									rgb(56, 61, 63);
+	border-left:							5px solid rgb(56, 61, 63);
+}
+QToolBox QWidget#chutierPage, QToolBox QWidget#feedPage, QToolBox QWidget#infosPage, QToolBox QWidget#conduitePage, QToolBox QWidget#tasksPage, QToolBox QWidget#peoplePage, QToolBox QWidget#previewPage, QToolBox QWidget#filtersPage {
+	border:									0px solid black;
+	background-color: 				rgb(56, 61, 63);
+}
+QFrame#frameGlobalTimeline, QWidget#timeline {
+	border:									0px solid black;
+	background-color: 				rgb(101, 105, 107);
+}
+QFrame#frameGlobalViewer, QWidget#viewer, QFrame#globalFramePlayer, QWidget#player {
+	border:									0px solid black;
+	background-color: 				rgb(0, 0, 0);
+}
+
+
+
+QTreeView {
+	background:								rgb(56, 61, 63);
+	alternate-background-color: 	rgb(56, 61, 63);
+	selection-background-color: 	rgb(41, 44, 45);
+	gridline-color: 							rgb(56, 61, 63);
+	border:										0px solid black;
+}
+QHeaderView {
+	background: 							transparent;
+	border: 									0px solid black;
+	color: 										rgb(200, 200, 200);
+	min-height: 								14px;
+}
+QHeaderView::section {
+	background: 							rgb(56, 61, 63);
+	border: 									0px solid transparent;
+	border-bottom: 						1px solid rgb(41, 44, 45);
+	font: 										10px;
+}
+QTreeView::item {
+	min-height: 		20px;
+}
+QTreeView::branch:has-children:!has-siblings:closed, QTreeView::branch:closed:has-children:has-siblings {
+	border-image: 	none;
+	image: 					url(:/items/res_tree_close.png);
+}
+QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-children:has-siblings  {
+	border-image: 	none;
+	image: 					url(:/items/res_tree_open.png);
+}
+
+
+
+
+QPushButton {
+	margin-left: 			6px;
+}
+QPushButton:hover {
+	border: 					1px solid rgb(28, 124, 195);
+	background-color: 	rgb(21, 91, 143);
+}
+QPushButton::checked, QPushButton:pressed, QCheckBox::indicator:checked, QTreeView::indicator:checked, QRadioButton::indicator:checked {
+	background-color: 	rgb(45, 202, 225);
+}
+
+
+QCheckBox, QRadioButton {
+	spacing: 					5px;
+}
+QCheckBox::indicator, QTreeView::indicator, QRadioButton::indicator  {
+	width: 						10px;
+	height: 					10px;
+}
+
+
+QSpinBox, QDoubleSpinBox, QLineEdit {
+	padding-left	:			5px;
+}
+QSpinBox::up-button, QDoubleSpinBox::up-button, QSpinBox::down-button, QDoubleSpinBox::down-button {
+	width: 						5px;
+	padding: 					2px;
+	padding-left:			3px;
+	background-color: 	rgb(60, 60, 60);
+	border: 					0px solid black;
+	border-left:				1px solid rgb(70, 70, 70);
+}
+QSpinBox::up-button, QDoubleSpinBox::up-button {
+    image: 						url(:/icons/res_icon_plus.png);
+	border-bottom:		1px solid rgb(70, 70, 70);
+}
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+    image: 						url(:/icons/res_icon_minus.png);
+}
+
+
+QComboBox {
+	background:			rgb(242, 241, 237);
+	color: 					black;
+	margin-left: 		3px;
+	margin-right: 		3px;
+	border-radius: 	3px;
+	selection-color: 	black;
+	padding-left: 		5px;
+}
+QComboBox::drop-down {
+	width: 						10px;
+	padding: 					2px;
+	border: 					0px solid black;
+	background-color: 	rgb(70, 70, 70);
+    image: 						url(:/icons/res_icon_down.png);
+}
+
+
+
+QScrollBar:vertical, QScrollBar:horizontal {
+	border: 				0px solid black;
+	background: 		rgba(255, 255, 255, 32);
+}
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+	border: 				0px solid black;
+	background: 		rgb(161, 161, 161);
+	border-radius: 	3px;
+}
+QScrollBar:vertical {						width: 			8px;					}
+QScrollBar:horizontal {					height: 		8px;				}
+QScrollBar::handle:vertical {			min-height: 8px;		}
+QScrollBar::handle:horizontal {	min-width: 	8px;			}
+QScrollBar::add-line:vertical, QScrollBar::add-line:hozirontal, QScrollBar::sub-line:vertical, QScrollBar::sub-line:horizontal, QScrollBar::up-arrow:vertical, QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:vertical, QScrollBar::down-arrow:horizontal {
+	border: 			0px solid black;
+	background: 	transparent;
+	width: 				1px;
+	height: 			1px;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical, QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+	background: 	none;
+}
+
+
+QSlider:horizontal {
+	min-width: 				100px;
+}
+QSlider::groove:horizontal {
+	border: 					0px solid transparent;
+	background-color: 	rgb(70, 70, 70);
+	height: 					3px;
+}
+QSlider::handle:horizontal {
+	width: 						11px;
+	height: 					10px;
+	border-radius: 		5px;
+	margin-top: 			-4px;
+	margin-bottom: 		-4px;
+	border: 					0px solid black;
+	background-color: 	rgb(45, 202, 225);
+}
+
+
+QSplitter#conduiteSplitter::handle 				{		background: 	rgba(166,204,91,   30);	}
+QSplitter#conduiteSplitter::handle:pressed 	{		background: 	rgb(166,204,91);				}
+QSplitter#fileSplitter::handle 						{		background: 	rgba(255,147,102, 30);	}
+QSplitter#fileSplitter::handle:pressed 			{		background: 	rgb(255,147,102);			}
+QSplitter#timelineSplitter::handle 				{		background: 	rgb(71, 77, 79);				}
+QSplitter#timelineSplitter::handle:pressed 	{		background: 	rgb(226,226,226);			}
+QSplitter::handle:horizontal	 						{		width: 	4px; 											}
+QSplitter::handle:vertical     							{		height:	4px; 											}
+
+QDockWidget {
+}
+QDockWidget::title {
+    text-align:				center;
+	background-color: 	rgb(70, 70, 70);
+}
+
+
+QToolButton {
+	border: 					0px solid black;
+	border-radius: 		3px;
+	margin: 					2px;
+}
+QToolButton:pressed, QToolButton:checked {
+	border: 					0px solid black;
+    background-color: 	rgba(0, 0, 0, 20);
+}
+
+
+QStatusBar {
+	color: 						rgb(210, 210, 210);
+	border-top: 				1px solid rgb(50, 50, 50);
+	background-color: 	rgb(30, 30, 30);
+}
+
+
+
+QFrame#frameGlobalTimeline QPushButton {
+	border:						2px solid black;
+	border-color:			rgb(74,201,159);
+	background-color:	rgb(74,201,159);
+	padding:					0px;
+	padding-left: 			4px;
+	padding-right: 		4px;
+	margin:					0px;
+	height:						20px;
+	min-height:				20px;
+	max-height:				20px;
+}
+QFrame#frameGlobalTimeline QPushButton:checked, QFrame#frameGlobalTimeline QPushButton:pressed {
+	border-color:			rgb(255,84,79);
+	background-color:	rgb(255,84,79);
+}
+QFrame#frameGlobalTimeline QPushButton:hover {
+	border-color:			rgb(226,226,226);
+}
+QFrame#frameGlobalTimeline QPushButton#ffButton, QFrame#frameGlobalTimeline QPushButton#playButton {
+	padding: 					0px;
+	margin:					0px;
+	width:						30px;
+	height:						30px;
+	min-width:				30px;
+	min-height:				30px;
+	max-width:				30px;
+	max-height:				30px;
+	border-radius:			17px;
+}
+QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineFilters, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineZoom, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineMisc {
+	background: 			transparent;
+	border:						0px solid black;
+}
+QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineZoom, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineMisc {
+	border-left:				5px solid rgb(45, 50, 53);
+}
+QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
+	background:				rgb(45, 50, 53);
+}
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -33,7 +370,40 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="globalFrameSorting">
+    <widget class="QFrame" name="globalFrameRed">
+     <property name="styleSheet">
+      <string notr="true">QFrame#globalFrameRed {
+	border:				0px solid black;
+	background-color: 	transparent;
+	background-image: url(:/textures/res_bulle.png);
+}
+QLineEdit, QComboBox, QTreeWidget, QHeaderView::section, QCheckBox::indicator, QTreeView::indicator, QSpinBox, QDoubleSpinBox, QPushButton {
+	color:				white;
+	border: 			0px solid black;
+	background: 	rgba(255, 255, 255, 70);
+}
+QPushButton {
+	margin: 			0px;
+}
+QHeaderView::section {
+	padding-left: 	7px;
+	color:			 	rgb(41, 44, 45);
+	font: 				10px;
+}
+QComboBox::drop-down, QComboBox::drop-down, QSpinBox::up-button, QDoubleSpinBox::up-button, QSpinBox::down-button, QDoubleSpinBox::down-button, QSlider::groove:horizontal {
+	background: 	rgba(255, 255, 255, 100);
+	border: 			0px solid black;
+}
+QCheckBox::indicator:checked, QTreeView::indicator:checked, QPushButton:pressed, QPushButton:checked, QSlider::handle:horizontal, QScrollBar::handle {
+	color:				rgb(41, 44, 45);
+	background: 	rgba(255, 255, 255);
+}
+QPushButton:hover {
+	background: 	rgba(255, 255, 255, 100);
+	color:				rgb(41, 44, 45);
+}
+</string>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -42,64 +412,28 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
-       <number>6</number>
+       <number>12</number>
       </property>
       <property name="topMargin">
-       <number>6</number>
+       <number>12</number>
       </property>
       <property name="rightMargin">
-       <number>6</number>
+       <number>12</number>
       </property>
       <property name="bottomMargin">
+       <number>12</number>
+      </property>
+      <property name="horizontalSpacing">
+       <number>12</number>
+      </property>
+      <property name="verticalSpacing">
        <number>6</number>
       </property>
-      <property name="spacing">
-       <number>6</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="title">
-        <property name="minimumSize">
-         <size>
-          <width>110</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Filter by</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="filter">
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="matchesLabel">
-        <property name="minimumSize">
-         <size>
-          <width>110</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>matching criterias</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="matches"/>
-      </item>
       <item row="2" column="0" colspan="2">
        <widget class="QTreeWidget" name="checks">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="showDropIndicator" stdset="0">
          <bool>false</bool>
         </property>
@@ -120,20 +454,23 @@
         </attribute>
         <column>
          <property name="text">
-          <string notr="true">Description</string>
+          <string notr="true">Matching values</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Value</string>
+          <string>Additional information</string>
          </property>
         </column>
        </widget>
       </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="matches"/>
+      </item>
       <item row="3" column="0" colspan="2">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <property name="spacing">
-         <number>12</number>
+         <number>20</number>
         </property>
         <item>
          <widget class="QPushButton" name="uncheckAll">
@@ -158,6 +495,74 @@
         </item>
        </layout>
       </item>
+      <item row="4" column="0">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="matchesLabel">
+        <property name="minimumSize">
+         <size>
+          <width>110</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>matching criterias</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="title">
+        <property name="minimumSize">
+         <size>
+          <width>110</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Filter by</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="filter">
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>25</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
     </widget>
    </item>
@@ -166,6 +571,10 @@
  <tabstops>
   <tabstop>filter</tabstop>
   <tabstop>matches</tabstop>
+  <tabstop>checks</tabstop>
+  <tabstop>uncheckAll</tabstop>
+  <tabstop>invertAll</tabstop>
+  <tabstop>checkAll</tabstop>
  </tabstops>
  <resources/>
  <connections>

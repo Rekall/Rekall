@@ -51,7 +51,7 @@ void TaskProcess::run() {
                 if(meta.second.first.toLower().contains("file size"))
                     processedDocument.metadata->setMetadata("Rekall", "Size",     meta.second.second, processedDocument.version);
                 if(meta.second.first.toLower().contains("keywords"))
-                    processedDocument.metadata->setMetadata("Rekall", "Keywords", processedDocument.metadata->getMetadata("Rekall", "Keywords", processedDocument.version).toString() + ", " + meta.second.second, processedDocument.version);
+                    processedDocument.metadata->addKeyword(meta.second.second, processedDocument.version);
             }
         }
 

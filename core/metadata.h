@@ -145,6 +145,8 @@ public:
     bool updateImport(const QString &name, qint16 version = -1);
     bool updateCard(const PersonCard &card, qint16 version = -1);
     void updateFeed();
+    void addKeyword(const QStringList &keywords, qint16 version = -1, const QString &key = "Keywords", const QString &category = "Rekall");
+    void addKeyword(const QString &keyword, qint16 version = -1, const QString &key = "Keywords", const QString &category = "Rekall");
     const QPair<QString, QPixmap> getThumbnail(qint16 version = -1);
     const QList< QPair<QString,QString> > getGps();
     inline const QColor getColor() {
@@ -183,9 +185,10 @@ public:
     const QString getCriteriaColor(qint16 version = -1);
     const QString getCriteriaColorFormated(qint16 version = -1);
     const QString getCriteriaFilter(qint16 version = -1);
-    bool isAcceptableWithSortFilters(qint16 version = -1);
-    bool isAcceptableWithColorFilters(qint16 version = -1);
-    bool isAcceptableWithClusterFilters(qint16 version = -1);
+    const QString getCriteriaFilterFormated(qint16 version = -1);
+    bool isAcceptableWithSortFilters(bool strongCheck, qint16 version = -1);
+    bool isAcceptableWithColorFilters(bool strongCheck, qint16 version = -1);
+    bool isAcceptableWithClusterFilters(bool strongCheck, qint16 version = -1);
     const QString getAcceptableWithClusterFilters(qint16 version = -1);
 
 public:

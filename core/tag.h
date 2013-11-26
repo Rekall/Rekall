@@ -91,10 +91,10 @@ public:
     qreal viewerProgress(const QPointF &pos);
 
 public:
-    bool isAcceptableWithFilters();
-    bool isAcceptableWithSortFilters();
-    bool isAcceptableWithColorFilters();
-    bool isAcceptableWithClusterFilters();
+    bool tagHistoryFilters();
+    bool isAcceptableWithSortFilters(bool strongCheck);
+    bool isAcceptableWithColorFilters(bool strongCheck);
+    bool isAcceptableWithClusterFilters(bool strongCheck);
     const QString getAcceptableWithClusterFilters();
     static bool sortCriteria(Tag *first, Tag *second);
     static bool sortViewer(Tag *first, Tag *second);
@@ -102,10 +102,12 @@ public:
     static const QString getCriteriaSort(Tag *tag);
     static const QString getCriteriaColor(Tag *tag);
     static const QString getCriteriaCluster(Tag *tag);
+    static const QString getCriteriaFilter(Tag *tag);
     static const MetadataElement getCriteriaSortRaw(Tag *tag);
     static const QString getCriteriaSortFormated(Tag *tag);
     static const QString getCriteriaColorFormated(Tag *tag);
     static const QString getCriteriaClusterFormated(Tag *tag);
+    static const QString getCriteriaFilterFormated(Tag *tag);
     static bool isTagLastVersion(Tag *tag);
     inline qint16 getDocumentVersion() const {
         return document->getMetadataIndexVersion(documentVersion);

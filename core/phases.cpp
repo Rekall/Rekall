@@ -34,6 +34,12 @@ void Phases::closeEvent(QCloseEvent *) {
 void Phases::hideEvent(QHideEvent *) {
     emit(displayed(false));
 }
+const QString Phases::styleSheet2() const {
+    return styleSheet() + ui->globalFrameRed->styleSheet();
+}
+void Phases::setStyleSheet2(const QString &str) {
+    ui->globalFrameRed->setStyleSheet(str);
+}
 
 void Phases::analyse() {
     //ui->names->clear();

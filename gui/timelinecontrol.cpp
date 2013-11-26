@@ -16,7 +16,9 @@ TimelineControl::TimelineControl(QWidget *parent) :
     Global::timelineGL->showLinkedTagsDest   .setAction(ui->linkedTags);
     Global::showHelp.setAction(ui->help);
     Global::timelineGL->showHistory.setAction(ui->history);
+    Global::timelineGL->showHash.setAction(ui->hash);
     connect(&Global::timelineGL->showHistory, SIGNAL(triggered(bool)), SLOT(action()));
+    connect(&Global::timelineGL->showHash,    SIGNAL(triggered(bool)), SLOT(action()));
 }
 
 void TimelineControl::showEvent(QShowEvent *) {
@@ -28,6 +30,13 @@ void TimelineControl::closeEvent(QCloseEvent *) {
 void TimelineControl::hideEvent(QHideEvent *) {
     emit(displayed(false));
 }
+const QString TimelineControl::styleSheet2() const {
+    return styleSheet() + ui->globalFrameRed->styleSheet();
+}
+void TimelineControl::setStyleSheet2(const QString &str) {
+    ui->globalFrameRed->setStyleSheet(str);
+}
+
 
 void TimelineControl::action() {
     Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
