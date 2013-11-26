@@ -267,65 +267,23 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="hZoomLabel">
-             <property name="text">
-              <string>TIME STRETCH</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="hZoom">
-             <property name="maximumSize">
-              <size>
-               <width>150</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>30</number>
-             </property>
+            <spacer name="horizontalSpacer_2">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="vZoomLabel">
-             <property name="text">
-              <string>OVERALL SIZE</string>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
              </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="vZoom">
-             <property name="maximumSize">
+             <property name="sizeHint" stdset="0">
               <size>
-               <width>150</width>
-               <height>16777215</height>
+               <width>20</width>
+               <height>20</height>
               </size>
              </property>
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>30</number>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
+            </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="legend">
+            <widget class="QPushButton" name="viewOption">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -339,7 +297,7 @@
               </size>
              </property>
              <property name="text">
-              <string>LEGEND</string>
+              <string>VIEW OPTIONS</string>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -358,6 +316,28 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="legend">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>LEGEND / STATS</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -434,8 +414,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>589</x>
-     <y>188</y>
+     <x>605</x>
+     <y>175</y>
     </hint>
     <hint type="destinationlabel">
      <x>493</x>
@@ -450,8 +430,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>524</x>
-     <y>188</y>
+     <x>563</x>
+     <y>175</y>
     </hint>
     <hint type="destinationlabel">
      <x>518</x>
@@ -466,8 +446,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1007</x>
-     <y>188</y>
+     <x>1154</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -482,8 +462,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>188</y>
+     <x>92</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
      <x>100</x>
@@ -498,8 +478,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>120</x>
-     <y>162</y>
+     <x>284</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
      <x>121</x>
@@ -514,8 +494,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>233</x>
-     <y>180</y>
+     <x>499</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
      <x>233</x>
@@ -530,8 +510,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>312</x>
-     <y>181</y>
+     <x>407</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
      <x>313</x>
@@ -546,12 +526,28 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>411</x>
-     <y>166</y>
+     <x>189</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
      <x>402</x>
      <y>329</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>viewOption</sender>
+   <signal>released()</signal>
+   <receiver>Timeline</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>655</x>
+     <y>162</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>657</x>
+     <y>239</y>
     </hint>
    </hints>
   </connection>

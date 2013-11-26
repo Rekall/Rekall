@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QInputDialog>
+#include "gui/timelinecontrol.h"
 #include "gui/timelinegl.h"
 
 namespace Ui {
@@ -16,6 +17,8 @@ public:
     explicit Timeline(QWidget *parent = 0);
     ~Timeline();
 
+public:
+    TimelineControl *timelineControl;
 private:
     QPointF timelinePos, timelinePosDest;
     QPointF viewerPos,   viewerPosDest;

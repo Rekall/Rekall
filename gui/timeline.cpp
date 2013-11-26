@@ -8,12 +8,8 @@ Timeline::Timeline(QWidget *parent) :
     Global::timeline = this;
     startTimer(40);
     ticksWidth = 50;
-
+    timelineControl = new TimelineControl();
     Global::timelineGL->showLegendDest.setAction(ui->legend);
-    Global::timeUnitDest              .setAction(ui->hZoom);
-    Global::timelineTagHeightDest     .setAction(ui->vZoom);
-    ui->hZoom->setValue(13);
-    ui->vZoom->setValue(8);
 }
 
 Timeline::~Timeline() {
@@ -200,6 +196,12 @@ void Timeline::action() {
         if(ui->phaseBy->isChecked())  Global::phases->show();
         else                          Global::phases->hide();
     }
+    else if(sender() == ui->viewOption) {
+        timelineControl->move(ui->viewOption->parentWidget()->mapToGlobal(ui->viewOption->pos()) + QPoint(0, -timelineControl->height()));
+        if(ui->viewOption->isChecked()) timelineControl->show();
+        else                            timelineControl->hide();
+    }
+
 }
 void Timeline::actionDisplayed(bool val) {
     if(sender() == Global::tagFilterCriteria)
@@ -212,7 +214,10 @@ void Timeline::actionDisplayed(bool val) {
         ui->clusterBy->setChecked(val);
     else if(sender() == Global::phases)
         ui->phaseBy->setChecked(val);
+    else if(sender() == timelineControl)
+        ui->viewOption->setChecked(val);
 }
+
 void Timeline::actionChanged(QString text, QString text2) {
     if(sender() == Global::tagFilterCriteria) {
         if(text2.isEmpty())  ui->filterBy->setText(tr("NO FILTER"));

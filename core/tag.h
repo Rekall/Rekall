@@ -90,9 +90,8 @@ public:
     bool  viewerContains(const QPointF &pos);
     qreal viewerProgress(const QPointF &pos);
 
-private:
-    bool isAcceptableWithFilters();
 public:
+    bool isAcceptableWithFilters();
     bool isAcceptableWithSortFilters();
     bool isAcceptableWithColorFilters();
     bool isAcceptableWithClusterFilters();

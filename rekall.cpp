@@ -43,29 +43,25 @@ Rekall::Rekall(QWidget *parent) :
     Global::currentProject = currentProject;
     connect(currentProject, SIGNAL(refreshMetadata()), SLOT(refreshAndLastMetadata()));
 
-    Global::timelineGL->showLinkedRendersDest.setAction(ui->linkedRenders);
-    Global::timelineGL->showLinkedTagsDest   .setAction(ui->linkedTags);
-    Global::showHelp.setAction(ui->help);
-    Global::timelineGL->showHistory.setAction(ui->history);
-    connect(&Global::timelineGL->showHistory, SIGNAL(triggered(bool)), SLOT(action()));
-
     Global::phases             = new Phases(0);
     Global::tagFilterCriteria  = new Sorting(tr("Filter rules"),     6);
     Global::tagSortCriteria    = new Sorting(tr("Sorting rules"),    2);
     Global::tagColorCriteria   = new Sorting(tr("Color rules"),      5);
     Global::tagClusterCriteria = new Sorting(tr("Hightlight rules"), 7);
 
-    Global::phases            ->setStyleSheet(styleSheet());
-    Global::tagFilterCriteria ->setStyleSheet(styleSheet());
-    Global::tagSortCriteria   ->setStyleSheet(styleSheet());
-    Global::tagColorCriteria  ->setStyleSheet(styleSheet());
-    Global::tagClusterCriteria->setStyleSheet(styleSheet());
+    Global::phases               ->setStyleSheet(styleSheet());
+    Global::tagFilterCriteria    ->setStyleSheet(styleSheet());
+    Global::tagSortCriteria      ->setStyleSheet(styleSheet());
+    Global::tagColorCriteria     ->setStyleSheet(styleSheet());
+    Global::tagClusterCriteria   ->setStyleSheet(styleSheet());
+    ui->timeline->timelineControl->setStyleSheet(styleSheet());
 
-    connect(Global::phases,             SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
-    connect(Global::tagFilterCriteria,  SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
-    connect(Global::tagSortCriteria,    SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
-    connect(Global::tagColorCriteria,   SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
-    connect(Global::tagClusterCriteria, SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::phases,                SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::tagFilterCriteria,     SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::tagSortCriteria,       SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::tagColorCriteria,      SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::tagClusterCriteria,    SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(ui->timeline->timelineControl, SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
 
     connect(Global::phases,             SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagFilterCriteria,  SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
@@ -251,7 +247,6 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
 
 
 void Rekall::action() {
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
     if(sender() == ui->actionSave)
         currentProject->save();
     else if(sender() == ui->actionPaste)

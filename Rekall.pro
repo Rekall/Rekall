@@ -36,9 +36,9 @@ HEADERS  += core/sorting.h   core/phases.h   core/metadata.h   core/project.h   
 SOURCES  += core/sorting.cpp core/phases.cpp core/metadata.cpp core/project.cpp core/document.cpp core/tag.cpp core/cluster.cpp
 FORMS    += core/sorting.ui  core/phases.ui
 
-HEADERS  += gui/timeline.h   gui/previewer.h   gui/playervideo.h   gui/timelinegl.h   gui/previewerlabel.h
-SOURCES  += gui/timeline.cpp gui/previewer.cpp gui/playervideo.cpp gui/timelinegl.cpp gui/previewerlabel.cpp
-FORMS    += gui/timeline.ui  gui/previewer.ui  gui/playervideo.ui
+HEADERS  += gui/timeline.h   gui/previewer.h   gui/playervideo.h   gui/timelinecontrol.h   gui/timelinegl.h   gui/previewerlabel.h
+SOURCES  += gui/timeline.cpp gui/previewer.cpp gui/playervideo.cpp gui/timelinecontrol.cpp gui/timelinegl.cpp gui/previewerlabel.cpp
+FORMS    += gui/timeline.ui  gui/previewer.ui  gui/playervideo.ui  gui/timelinecontrol.ui
 
 HEADERS  += gui/player.h   gui/viewer.h   gui/viewergl.h
 SOURCES  += gui/player.cpp gui/viewer.cpp gui/viewergl.cpp

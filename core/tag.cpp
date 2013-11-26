@@ -275,7 +275,7 @@ const QRectF Tag::paintTimeline(bool before) {
             GLfloat historyChordPts[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
             glLineWidth(2);
             foreach(Tag *historyTag, historyTags) {
-                if((historyTag == this) || (!historyTag))
+                if((historyTag == this) || (!historyTag) || (!historyTag->isAcceptableWithSortFilters()))
                     continue;
 
                 //Color
@@ -319,12 +319,12 @@ const QRectF Tag::paintTimeline(bool before) {
             glLineStipple(5, 0xAAAA);
             glEnable(GL_LINE_STIPPLE);
             foreach(Tag *hashTag, hashTags) {
-                if((hashTag == this) || (!hashTag))
+                if((hashTag == this) || (!hashTag) || (!hashTag->isAcceptableWithSortFilters()))
                     continue;
 
                 //Color
                 if(((hashTag->type == TagTypeGlobal) && (type != TagTypeGlobal)) || ((type == TagTypeGlobal) && (hashTag->type != TagTypeGlobal)))
-                    colorAlpha.setAlphaF(0.1);
+                    colorAlpha.setAlphaF(0.2);
                 else
                     colorAlpha.setAlphaF(0.4);
                 Global::timelineGL->qglColor(colorAlpha);
@@ -332,8 +332,8 @@ const QRectF Tag::paintTimeline(bool before) {
 
                 //Anchors
                 QPointF hashChordEndCtr = hashTag->timelineBoundingRect.center() - timelinePos + hashTag->timelinePos;
-                QPointF hashChordEndTop = QPointF(hashChordEndCtr.x(), hashTag->timelineBoundingRect.top()    + 1 - timelinePos.y() + hashTag->timelinePos.y());
-                QPointF hashChordEndBtm = QPointF(hashChordEndCtr.x(), hashTag->timelineBoundingRect.bottom() - 1 - timelinePos.y() + hashTag->timelinePos.y());
+                //QPointF hashChordEndTop = QPointF(hashChordEndCtr.x(), hashTag->timelineBoundingRect.top()    + 1 - timelinePos.y() + hashTag->timelinePos.y());
+                //QPointF hashChordEndBtm = QPointF(hashChordEndCtr.x(), hashTag->timelineBoundingRect.bottom() - 1 - timelinePos.y() + hashTag->timelinePos.y());
 
                 QPointF hashChordBeg = hashChordBegCtr, hashChordEnd = hashChordEndCtr;
                 /*
