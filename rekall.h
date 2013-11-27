@@ -47,9 +47,11 @@ public:
 private slots:
 public:
     void displayDocumentName(const QString &documentName = "");
-    void displayPixmap(const QPair<QString, QPixmap> &_picture);
+    void displayPixmap(DocumentType documentType, const QPair<QString, QPixmap> &picture);
+    void displayPixmap(DocumentType documentType, const QString &filename, const QPixmap &picture);
     void displayGps(const QList<QPair<QString, QString> > &gps);
     void refreshMetadata(void *_tag, bool inChutier);
+    void showPreviewTab();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *);
@@ -59,6 +61,7 @@ protected:
 private slots:
     void fileUploaded(QString gps, QString filename, QTemporaryFile*);
     void action();
+    void actionForceGL();
     void actionMetadata();
     void actionMetadata(QTreeWidgetItem *item, int col);
     void closeSplash();

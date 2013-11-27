@@ -71,6 +71,7 @@ Rekall::Rekall(QWidget *parent) :
     connect(Global::tagSortCriteria,    SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagColorCriteria,   SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagClusterCriteria, SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    Global::phases            ->action();
     Global::tagFilterCriteria ->action();
     Global::tagSortCriteria   ->action();
     Global::tagColorCriteria  ->action();
@@ -128,11 +129,8 @@ Rekall::~Rekall() {
 
 void Rekall::fileUploaded(QString gpsCoord, QString filename, QTemporaryFile *file) {
     if((filename.toLower().endsWith("jpg")) || (filename.toLower().endsWith("jpeg"))) {
-        QPair<QString, QPixmap> picture;
-        picture.first = file->fileName();
-        picture.second = QPixmap(file->fileName());
         displayDocumentName(tr("Imported file"));
-        displayPixmap(picture);
+        displayPixmap(DocumentTypeImage, file->fileName(), QPixmap(file->fileName()));
         displayGps(QList< QPair<QString,QString> >() << qMakePair(gpsCoord, tr("Imported file")));
     }
 }
@@ -257,6 +255,9 @@ void Rekall::action() {
     else if(sender() == ui->metadataOpenGps)
         gps->show();
 }
+void Rekall::actionForceGL() {
+    ui->toolBoxRight->resize(ui->toolBoxRight->width()+1, ui->toolBoxRight->height());
+}
 
 void Rekall::actionMetadata() {
     if((currentDocument) && (ui->metadata->currentItem()) && (ui->metadata->currentItem()->parent())) {
@@ -312,6 +313,9 @@ void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
         }
     }
 }
+void Rekall::showPreviewTab() {
+    ui->toolBoxRight->setCurrentIndex(1);
+}
 void Rekall::refreshMetadata(void *_tag, bool inChutier) {
     Tag *tag = (Tag*)_tag;
     if(inChutier)   chutierItemChanged(ui->chutier->getTree()->currentItem(), ui->chutier->getTree()->currentItem());
@@ -355,9 +359,9 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
             ui->metadata->expandItem(metadataRootItem);
 
         if(!metadata->getMetadata("Rekall", "Folder").toString().isEmpty())
-            ui->toolBoxRight->setItemText(2, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
+            ui->toolBoxRight->setItemText(1, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
         else
-            ui->toolBoxRight->setItemText(2, tr("INFOS — %1").arg(metadata->getMetadata("Rekall", "Name").toString()));
+            ui->toolBoxRight->setItemText(1, tr("INFOS — %1").arg(metadata->getMetadata("Rekall", "Name").toString()));
 
         //Versions
         ui->metadataSlider->setMaximum(metadata->getMetadataCountM());
@@ -396,7 +400,7 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
         }
 
         displayDocumentName(QString("%1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
-        displayPixmap(metadata->getThumbnail(ui->metadataSlider->value()));
+        displayPixmap(metadata->type, metadata->getThumbnail(ui->metadataSlider->value()));
         displayGps(metadata->getGps());
     }
     metaIsChanging = false;
@@ -404,9 +408,14 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
 void Rekall::displayDocumentName(const QString &documentName) {
     gps->setWindowTitle(tr("Location — %1").arg(documentName));
 }
-void Rekall::displayPixmap(const QPair<QString, QPixmap> &_picture) {
-    ui->preview->displayPixmap(_picture);
+void Rekall::displayPixmap(DocumentType documentType, const QPair<QString, QPixmap> &picture) {
+    displayPixmap(documentType, picture.first, picture.second);
 }
+void Rekall::displayPixmap(DocumentType documentType, const QString &filename, const QPixmap &picture) {
+    ui->preview->setMaximumHeight(ui->toolBoxRight->height() / 2.5);
+    ui->preview->preview(documentType, filename, picture);
+}
+
 void Rekall::displayGps(const QList< QPair<QString,QString> > &gpsCoords) {
     QString mapsParam;
     for(quint16 i = 0 ; i < gpsCoords.count() ; i++) {

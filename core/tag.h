@@ -17,7 +17,7 @@ public:
     UiBool renderActive;
 };
 
-class Tag : public QObject {
+class Tag : public QObject, public Nameable {
     Q_OBJECT
 
 
@@ -35,6 +35,7 @@ public:
 
 public:
     void create(TagType _type, qreal _timeStart, qreal _duration = 10, bool debug = false);
+    const QString getTitle() const;
     QList<Tag*> historyTags, hashTags;
     qreal progression;
 private:
@@ -61,7 +62,7 @@ public:
     void setTimeStart(qreal _timeStart);
     void setTimeEnd(qreal _timeEnd);
     void moveTo(qreal _val);
-    PlayerVideo *playerVideo;
+    PlayerVideo *player;
     void fireEvents();
 private slots:
     void renderActiveChanged();
@@ -69,7 +70,7 @@ private slots:
 public:
     QRectF  timelineBoundingRect;
     QPointF timelinePos, timelineDestPos;
-    qreal   timelineScale, timelineDestScale;
+    qreal   tagScale, tagDestScale;
 public:
     void  setTimelinePos(const QPointF _timelineDestPos)    { timelineDestPos = _timelineDestPos;  }
     const QRectF getTimelineBoundingRect() const            { return timelineBoundingRect; }

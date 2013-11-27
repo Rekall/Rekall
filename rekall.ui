@@ -135,6 +135,10 @@ QFrame#frameGlobalViewer, QWidget#viewer, QFrame#globalFramePlayer, QWidget#play
 	border:									0px solid black;
 	background-color: 				rgb(0, 0, 0);
 }
+QFrame#globalFrameTransparent, QFrame#globalFrameTransparent2 {
+	border:									0px solid black;
+	background-color: 				transparent;
+}
 
 
 
@@ -256,9 +260,6 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical, QScrollBar::add-pa
 }
 
 
-QSlider:horizontal {
-	min-width: 				100px;
-}
 QSlider::groove:horizontal {
 	border: 					0px solid transparent;
 	background-color: 	rgb(70, 70, 70);
@@ -281,8 +282,11 @@ QSplitter#fileSplitter::handle 						{		background: 	rgba(255,147,102, 30);	}
 QSplitter#fileSplitter::handle:pressed 			{		background: 	rgb(255,147,102);			}
 QSplitter#timelineSplitter::handle 				{		background: 	rgb(71, 77, 79);				}
 QSplitter#timelineSplitter::handle:pressed 	{		background: 	rgb(226,226,226);			}
+QSplitter#previewSplitter::handle 				{		background: 	rgb(71, 77, 79);				}
+QSplitter#previewSplitter::handle:pressed 	{		background: 	rgb(226,226,226);			}
 QSplitter::handle:horizontal	 						{		width: 	4px; 											}
 QSplitter::handle:vertical     							{		height:	4px; 											}
+QSplitter#previewSplitter::handle:vertical	{		height: 2px; 											}
 
 QDockWidget {
 }
@@ -313,8 +317,8 @@ QStatusBar {
 
 QFrame#frameGlobalTimeline QPushButton {
 	border:						2px solid black;
-	border-color:			rgb(74,201,159);
-	background-color:	rgb(74,201,159);
+	border-color:			rgb(64, 175, 140);
+	background-color:	rgb(64, 175, 140);
 	padding:					0px;
 	padding-left: 			4px;
 	padding-right: 		4px;
@@ -355,7 +359,7 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout_7">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -396,7 +400,7 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>200</width>
+            <width>205</width>
             <height>237</height>
            </rect>
           </property>
@@ -449,8 +453,8 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>178</height>
+            <width>205</width>
+            <height>237</height>
            </rect>
           </property>
           <attribute name="label">
@@ -492,8 +496,8 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>248</height>
+            <width>205</width>
+            <height>237</height>
            </rect>
           </property>
           <attribute name="label">
@@ -535,8 +539,8 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>484</height>
+            <width>205</width>
+            <height>330</height>
            </rect>
           </property>
           <attribute name="label">
@@ -642,7 +646,7 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
       </widget>
       <widget class="QToolBox" name="toolBoxRight">
        <property name="currentIndex">
-        <number>2</number>
+        <number>1</number>
        </property>
        <property name="tabSpacing">
         <number>0</number>
@@ -652,12 +656,12 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>449</height>
+          <width>475</width>
+          <height>399</height>
          </rect>
         </property>
         <attribute name="label">
-         <string>CUES</string>
+         <string>FLATTENED TIMELINE</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,9999">
          <property name="spacing">
@@ -700,49 +704,34 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="filtersPage">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>100</width>
-          <height>30</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>NOTHING… TO DELETE ?</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <property name="leftMargin">
-          <number>12</number>
-         </property>
-         <property name="topMargin">
-          <number>12</number>
-         </property>
-         <property name="rightMargin">
-          <number>12</number>
-         </property>
-         <property name="bottomMargin">
-          <number>12</number>
-         </property>
-        </layout>
-       </widget>
        <widget class="QWidget" name="infosPage">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>483</width>
-          <height>376</height>
+          <width>475</width>
+          <height>399</height>
          </rect>
         </property>
         <attribute name="label">
          <string>INFOS</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,9999,9999,9999,9999">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>12</number>
+         </property>
+         <property name="leftMargin">
+          <number>6</number>
+         </property>
+         <property name="topMargin">
+          <number>6</number>
+         </property>
+         <property name="rightMargin">
+          <number>6</number>
+         </property>
+         <property name="bottomMargin">
+          <number>6</number>
+         </property>
          <item>
           <widget class="QLabel" name="previewLabel">
            <property name="text">
@@ -754,47 +743,50 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
           </widget>
          </item>
          <item>
-          <widget class="Previewer" name="preview" native="true"/>
-         </item>
-         <item>
-          <widget class="QTreeWidget" name="metadata">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>20</height>
-            </size>
+          <widget class="QSplitter" name="previewSplitter">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-           <property name="editTriggers">
-            <set>QAbstractItemView::DoubleClicked</set>
-           </property>
-           <property name="alternatingRowColors">
-            <bool>false</bool>
-           </property>
-           <property name="indentation">
-            <number>10</number>
-           </property>
-           <property name="animated">
-            <bool>true</bool>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-           <attribute name="headerVisible">
-            <bool>false</bool>
-           </attribute>
-           <column>
-            <property name="text">
-             <string notr="true">Key</string>
+           <widget class="Previewer" name="preview" native="true"/>
+           <widget class="QTreeWidget" name="metadata">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
             </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Value</string>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
             </property>
-           </column>
+            <property name="editTriggers">
+             <set>QAbstractItemView::DoubleClicked</set>
+            </property>
+            <property name="alternatingRowColors">
+             <bool>false</bool>
+            </property>
+            <property name="indentation">
+             <number>10</number>
+            </property>
+            <property name="animated">
+             <bool>true</bool>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <attribute name="headerVisible">
+             <bool>false</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string notr="true">Key</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Value</string>
+             </property>
+            </column>
+           </widget>
           </widget>
          </item>
          <item>
@@ -948,8 +940,8 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
    <slot>actionMetadata(QTreeWidgetItem*,int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1036</x>
-     <y>388</y>
+     <x>788</x>
+     <y>401</y>
     </hint>
     <hint type="destinationlabel">
      <x>916</x>
@@ -964,8 +956,8 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
    <slot>refreshMetadata()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1036</x>
-     <y>548</y>
+     <x>788</x>
+     <y>458</y>
     </hint>
     <hint type="destinationlabel">
      <x>69</x>
@@ -980,8 +972,8 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1042</x>
-     <y>529</y>
+     <x>794</x>
+     <y>439</y>
     </hint>
     <hint type="destinationlabel">
      <x>1145</x>
@@ -1005,11 +997,28 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>toolBoxRight</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>Rekall</receiver>
+   <slot>actionForceGL()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>322</x>
+     <y>83</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1048</x>
+     <y>208</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>action()</slot>
   <slot>actionMetadata(QTreeWidgetItem*,int)</slot>
   <slot>refreshMetadata()</slot>
   <slot>personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
+  <slot>actionForceGL()</slot>
  </slots>
 </ui>

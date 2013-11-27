@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <Phonon>
-#include "misc/global.h"
 #include "core/project.h"
 
 namespace Ui {
@@ -12,7 +11,7 @@ class Player;
 
 using namespace Phonon;
 
-class Player : public QWidget, public GlVideo {
+class Player : public QWidget, public GlVideo, public Resizable {
     Q_OBJECT
 
 public:
@@ -29,6 +28,8 @@ public:
     qreal getCurrentTime() const;
 
 protected:
+    void globalPlayPause();
+    void forceResizeEvent();
     void resizeEvent(QResizeEvent *);
 
 private:

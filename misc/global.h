@@ -33,6 +33,7 @@ public:
     virtual void fireEvents()         {}
     virtual void seek(qreal, bool = false, bool = false) {}
     virtual qreal totalTime() const   { return 0.; }
+    virtual void actionPlay() {}
 public:
     virtual QPointF getTimelineCursorPos (qreal)           { return QPointF(); }
     virtual QPointF getViewerCursorPos   (qreal)           { return QPointF(); }
@@ -185,6 +186,7 @@ public:
 public:
     virtual void setVisbility(bool) = 0;
     virtual void refreshMetadata(void *_tag, bool inChutier) = 0;
+    virtual void showPreviewTab() = 0;
 public:
     virtual bool parseMimeData(const QMimeData *mime, const QString &source, bool test = false) = 0;
 };

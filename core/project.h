@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMenu>
+#include <QImage>
 #include "document.h"
 #include "cluster.h"
 #include "person.h"
@@ -45,7 +46,6 @@ public:
     qreal nbTagsPerCategories;
     QMap< QPair<QString, QString>, Cluster*> timelineClusters;
     QList<GlText> timelineCategories, timelinePhases;
-    QList< QPair<QRectF, UiBool*> > guiToggles;
     QList< QPair<QRectF, QPair<QString, QString> > > guiCategories;
     GlRect textureStrips;
     QMenu *timelineFilesMenu;

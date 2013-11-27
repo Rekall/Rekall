@@ -10,3 +10,14 @@ void PreviewerLabel::mouseReleaseEvent(QMouseEvent*) {
 void PreviewerLabel::mouseDoubleClickEvent(QMouseEvent*) {
     emit(mouseDoubleClick());
 }
+
+PreviewerVideoPlayer::PreviewerVideoPlayer(QWidget *parent) :
+    Phonon::VideoPlayer(parent) {
+}
+
+void PreviewerVideoPlayer::mouseReleaseEvent(QMouseEvent*) {
+    emit(mouseReleased());
+}
+void PreviewerVideoPlayer::mouseDoubleClickEvent(QMouseEvent*) {
+    emit(mouseDoubleClick());
+}

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1172</width>
+    <width>1285</width>
     <height>183</height>
    </rect>
   </property>
@@ -102,6 +102,10 @@
              <property name="text">
               <string>PHASES</string>
              </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_date.png</normaloff>:/icons/res_icon_filter_date.png</iconset>
+             </property>
              <property name="checkable">
               <bool>true</bool>
              </property>
@@ -123,6 +127,10 @@
              </property>
              <property name="text">
               <string>SORT</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_sort.png</normaloff>:/icons/res_icon_filter_sort.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -146,6 +154,10 @@
              <property name="text">
               <string>COLOR</string>
              </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_color.png</normaloff>:/icons/res_icon_filter_color.png</iconset>
+             </property>
              <property name="checkable">
               <bool>true</bool>
              </property>
@@ -168,6 +180,10 @@
              <property name="text">
               <string>FILTER</string>
              </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_filter.png</normaloff>:/icons/res_icon_filter_filter.png</iconset>
+             </property>
              <property name="checkable">
               <bool>true</bool>
              </property>
@@ -189,6 +205,10 @@
              </property>
              <property name="text">
               <string>HIGHLIGHT</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_search.png</normaloff>:/icons/res_icon_filter_search.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -283,6 +303,19 @@
             </spacer>
            </item>
            <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <widget class="QPushButton" name="viewOption">
              <property name="minimumSize">
               <size>
@@ -297,25 +330,16 @@
               </size>
              </property>
              <property name="text">
-              <string>VIEW OPTIONS</string>
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_options.png</normaloff>:/icons/res_icon_filter_options.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
              </property>
             </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item>
             <widget class="QPushButton" name="legend">
@@ -332,7 +356,11 @@
               </size>
              </property>
              <property name="text">
-              <string>LEGEND / STATS</string>
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_legend.png</normaloff>:/icons/res_icon_filter_legend.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>

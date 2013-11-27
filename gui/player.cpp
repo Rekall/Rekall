@@ -15,11 +15,11 @@ Player::~Player() {
 void Player::load(void *_tag) {
     Tag *tag = (Tag*)_tag;
     if(!tags.contains(tag)) {
-        if(tag->playerVideo)
+        if(tag->player)
             tags.append(tag);
-        tag->playerVideo->setParent(ui->globalFramePlayer);
-
-        tag->playerVideo->setVisible(true);
+        tag->player->setParent(ui->globalFramePlayer);
+        tag->player->window = this;
+        tag->player->setVisible(true);
         play(Global::timerPlay);
         seek(Global::time);
         resizeEvent(0);
@@ -29,51 +29,66 @@ void Player::unload(void *_tag) {
     Tag *tag = (Tag*)_tag;
     if(tags.contains(tag)) {
         tags.removeOne(tag);
-        tag->playerVideo->pause();
-        tag->playerVideo->setVisible(false);
-        tag->playerVideo->setParent(0);
+        tag->player->pause();
+        tag->player->setVisible(false);
+        tag->player->setParent(0);
         resizeEvent(0);
     }
 }
 
 
-void Player::resizeEvent(QResizeEvent *) {
-    quint16 videoNb = 0;
+void Player::globalPlayPause() {
+    Global::timeline->actionPlay();
+}
+void Player::forceResizeEvent() {
+    QList<Tag*> videos, audios;
 
+    //Player
     foreach(Tag *tag, tags)
-        if((tag->getDocument()->type == DocumentTypeVideo) || (tag->getDocument()->type == DocumentTypeImage))
-            videoNb++;
+        if(     (tag->player) && ( tag->player->isVideo) && (tag->player->isDisplayed()))
+            videos << tag;
+        else if (tag->player)
+            audios << tag;
 
-    if(videoNb) {
-        quint16 videoIndex = 0;
-        QPoint start;
-        QSize videoSize(size().width() / qMin(videoNb, (quint16)2), size().height() / qMax(1, qCeil((qreal)videoNb / 2.)));
-        foreach(Tag *tag, tags) {
-            if((tag->getDocument()->type == DocumentTypeVideo) || (tag->getDocument()->type == DocumentTypeImage)) {
-                tag->playerVideo->setGeometry(QRect(start, videoSize));
-                videoIndex++;
-                if(videoIndex % 2 == 0) start += QPoint(-start.x(), videoSize.height());
-                else                    start += QPoint(videoSize.width(), 0);
-            }
-        }
+    //Space division
+    QRect videoSpace(QPoint(0, 0), QSize(width(), height() - (qCeil((qreal)audios.count() / 2.) * 40)));
+    QRect audioSpace(videoSpace.bottomLeft(), QSize(videoSpace.width(), height() - videoSpace.height()));
+
+    //Distribution
+    quint16 index = 0;
+    foreach(Tag *video, videos) {
+        QSize videoSize(videoSpace.width() / 2, videoSpace.height() / qCeil((qreal)videos.count() / 2));
+        if(video->player)
+            video->player->setGeometry(QRect(videoSpace.topLeft() + QPoint((index % 2) * videoSize.width(), qFloor(index / 2) * videoSize.height()), videoSize));
+        index++;
     }
+    index = 0;
+    foreach(Tag *audio, audios) {
+        QSize audioSize(audioSpace.width() / 2, audioSpace.height() / qCeil((qreal)audios.count() / 2));
+        if(audio->player)
+            audio->player->setGeometry(QRect(audioSpace.topLeft() + QPoint((index % 2) * audioSize.width(), qFloor(index / 2) * audioSize.height()), audioSize));
+        index++;
+    }
+}
+void Player::resizeEvent(QResizeEvent *) {
+    forceResizeEvent();
 }
 
 void Player::seek(qreal time) {
     foreach(Tag *tag, tags)
-        tag->playerVideo->seek(qBound(0., (tag->getDocument()->getMetadata("Rekall", "Media Offset").toDouble() + time - tag->timeStart) * 1000., (qreal)tag->playerVideo->totalTime()));
+        tag->player->seek(qBound(0., (tag->getDocument()->getMetadata("Rekall", "Media Offset").toDouble() + time - tag->timeStart) * 1000., (qreal)tag->player->totalTime()));
 }
 void Player::play(bool state) {
     foreach(Tag *tag, tags) {
         if(tag->contains(Global::time)) {
-            if(state)   tag->playerVideo->play();
-            else        tag->playerVideo->pause();
+            if(state)   tag->player->play();
+            else        tag->player->pause();
         }
     }
 }
 
 
 qreal Player::getCurrentTime() const {
-    if(tags.count())    return tags.first()->playerVideo->currentTime() / 1000.;
+    if(tags.count())    return tags.first()->player->currentTime() / 1000.;
     else                return 0;
 }

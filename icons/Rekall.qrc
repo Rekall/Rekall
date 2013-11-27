@@ -23,6 +23,23 @@
         <file>events/pencil.gif</file>
         <file>events/person.gif</file>
         <file>events/x.gif</file>
+        <file>res_icon_volumeHigh.png</file>
+        <file>res_icon_volumeLow.png</file>
+        <file>res_icon_volumeMute.png</file>
+        <file>res_icon_video_off.png</file>
+        <file>res_icon_video_on.png</file>
+        <file>res_icon_audio_off.png</file>
+        <file>res_icon_audio_on.png</file>
+        <file>res_icon_video_play_off.png</file>
+        <file>res_icon_video_play_on.png</file>
+        <file>res_icon_filter_color.png</file>
+        <file>res_icon_filter_date.png</file>
+        <file>res_icon_filter_filter.png</file>
+        <file>res_icon_filter_search.png</file>
+        <file>res_icon_filter_sort.png</file>
+        <file>res_icon_filter_options.png</file>
+        <file>res_icon_filter_legend.png</file>
+        <file>res_icon_filter_note.png</file>
     </qresource>
     <qresource prefix="/textures">
         <file>res_texture_strips.png</file>

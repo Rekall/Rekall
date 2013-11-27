@@ -17,8 +17,8 @@ Phases::Phases(QWidget *parent) :
     ui(new Ui::Phases) {
     ui->setupUi(this);
 
-    needCalulation = true;
     phasesByDaysTo.setAction(ui->daysTo);
+    action();
 }
 
 Phases::~Phases() {

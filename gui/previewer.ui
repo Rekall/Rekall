@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>342</width>
-    <height>270</height>
+    <width>335</width>
+    <height>224</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Previewer</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -30,7 +33,10 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="globalFrame">
+    <widget class="QFrame" name="globalFrameTransparent">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -55,7 +61,11 @@
       </property>
       <item>
        <widget class="QStackedWidget" name="type">
-        <widget class="QWidget" name="page">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="empty"/>
+        <widget class="QWidget" name="image">
          <widget class="PreviewerLabel" name="picture">
           <property name="geometry">
            <rect>
@@ -79,6 +89,197 @@
           </property>
          </widget>
         </widget>
+        <widget class="QWidget" name="media">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="PreviewerVideoPlayer" name="playerVideo" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>50</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="globalFrameTransparent2">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QFrame#globalFramePlayer {
+	border:						0px solid black;
+}
+QSlider::groove {
+	background-color: 	qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255,255,255,30), stop:1 rgb(255,255,255, 130));
+	height: 					1px;
+}
+QSlider::handle {
+	width: 						2px;
+	background-color: 	rgb(200, 200, 200);
+}
+QPushButton {
+	padding: 					1px;
+	margin: 					0px;
+	margin-bottom:		2px;
+	background-color: 	transparent;
+	border: 					0px solid transparent;
+}
+QLabel {
+	font-size: 				9px;
+	color: 						rgb(200, 200, 200);
+}
+QLabel::disabled {
+	color: 						rgb(100, 100, 100);
+}</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0,0,0">
+             <property name="spacing">
+              <number>12</number>
+             </property>
+             <property name="leftMargin">
+              <number>12</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="playPause">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../icons/Rekall.qrc">
+                 <normaloff>:/icons/res_icon_video_play_on.png</normaloff>
+                 <normalon>:/icons/res_icon_video_play_off.png</normalon>:/icons/res_icon_video_play_on.png</iconset>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="seek">
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="time">
+               <property name="text">
+                <string>TIME</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="volumeLow">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../icons/Rekall.qrc">
+                 <normaloff>:/icons/res_icon_volumeLow.png</normaloff>
+                 <normalon>:/icons/res_icon_volumeMute.png</normalon>:/icons/res_icon_volumeLow.png</iconset>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="volume">
+               <property name="minimumSize">
+                <size>
+                 <width>50</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>50</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="volumeHigh">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../icons/Rekall.qrc">
+                 <normaloff>:/icons/res_icon_volumeHigh.png</normaloff>:/icons/res_icon_volumeHigh.png</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>
@@ -93,10 +294,24 @@
    <header>gui/previewerlabel.h</header>
    <slots>
     <signal>mouseDoubleClick()</signal>
+    <signal>mouseReleased()</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>PreviewerVideoPlayer</class>
+   <extends>QWidget</extends>
+   <header>gui/previewerlabel.h</header>
+   <container>1</container>
+   <slots>
+    <signal>mouseReleased()</signal>
+    <signal>mouseDoubleClick()</signal>
+    <signal>finished()</signal>
    </slots>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../icons/Rekall.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>picture</sender>
@@ -114,8 +329,138 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>volumeHigh</sender>
+   <signal>released()</signal>
+   <receiver>Previewer</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>214</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>497</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>volume</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>Previewer</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>298</x>
+     <y>213</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>volumeLow</sender>
+   <signal>released()</signal>
+   <receiver>Previewer</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>242</x>
+     <y>214</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>529</x>
+     <y>98</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>seek</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>Previewer</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>136</x>
+     <y>213</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>500</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>playPause</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Previewer</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>29</x>
+     <y>214</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>489</x>
+     <y>128</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>playerVideo</sender>
+   <signal>mouseReleased()</signal>
+   <receiver>Previewer</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>101</x>
+     <y>182</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>602</x>
+     <y>64</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>playerVideo</sender>
+   <signal>mouseDoubleClick()</signal>
+   <receiver>Previewer</receiver>
+   <slot>actionOpen()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>171</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>73</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>playerVideo</sender>
+   <signal>finished()</signal>
+   <receiver>Previewer</receiver>
+   <slot>actionFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>196</x>
+     <y>146</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>481</x>
+     <y>45</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>action()</slot>
+  <slot>actionOpen()</slot>
+  <slot>actionFinished()</slot>
  </slots>
 </ui>

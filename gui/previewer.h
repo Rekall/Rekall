@@ -3,7 +3,13 @@
 
 #include <QWidget>
 #include <QUrl>
+#include <QFileInfo>
 #include <QDesktopServices>
+#include <Phonon>
+#include "misc/global.h"
+
+
+using namespace Phonon;
 
 namespace Ui {
 class Previewer;
@@ -18,15 +24,22 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *);
+    void timerEvent(QTimerEvent *);
 
 private slots:
     void action();
+    void actionOpen();
+    void actionFinished();
 
 private:
-    QPair<QString, QPixmap> picture;
+    bool isUpdating;
+    qreal volumeOld;
+    QPixmap picture;
+    QString filename;
 public:
-    void displayPixmap(const QPair<QString, QPixmap> &_picture);
-    
+    void setVolume(qreal volume);
+    void preview(int documentType, const QString &_filename, const QPixmap &_picture);
+
 private:
     Ui::Previewer *ui;
 };

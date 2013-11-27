@@ -153,7 +153,7 @@ public:
         if(Global::colorForMeta.contains(getCriteriaColorFormated()))
             return Global::colorForMeta.value(getCriteriaColorFormated()).first;
         else if(function == DocumentFunctionRender)
-            return QColor(226, 226, 226);
+            return QColor(255, 255, 255);
         else
             return QColor(226, 226, 226, 46);
     }

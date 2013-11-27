@@ -3,12 +3,23 @@
 
 #include <QWidget>
 #include <Phonon>
+#include "misc/global.h"
 
 using namespace Phonon;
 
 namespace Ui {
 class PlayerVideo;
 }
+
+class Nameable {
+public:
+    virtual const QString getTitle() const = 0;
+};
+class Resizable {
+public:
+    virtual void globalPlayPause() = 0;
+    virtual void forceResizeEvent() = 0;
+};
 
 class PlayerVideo : public QWidget {
     Q_OBJECT
@@ -18,16 +29,28 @@ public:
     ~PlayerVideo();
 
 public:
-    void load(const QString &filename);
+    bool isVideo;
+    Nameable  *tag;
+    Resizable *window;
+private:
+    qreal volumeOld;
+public:
+    void load(Nameable *_tag, bool _isVideo, const QString &filename);
     void play();
     void pause();
     void seek(qint64 time);
+    bool isDisplayed() const;
     qint64 currentTime();
     qint64 totalTime();
     void setVolume(qreal volume);
+    void refreshControls();
+private slots:
+    void action();
 protected:
     void resizeEvent(QResizeEvent *);
-    
+    void enterEvent(QEvent *);
+    void leaveEvent(QEvent *);
+
 private:
     Ui::PlayerVideo *ui;
 };
