@@ -76,7 +76,7 @@ void Player::resizeEvent(QResizeEvent *) {
 
 void Player::seek(qreal time) {
     foreach(Tag *tag, tags)
-        tag->player->seek(qBound(0., (tag->getDocument()->getMetadata("Rekall", "Media Offset").toDouble() + time - tag->timeStart) * 1000., (qreal)tag->player->totalTime()));
+        tag->player->seek(qBound(0., (tag->getDocument()->getMetadata("Rekall", "Media Offset").toDouble() + time - tag->getTimeStart()) * 1000., (qreal)tag->player->totalTime()));
 }
 void Player::play(bool state) {
     foreach(Tag *tag, tags) {

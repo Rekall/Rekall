@@ -42,6 +42,8 @@ public slots:
     void actionChanged(QString,QString);
     void actionRewind();
     void actionPlay();
+    void setDuplicates(quint16 nbDuplicates);
+    void setHistories(quint16 nbHistories);
 
     
 private:

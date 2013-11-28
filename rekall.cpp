@@ -43,17 +43,19 @@ Rekall::Rekall(QWidget *parent) :
     Global::currentProject = currentProject;
     connect(currentProject, SIGNAL(refreshMetadata()), SLOT(refreshAndLastMetadata()));
 
-    Global::phases             = new Phases(0);
-    Global::tagFilterCriteria  = new Sorting(tr("Filter rules"),     6);
-    Global::tagSortCriteria    = new Sorting(tr("Sorting rules"),    2);
-    Global::tagColorCriteria   = new Sorting(tr("Color rules"),      5);
-    Global::tagClusterCriteria = new Sorting(tr("Hightlight rules"), 7, true);
+    Global::phases                = new Phases(0);
+    Global::tagFilterCriteria     = new Sorting(tr("Filter rules"),     6);
+    Global::tagSortCriteria       = new Sorting(tr("Sorting rules"),    2);
+    Global::tagColorCriteria      = new Sorting(tr("Color rules"),      5);
+    Global::tagClusterCriteria    = new Sorting(tr("Hightlight rules"), 7, true);
+    Global::tagHorizontalCriteria = new Sorting(tr("Horizontal rules"), 1, false, true);
 
     QString styleAdditionnal = "QWidget#Sorting, QWidget#Phases, QWidget#TimelineControl { background-color: transparent;}";
     Global::tagFilterCriteria    ->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::tagSortCriteria      ->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::tagColorCriteria     ->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::tagClusterCriteria   ->setStyleSheet(styleSheet() + styleAdditionnal);
+    Global::tagHorizontalCriteria->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::phases               ->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::phases               ->setStyleSheet2(Global::tagFilterCriteria->styleSheet2());
     ui->timeline->timelineControl->setStyleSheet(styleSheet() + styleAdditionnal);
@@ -64,20 +66,24 @@ Rekall::Rekall(QWidget *parent) :
     connect(Global::tagSortCriteria,       SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(Global::tagColorCriteria,      SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(Global::tagClusterCriteria,    SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::tagHorizontalCriteria, SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(ui->timeline->timelineControl, SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
 
-    connect(Global::phases,             SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
-    connect(Global::tagFilterCriteria,  SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
-    connect(Global::tagSortCriteria,    SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
-    connect(Global::tagColorCriteria,   SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
-    connect(Global::tagClusterCriteria, SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
-    Global::phases            ->action();
-    Global::tagFilterCriteria ->action();
-    Global::tagSortCriteria   ->action();
-    Global::tagColorCriteria  ->action();
-    Global::tagClusterCriteria->action();
+    connect(Global::phases,                SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::tagFilterCriteria,     SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::tagSortCriteria,       SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::tagColorCriteria,      SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::tagClusterCriteria,    SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::tagHorizontalCriteria, SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    Global::phases               ->action();
+    Global::tagFilterCriteria    ->action();
+    Global::tagSortCriteria      ->action();
+    Global::tagColorCriteria     ->action();
+    Global::tagClusterCriteria   ->action();
+    Global::tagHorizontalCriteria->action();
 
 
+    Global::showHelp.setAction(ui->actionInlineHelp);
     connect(ui->actionSave, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionPaste, SIGNAL(triggered()), SLOT(action()));
     connect(&Global::showHelp, SIGNAL(triggered(bool)), SLOT(showHelp(bool)));
@@ -233,7 +239,7 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
                 Tag *tag = new Tag(droppedDocument);
                 tag->create(TagTypeContextualTime, currentProject->getTimelineCursorTime(Global::timelineGL->mapFromGlobal(QCursor::pos()) + Global::timelineGL->scroll), 10);
                 currentProject->addTag(tag);
-                Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = true;
+                Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
                 if(droppedDocument->chutierItem)
                     Global::chutier->setCurrentItem(droppedDocument->chutierItem);
                 retour = true;
@@ -266,7 +272,7 @@ void Rekall::actionMetadata() {
         QString category = ui->metadata->currentItem()->parent()->text(0).remove(QRegExp("<[^>]*>")).trimmed();
         if(category == "General")   category = "Rekall";
         currentDocument->setMetadata(category, key, value, ui->metadataSlider->value());
-        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = true;
+        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
     }
 }
 void Rekall::actionMetadata(QTreeWidgetItem *item, int) {

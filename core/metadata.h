@@ -150,8 +150,9 @@ public:
     const QPair<QString, QPixmap> getThumbnail(qint16 version = -1);
     const QList< QPair<QString,QString> > getGps();
     inline const QColor getColor() {
-        if(Global::colorForMeta.contains(getCriteriaColorFormated()))
-            return Global::colorForMeta.value(getCriteriaColorFormated()).first;
+        QString colorMeta = getCriteriaColorFormated();
+        if(Global::colorForMeta.contains(colorMeta))
+            return Global::colorForMeta.value(colorMeta).first;
         else if(function == DocumentFunctionRender)
             return QColor(255, 255, 255);
         else
@@ -179,16 +180,20 @@ public:
 public:
     const QString getCriteriaSort(qint16 version = -1);
     const QString getCriteriaSortFormated(qint16 version = -1);
-    const MetadataElement getCriteriaSortRaw(qint16 version);
+    const MetadataElement getCriteriaPhase(qint16 version);
     const QString getCriteriaCluster(qint16 version = -1);
     const QString getCriteriaClusterFormated(qint16 version = -1);
     const QString getCriteriaColor(qint16 version = -1);
     const QString getCriteriaColorFormated(qint16 version = -1);
     const QString getCriteriaFilter(qint16 version = -1);
     const QString getCriteriaFilterFormated(qint16 version = -1);
+    const QString getCriteriaHorizontal(qint16 version = -1);
+    const QString getCriteriaHorizontalFormated(qint16 version = -1);
     bool isAcceptableWithSortFilters(bool strongCheck, qint16 version = -1);
     bool isAcceptableWithColorFilters(bool strongCheck, qint16 version = -1);
     bool isAcceptableWithClusterFilters(bool strongCheck, qint16 version = -1);
+    bool isAcceptableWithFilterFilters(bool strongCheck, qint16 version = -1);
+    bool isAcceptableWithHorizontalFilters(bool strongCheck, qint16 version = -1);
     const QString getAcceptableWithClusterFilters(qint16 version = -1);
 
 public:

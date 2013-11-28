@@ -14,7 +14,7 @@
    <string>Rekall</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QTabWidget, QLabel, QCheckBox, QLineEdit, QPlainTextEdit, QPushButton, QSpinBox, QDoubleSpinBox, QTreeView, QHeaderView, QTabBar, QComboBox, QFrame#globalFrame, QTabBar::tab, QTreeView, QHeaderView, QDockWidget, QStatusBar, QRadioButton, QToolBox, QToolBox::tab {
+   <string notr="true">QTabWidget, QLabel, QCheckBox, QLineEdit, QPlainTextEdit, QPushButton, QSpinBox, QDoubleSpinBox, QTreeView, QHeaderView, QTabBar, QComboBox, QFrame#globalFrame, QTabBar::tab, QTreeView, QHeaderView, QDockWidget, QStatusBar, QRadioButton, QToolBox, QToolBox::tab, QMenuBar, QMenu {
 	font: 						12px &quot;Calibri&quot;, &quot;Arial&quot;;
 	padding:					0px;
 	margin:					0px;
@@ -327,9 +327,15 @@ QFrame#frameGlobalTimeline QPushButton {
 	min-height:				20px;
 	max-height:				20px;
 }
-QFrame#frameGlobalTimeline QPushButton:checked, QFrame#frameGlobalTimeline QPushButton:pressed {
+QFrame#frameGlobalTimeline QPushButton:enabled:checked, QFrame#frameGlobalTimeline QPushButton:enabled:pressed {
 	border-color:			rgb(255,84,79);
 	background-color:	rgb(255,84,79);
+}
+QFrame#frameGlobalTimeline QPushButton:disabled, QFrame#frameGlobalTimeline QPushButton:checked:disabled {
+	border:						2px solid black;
+	border-color:			rgb(41, 44, 45);;
+	background-color:	rgb(41, 44, 45);
+	color:						rgb(120, 120, 120);
 }
 QFrame#frameGlobalTimeline QPushButton:hover {
 	border-color:			rgb(226,226,226);
@@ -356,7 +362,36 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
 	background:				rgb(45, 50, 53);
 }
 
-</string>
+
+
+QMenuBar, QMenu {
+	background-color: 	rgb(56, 61, 63);
+}
+QMenuBar::item {
+     padding: 				1px 8px;
+     background: 			transparent;
+     border-radius: 		4px;
+}
+QMenuBar::item:selected {
+     background: 			rgb(45, 202, 225);
+}
+QMenuBar::item:pressed {
+     background: 			red;
+}
+
+
+QMenu {
+     border: 					1px solid rgb(46, 51, 53);;
+}
+QMenu::item {
+     background-color: transparent;
+}
+QMenu::item:disabled {
+     color:						rgb(131, 135, 137);
+}
+QMenu::item:enabled:selected {
+     background-color: rgb(45, 202, 225);
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -401,7 +436,7 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
             <x>0</x>
             <y>0</y>
             <width>205</width>
-            <height>237</height>
+            <height>236</height>
            </rect>
           </property>
           <attribute name="label">
@@ -453,8 +488,8 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>205</width>
-            <height>237</height>
+            <width>98</width>
+            <height>192</height>
            </rect>
           </property>
           <attribute name="label">
@@ -496,8 +531,8 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>205</width>
-            <height>237</height>
+            <width>98</width>
+            <height>262</height>
            </rect>
           </property>
           <attribute name="label">
@@ -539,8 +574,8 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>205</width>
-            <height>330</height>
+            <width>98</width>
+            <height>498</height>
            </rect>
           </property>
           <attribute name="label">
@@ -656,8 +691,8 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>475</width>
-          <height>399</height>
+          <width>100</width>
+          <height>449</height>
          </rect>
         </property>
         <attribute name="label">
@@ -710,7 +745,7 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
           <x>0</x>
           <y>0</y>
           <width>475</width>
-          <height>399</height>
+          <height>398</height>
          </rect>
         </property>
         <attribute name="label">
@@ -816,7 +851,7 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
      <x>0</x>
      <y>0</y>
      <width>801</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPlayback">
@@ -838,9 +873,16 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
     </property>
     <addaction name="actionPaste"/>
    </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>Window</string>
+    </property>
+    <addaction name="actionInlineHelp"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuPlayback"/>
+   <addaction name="menuWindow"/>
   </widget>
   <action name="actionPlay">
    <property name="text">
@@ -883,6 +925,20 @@ QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport {
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionInlineHelp">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Inline help</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+H</string>
    </property>
   </action>
  </widget>

@@ -14,10 +14,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QLabel {
-	padding-top: 3px;
-}
-</string>
+   <string notr="true">font-size: 10px;</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -43,54 +40,76 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="spacing">
        <number>6</number>
       </property>
-      <property name="leftMargin">
-       <number>12</number>
-      </property>
-      <property name="topMargin">
-       <number>12</number>
-      </property>
-      <property name="rightMargin">
-       <number>12</number>
-      </property>
-      <property name="bottomMargin">
-       <number>12</number>
-      </property>
       <item>
-       <layout class="QGridLayout" name="gridLayout">
-        <property name="horizontalSpacing">
-         <number>12</number>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>0</number>
         </property>
-        <property name="verticalSpacing">
-         <number>6</number>
-        </property>
-        <item row="0" column="0">
-         <widget class="QLabel" name="daysToLabel">
-          <property name="text">
-           <string>Dates spaced by more than</string>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
+          <property name="spacing">
+           <number>10</number>
           </property>
-         </widget>
+          <item>
+           <widget class="QCheckBox" name="allow">
+            <property name="text">
+             <string>Split in periods based on</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="filter">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
-        <item row="0" column="1">
-         <widget class="QSpinBox" name="daysTo">
-          <property name="suffix">
-           <string> days</string>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+          <property name="spacing">
+           <number>10</number>
           </property>
-          <property name="maximum">
-           <number>999999</number>
-          </property>
-          <property name="value">
-           <number>60</number>
-          </property>
-         </widget>
+          <item>
+           <widget class="QLabel" name="title">
+            <property name="minimumSize">
+             <size>
+              <width>110</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>when they are spaced of more than</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="daysTo">
+            <property name="suffix">
+             <string> days</string>
+            </property>
+            <property name="maximum">
+             <number>999999</number>
+            </property>
+            <property name="value">
+             <number>180</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
       <item>
-       <widget class="QTreeWidget" name="names">
+       <widget class="QTreeWidget" name="checks">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ContiguousSelection</enum>
+        </property>
         <property name="indentation">
          <number>0</number>
         </property>
@@ -108,6 +127,34 @@
          </property>
         </column>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>20</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="uncheckAll">
+          <property name="text">
+           <string>Uncheck</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="invertAll">
+          <property name="text">
+           <string>Invert</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="checkAll">
+          <property name="text">
+           <string>Check</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <spacer name="verticalSpacer">
@@ -139,8 +186,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>367</x>
-     <y>30</y>
+     <x>325</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -149,7 +196,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>names</sender>
+   <sender>checks</sender>
    <signal>itemChanged(QTreeWidgetItem*,int)</signal>
    <receiver>Phases</receiver>
    <slot>actionNames()</slot>
@@ -160,7 +207,103 @@
     </hint>
     <hint type="destinationlabel">
      <x>333</x>
-     <y>338</y>
+     <y>286</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>allow</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Phases</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>62</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>56</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checks</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>Phases</receiver>
+   <slot>actionSelection()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>152</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>532</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkAll</sender>
+   <signal>released()</signal>
+   <receiver>Phases</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>296</x>
+     <y>211</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>460</x>
+     <y>200</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>invertAll</sender>
+   <signal>released()</signal>
+   <receiver>Phases</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>192</x>
+     <y>225</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>510</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uncheckAll</sender>
+   <signal>released()</signal>
+   <receiver>Phases</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>224</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>406</x>
+     <y>127</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>filter</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>Phases</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>254</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>22</y>
     </hint>
    </hints>
   </connection>
@@ -168,5 +311,6 @@
  <slots>
   <slot>action()</slot>
   <slot>actionNames()</slot>
+  <slot>actionSelection()</slot>
  </slots>
 </ui>

@@ -70,11 +70,13 @@ bool         Global::timelineSortChanged          = true;
 bool         Global::metaChanged                  = true;
 bool         Global::viewerSortChanged            = true;
 bool         Global::eventsSortChanged            = true;
+bool         Global::ticksChanged                 = true;
 QMap<QString, QPair<QColor, qreal> > Global::colorForMeta;
-Sorting*     Global::tagSortCriteria    = 0;
-Sorting*     Global::tagColorCriteria   = 0;
-Sorting*     Global::tagClusterCriteria = 0;
-Sorting*     Global::tagFilterCriteria  = 0;
+Sorting*     Global::tagSortCriteria       = 0;
+Sorting*     Global::tagColorCriteria      = 0;
+Sorting*     Global::tagClusterCriteria    = 0;
+Sorting*     Global::tagFilterCriteria     = 0;
+Sorting*     Global::tagHorizontalCriteria = 0;
 Phases*      Global::phases             = 0;
 WatcherBase* Global::watcher            = 0;
 RekallBase*  Global::mainWindow         = 0;
@@ -94,29 +96,7 @@ void Global::play(bool state) {
 }
 
 
-const QString Global::timeToString(qreal time) {
-    QString timeStr = "";
 
-    quint16 min = time / 60;
-    if(min < 10)        timeStr += "0";
-    else if(min < 100)  timeStr += "";
-    timeStr += QString::number(min) + ":";
-
-    quint8 sec = qFloor(time) % 60;
-    if(sec < 10) timeStr += "0";
-    timeStr += QString::number(sec);
-
-    return timeStr;
-}
-qreal Global::stringToTime(const QString &timeStr) {
-    qreal time = 0;
-    if(timeStr.count()) {
-        QStringList timeParts = timeStr.split(":");
-        if(timeParts.count() > 1)
-            time = timeParts.last().toDouble() + timeParts.at(timeParts.count() - 2).toDouble() * 60;
-    }
-    return time;
-}
 
 const QString Global::dateToString(const QDateTime &date, bool addExactTime) {
     quint16 daysTo   = date.daysTo(QDateTime::currentDateTime());
@@ -277,7 +257,7 @@ void GlText::setStyle(const QSize &_size, int _alignement, const QFont &_font) {
     init       = false;
     alignement = _alignement;
     image      = QImage(size, QImage::Format_ARGB32_Premultiplied);
-    text       = "";
+    text       = "...";
 }
 
 void GlText::drawText(const QString &newtext, const QPoint &pos) {
@@ -302,7 +282,7 @@ void GlText::drawText(const QPoint &pos) {
         glEnable(GL_TEXTURE_2D);
         if(!texture) {
             glGenTextures(1, &texture);
-            qDebug("%s", qPrintable(QString("[OPENGL] Création de la texture #%1 => %2 (%3 x %4)").arg(texture).arg(text).arg(size.width()).arg(size.height())));
+            qDebug("%s", qPrintable(QString("[OPENGL] Création de la texture #%1 => |%2| (%3 x %4)").arg(texture).arg(text).arg(size.width()).arg(size.height())));
         }
         glBindTexture  (GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

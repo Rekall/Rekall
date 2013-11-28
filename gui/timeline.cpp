@@ -40,11 +40,20 @@ const QRectF Timeline::paintTimeline(bool before) {
         while(ticks.count() < qFloor(Global::currentProject->totalTime() / Global::timeUnitTick)) {
             GlText text;
             text.setStyle(QSize(50., Global::timelineHeaderSize.height()), Qt::AlignCenter, Global::fontSmall);
-            text.setText(Global::timeToString(ticks.count() * Global::timeUnitTick));
             ticks.append(text);
         }
+        if(Global::ticksChanged) {
+            for(quint16 i = 0 ; i < ticks.count() ; i++) {
+                QString tickText = Global::tagHorizontalCriteria->getCriteriaFormated(i * Global::timeUnitTick);
+                if(ticks.at(i).text != tickText)
+                    ticks[i].setText(tickText);
+            }
+            Global::ticksChanged = false;
+        }
+
+
         Global::timelineGL->qglColor(Global::colorTicks);
-        QRectF tickRectOld;
+        QRectF tickRectOld(-100, 10, 10, 10);
         glBegin(GL_LINES);
         for(quint16 tickIndex = 0 ; tickIndex < ticks.count() ; tickIndex++) {
             QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
@@ -60,38 +69,42 @@ const QRectF Timeline::paintTimeline(bool before) {
         //Timetext
         Global::timelineGL->qglColor(Global::colorBackground);
         GlRect::drawRect(QRectF(QPointF(Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timelineGL->scroll.x(), Global::timelineGL->scroll.y()), QSizeF(Global::timelineGL->width(), Global::timelineHeaderSize.height())));
-        Global::timelineGL->qglColor(Global::colorTextBlack);
-        QRectF tickRectOld;
-        for(quint16 tickIndex = 1 ; tickIndex < ticks.count() ; tickIndex++) {
+        Global::timelineGL->qglColor(QColor(120, 120, 120));
+        QRectF tickRectOld(-100, 10, 10, 10);
+        glDisable(GL_SCISSOR_TEST);
+        for(quint16 tickIndex = 0 ; tickIndex < ticks.count() ; tickIndex++) {
             QRectF tickRect(QPointF(Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + tickIndex * Global::timeUnitTick * Global::timeUnit, 0), QSizeF(ticksWidth, Global::timelineHeaderSize.height()));
             if(!tickRect.intersects(tickRectOld)) {
                 ticks[tickIndex].drawText((tickRect.topLeft() + QPointF(-ticksWidth/2, Global::timelineGL->scroll.y())).toPoint());
                 tickRectOld = tickRect;
             }
         }
+        glEnable(GL_SCISSOR_TEST);
 
         //Timeline
         timelinePosDest = Global::currentProject->getTimelineCursorPos(Global::time);
         timelinePos = timelinePos + (timelinePosDest - timelinePos) / Global::inertie;
         QRectF timelineBoundingRect(QPointF(timelinePos.x() + 1, Global::timelineGL->scroll.y()), QSizeF(-50, Global::timelineGL->height()));
 
-        glBegin(GL_QUADS);
-        qreal opacity = qMin(qAbs(timelinePos.x() - timelinePosDest.x()) / 200., 1.0);
-        if(Global::timerPlay)
-            opacity += 0.2;
-        QRectF timelineBoundingRect2 = timelineBoundingRect;
-        if((timelinePos.x() - timelinePosDest.x()) > 0)
-            timelineBoundingRect2.setSize(QSizeF(50., timelineBoundingRect2.height()));
-        Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*64));    glVertex2f(timelineBoundingRect2.topLeft()    .x(), timelineBoundingRect2.topLeft()    .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
-        Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*0));     glVertex2f(timelineBoundingRect2.topRight()   .x(), timelineBoundingRect2.topRight()   .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
-        Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*0));     glVertex2f(timelineBoundingRect2.bottomRight().x(), timelineBoundingRect2.bottomRight().y());
-        Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*64));    glVertex2f(timelineBoundingRect2.bottomLeft() .x(), timelineBoundingRect2.bottomLeft() .y());
-        glEnd();
-        Global::timelineGL->qglColor(Global::colorProgression);
-        glBegin(GL_LINES);
-        glVertex2f(timelineBoundingRect.topLeft()   .x(), timelineBoundingRect.topLeft()   .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
-        glVertex2f(timelineBoundingRect.bottomLeft().x(), timelineBoundingRect.bottomLeft().y());
-        glEnd();
+        if(Global::tagHorizontalCriteria->asTimeline) {
+            glBegin(GL_QUADS);
+            qreal opacity = qMin(qAbs(timelinePos.x() - timelinePosDest.x()) / 200., 1.0);
+            if(Global::timerPlay)
+                opacity += 0.2;
+            QRectF timelineBoundingRect2 = timelineBoundingRect;
+            if((timelinePos.x() - timelinePosDest.x()) > 0)
+                timelineBoundingRect2.setSize(QSizeF(50., timelineBoundingRect2.height()));
+            Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*64));    glVertex2f(timelineBoundingRect2.topLeft()    .x(), timelineBoundingRect2.topLeft()    .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
+            Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*0));     glVertex2f(timelineBoundingRect2.topRight()   .x(), timelineBoundingRect2.topRight()   .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
+            Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*0));     glVertex2f(timelineBoundingRect2.bottomRight().x(), timelineBoundingRect2.bottomRight().y());
+            Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*64));    glVertex2f(timelineBoundingRect2.bottomLeft() .x(), timelineBoundingRect2.bottomLeft() .y());
+            glEnd();
+            Global::timelineGL->qglColor(Global::colorProgression);
+            glBegin(GL_LINES);
+            glVertex2f(timelineBoundingRect.topLeft()   .x(), timelineBoundingRect.topLeft()   .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
+            glVertex2f(timelineBoundingRect.bottomLeft().x(), timelineBoundingRect.bottomLeft().y());
+            glEnd();
+        }
 
         //Current
         QRectF timeTextRect(QPointF(timelineBoundingRect.topLeft().x() - timeText.size.width()/2, timelineBoundingRect.topLeft().y() + (Global::timelineHeaderSize.height()/2-timeText.size.height()/2)), timeText.size);
@@ -100,7 +113,7 @@ const QRectF Timeline::paintTimeline(bool before) {
         GlRect::drawRoundedRect(timeTextRect, true);
         Global::timelineGL->qglColor(Qt::white);
         timeText.setStyle(QSize(50, Global::timelineTagHeight*1.2), Qt::AlignCenter, Global::font);
-        timeText.drawText(Global::timeToString(Global::time), timeTextRect.topLeft().toPoint());
+        timeText.drawText(Sorting::timeToString(Global::time), timeTextRect.topLeft().toPoint());
 
         if(Global::timerPlay)
             Global::timelineGL->ensureVisible(QPointF(timelinePos.x(), -1));
@@ -121,13 +134,13 @@ const QRectF Timeline::paintViewer() {
 
 bool Timeline::jumpTo() {
     bool ok = false;
-    qreal time = Global::stringToTime(QInputDialog::getText(0, tr("Jump to…"), tr("Jump to specific timecode"), QLineEdit::Normal, Global::timeToString(Global::time), &ok));
+    qreal time = Sorting::stringToTime(QInputDialog::getText(0, tr("Jump to…"), tr("Jump to specific timecode"), QLineEdit::Normal, Sorting::timeToString(Global::time), &ok));
     if(ok)
         seek(time, true, true);
     return ok;
 }
 bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool action, bool press) {
-    if((action) && (press)) {
+    if((action) && (press) && (Global::tagHorizontalCriteria->asTimeline)) {
         if(dbl) jumpTo();
         else    seek(Global::currentProject->getTimelineCursorTime(pos), false, true);
         Global::selectedTagInAction = 0;
@@ -146,7 +159,7 @@ void Timeline::seek(qreal time, bool forceVisibleTimeline, bool forceVisibleView
     Global::inertie = 1;
     Global::currentProject->fireEvents();
     Global::inertie = oldInertie;
-    if((forceVisibleTimeline) || (Global::timerPlay))
+    if((Global::tagHorizontalCriteria->asTimeline) && ((forceVisibleTimeline) || (Global::timerPlay)))
         Global::timelineGL->ensureVisible(QPointF(timelinePosDest.x(), -1));
     if((forceVisibleViewer) || (Global::timerPlay))
         Global::viewerGL  ->ensureVisible(QPointF(-1, viewerPosDest.y()), 0.8);
@@ -160,41 +173,53 @@ void Timeline::actionRewind() {
 void Timeline::actionPlay() {
     ui->playButton->setChecked(!ui->playButton->isChecked());
 }
+void Timeline::setDuplicates(quint16 nbDuplicates) {
+    timelineControl->setDuplicates(nbDuplicates);
+}
+void Timeline::setHistories(quint16 nbHistories) {
+    timelineControl->setHistories(nbHistories);
+}
 
 void Timeline::action() {
     if(sender() == ui->playButton)       Global::play(ui->playButton->isChecked());
     else if(sender() == ui->ffButton)    seek(0);
     else if(sender() == ui->writeNote)   Global::watcher->writeNote();
+    else if(sender() == ui->phaseBy) {
+        Global::phases->move(ui->phaseBy->parentWidget()->mapToGlobal(ui->phaseBy->pos())                       - QPoint(12, 3 + Global::phases->height()));
+        if(ui->phaseBy->isChecked())  Global::phases->show();
+        else                          Global::phases->hide();
+    }
     else if(sender() == ui->filterBy) {
-        Global::tagFilterCriteria->move(ui->filterBy->parentWidget()->mapToGlobal(ui->filterBy->pos())    - QPoint(23, 3 + Global::tagFilterCriteria->height()));
+        Global::tagFilterCriteria->move(ui->filterBy->parentWidget()->mapToGlobal(ui->filterBy->pos())          - QPoint(23, 3 + Global::tagFilterCriteria->height()));
         if(ui->filterBy->isChecked())   Global::tagFilterCriteria->show();
         else                            Global::tagFilterCriteria->hide();
     }
     else if(sender() == ui->sortBy) {
-        Global::tagSortCriteria->move(ui->sortBy->parentWidget()->mapToGlobal(ui->sortBy->pos())          - QPoint(23, 3 + Global::tagSortCriteria->height()));
+        Global::tagSortCriteria->move(ui->sortBy->parentWidget()->mapToGlobal(ui->sortBy->pos())                - QPoint(23, 3 + Global::tagSortCriteria->height()));
         if(ui->sortBy->isChecked()) Global::tagSortCriteria->show();
         else                        Global::tagSortCriteria->hide();
     }
     else if(sender() == ui->colorBy) {
-        Global::tagColorCriteria->move(ui->colorBy->parentWidget()->mapToGlobal(ui->colorBy->pos())       - QPoint(23, 3 + Global::tagColorCriteria->height()));
+        Global::tagColorCriteria->move(ui->colorBy->parentWidget()->mapToGlobal(ui->colorBy->pos())             - QPoint(23, 3 + Global::tagColorCriteria->height()));
         if(ui->colorBy->isChecked()) Global::tagColorCriteria->show();
         else                         Global::tagColorCriteria->hide();
     }
     else if(sender() == ui->clusterBy) {
-        Global::tagClusterCriteria->move(ui->clusterBy->parentWidget()->mapToGlobal(ui->clusterBy->pos()) - QPoint(23, 3 + Global::tagClusterCriteria->height()));
+        Global::tagClusterCriteria->move(ui->clusterBy->parentWidget()->mapToGlobal(ui->clusterBy->pos())       - QPoint(23, 3 + Global::tagClusterCriteria->height()));
         if(ui->clusterBy->isChecked())  Global::tagClusterCriteria->show();
         else                            Global::tagClusterCriteria->hide();
     }
-    else if(sender() == ui->phaseBy) {
-        Global::phases->move(ui->phaseBy->parentWidget()->mapToGlobal(ui->phaseBy->pos())                 - QPoint(23, 3 + Global::phases->height()));
-        if(ui->phaseBy->isChecked())  Global::phases->show();
-        else                          Global::phases->hide();
+    else if(sender() == ui->horizontalBy) {
+        Global::tagHorizontalCriteria->move(ui->clusterBy->parentWidget()->mapToGlobal(ui->horizontalBy->pos()) - QPoint(23, 3 + Global::tagHorizontalCriteria->height()));
+        if(ui->horizontalBy->isChecked())  Global::tagHorizontalCriteria->show();
+        else                               Global::tagHorizontalCriteria->hide();
     }
     else if(sender() == ui->viewOption) {
-        timelineControl->move(ui->viewOption->parentWidget()->mapToGlobal(ui->viewOption->pos())          - QPoint(23, 3 + timelineControl->height()));
+        timelineControl->move(ui->viewOption->parentWidget()->mapToGlobal(ui->viewOption->pos())                - QPoint(23, 3 + timelineControl->height()));
         if(ui->viewOption->isChecked()) timelineControl->show();
         else                            timelineControl->hide();
     }
+
 
 }
 void Timeline::actionDisplayed(bool val) {
@@ -206,6 +231,8 @@ void Timeline::actionDisplayed(bool val) {
         ui->colorBy->setChecked(val);
     else if(sender() == Global::tagClusterCriteria)
         ui->clusterBy->setChecked(val);
+    else if(sender() == Global::tagHorizontalCriteria)
+        ui->horizontalBy->setChecked(val);
     else if(sender() == Global::phases)
         ui->phaseBy->setChecked(val);
     else if(sender() == timelineControl)
@@ -213,58 +240,71 @@ void Timeline::actionDisplayed(bool val) {
 }
 
 void Timeline::actionChanged(QString text, QString text2) {
-    QString buttonOrange = "QPushButton { background-color: rgb(255,147,102); border-color: rgb(255,147,102); } QPushButton:hover { border-color: rgb(255,255,255); }";
-    if(sender() == Global::phases) {
-        if(text2.isEmpty()) {
-            ui->phaseBy->setText("");//.arg(text));
-            ui->phaseBy->setStyleSheet("");
+    QString buttonOrange = "QPushButton { background-color: rgb(255,147,102); border-color: rgb(255,147,102); } QPushButton:hover { border-color: rgb(255,255,255); } QPushButton:disabled { background-color: rgb(41, 44, 45);  border-color: rgb(41, 44, 45); }";
+
+    if(text != "nothing") {
+        if(sender() == Global::phases) {
+            if(text.isEmpty()) {
+                ui->phaseBy->setText(text);
+                ui->phaseBy->setStyleSheet("");
+            }
+            else {
+                ui->phaseBy->setText(text);
+                ui->phaseBy->setStyleSheet(buttonOrange);
+            }
         }
-        else {
-            ui->phaseBy->setText("");//.arg(text));
-            ui->phaseBy->setStyleSheet(buttonOrange);
+        else if(sender() == Global::tagSortCriteria) {
+            if(text2.isEmpty()) {
+                ui->sortBy->setText(text);
+                ui->sortBy->setStyleSheet("");
+            }
+            else {
+                ui->sortBy->setText(text2);
+                ui->sortBy->setStyleSheet(buttonOrange);
+            }
+        }
+        else if(sender() == Global::tagColorCriteria) {
+            if(text2.isEmpty()) {
+                ui->colorBy->setText(text);
+                ui->colorBy->setStyleSheet("");
+            }
+            else {
+                ui->colorBy->setText(text2);
+                ui->colorBy->setStyleSheet(buttonOrange);
+            }
+        }
+        else if(sender() == Global::tagFilterCriteria) {
+            if(text2.isEmpty()) {
+                ui->filterBy->setText("");
+                ui->filterBy->setStyleSheet("");
+            }
+            else {
+                ui->filterBy->setText(text2);
+                ui->filterBy->setStyleSheet(buttonOrange);
+            }
+        }
+        else if(sender() == Global::tagClusterCriteria) {
+            if(text2.isEmpty()) {
+                ui->clusterBy->setText("");
+                ui->clusterBy->setStyleSheet("");
+            }
+            else {
+                ui->clusterBy->setText(text2);
+                ui->clusterBy->setStyleSheet(buttonOrange);
+            }
+        }
+        else if(sender() == Global::tagHorizontalCriteria) {
+            if(text2.isEmpty()) {
+                ui->horizontalBy->setText(text);
+                ui->horizontalBy->setStyleSheet("");
+            }
+            else {
+                ui->horizontalBy->setText(text2);
+                ui->horizontalBy->setStyleSheet(buttonOrange);
+            }
         }
     }
-    else if(sender() == Global::tagSortCriteria) {
-        if(text2.isEmpty()) {
-            ui->sortBy->setText(text);
-            ui->sortBy->setStyleSheet("");
-        }
-        else {
-            ui->sortBy->setText(text2);
-            ui->sortBy->setStyleSheet(buttonOrange);
-        }
-    }
-    else if(sender() == Global::tagColorCriteria) {
-        if(text2.isEmpty()) {
-            ui->colorBy->setText(text);
-            ui->colorBy->setStyleSheet("");
-        }
-        else {
-            ui->colorBy->setText(text2);
-            ui->colorBy->setStyleSheet(buttonOrange);
-        }
-    }
-    else if(sender() == Global::tagFilterCriteria) {
-        if(text2.isEmpty()) {
-            ui->filterBy->setText("");
-            ui->filterBy->setStyleSheet("");
-        }
-        else {
-            ui->filterBy->setText(text2);
-            ui->filterBy->setStyleSheet(buttonOrange);
-        }
-    }
-    else if(sender() == Global::tagClusterCriteria) {
-        if(text2.isEmpty()) {
-            ui->clusterBy->setText("");
-            ui->clusterBy->setStyleSheet("");
-        }
-        else {
-            ui->clusterBy->setText(text2);
-            ui->clusterBy->setStyleSheet(buttonOrange);
-        }
-    }
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
     Global::timelineGL->scrollTo();
     Global::viewerGL  ->scrollTo();
 }

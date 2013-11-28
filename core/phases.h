@@ -36,13 +36,14 @@ public:
     UiReal phasesByDaysTo;
     QMap<QString, MetadataElement> metaElements;
     bool needCalulation;
+    QString tagNameCategory, tagName;
 public:
-    void addToMetaElements(const MetadataElement &value) { metaElements.insert(value.toString(), value); }
-    void analyse();
+    void addCheck(const MetadataElement &value) { metaElements.insert(value.toString(), value); }
 
 public:
     const QString styleSheet2() const;
     void setStyleSheet2(const QString &str);
+    void addCheckEnd();
 protected:
     void showEvent(QShowEvent *);
     void closeEvent(QCloseEvent *);
@@ -51,8 +52,9 @@ signals:
     void displayed(bool);
 
 public:
-    const QString getPhaseFor(const MetadataElement &value);
-    const QString getVerbosePhaseFor(const QString &phaseId);
+    const QString getPhaseFor(const MetadataElement &value) const;
+    bool isAcceptable(bool strongCheck, const MetadataElement &value) const;
+    const QString getVerbosePhaseFor(const QString &phaseId) const;
 
 public:
     QDomElement serialize(QDomDocument &xmlDoc);
@@ -61,6 +63,7 @@ public:
 public slots:
     void action();
     void actionNames();
+    void actionSelection();
 signals:
     void actionned(QString,QString);
 

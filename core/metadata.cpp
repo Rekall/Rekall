@@ -318,20 +318,39 @@ void Metadata::setMetadata(const QMetaDictionnay &metaDictionnay) {
 
 bool Metadata::isAcceptableWithSortFilters(bool strongCheck, qint16 version) {
     return (function == DocumentFunctionRender) ||
-            ((   Global::tagFilterCriteria->isAcceptable(true, getCriteriaFilter(version)))
-             && (Global::tagSortCriteria  ->isAcceptable(strongCheck, getCriteriaSort(version))));
+            (   (Global::phases                  ->isAcceptable(true,        getCriteriaPhase(version)))
+                && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
+                && (Global::tagSortCriteria      ->isAcceptable(strongCheck, getCriteriaSort(version)))
+                && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version))));
 }
 bool Metadata::isAcceptableWithColorFilters(bool strongCheck, qint16 version) {
     return (function == DocumentFunctionContextual)
-            && (Global::tagFilterCriteria->isAcceptable(true, getCriteriaFilter(version)))
-            && (Global::tagSortCriteria  ->isAcceptable(true, getCriteriaSort(version)))
-            && (Global::tagColorCriteria ->isAcceptable(strongCheck, getCriteriaColor(version)));
+            && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+            && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
+            && (Global::tagColorCriteria     ->isAcceptable(strongCheck, getCriteriaColor(version)))
+            && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
 bool Metadata::isAcceptableWithClusterFilters(bool strongCheck, qint16 version) {
-    return (    Global::tagFilterCriteria ->isAcceptable(true, getCriteriaFilter(version)))
-            && (Global::tagSortCriteria   ->isAcceptable(true, getCriteriaSort(version)))
-            && (Global::tagClusterCriteria->isAcceptable(strongCheck, getCriteriaCluster(version)));
+    return (    Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+            && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
+            && (Global::tagClusterCriteria   ->isAcceptable(strongCheck, getCriteriaCluster(version)))
+            && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
+bool Metadata::isAcceptableWithFilterFilters(bool strongCheck, qint16 version) {
+    return (    Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+            && (Global::tagFilterCriteria    ->isAcceptable(strongCheck, getCriteriaFilter(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
+            && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
+}
+bool Metadata::isAcceptableWithHorizontalFilters(bool strongCheck, qint16 version) {
+    return (    Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+            && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
+            && (Global::tagHorizontalCriteria->isAcceptable(strongCheck, getCriteriaHorizontal(version)));
+}
+
 
 
 const QString Metadata::getAcceptableWithClusterFilters(qint16 version) {
@@ -365,6 +384,14 @@ const QString Metadata::getCriteriaFilterFormated(qint16 version) {
     if(function == DocumentFunctionRender) return "";
     return Global::tagFilterCriteria->getCriteriaFormated(getCriteriaFilter(version));
 }
+const QString Metadata::getCriteriaHorizontal(qint16 version) {
+    if(function == DocumentFunctionRender) return "";
+    return getMetadata(Global::tagHorizontalCriteria->tagNameCategory, Global::tagHorizontalCriteria->tagName, version).toString(Global::tagHorizontalCriteria->left, Global::tagHorizontalCriteria->leftLength);
+}
+const QString Metadata::getCriteriaHorizontalFormated(qint16 version) {
+    if(function == DocumentFunctionRender) return "";
+    return Global::tagHorizontalCriteria->getCriteriaFormated(getCriteriaHorizontal(version));
+}
 
 const QString Metadata::getCriteriaSort(qint16 version) {
     if(function == DocumentFunctionRender) {
@@ -379,8 +406,8 @@ const QString Metadata::getCriteriaSort(qint16 version) {
 const QString Metadata::getCriteriaSortFormated(qint16 version) {
     return Global::tagSortCriteria->getCriteriaFormated(getCriteriaSort(version));
 }
-const MetadataElement Metadata::getCriteriaSortRaw(qint16 version) {
-    return getMetadata(Global::tagSortCriteria->tagNameCategory, Global::tagSortCriteria->tagName, version);
+const MetadataElement Metadata::getCriteriaPhase(qint16 version) {
+    return getMetadata(Global::phases->tagNameCategory, Global::phases->tagName, version);
 }
 
 const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) {

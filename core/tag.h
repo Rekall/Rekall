@@ -28,9 +28,10 @@ public:
 public:
     QAction *timelineFilesAction;
     QList<Tag*> linkedTags;
-    qreal   timeStart, timeEnd;
     qint16  documentVersion;
     TagType type;
+protected:
+    qreal   timeStart, timeEnd;
 
 
 public:
@@ -50,7 +51,6 @@ public:
     bool  contains(qreal time) const;
     qreal progress(qreal time) const;
     qreal progressAbs(qreal time) const;
-    qreal getDuration() const;
     DocumentBase* getDocument() const { return document; }
     void snapTime(qreal *time);
 public:
@@ -61,6 +61,9 @@ public:
     void setType(TagType _type, qreal time);
     void setTimeStart(qreal _timeStart);
     void setTimeEnd(qreal _timeEnd);
+    inline qreal getTimeStart() const { return timeStart; }
+    inline qreal getTimeEnd() const   { return timeEnd;   }
+    inline qreal getDuration() const  { return timeEnd - timeStart; }
     void moveTo(qreal _val);
     PlayerVideo *player;
     void fireEvents();
@@ -96,19 +99,24 @@ public:
     bool isAcceptableWithSortFilters(bool strongCheck);
     bool isAcceptableWithColorFilters(bool strongCheck);
     bool isAcceptableWithClusterFilters(bool strongCheck);
+    bool isAcceptableWithFilterFilters(bool strongCheck);
+    bool isAcceptableWithHorizontalFilters(bool strongCheck);
     const QString getAcceptableWithClusterFilters();
-    static bool sortCriteria(Tag *first, Tag *second);
+    static bool sortCriteriaColor(Tag *first, Tag *second);
     static bool sortViewer(Tag *first, Tag *second);
     static bool sortEvents(Tag *first, Tag *second);
+    static bool sortAlpha(Tag *first, Tag *second);;
     static const QString getCriteriaSort(Tag *tag);
     static const QString getCriteriaColor(Tag *tag);
     static const QString getCriteriaCluster(Tag *tag);
     static const QString getCriteriaFilter(Tag *tag);
-    static const MetadataElement getCriteriaSortRaw(Tag *tag);
+    static const QString getCriteriaHorizontal(Tag *tag);
+    static const MetadataElement getCriteriaPhase(Tag *tag);
     static const QString getCriteriaSortFormated(Tag *tag);
     static const QString getCriteriaColorFormated(Tag *tag);
     static const QString getCriteriaClusterFormated(Tag *tag);
     static const QString getCriteriaFilterFormated(Tag *tag);
+    static const QString getCriteriaHorizontalFormated(Tag *tag);
     static bool isTagLastVersion(Tag *tag);
     inline qint16 getDocumentVersion() const {
         return document->getMetadataIndexVersion(documentVersion);

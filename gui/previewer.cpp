@@ -18,7 +18,7 @@ void Previewer::timerEvent(QTimerEvent *) {
     if(ui->type->currentIndex() == 2) {
         isUpdating = true;
         ui->seek->setValue(ui->playerVideo->currentTime()/1000);
-        ui->time->setText(QString("%1\n%2").arg(Global::timeToString(ui->playerVideo->currentTime()/1000)).arg(Global::timeToString(ui->playerVideo->totalTime()/1000)));
+        ui->time->setText(QString("%1\n%2").arg(Sorting::timeToString(ui->playerVideo->currentTime()/1000)).arg(Sorting::timeToString(ui->playerVideo->totalTime()/1000)));
         isUpdating = false;
     }
 }
@@ -88,7 +88,7 @@ void Previewer::action() {
     }
     else if((sender() == ui->seek) && (!isUpdating)) {
         ui->playerVideo->seek(ui->seek->value()*1000);
-        ui->time->setText(QString("%1\n%2").arg(Global::timeToString(ui->playerVideo->currentTime()/1000)).arg(Global::timeToString(ui->playerVideo->totalTime()/1000)));
+        ui->time->setText(QString("%1\n%2").arg(Sorting::timeToString(ui->playerVideo->currentTime()/1000)).arg(Sorting::timeToString(ui->playerVideo->totalTime()/1000)));
     }
 }
 void Previewer::actionOpen() {

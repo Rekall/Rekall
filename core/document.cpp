@@ -32,12 +32,12 @@ void Document::createTagBasedOnPrevious(qint16 _forVersion) {
         }
         foreach(Tag *tag, tagsToDuplicate) {
             Tag *newTag = new Tag(this, forVersion);
-            newTag->create(tag->type, tag->timeStart, tag->getDuration());
+            newTag->create(tag->type, tag->getTimeStart(), tag->getDuration());
             newTag->timelinePos     = tag->timelinePos;
             newTag->timelineDestPos = tag->timelineDestPos;
             newTag->viewerPos       = tag->viewerPos;
             newTag->viewerDestPos   = tag->viewerDestPos;
-            newTag->setTimeEnd(tag->timeEnd);
+            newTag->setTimeEnd(tag->getTimeEnd());
             tags.append(newTag);
         }
     }

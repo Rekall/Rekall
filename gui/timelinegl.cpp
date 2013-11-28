@@ -6,11 +6,19 @@ TimelineGL::TimelineGL(QWidget *parent) :
     startTimer(20);
     setMouseTracking(true);
     setAcceptDrops(true);
+    grabGesture(Qt::PinchGesture);
+    gestureZoomInitial = Global::timeUnitDest;
     showLegend = 0;
     showLegendDest = true;
     connect(&mouseTimer, SIGNAL(timeout()), SLOT(mouseMoveLong()));
 
     tagMenu = new QMenu(Global::mainWindow);
+}
+
+bool TimelineGL::event(QEvent *event) {
+    if(event->type() == QEvent::Gesture)
+        return gestureEvent(static_cast<QGestureEvent*>(event));
+    return QWidget::event(event);
 }
 
 void TimelineGL::timerEvent(QTimerEvent *) {
@@ -148,6 +156,15 @@ void TimelineGL::paintGL() {
     }
 }
 
+bool TimelineGL::gestureEvent(QGestureEvent *event) {
+    if(QGesture *pinch = event->gesture(Qt::PinchGesture)) {
+        QPinchGesture *pinchGesture = (static_cast<QPinchGesture *>(pinch));
+        if(pinchGesture->state() == Qt::GestureStarted)
+            gestureZoomInitial = Global::timeUnitDest;
+        Global::timeUnitDest = gestureZoomInitial * pinchGesture->scaleFactor();
+    }
+    return true;
+}
 void TimelineGL::mousePressEvent(QMouseEvent *e) {
     mouseTimerPos = e->posF();
     mouseTimerOk = true;
@@ -244,7 +261,7 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
                 if(stay) {
                     if(selectedTag->type == TagTypeContextualMilestone) selectedTag->setType(TagTypeContextualTime,      Global::currentProject->getTimelineCursorTime(mousePos));
                     else if(selectedTag->type == TagTypeContextualTime) selectedTag->setType(TagTypeContextualMilestone, Global::currentProject->getTimelineCursorTime(mousePos));
-                    Global::selectedTagStartDrag = (selectedTag->timeEnd - selectedTag->timeStart) / 2;
+                    Global::selectedTagStartDrag = (selectedTag->getTimeEnd() - selectedTag->getTimeStart()) / 2;
                 }
                 if((e) && (mouseTimerPos != e->pos())) {
                     selectedTag->moveTo(Global::currentProject->getTimelineCursorTime(mousePos) - Global::selectedTagStartDrag);

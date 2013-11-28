@@ -30,10 +30,12 @@ typedef QMap<QString, QMetaMap > QMetaDictionnay;
 
 class GlDrawable {
 public:
-    virtual void fireEvents()         {}
+    virtual void fireEvents()           {}
     virtual void seek(qreal, bool = false, bool = false) {}
-    virtual qreal totalTime() const   { return 0.; }
-    virtual void actionPlay() {}
+    virtual qreal totalTime() const     { return 0.; }
+    virtual void actionPlay()           {}
+    virtual void setDuplicates(quint16) {};
+    virtual void setHistories (quint16) {};
 public:
     virtual QPointF getTimelineCursorPos (qreal)           { return QPointF(); }
     virtual QPointF getViewerCursorPos   (qreal)           { return QPointF(); }
@@ -222,7 +224,7 @@ public:
     static qreal tagBlinkTime;
     static qreal breathing, breathingDest, breathingFast, breathingFastDest, breathingPics, breathingPicsDest;
     static QTime timer;
-    static Sorting *tagSortCriteria, *tagColorCriteria, *tagClusterCriteria, *tagFilterCriteria;
+    static Sorting *tagSortCriteria, *tagColorCriteria, *tagClusterCriteria, *tagFilterCriteria, *tagHorizontalCriteria;
     static Phases *phases;
     static void *selectedTagInAction, *selectedTag, *selectedTagHover;
     static qreal selectedTagHoverSnapped;
@@ -235,15 +237,13 @@ public:
     static GlVideo *video;
     static QColor colorAlternateStrong, colorAlternate, colorAlternateLight, colorAlternateMore, colorCluster, colorTicks, colorSelection, colorProgression, colorText, colorTextDark, colorBackground, colorBackgroundDark, colorBackgroundMidDark, colorTextBlack;
     static QMap<QString, QPair<QColor, qreal> > colorForMeta;
-    static bool timelineSortChanged, viewerSortChanged, eventsSortChanged, metaChanged;
+    static bool timelineSortChanged, viewerSortChanged, eventsSortChanged, metaChanged, ticksChanged;
     static WatcherBase *watcher;
     static RekallBase* mainWindow;
     static TaskListBase *taskList;
     static FeedListBase *feedList;
 
 public:
-    static const QString timeToString(qreal time);
-    static qreal stringToTime(const QString &timeStr);
     static const QString dateToString(const QDateTime &date, bool addExactTime = true);
     static const QString plurial(qint16 value, const QString &text);
     static const QString cacheFile(const QString &type, const QFileInfo &file) {

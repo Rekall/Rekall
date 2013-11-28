@@ -2,6 +2,7 @@
 #define SORTING_H
 
 #include <QWidget>
+#include "qmath.h"
 #include "misc/options.h"
 
 namespace Ui {
@@ -12,15 +13,15 @@ class Sorting : public QWidget {
     Q_OBJECT
     
 public:
-    explicit Sorting(const QString &title, quint16 index = 0, bool _needWord = false, QWidget *parent = 0);
+    explicit Sorting(const QString &title, quint16 index = 0, bool _needWord = false, bool _isHorizontal = false, QWidget *parent = 0);
     ~Sorting();
 
 
 public:
-    bool asNumber, asDate, sortAscending;
+    bool asNumber, asDate, sortAscending, asTimeline;
     QString tagName, tagNameCategory;
     qint16 left, leftLength;
-    bool isUpdating, needWord;
+    bool isUpdating, needWord, isHorizontal;
 
 
 private:
@@ -46,8 +47,12 @@ signals:
 
 private:
     QHash<QString,QString> criteriaFormatedCache;
+    QStringList criteriaFormatedRealCache;
+
 public:
     const QString getCriteriaFormated(const QString &criteria);
+    const QString getCriteriaFormated(qreal criteria) const;
+    qreal getCriteriaFormatedReal(const QString &criteria);
     bool isAcceptable(bool strongCheck, const QString &criteria);
     const QString getAcceptableWithFilters(const QString &criteria);
     const QString getMatchName() const;
@@ -55,6 +60,7 @@ public:
 public:
     void addCheckStart();
     void addCheck(const QString &check, const QString &value = QString());
+    void addCheckEnd();
 
 public:
     QDomElement serialize(QDomDocument &xmlDoc);
@@ -66,6 +72,10 @@ signals:
 public slots:
     void action();
     void actionSelection();
+
+public:
+    static const QString timeToString(qreal time);
+    static qreal stringToTime(const QString &timeStr);
 
 private:
     Ui::Sorting *ui;

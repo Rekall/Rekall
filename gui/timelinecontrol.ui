@@ -54,16 +54,6 @@
        <number>12</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="help">
-        <property name="text">
-         <string>Show help labels in interface</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="history">
         <property name="text">
          <string>Show document modifications history</string>
@@ -80,14 +70,7 @@
       <item>
        <widget class="QCheckBox" name="linkedTags">
         <property name="text">
-         <string>Show relationship betweend documents</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="linkedRenders">
-        <property name="text">
-         <string>Show recording links with documents</string>
+         <string>Show relationship between documents</string>
         </property>
        </widget>
       </item>

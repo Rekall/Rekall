@@ -29,6 +29,8 @@ signals:
     void displayed(bool);
 
 public slots:
+    void setDuplicates(quint16 nbDuplicates);
+    void setHistories(quint16 nbHistories);
     void action();
 
 };

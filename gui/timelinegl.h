@@ -3,6 +3,7 @@
 
 #include <QGLWidget>
 #include <QMouseEvent>
+#include <QPinchGesture>
 #include <misc/global.h>
 #include "items/uifileitem.h"
 #include "core/project.h"
@@ -14,6 +15,7 @@ public:
 
 private:
     qreal showLegend;
+    qreal gestureZoomInitial;
     QList<GlText> categories;
     QMenu *tagMenu;
 
@@ -23,8 +25,10 @@ protected:
     void resizeGL(int, int);
     void wheelEvent(QWheelEvent *);
     void paintGL();
+    bool event(QEvent *);
 
 protected:
+    bool gestureEvent(QGestureEvent *event);
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
