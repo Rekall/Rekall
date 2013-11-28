@@ -115,7 +115,7 @@ const QRectF Timeline::paintTimeline(bool before) {
         timeText.setStyle(QSize(50, Global::timelineTagHeight*1.2), Qt::AlignCenter, Global::font);
         timeText.drawText(Sorting::timeToString(Global::time), timeTextRect.topLeft().toPoint());
 
-        if(Global::timerPlay)
+        if((Global::timerPlay) && (Global::tagHorizontalCriteria->asTimeline))
             Global::timelineGL->ensureVisible(QPointF(timelinePos.x(), -1));
     }
     glDisable(GL_SCISSOR_TEST);
