@@ -529,7 +529,7 @@ const QRectF Project::paintTimeline(bool before) {
                     }
 
                     //Draw text
-                    if(tagCategoryIsSelected)   Global::timelineGL->qglColor(Global::colorSelection);
+                    if(tagCategoryIsSelected)   Global::timelineGL->qglColor(Global::colorTimeline);
                     else                        Global::timelineGL->qglColor(Global::colorText);
                     bool textFound = false;
                     if(timelineCategories.count() > 1000)
@@ -550,7 +550,7 @@ const QRectF Project::paintTimeline(bool before) {
                     //Draw renders tools
                     if(false) {
                         QRectF toggleRect(QPointF(tagCategoryRect.right() - 30, tagCategoryRect.center().y()-Global::timelineTagHeight/2), QSizeF(Global::timelineTagHeight, Global::timelineTagHeight));
-                        Global::timelineGL->qglColor(Global::colorSelection);
+                        Global::timelineGL->qglColor(Global::colorTimeline);
                         if((drawToggleActive) && (drawToggleActive->val()))
                             GlRect::drawRoundedRect(toggleRect, false);
                         GlRect::drawRoundedRect(toggleRect, true);

@@ -52,7 +52,7 @@ const QRectF Timeline::paintTimeline(bool before) {
         }
 
 
-        Global::timelineGL->qglColor(Global::colorTicks);
+        Global::timelineGL->qglColor(Global::colorTextBlack);
         QRectF tickRectOld(-100, 10, 10, 10);
         glBegin(GL_LINES);
         for(quint16 tickIndex = 0 ; tickIndex < ticks.count() ; tickIndex++) {
@@ -99,7 +99,7 @@ const QRectF Timeline::paintTimeline(bool before) {
             Global::timelineGL->qglColor(QColor(Global::colorTimeline.red(), Global::colorTimeline.green(), Global::colorTimeline.blue(), opacity*0));     glVertex2f(timelineBoundingRect2.bottomRight().x(), timelineBoundingRect2.bottomRight().y());
             Global::timelineGL->qglColor(QColor(Global::colorTimeline.red(), Global::colorTimeline.green(), Global::colorTimeline.blue(), opacity*64));    glVertex2f(timelineBoundingRect2.bottomLeft() .x(), timelineBoundingRect2.bottomLeft() .y());
             glEnd();
-            Global::timelineGL->qglColor(Global::colorProgression);
+            Global::timelineGL->qglColor(Global::colorTimeline);
             glBegin(GL_LINES);
             glVertex2f(timelineBoundingRect.topLeft()   .x(), timelineBoundingRect.topLeft()   .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
             glVertex2f(timelineBoundingRect.bottomLeft().x(), timelineBoundingRect.bottomLeft().y());
@@ -107,7 +107,7 @@ const QRectF Timeline::paintTimeline(bool before) {
 
             //Current
             QRectF timeTextRect(QPointF(timelineBoundingRect.topLeft().x() - timeText.size.width()/2, timelineBoundingRect.topLeft().y() + (Global::timelineHeaderSize.height()/2-timeText.size.height()/2)), timeText.size);
-            Global::timelineGL->qglColor(Global::colorProgression);
+            Global::timelineGL->qglColor(Global::colorTimeline);
             GlRect::drawRoundedRect(timeTextRect, false);
             GlRect::drawRoundedRect(timeTextRect, true);
             Global::timelineGL->qglColor(Qt::white);

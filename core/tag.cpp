@@ -168,7 +168,7 @@ const QRectF Tag::paintTimeline(bool before) {
         if(timelineBoundingRect.width() < timelineBoundingRect.height())
             timelineBoundingRect.adjust(-(timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0, (timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0);
 
-        QColor colorDestTmp = (Global::selectedTag == this)?(Global::colorSelection):(document->baseColor);
+        QColor colorDestTmp = (Global::selectedTag == this)?(Global::colorTimeline):(document->baseColor);
         if(document->status == DocumentStatusWaiting)
             colorDestTmp.setAlphaF(0.1);
         if((document->status == DocumentStatusProcessing) || (Global::selectedTag == this))
@@ -490,7 +490,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
 
         //Selection
         if(Global::selectedTag == this) {
-            QColor color = Global::colorSelection;
+            QColor color = Global::colorTimeline;
             if((document->status == DocumentStatusProcessing) || (Global::selectedTag == this))
                 color.setAlphaF(Global::breathingFast);
             Global::viewerGL->qglColor(color);
@@ -517,7 +517,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
                     GlRect::drawRect(viewerBoundingRect);
                 }
                 else {
-                    Global::viewerGL->qglColor(Global::colorProgression);
+                    Global::viewerGL->qglColor(Global::colorTimeline);
                     GlRect::drawRect(progressionRect);
                 }
             }
@@ -529,7 +529,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
                 GlRect::drawRect(QRectF(progressionRect.topLeft(), QSizeF(progressionRect.width() * progression, viewerBoundingRect.height())));
             }
             else {
-                Global::viewerGL->qglColor(Global::colorProgression);
+                Global::viewerGL->qglColor(Global::colorTimeline);
                 GlRect::drawRect(QRectF(progressionRect.topLeft(), QSizeF(progressionRect.width() * progression, progressionRect.height())));
             }
         }

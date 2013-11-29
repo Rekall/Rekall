@@ -49,25 +49,17 @@ QTreeWidget*   Global::chutier                    = 0;
 ProjectBase*   Global::currentProject             = 0;
 UserInfosBase* Global::userInfos                  = 0;
 
-QColor       Global::colorAlternate               = QColor(255, 255, 255, 12);
-QColor       Global::colorAlternateLight          = QColor(255, 255, 255,  8);
-QColor       Global::colorAlternateMore           = QColor(255, 255, 255, 30);
-QColor       Global::colorAlternateStrong         = QColor(0, 0, 0, 128);
-QColor       Global::colorCluster                 = QColor(255, 255, 255, 100);
-
-QColor       Global::colorTicks                   = QColor(43, 46, 47);
-QColor       Global::colorSelection               = QColor(45, 202, 225);//QColor(50, 221, 255);
-QColor       Global::colorProgression             = QColor(45, 202, 225);//QColor(45, 202, 225);
-QColor       Global::colorText                    = QColor(245, 248, 250);
-QColor       Global::colorTextDark                = Global::colorText.darker(120);
-QColor       Global::colorTextBlack               = QColor(45, 50, 53);
-QColor       Global::colorBackground              = QColor(71, 77, 79);
-QColor       Global::colorBackgroundDark          = QColor(41, 44, 45);
-QColor       Global::colorBackgroundMidDark       = QColor(51, 61, 63);
-
 QColor       Global::colorTagCaptation            = QColor(255, 255, 255);
+QColor       Global::colorCluster                 = QColor(255, 255, 255, 100);
+QColor       Global::colorAlternateMore           = QColor(255, 255, 255,  30);
+QColor       Global::colorAlternate               = QColor(255, 255, 255,  12);
+QColor       Global::colorAlternateLight          = QColor(255, 255, 255,   8);
+QColor       Global::colorText                    = QColor(245, 248, 250);
 QColor       Global::colorTagDisabled             = QColor(126, 126, 126);
-QColor       Global::colorTimeline                = QColor(50, 221, 255);
+QColor       Global::colorTimeline                = QColor( 45, 202, 225);//QColor(50, 221, 255);
+QColor       Global::colorTextBlack               = QColor( 45,  50,  53);//QColor( 43,  46,  47)
+QColor       Global::colorBackground              = QColor( 71,  77,  79);
+QColor       Global::colorAlternateStrong         = QColor(  0,   0,   0, 128);
 
 
 bool         Global::timelineSortChanged          = true;
