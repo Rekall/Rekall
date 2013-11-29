@@ -69,7 +69,7 @@ const QRectF Timeline::paintTimeline(bool before) {
         //Timetext
         Global::timelineGL->qglColor(Global::colorBackground);
         GlRect::drawRect(QRectF(QPointF(Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timelineGL->scroll.x(), Global::timelineGL->scroll.y()), QSizeF(Global::timelineGL->width(), Global::timelineHeaderSize.height())));
-        Global::timelineGL->qglColor(QColor(120, 120, 120));
+        Global::timelineGL->qglColor(Global::colorTagDisabled);
         QRectF tickRectOld(-100, 10, 10, 10);
         glDisable(GL_SCISSOR_TEST);
         for(quint16 tickIndex = 0 ; tickIndex < ticks.count() ; tickIndex++) {
@@ -94,10 +94,10 @@ const QRectF Timeline::paintTimeline(bool before) {
             QRectF timelineBoundingRect2 = timelineBoundingRect;
             if((timelinePos.x() - timelinePosDest.x()) > 0)
                 timelineBoundingRect2.setSize(QSizeF(50., timelineBoundingRect2.height()));
-            Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*64));    glVertex2f(timelineBoundingRect2.topLeft()    .x(), timelineBoundingRect2.topLeft()    .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
-            Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*0));     glVertex2f(timelineBoundingRect2.topRight()   .x(), timelineBoundingRect2.topRight()   .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
-            Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*0));     glVertex2f(timelineBoundingRect2.bottomRight().x(), timelineBoundingRect2.bottomRight().y());
-            Global::timelineGL->qglColor(QColor(50, 221, 255, opacity*64));    glVertex2f(timelineBoundingRect2.bottomLeft() .x(), timelineBoundingRect2.bottomLeft() .y());
+            Global::timelineGL->qglColor(QColor(Global::colorTimeline.red(), Global::colorTimeline.green(), Global::colorTimeline.blue(), opacity*64));    glVertex2f(timelineBoundingRect2.topLeft()    .x(), timelineBoundingRect2.topLeft()    .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
+            Global::timelineGL->qglColor(QColor(Global::colorTimeline.red(), Global::colorTimeline.green(), Global::colorTimeline.blue(), opacity*0));     glVertex2f(timelineBoundingRect2.topRight()   .x(), timelineBoundingRect2.topRight()   .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
+            Global::timelineGL->qglColor(QColor(Global::colorTimeline.red(), Global::colorTimeline.green(), Global::colorTimeline.blue(), opacity*0));     glVertex2f(timelineBoundingRect2.bottomRight().x(), timelineBoundingRect2.bottomRight().y());
+            Global::timelineGL->qglColor(QColor(Global::colorTimeline.red(), Global::colorTimeline.green(), Global::colorTimeline.blue(), opacity*64));    glVertex2f(timelineBoundingRect2.bottomLeft() .x(), timelineBoundingRect2.bottomLeft() .y());
             glEnd();
             Global::timelineGL->qglColor(Global::colorProgression);
             glBegin(GL_LINES);

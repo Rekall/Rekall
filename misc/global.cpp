@@ -65,6 +65,10 @@ QColor       Global::colorBackground              = QColor(71, 77, 79);
 QColor       Global::colorBackgroundDark          = QColor(41, 44, 45);
 QColor       Global::colorBackgroundMidDark       = QColor(51, 61, 63);
 
+QColor       Global::colorTagCaptation            = QColor(255, 255, 255);
+QColor       Global::colorTagDisabled             = QColor(126, 126, 126);
+QColor       Global::colorTimeline                = QColor(50, 221, 255);
+
 
 bool         Global::timelineSortChanged          = true;
 bool         Global::metaChanged                  = true;

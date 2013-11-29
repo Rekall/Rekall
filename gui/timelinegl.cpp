@@ -92,7 +92,7 @@ void TimelineGL::paintGL() {
         //Background
         qreal legendBaseSize = qBound(200., height() * 0.75, 400.);
         QRectF legendRect = QRectF(width() - legendBaseSize * 1.2, height() - showLegend * legendBaseSize, legendBaseSize * 1.2, legendBaseSize);
-        qglColor(QColor(0, 0, 0, 128));
+        qglColor(Global::colorAlternateStrong);
         GlRect::drawRect(legendRect);
 
         //Circles
