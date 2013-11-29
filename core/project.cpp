@@ -122,6 +122,7 @@ void Project::fireEvents() {
             }
         }
 
+
         //Color
         qreal index = 0;
         QMutableMapIterator<QString, QPair<QColor, qreal> > colorForMetaIterator(Global::colorForMeta);
@@ -134,6 +135,9 @@ void Project::fireEvents() {
             Global::tagColorCriteria->addCheck(colorForMetaIterator.key(), QString("%1%").arg(qRound(colorForMetaIterator.value().second*100), 2, 10, QChar('0')));
             index++;
         }
+        foreach(Document *document, documents)
+            document->baseColor = document->calcColor();
+
 
         //Events
         eventsTags.clear();

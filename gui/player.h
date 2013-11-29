@@ -20,6 +20,9 @@ public:
 
 private:
     QList<Tag*> tags;
+    UiBool timeMode;
+    bool isUpdating;
+    qreal volumeMasterOld, volumeMaster;
 public:
     void load(void* tag);
     void play(bool state);
@@ -27,7 +30,13 @@ public:
     void seek(qreal time);
     qreal getCurrentTime() const;
 
+public slots:
+    void action();
+    void actionDbl();
+    void setVolume(qreal _volumeMaster);
+
 protected:
+    void timerEvent(QTimerEvent*);
     void globalPlayPause();
     void forceResizeEvent();
     void resizeEvent(QResizeEvent *);

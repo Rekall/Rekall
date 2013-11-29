@@ -11,7 +11,7 @@ PlayerVideo::PlayerVideo(QWidget *parent) :
     ui->volumeHigh->setVisible(false);
     window = 0;
     volumeOld = 0;
-    setVolume(0.5);
+    setVolume(1, 1);
 }
 
 PlayerVideo::~PlayerVideo() {
@@ -51,14 +51,20 @@ qint64 PlayerVideo::currentTime() {
 qint64 PlayerVideo::totalTime() {
     return ui->playerVideo->totalTime();
 }
-void PlayerVideo::setVolume(qreal volume) {
-    if(volume > 0.1)
-        volumeOld = ui->playerVideo->volume();
-    ui->playerVideo->setVolume(volume);
-    if(sender() != ui->volume)
-        ui->volume->setValue(ui->volume->maximum() * volume);
-    if(volume == 0) ui->volumeLow->setChecked(true);
-    else            ui->volumeLow->setChecked(false);
+void PlayerVideo::setVolume(qreal _volume, qreal _masterVolume) {
+    if(_masterVolume >= 0)
+        masterVolume = _masterVolume;
+
+    if(_volume >= 0) {
+        if(_volume > 0.1)
+            volumeOld = volume;
+        volume = _volume;
+        if(sender() != ui->volume)
+            ui->volume->setValue(ui->volume->maximum() * volume);
+        if(volume == 0) ui->volumeLow->setChecked(true);
+        else            ui->volumeLow->setChecked(false);
+    }
+    ui->playerVideo->setVolume(volume * masterVolume);
 }
 void PlayerVideo::action() {
     if(sender() == ui->volumeLow) {

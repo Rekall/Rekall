@@ -151,6 +151,9 @@ QSlider::groove {
 	background-color: 	qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255,255,255,30), stop:1 rgb(255,255,255, 130));
 	height: 					1px;
 }
+QSlider::groove#seek {
+	background-color: 	rgba(255,255,255, 130);
+}
 QSlider::handle {
 	width: 						2px;
 	background-color: 	rgb(200, 200, 200);
@@ -176,7 +179,7 @@ QLabel::disabled {
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0,0,0">
+            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1,0,0,0,0">
              <property name="spacing">
               <number>12</number>
              </property>
@@ -184,10 +187,15 @@ QLabel::disabled {
               <number>12</number>
              </property>
              <item>
-              <widget class="QPushButton" name="playPause">
-               <property name="text">
-                <string/>
+              <widget class="QPushButton" name="rewind">
+               <property name="icon">
+                <iconset resource="../icons/Rekall.qrc">
+                 <normaloff>:/icons/res_icon_video_rewind.png</normaloff>:/icons/res_icon_video_rewind.png</iconset>
                </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="playPause">
                <property name="icon">
                 <iconset resource="../icons/Rekall.qrc">
                  <normaloff>:/icons/res_icon_video_play_on.png</normaloff>
@@ -215,9 +223,12 @@ QLabel::disabled {
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="time">
+              <widget class="PreviewerLabel" name="time">
                <property name="text">
                 <string>TIME</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -320,8 +331,8 @@ QLabel::disabled {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>93</x>
-     <y>47</y>
+     <x>326</x>
+     <y>214</y>
     </hint>
     <hint type="destinationlabel">
      <x>497</x>
@@ -336,8 +347,8 @@ QLabel::disabled {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>121</x>
-     <y>46</y>
+     <x>298</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
      <x>422</x>
@@ -352,8 +363,8 @@ QLabel::disabled {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>65</x>
-     <y>47</y>
+     <x>242</x>
+     <y>214</y>
     </hint>
     <hint type="destinationlabel">
      <x>529</x>
@@ -368,8 +379,8 @@ QLabel::disabled {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>30</x>
-     <y>46</y>
+     <x>66</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
      <x>500</x>
@@ -384,8 +395,8 @@ QLabel::disabled {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>22</x>
-     <y>47</y>
+     <x>51</x>
+     <y>214</y>
     </hint>
     <hint type="destinationlabel">
      <x>489</x>
@@ -400,8 +411,8 @@ QLabel::disabled {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>50</y>
+     <x>101</x>
+     <y>182</y>
     </hint>
     <hint type="destinationlabel">
      <x>602</x>
@@ -416,8 +427,8 @@ QLabel::disabled {
    <slot>actionOpen()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>50</y>
+     <x>101</x>
+     <y>182</y>
     </hint>
     <hint type="destinationlabel">
      <x>487</x>
@@ -432,8 +443,8 @@ QLabel::disabled {
    <slot>actionFinished()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>50</y>
+     <x>101</x>
+     <y>182</y>
     </hint>
     <hint type="destinationlabel">
      <x>481</x>
@@ -454,6 +465,38 @@ QLabel::disabled {
     <hint type="destinationlabel">
      <x>516</x>
      <y>186</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>time</sender>
+   <signal>mouseReleased()</signal>
+   <receiver>Previewer</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>202</x>
+     <y>206</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>211</x>
+     <y>286</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rewind</sender>
+   <signal>released()</signal>
+   <receiver>Previewer</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>18</x>
+     <y>205</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>22</x>
+     <y>336</y>
     </hint>
    </hints>
   </connection>

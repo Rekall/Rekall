@@ -168,7 +168,7 @@ const QRectF Tag::paintTimeline(bool before) {
         if(timelineBoundingRect.width() < timelineBoundingRect.height())
             timelineBoundingRect.adjust(-(timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0, (timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0);
 
-        QColor colorDestTmp = (Global::selectedTag == this)?(Global::colorSelection):(document->getColor());
+        QColor colorDestTmp = (Global::selectedTag == this)?(Global::colorSelection):(document->baseColor);
         if(document->status == DocumentStatusWaiting)
             colorDestTmp.setAlphaF(0.1);
         if((document->status == DocumentStatusProcessing) || (Global::selectedTag == this))

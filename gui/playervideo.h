@@ -32,6 +32,7 @@ public:
     bool isVideo;
     Nameable  *tag;
     Resizable *window;
+    qreal masterVolume, volume;
 private:
     qreal volumeOld;
 public:
@@ -42,7 +43,7 @@ public:
     bool isDisplayed() const;
     qint64 currentTime();
     qint64 totalTime();
-    void setVolume(qreal volume);
+    void setVolume(qreal _volume, qreal masterVolume = -1);
     void refreshControls();
 private slots:
     void action();

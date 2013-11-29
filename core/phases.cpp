@@ -72,7 +72,12 @@ void Phases::addCheckEnd() {
         currentDate = currentDate.addSecs(1);
         if(index < ui->checks->topLevelItemCount())  ((Phase*)(ui->checks->topLevelItem(index)))->setValues(currentDate, "");
         else                                         new Phase(ui->checks, currentDate, QString("#%1").arg(index+1));
-        emit(actionned(QString("%1 days").arg(ui->daysTo->value()), ""));
+
+        QString text2;
+        for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++)
+            if((!ui->checks->topLevelItem(i)->isHidden()) && (ui->checks->topLevelItem(i)->checkState(0) == Qt::Unchecked))
+                text2 = ui->filter->currentText();
+        emit(actionned(QString("%1 days").arg(ui->daysTo->value()), text2));
     }
     else
         emit(actionned("", ""));

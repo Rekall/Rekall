@@ -5,8 +5,9 @@ Previewer::Previewer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Previewer) {
     ui->setupUi(this);
-    volumeOld = 0;
+    timeMode   = true;
     isUpdating = false;
+    volumeOld = 0;
     setVolume(0.5);
     startTimer(500);
 }
@@ -18,7 +19,8 @@ void Previewer::timerEvent(QTimerEvent *) {
     if(ui->type->currentIndex() == 2) {
         isUpdating = true;
         ui->seek->setValue(ui->playerVideo->currentTime()/1000);
-        ui->time->setText(QString("%1\n%2").arg(Sorting::timeToString(ui->playerVideo->currentTime()/1000)).arg(Sorting::timeToString(ui->playerVideo->totalTime()/1000)));
+        if(timeMode)    ui->time->setText(QString("%1\n%2") .arg(Sorting::timeToString(ui->playerVideo->currentTime()/1000)).arg(Sorting::timeToString(ui->playerVideo->totalTime()/1000)));
+        else            ui->time->setText(QString("%1\n-%2").arg(Sorting::timeToString(ui->playerVideo->currentTime()/1000)).arg((Sorting::timeToString((ui->playerVideo->totalTime() - ui->playerVideo->currentTime())/1000))));
         isUpdating = false;
     }
 }
@@ -88,8 +90,14 @@ void Previewer::action() {
     }
     else if((sender() == ui->seek) && (!isUpdating)) {
         ui->playerVideo->seek(ui->seek->value()*1000);
-        ui->time->setText(QString("%1\n%2").arg(Sorting::timeToString(ui->playerVideo->currentTime()/1000)).arg(Sorting::timeToString(ui->playerVideo->totalTime()/1000)));
+        timerEvent(0);
     }
+    else if(sender() == ui->time) {
+        timeMode = !timeMode;
+        timerEvent(0);
+    }
+    else if(sender() == ui->rewind)
+        ui->playerVideo->seek(0);
 }
 void Previewer::actionOpen() {
     QDesktopServices::openUrl(QUrl::fromLocalFile(filename));

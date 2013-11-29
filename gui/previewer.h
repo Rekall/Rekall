@@ -32,6 +32,7 @@ private slots:
     void actionFinished();
 
 private:
+    UiBool timeMode;
     bool isUpdating;
     qreal volumeOld;
     QPixmap picture;

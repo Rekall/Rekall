@@ -34,8 +34,9 @@ public:
     virtual void seek(qreal, bool = false, bool = false) {}
     virtual qreal totalTime() const     { return 0.; }
     virtual void actionPlay()           {}
-    virtual void setDuplicates(quint16) {};
-    virtual void setHistories (quint16) {};
+    virtual bool jumpTo()               { return false; }
+    virtual void setDuplicates(quint16) {}
+    virtual void setHistories (quint16) {}
 public:
     virtual QPointF getTimelineCursorPos (qreal)           { return QPointF(); }
     virtual QPointF getViewerCursorPos   (qreal)           { return QPointF(); }

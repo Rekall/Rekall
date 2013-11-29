@@ -359,7 +359,6 @@ const QString Metadata::getAcceptableWithClusterFilters(qint16 version) {
 
 
 
-
 const QString Metadata::getCriteriaColor(qint16 version) {
     if(function == DocumentFunctionRender) return "";
     return getMetadata(Global::tagColorCriteria->tagNameCategory, Global::tagColorCriteria->tagName, version).toString(Global::tagColorCriteria->left, Global::tagColorCriteria->leftLength);
@@ -452,6 +451,15 @@ const QList<QPair<QString, QString> > Metadata::getGps() {
     return (QList< QPair<QString,QString> >() << gps);
 }
 
+const QColor Metadata::calcColor() {
+    QString colorMeta = getCriteriaColorFormated();
+    if(Global::colorForMeta.contains(colorMeta))
+        return Global::colorForMeta.value(colorMeta).first;
+    else if(function == DocumentFunctionRender)
+        return QColor(255, 255, 255);
+    else
+        return QColor(126, 126, 126);
+}
 
 
 void Metadata::debug() {

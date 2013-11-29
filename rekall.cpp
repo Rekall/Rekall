@@ -290,7 +290,7 @@ void Rekall::closeSplash() {
     showMaximized();
     updateGeometry();
     ui->timelineSplitter->setSizes(QList<int>() << ui->timelineSplitter->height() * 0.50 << ui->timelineSplitter->height() * 0.50);
-    ui->fileSplitter->setSizes(QList<int>()     << 300                                   << ui->fileSplitter->width()      - 300);
+    ui->fileSplitter->setSizes(QList<int>()     << 200                                   << ui->fileSplitter->width()      - 200);
     ui->conduiteSplitter->setSizes(QList<int>() << ui->conduiteSplitter->width()  - 300  << 300);
     //trayMenu->showMessage("Rekall", "Ready!", QSystemTrayIcon::NoIcon);
 }
@@ -364,10 +364,12 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
         if(expandItems.contains("Details"))
             ui->metadata->expandItem(metadataRootItem);
 
+        /*
         if(!metadata->getMetadata("Rekall", "Folder").toString().isEmpty())
-            ui->toolBoxRight->setItemText(1, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
+            ui->toolBoxRight->setTabText(1, tr("INFOS — %1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
         else
-            ui->toolBoxRight->setItemText(1, tr("INFOS — %1").arg(metadata->getMetadata("Rekall", "Name").toString()));
+            ui->toolBoxRight->setTabText(1, tr("INFOS — %1").arg(metadata->getMetadata("Rekall", "Name").toString()));
+        */
 
         //Versions
         ui->metadataSlider->setMaximum(metadata->getMetadataCountM());
@@ -394,7 +396,7 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
                 ssMetaIterator.next();
                 QString color = "#C8C8C8";
                 if(ssMetaIterator.key() == "Name")
-                    color = metadata->getColor().name();
+                    color = metadata->baseColor.name();
                 QTreeWidgetItem *item = new QTreeWidgetItem(rootItem, QStringList()
                                                             << metadataPrefix0 + ssMetaIterator.key() + metadataSuffix
                                                             << metadataPrefix1.arg(color) + ssMetaIterator.value().toString() + metadataSuffix);

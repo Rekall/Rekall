@@ -104,19 +104,19 @@ const QRectF Timeline::paintTimeline(bool before) {
             glVertex2f(timelineBoundingRect.topLeft()   .x(), timelineBoundingRect.topLeft()   .y() + (Global::timelineHeaderSize.height()/2+timeText.size.height()/2));
             glVertex2f(timelineBoundingRect.bottomLeft().x(), timelineBoundingRect.bottomLeft().y());
             glEnd();
+
+            //Current
+            QRectF timeTextRect(QPointF(timelineBoundingRect.topLeft().x() - timeText.size.width()/2, timelineBoundingRect.topLeft().y() + (Global::timelineHeaderSize.height()/2-timeText.size.height()/2)), timeText.size);
+            Global::timelineGL->qglColor(Global::colorProgression);
+            GlRect::drawRoundedRect(timeTextRect, false);
+            GlRect::drawRoundedRect(timeTextRect, true);
+            Global::timelineGL->qglColor(Qt::white);
+            timeText.setStyle(QSize(50, Global::timelineTagHeight*1.2), Qt::AlignCenter, Global::font);
+            timeText.drawText(Sorting::timeToString(Global::time), timeTextRect.topLeft().toPoint());
+
+            if((Global::timerPlay) && (Global::tagHorizontalCriteria->asTimeline))
+                Global::timelineGL->ensureVisible(QPointF(timelinePos.x(), -1));
         }
-
-        //Current
-        QRectF timeTextRect(QPointF(timelineBoundingRect.topLeft().x() - timeText.size.width()/2, timelineBoundingRect.topLeft().y() + (Global::timelineHeaderSize.height()/2-timeText.size.height()/2)), timeText.size);
-        Global::timelineGL->qglColor(Global::colorProgression);
-        GlRect::drawRoundedRect(timeTextRect, false);
-        GlRect::drawRoundedRect(timeTextRect, true);
-        Global::timelineGL->qglColor(Qt::white);
-        timeText.setStyle(QSize(50, Global::timelineTagHeight*1.2), Qt::AlignCenter, Global::font);
-        timeText.drawText(Sorting::timeToString(Global::time), timeTextRect.topLeft().toPoint());
-
-        if((Global::timerPlay) && (Global::tagHorizontalCriteria->asTimeline))
-            Global::timelineGL->ensureVisible(QPointF(timelinePos.x(), -1));
     }
     glDisable(GL_SCISSOR_TEST);
     return QRectF(timelinePos, QSizeF(2, Global::timelineGL->height()));
@@ -139,10 +139,12 @@ bool Timeline::jumpTo() {
         seek(time, true, true);
     return ok;
 }
-bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool action, bool press) {
-    if((action) && (press) && (Global::tagHorizontalCriteria->asTimeline)) {
-        if(dbl) jumpTo();
-        else    seek(Global::currentProject->getTimelineCursorTime(pos), false, true);
+bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool action, bool press) {
+    if((action) && (press)) {
+        if(dbl)
+            jumpTo();
+        else if(Global::tagHorizontalCriteria->asTimeline)
+            seek(Global::currentProject->getTimelineCursorTime(pos), false, true);
         Global::selectedTagInAction = 0;
         Global::selectedTag         = 0;
         return true;
@@ -244,7 +246,7 @@ void Timeline::actionChanged(QString text, QString text2) {
 
     if(text != "nothing") {
         if(sender() == Global::phases) {
-            if(text.isEmpty()) {
+            if(text2.isEmpty()) {
                 ui->phaseBy->setText(text);
                 ui->phaseBy->setStyleSheet("");
             }

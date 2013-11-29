@@ -139,6 +139,7 @@ public:
     DocumentType type;
     Thumbnails thumbnails;
     MetadataWaveform waveform;
+    QColor baseColor;
 
 public:
     bool updateFile(const QFileInfo &file, qint16 version = -1, quint16 falseInfoForTest = 0);
@@ -149,15 +150,7 @@ public:
     void addKeyword(const QString &keyword, qint16 version = -1, const QString &key = "Keywords", const QString &category = "Rekall");
     const QPair<QString, QPixmap> getThumbnail(qint16 version = -1);
     const QList< QPair<QString,QString> > getGps();
-    inline const QColor getColor() {
-        QString colorMeta = getCriteriaColorFormated();
-        if(Global::colorForMeta.contains(colorMeta))
-            return Global::colorForMeta.value(colorMeta).first;
-        else if(function == DocumentFunctionRender)
-            return QColor(255, 255, 255);
-        else
-            return QColor(226, 226, 226, 46);
-    }
+    const QColor calcColor();
 
 
 public:
