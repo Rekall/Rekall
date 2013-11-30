@@ -80,7 +80,7 @@ HttpSession HttpSessionStore::getSession(const QByteArray id) {
     return session;
 }
 
-void HttpSessionStore::timerEvent() {
+void HttpSessionStore::timerEvent(QTimerEvent *) {
     // Todo: find a way to delete sessions only if no controller is accessing them
     mutex.lock();
     qint64 now=QDateTime::currentMSecsSinceEpoch();

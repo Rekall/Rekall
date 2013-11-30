@@ -98,7 +98,7 @@ private:
 private slots:
 
     /** Called every minute to cleanup expired sessions. */
-    void timerEvent();
+    void timerEvent(QTimerEvent*);
 };
 
 #endif // HTTPSESSIONSTORE_H

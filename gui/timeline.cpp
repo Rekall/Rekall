@@ -139,7 +139,7 @@ bool Timeline::jumpTo() {
         seek(time, true, true);
     return ok;
 }
-bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool action, bool press) {
+bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool action, bool press) {
     if((action) && (press)) {
         if(dbl)
             jumpTo();
@@ -169,7 +169,7 @@ void Timeline::seek(qreal time, bool forceVisibleTimeline, bool forceVisibleView
 
 
 void Timeline::actionRewind() {
-    seek(0);
+    seek(0, true, true);
 
 }
 void Timeline::actionPlay() {

@@ -49,19 +49,6 @@ QTreeWidget*   Global::chutier                    = 0;
 ProjectBase*   Global::currentProject             = 0;
 UserInfosBase* Global::userInfos                  = 0;
 
-QColor       Global::colorTagCaptation            = QColor(255, 255, 255);
-QColor       Global::colorCluster                 = QColor(255, 255, 255, 100);
-QColor       Global::colorAlternateMore           = QColor(255, 255, 255,  30);
-QColor       Global::colorAlternate               = QColor(255, 255, 255,  12);
-QColor       Global::colorAlternateLight          = QColor(255, 255, 255,   8);
-QColor       Global::colorText                    = QColor(245, 248, 250);
-QColor       Global::colorTagDisabled             = QColor(126, 126, 126);
-QColor       Global::colorTimeline                = QColor( 45, 202, 225);//QColor(50, 221, 255);
-QColor       Global::colorTextBlack               = QColor( 45,  50,  53);//QColor( 43,  46,  47)
-QColor       Global::colorBackground              = QColor( 71,  77,  79);
-QColor       Global::colorAlternateStrong         = QColor(  0,   0,   0, 128);
-
-
 bool         Global::timelineSortChanged          = true;
 bool         Global::metaChanged                  = true;
 bool         Global::viewerSortChanged            = true;
@@ -78,6 +65,40 @@ WatcherBase* Global::watcher            = 0;
 RekallBase*  Global::mainWindow         = 0;
 TaskListBase*  Global::taskList         = 0;
 FeedListBase*  Global::feedList         = 0;
+
+
+QColor       Global::colorTagCaptation            = QColor(255, 255, 255);
+QColor       Global::colorCluster                 = QColor(255, 255, 255, 100);
+QColor       Global::colorAlternateMore           = QColor(255, 255, 255,  30);
+QColor       Global::colorAlternate               = QColor(255, 255, 255,  12);
+QColor       Global::colorAlternateLight          = QColor(255, 255, 255,   8);
+QColor       Global::colorText                    = QColor(245, 248, 250);
+QColor       Global::colorTagDisabled             = QColor(126, 126, 126);
+QColor       Global::colorTimeline                = QColor( 45, 202, 225);      //QColor(50, 221, 255);
+QColor       Global::colorAlternateStrong         = QColor(  0,   0,   0, 128);
+QColor       Global::colorTextBlack               = QColor( 45,  50,  53);      //QColor( 43,  46,  47)
+QColor       Global::colorBackground              = QColor( 71,  77,  79);
+QColor Global::getColorScale(qreal val) {
+    QList<QColor> colors;
+    if(val >= 100) {
+        colors << QColor(74,201,159) << QColor(255,84,79) << QColor(229,149,205) << QColor(255,147,102) << QColor(166,204,91) << QColor(181,134,118) << QColor(255,234,136);
+        val = (val/100)-1;
+        return QColor(colors.at(val).red(),
+                      colors.at(val).green(),
+                      colors.at(val).blue(),
+                      colors.at(val).alpha());
+    }
+    else {
+        colors << QColor(229,149,205) << QColor(123,144,206) << QColor(74,201,159) << QColor(166,204,91) << QColor(255,234,136) << QColor(255,147,102) << QColor(181,134,118) << QColor(255,84,79);
+        qreal indexFloat = val * (colors.count()-1);
+        quint16 indexLow = qFloor(indexFloat), indexSup = qMin(indexLow+1, colors.count()-1); indexFloat = indexFloat - indexLow;
+        return QColor(colors.at(indexLow).red()   * (1.-indexFloat) + colors.at(indexSup).red()   * (indexFloat),
+                      colors.at(indexLow).green() * (1.-indexFloat) + colors.at(indexSup).green() * (indexFloat),
+                      colors.at(indexLow).blue()  * (1.-indexFloat) + colors.at(indexSup).blue()  * (indexFloat),
+                      colors.at(indexLow).alpha() * (1.-indexFloat) + colors.at(indexSup).alpha() * (indexFloat));
+    }
+}
+
 
 void Global::seek(qreal _time) {
     time = _time;
@@ -167,26 +188,6 @@ QPair<QString, QPair<QString,QString> > Global::seperateMetadataAndGroup(const Q
 }
 
 
-QColor Global::getColorScale(qreal val) {
-    QList<QColor> colors;
-    if(val >= 100) {
-        colors << QColor(74,201,159) << QColor(255,84,79) << QColor(229,149,205) << QColor(255,147,102) << QColor(166,204,91) << QColor(181,134,118) << QColor(255,234,136);
-        val = (val/100)-1;
-        return QColor(colors.at(val).red(),
-                      colors.at(val).green(),
-                      colors.at(val).blue(),
-                      colors.at(val).alpha());
-    }
-    else {
-        colors << QColor(229,149,205) << QColor(123,144,206) << QColor(74,201,159) << QColor(166,204,91) << QColor(255,234,136) << QColor(255,147,102) << QColor(181,134,118) << QColor(255,84,79);
-        qreal indexFloat = val * (colors.count()-1);
-        quint16 indexLow = qFloor(indexFloat), indexSup = qMin(indexLow+1, colors.count()-1); indexFloat = indexFloat - indexLow;
-        return QColor(colors.at(indexLow).red()   * (1.-indexFloat) + colors.at(indexSup).red()   * (indexFloat),
-                      colors.at(indexLow).green() * (1.-indexFloat) + colors.at(indexSup).green() * (indexFloat),
-                      colors.at(indexLow).blue()  * (1.-indexFloat) + colors.at(indexSup).blue()  * (indexFloat),
-                      colors.at(indexLow).alpha() * (1.-indexFloat) + colors.at(indexSup).alpha() * (indexFloat));
-    }
-}
 
 QString Global::getFileHash(const QFileInfo &file) {
     QCryptographicHash fileHasher(QCryptographicHash::Sha1);
