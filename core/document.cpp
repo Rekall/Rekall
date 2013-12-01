@@ -3,13 +3,11 @@
 Document::Document(ProjectBase *_project) :
     DocumentBase(_project) {
     project     = _project;
-    chutierItem = 0;
     project->addDocument(this);
 }
 Document::Document(ProjectBase *_project, const QDir &_dirBase) :
     DocumentBase(_project) {
     project     = _project;
-    chutierItem = 0;
     project->addDocument(this);
     dirBase = _dirBase;
 }

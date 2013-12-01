@@ -24,11 +24,11 @@ Rekall::Rekall(QWidget *parent) :
     Global::chutier = ui->chutier->getTree();
     Global::udp = new Udp(0, 5678);
     settings = new QSettings(Global::pathApplication.absoluteFilePath() + "/Rekall.ini", QSettings::IniFormat, this);
-    if(false) {
+    if(true) {
         httpUpload = new FileUploadController();
         settings->beginGroup("listener");
         http = new HttpListener(settings, httpUpload, this);
-        connect(httpUpload, SIGNAL(fileUploaded(QString, QString, QTemporaryFile*)), SLOT(fileUploaded(QString, QString, QTemporaryFile*)), Qt::QueuedConnection);
+        connect(httpUpload, SIGNAL(fileUploaded(QString,QString,QString)), SLOT(fileUploaded(QString,QString,QString)));
     }
 
     Global::font.setFamily("Calibri");
@@ -90,6 +90,8 @@ Rekall::Rekall(QWidget *parent) :
 
     ui->metadata->setColumnWidth(0, 135);
     ui->metadataSlider->setVisible(false);
+    ui->metadataSliderLabel->setVisible(ui->metadataSlider->isVisible());
+    ui->metadataSliderIcon ->setVisible(ui->metadataSlider->isVisible());
     HtmlDelegate *delegate0 = new HtmlDelegate(false);
     HtmlDelegate *delegate1 = new HtmlDelegate(true);
     connect(delegate1, SIGNAL(closeEditor(QWidget*)), SLOT(actionMetadata()));
@@ -114,6 +116,8 @@ Rekall::Rekall(QWidget *parent) :
 
     //GPS
     ui->metadataOpenGps->setVisible(false);
+    ui->metadataOpenFinder->setVisible(false);
+    ui->metadataOpen->setVisible(false);
     gps = new QWebView(0);
     gps->setWindowFlags(Qt::Tool);
     gps->load(QUrl::fromLocalFile(Global::pathApplication.absoluteFilePath() + "/tools/maps.html"));
@@ -133,12 +137,15 @@ Rekall::~Rekall() {
     delete ui;
 }
 
-void Rekall::fileUploaded(QString gpsCoord, QString filename, QTemporaryFile *file) {
-    if((filename.toLower().endsWith("jpg")) || (filename.toLower().endsWith("jpeg"))) {
-        displayDocumentName(tr("Imported file"));
-        displayPixmap(DocumentTypeImage, file->fileName(), QPixmap(file->fileName()));
-        displayGps(QList< QPair<QString,QString> >() << qMakePair(gpsCoord, tr("Imported file")));
-    }
+void Rekall::fileUploaded(const QString &gpsCoord, const QString &filename, const QString &file) {
+    QFileInfo fileInfo(file);
+    qDebug("Upload %s @ %s = %s (%d)", qPrintable(gpsCoord), qPrintable(filename), qPrintable(fileInfo.absoluteFilePath()), fileInfo.exists());
+    Document *document = new Document(Global::currentProject);
+    document->updateFile(fileInfo);
+
+    displayDocumentName(tr("Imported file"));
+    displayPixmap(DocumentTypeImage, document->file.fileName(), QPixmap(document->file.fileName()));
+    displayGps(QList< QPair<QString,QString> >() << qMakePair(gpsCoord, tr("Imported file")));
 }
 
 void Rekall::dragEnterEvent(QDragEnterEvent *event) {
@@ -260,6 +267,10 @@ void Rekall::action() {
         parseMimeData(QApplication::clipboard()->mimeData(), "rekall");
     else if(sender() == ui->metadataOpenGps)
         gps->show();
+    else if((sender() == ui->metadataOpen) && (currentDocument) && (currentDocument->chutierItem))
+        currentDocument->chutierItem->fileShowInOS();
+    else if((sender() == ui->metadataOpenFinder) && (currentDocument) && (currentDocument->chutierItem))
+        currentDocument->chutierItem->fileShowInFinder();
 }
 void Rekall::actionForceGL() {
     ui->toolBoxRight->resize(ui->toolBoxRight->width()+1, ui->toolBoxRight->height());
@@ -377,6 +388,8 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
             ui->metadataSlider->setValue(metadata->getMetadataCountM());
         if(metadata->getMetadataCount() > 1) ui->metadataSlider->setVisible(true);
         else                                 ui->metadataSlider->setVisible(false);
+        ui->metadataSliderLabel->setVisible(ui->metadataSlider->isVisible());
+        ui->metadataSliderIcon ->setVisible(ui->metadataSlider->isVisible());
 
         //Sum up
         QMapIterator<QString, QMetaMap> metaIterator(metadata->getMetadata(ui->metadataSlider->value()));
@@ -394,9 +407,11 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
             QMapIterator<QString,MetadataElement> ssMetaIterator(metaIterator.value());
             while(ssMetaIterator.hasNext()) {
                 ssMetaIterator.next();
-                QString color = "#C8C8C8";
+                QString color = "#000000";
                 if(ssMetaIterator.key() == "Name")
                     color = metadata->baseColor.name();
+                if(color == "#000000")
+                    color = "#C8C8C8";
                 QTreeWidgetItem *item = new QTreeWidgetItem(rootItem, QStringList()
                                                             << metadataPrefix0 + ssMetaIterator.key() + metadataSuffix
                                                             << metadataPrefix1.arg(color) + ssMetaIterator.value().toString() + metadataSuffix);
@@ -405,6 +420,15 @@ void Rekall::displayMetadata(Metadata *metadata, QTreeWidget *tree, QTreeWidgetI
 
             if(expandItems.contains(metaIteratorKey))    ui->metadata->expandItem(rootItem);
             else                                         ui->metadata->collapseItem(rootItem);
+        }
+
+        if(metadata->chutierItem) {
+            ui->metadataOpenFinder->setVisible(true);
+            ui->metadataOpen      ->setVisible(true);
+        }
+        else {
+            ui->metadataOpenFinder->setVisible(false);
+            ui->metadataOpen      ->setVisible(false);
         }
 
         displayDocumentName(QString("%1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));

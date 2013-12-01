@@ -8,13 +8,20 @@
 FileUploadController::FileUploadController() {}
 
 void FileUploadController::service(HttpRequest& request, HttpResponse& response) {
-    QMapIterator<QByteArray,QByteArray> paramsIterator(request.getParameterMap());
-    while(paramsIterator.hasNext()) {
-        paramsIterator.next();
-        qDebug("\t%s = %s", qPrintable(paramsIterator.key()), qPrintable(paramsIterator.value()));
+    if(false) {
+        QMapIterator<QByteArray,QByteArray> paramsIterator(request.getParameterMap());
+        while(paramsIterator.hasNext()) {
+            paramsIterator.next();
+            qDebug("\t%s = %s", qPrintable(paramsIterator.key()), qPrintable(paramsIterator.value()));
+        }
     }
-    foreach(QTemporaryFile *file, request.getUploadedFiles())
-        emit(fileUploaded(request.getParameter("gps"), request.getParameter("file"), file));
+    foreach(QTemporaryFile *file, request.getUploadedFiles()) {
+        QString filePath = Global::pathCurrent.absoluteFilePath() + "/Upload/";
+        QDir().mkpath(filePath);
+        filePath = filePath + request.getParameter("file1");
+        file->copy(filePath);
+        emit(fileUploaded(request.getParameter("gps"), request.getParameter("file1"), filePath));
+    }
 
     if(request.getParameter("action") == "show") {
         if(request.getUploadedFiles().count())  response.write("ok");

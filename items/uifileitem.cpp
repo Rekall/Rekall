@@ -315,6 +315,7 @@ void UiFileItem::fileWatcherDirChanged(QString dir) {
     if(filename.lastWatcherUpdate.msecsTo(QDateTime::currentDateTime()) > 1000) {
         filename.lastWatcherUpdate = QDateTime::currentDateTime();
         watcher->fileWatcherDirChanged(filename.file.absoluteFilePath());
+        qDebug("DIR CHANGED %s", qPrintable(dir));
         if(filename.file.isDir()) {
             if(QDir(filename.file.absoluteFilePath()).exists())     syncWith(currentDepth);
             else                                                    askForDeletion(this);
@@ -330,6 +331,7 @@ void UiFileItem::fileWatcherFileChanged(QString file) {
     if(filename.lastWatcherUpdate.msecsTo(QDateTime::currentDateTime()) > 1000) {
         filename.lastWatcherUpdate = QDateTime::currentDateTime();
         watcher->fileWatcherFileChanged(filename.file.absoluteFilePath());
+        qDebug("FILE CHANGED %s", qPrintable(file));
         if(isOpened)
             fileReload();
     }

@@ -11,8 +11,8 @@ Project::Project(QWidget *parent) :
 void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
     foreach(const QFileInfo &file, files) {
         QDir dir(file.absoluteFilePath());
-        if(file.isFile())
-            dir.cdUp();
+        //if(file.isFile())
+        //    dir.cdUp();
         UiFileItem::syncWith(QFileInfoList() << dir.absolutePath(), view->getTree());
         open(dir, dir, debug);
     }

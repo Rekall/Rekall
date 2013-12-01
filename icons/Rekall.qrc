@@ -42,6 +42,10 @@
         <file>res_icon_filter_note.png</file>
         <file>res_icon_filter_horizontal.png</file>
         <file>res_icon_video_rewind.png</file>
+        <file>res_icon_finder.png</file>
+        <file>res_icon_link.png</file>
+        <file>res_icon_map.png</file>
+        <file>res_icon_history.png</file>
     </qresource>
     <qresource prefix="/textures">
         <file>res_texture_strips.png</file>

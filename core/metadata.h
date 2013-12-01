@@ -2,6 +2,7 @@
 #define METADATA_H
 
 #include <QMutex>
+#include "items/uifileitem.h"
 #include "misc/global.h"
 
 enum DocumentType     { DocumentTypeFile, DocumentTypeVideo, DocumentTypeAudio, DocumentTypeImage, DocumentTypeDoc, DocumentTypeMarker, DocumentTypePeople };
@@ -124,6 +125,7 @@ public:
     ~Metadata();
 
 public:
+    UiFileItem      *chutierItem;
     DocumentFunction function;
     QFileInfo        file;
     QImage           photo;

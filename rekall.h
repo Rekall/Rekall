@@ -59,7 +59,7 @@ protected:
     bool parseMimeData(const QMimeData *mime, const QString &source, bool test = false);
 
 private slots:
-    void fileUploaded(QString gps, QString filename, QTemporaryFile*);
+    void fileUploaded(const QString &, const QString &, const QString &);
     void action();
     void actionForceGL();
     void actionMetadata();

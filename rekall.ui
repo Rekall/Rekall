@@ -68,25 +68,25 @@ QToolBox::tab, QTabBar::tab {
 	border-left:							5px solid rgb(114, 118, 118);
 	min-height:							23px;
 }
-QWidget#toolBoxLeft::tab {
+QToolBox#toolBoxLeft::tab {
 	color: 									rgb(255,147,102);
 	border-left:							5px solid rgb(255,147,102);
 }
-QWidget#toolBoxLeft::tab:selected {
+QToolBox#toolBoxLeft::tab:selected {
 	color:									white;
 	background-color: 				rgb(255,147,102);
 	border-left:							5px solid rgb(255,147,102);
 }
-QWidget#toolBoxRight::tab, QWidget#toolBoxRight QWidget::tab {
+QTabWidget#toolBoxRight::tab, QTabWidget#toolBoxRight QTabBar::tab {
 	color:									rgb(166,204,91);
 	border-left:							5px solid rgb(166,204,91);
 }
-QWidget#toolBoxRight::tab:selected, QWidget#toolBoxRight QWidget::tab:selected {
+QTabWidget#toolBoxRight::tab:selected, QTabWidget#toolBoxRight QTabBar::tab:selected {
 	color:									white;
 	background-color: 				rgb(166,204,91);
 	border-left:							5px solid rgb(166,204,91);
 }
-QWidget#toolBoxLeft::tab:disabled, QWidget#toolBoxRight QWidget::tab:disabled {
+QTabWidget#toolBoxLeft::tab:disabled, QTabWidget#toolBoxRight QTabBar::tab:disabled {
 	color:									rgb(56, 61, 63);
 	border-left:							5px solid rgb(56, 61, 63);
 }
@@ -410,7 +410,7 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>165</width>
+            <width>201</width>
             <height>271</height>
            </rect>
           </property>
@@ -463,8 +463,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>178</height>
+            <width>201</width>
+            <height>271</height>
            </rect>
           </property>
           <attribute name="label">
@@ -506,8 +506,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>248</height>
+            <width>201</width>
+            <height>271</height>
            </rect>
           </property>
           <attribute name="label">
@@ -549,8 +549,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>484</height>
+            <width>201</width>
+            <height>330</height>
            </rect>
           </property>
           <attribute name="label">
@@ -718,16 +718,16 @@ QMenu::item:enabled:selected {
              <number>20</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>6</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>6</number>
             </property>
             <property name="rightMargin">
-             <number>0</number>
+             <number>6</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>6</number>
             </property>
             <item>
              <widget class="QLabel" name="previewLabel">
@@ -787,18 +787,96 @@ QMenu::item:enabled:selected {
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="metadataOpenGps">
-              <property name="text">
-               <string>SHOW GPS LOCATION ON A MAP</string>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <property name="spacing">
+               <number>12</number>
               </property>
-             </widget>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="metadataOpenFinder">
+                <property name="toolTip">
+                 <string>Reveal file in Finder</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="icons/Rekall.qrc">
+                  <normaloff>:/icons/res_icon_finder.png</normaloff>:/icons/res_icon_finder.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="metadataOpen">
+                <property name="toolTip">
+                 <string>Open file with default application</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="icons/Rekall.qrc">
+                  <normaloff>:/icons/res_icon_link.png</normaloff>:/icons/res_icon_link.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>14</width>
+                  <height>14</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="metadataOpenGps">
+                <property name="toolTip">
+                 <string>Show file location on a map</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="icons/Rekall.qrc">
+                  <normaloff>:/icons/res_icon_map.png</normaloff>:/icons/res_icon_map.png</iconset>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QSlider" name="metadataSlider">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <property name="spacing">
+               <number>12</number>
               </property>
-             </widget>
+              <item>
+               <widget class="QLabel" name="metadataSliderLabel">
+                <property name="text">
+                 <string>Document history</string>
+                </property>
+                <property name="pixmap">
+                 <pixmap resource="icons/Rekall.qrc">:/icons/res_icon_history.png</pixmap>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="metadataSliderIcon">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="pixmap">
+                 <pixmap resource="icons/Rekall.qrc">:/icons/res_icon_history.png</pixmap>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="metadataSlider">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </widget>
@@ -955,7 +1033,9 @@ QMenu::item:enabled:selected {
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="icons/Rekall.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>metadata</sender>
@@ -964,8 +1044,8 @@ QMenu::item:enabled:selected {
    <slot>actionMetadata(QTreeWidgetItem*,int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>679</x>
-     <y>418</y>
+     <x>793</x>
+     <y>413</y>
     </hint>
     <hint type="destinationlabel">
      <x>916</x>
@@ -980,8 +1060,8 @@ QMenu::item:enabled:selected {
    <slot>refreshMetadata()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>679</x>
-     <y>477</y>
+     <x>793</x>
+     <y>500</y>
     </hint>
     <hint type="destinationlabel">
      <x>69</x>
@@ -996,8 +1076,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>685</x>
-     <y>454</y>
+     <x>558</x>
+     <y>461</y>
     </hint>
     <hint type="destinationlabel">
      <x>1145</x>
@@ -1012,12 +1092,44 @@ QMenu::item:enabled:selected {
    <slot>personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>48</x>
-     <y>520</y>
+     <x>47</x>
+     <y>441</y>
     </hint>
     <hint type="destinationlabel">
      <x>-71</x>
      <y>223</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>metadataOpenFinder</sender>
+   <signal>released()</signal>
+   <receiver>Rekall</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>793</x>
+     <y>461</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>981</x>
+     <y>331</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>metadataOpen</sender>
+   <signal>released()</signal>
+   <receiver>Rekall</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>432</x>
+     <y>445</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>945</x>
+     <y>390</y>
     </hint>
    </hints>
   </connection>

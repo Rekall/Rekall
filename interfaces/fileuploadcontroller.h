@@ -6,6 +6,7 @@
 #ifndef FILEUPLOADCONTROLLER_H
 #define FILEUPLOADCONTROLLER_H
 
+#include "misc/global.h"
 #include "interfaces/http/httprequest.h"
 #include "interfaces/http/httpresponse.h"
 #include "interfaces/http/httprequesthandler.h"
@@ -22,7 +23,7 @@ public:
     void service(HttpRequest& request, HttpResponse& response);
 
 signals:
-    void fileUploaded(QString, QString, QTemporaryFile*);
+    void fileUploaded(const QString &, const QString &, const QString &);
 };
 
 #endif // FILEUPLOADCONTROLLER_H

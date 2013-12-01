@@ -4,7 +4,6 @@
 #include <QObject>
 #include "misc/global.h"
 #include "metadata.h"
-#include "items/uifileitem.h"
 
 
 class DocumentBase : public Metadata {
@@ -13,7 +12,6 @@ public:
         renderActive   = true;
     }
 public:
-    UiFileItem *chutierItem;
     UiBool renderActive;
 };
 
