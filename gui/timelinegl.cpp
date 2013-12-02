@@ -63,17 +63,18 @@ void TimelineGL::paintGL() {
     glClear(clearFlag);
     qglClearColor(Global::colorTextBlack);
 
-    drawingBoundingRect = QRectF();
+    QRectF _drawingBoundingRect;
     scroll = scroll + (scrollDest - scroll) / Global::inertie;
     visibleRect = QRectF(scroll, size());
     glScissor(Global::timelineHeaderSize.width(), 0, width() - Global::timelineHeaderSize.width(), height());
     glPushMatrix();
     glTranslatef(qRound(-scroll.x()), qRound(-scroll.y()), 0);
-    if(Global::timeline)        drawingBoundingRect = drawingBoundingRect.united(Global::timeline      ->paintTimeline(true));
-    if(Global::currentProject)  drawingBoundingRect = drawingBoundingRect.united(Global::currentProject->paintTimeline(true));
-    if(Global::timeline)        Global::timeline      ->paintTimeline();
-    if(Global::currentProject)  Global::currentProject->paintTimeline();
+    if(Global::timeline)        _drawingBoundingRect = _drawingBoundingRect.united(Global::timeline      ->paintTimeline(true));
+    if(Global::currentProject)  _drawingBoundingRect = _drawingBoundingRect.united(Global::currentProject->paintTimeline(true));
+    if(Global::timeline)        _drawingBoundingRect = _drawingBoundingRect.united(Global::timeline      ->paintTimeline());
+    if(Global::currentProject)  _drawingBoundingRect = _drawingBoundingRect.united(Global::currentProject->paintTimeline());
     glPopMatrix();
+    drawingBoundingRect = _drawingBoundingRect;
 
     showLegend = showLegend + ((qreal)showLegendDest - showLegend) / Global::inertie;
     showLinkedRenders = showLinkedRenders + ((qreal)showLinkedRendersDest - showLinkedRenders) / Global::inertie;
@@ -165,6 +166,7 @@ bool TimelineGL::gestureEvent(QGestureEvent *event) {
     }
     return true;
 }
+
 void TimelineGL::mousePressEvent(QMouseEvent *e) {
     mouseTimerPos = e->posF();
     mouseTimerOk = true;

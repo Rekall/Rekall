@@ -22,6 +22,8 @@ void Timeline::timerEvent(QTimerEvent *) {
         Global::time += Global::timer.elapsed() / 1000.;
         Global::timer.restart();
     }
+    if(Global::timeMarkerAdded)
+        ((Tag*)Global::timeMarkerAdded)->setTimeEnd(Global::time);
     Global::currentProject->fireEvents();
     Global::timeUnit          = Global::timeUnit          + (Global::timeUnitDest          - Global::timeUnit)          / Global::inertie;
     Global::timelineTagHeight = Global::timelineTagHeight + (Global::timelineTagHeightDest - Global::timelineTagHeight) / Global::inertie;
@@ -174,6 +176,8 @@ void Timeline::actionRewind() {
 }
 void Timeline::actionPlay() {
     ui->playButton->setChecked(!ui->playButton->isChecked());
+    if(!ui->playButton->isChecked())
+        Global::timeMarkerAdded = 0;
 }
 void Timeline::setDuplicates(quint16 nbDuplicates) {
     timelineControl->setDuplicates(nbDuplicates);
@@ -221,9 +225,35 @@ void Timeline::action() {
         if(ui->viewOption->isChecked()) timelineControl->show();
         else                            timelineControl->hide();
     }
-
-
 }
+
+void Timeline::actionMarkerAddStart() {
+    qDebug("START");
+    Document *marker = new Document(Global::currentProject);
+    marker->updateImport(tr("Marker"));
+    Tag *tag = new Tag(marker);
+    tag->create(TagTypeContextualTime, Global::time, 0);
+    Global::timeMarkerAdded = tag;
+    marker->tags.append(tag);
+    marker->updateFeed();
+
+    actionMarkerAddStarted.restart();
+    ui->marker->setStyleSheet("background-color: rgb(255,84,79); border-color: rgb(255,84,79);");
+    ui->marker->setText("Keep pressed for long marker");
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+}
+void Timeline::actionMarkerAddEnd() {
+    if(Global::timeMarkerAdded) {
+        Tag *tag = (Tag*)Global::timeMarkerAdded;
+        if(actionMarkerAddStarted.elapsed() < 1000)
+            tag->setType(TagTypeContextualMilestone, tag->getTimeStart());
+        Global::timeMarkerAdded = 0;
+        ui->marker->setText("+");
+        ui->marker->setStyleSheet("");
+        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    }
+}
+
 void Timeline::actionDisplayed(bool val) {
     if(sender() == Global::tagFilterCriteria)
         ui->filterBy->setChecked(val);

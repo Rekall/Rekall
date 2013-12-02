@@ -25,6 +25,7 @@ private:
     QList<GlText> ticks;
     qreal ticksWidth;
     GlText timeText;
+    QTime actionMarkerAddStarted;
 private:
     void seek(qreal _time, bool forceVisibleTimeline = false, bool forceVisibleViewer = false);
 protected:
@@ -38,6 +39,8 @@ public:
 
 public slots:
     void action();
+    void actionMarkerAddStart();
+    void actionMarkerAddEnd();
     void actionDisplayed(bool);
     void actionChanged(QString,QString);
     void actionRewind();

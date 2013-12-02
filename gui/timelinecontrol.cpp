@@ -49,7 +49,7 @@ void TimelineControl::setHistories(quint16 nbHistories) {
 
 
 void TimelineControl::action() {
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
 }
 
 TimelineControl::~TimelineControl() {

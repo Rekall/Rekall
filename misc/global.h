@@ -37,6 +37,8 @@ public:
     virtual bool jumpTo()               { return false; }
     virtual void setDuplicates(quint16) {}
     virtual void setHistories (quint16) {}
+    virtual void actionMarkerAddStart() {}
+    virtual void actionMarkerAddEnd()   {}
 public:
     virtual QPointF getTimelineCursorPos (qreal)           { return QPointF(); }
     virtual QPointF getViewerCursorPos   (qreal)           { return QPointF(); }
@@ -227,7 +229,7 @@ public:
     static QTime timer;
     static Sorting *tagSortCriteria, *tagColorCriteria, *tagClusterCriteria, *tagFilterCriteria, *tagHorizontalCriteria;
     static Phases *phases;
-    static void *selectedTagInAction, *selectedTag, *selectedTagHover;
+    static void *selectedTagInAction, *selectedTag, *selectedTagHover, *timeMarkerAdded;
     static qreal selectedTagHoverSnapped;
     static QMap<QString,void*> renders;
     static qreal selectedTagStartDrag;

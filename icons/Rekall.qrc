@@ -46,6 +46,8 @@
         <file>res_icon_link.png</file>
         <file>res_icon_map.png</file>
         <file>res_icon_history.png</file>
+        <file>res_icon_history_reverse.png</file>
+        <file>res_icon_marker.png</file>
     </qresource>
     <qresource prefix="/textures">
         <file>res_texture_strips.png</file>

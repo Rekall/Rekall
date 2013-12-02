@@ -45,7 +45,7 @@ private:
     DocumentBase *document;
 public:
     QColor color;
-    bool  mouseHover, breathing;
+    bool  breathing;
     bool  contains(qreal time) const;
     qreal progress(qreal time) const;
     qreal progressAbs(qreal time) const;
@@ -72,8 +72,16 @@ public:
     QRectF  timelineBoundingRect;
     QPointF timelinePos, timelineDestPos;
     qreal   tagScale, tagDestScale;
+    bool timelineFirstPos, timelineFirstPosVisible;
 public:
-    void  setTimelinePos(const QPointF _timelineDestPos)    { timelineDestPos = _timelineDestPos;  }
+    void  setTimelinePos(const QPointF _timelineDestPos)    {
+        timelineDestPos = _timelineDestPos;
+        if(timelineFirstPos) {
+            timelinePos = timelineDestPos;
+            timelineFirstPos = false;
+            timelineFirstPosVisible = true;
+        }
+    }
     const QRectF getTimelineBoundingRect() const            { return timelineBoundingRect; }
     const QRectF paintTimeline(bool before = false);
     bool  mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool);
@@ -83,9 +91,16 @@ public:
 public:
     QRectF  viewerBoundingRect;
     QPointF viewerPos, viewerDestPos;
-    bool isInProgress;
+    bool isInProgress, viewerFirstPos, viewerFirstPosVisible;
 public:
-    void  setViewerPos(const QPointF _viewerDestPos)  { viewerDestPos = _viewerDestPos;  }
+    void  setViewerPos(const QPointF _viewerDestPos)  {
+        viewerDestPos = _viewerDestPos;
+        if(viewerFirstPos) {
+            viewerPos = viewerDestPos;
+            viewerFirstPos = false;
+            viewerFirstPosVisible = true;
+        }
+    }
     const QRectF getViewerBoundingRect() const        { return viewerBoundingRect; }
     const QRectF paintViewer(quint16 tagIndex);
     bool  mouseViewer(const QPointF &, QMouseEvent *, bool, bool, bool, bool);

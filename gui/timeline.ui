@@ -801,6 +801,29 @@ QMenu::item:enabled:selected {
             <number>12</number>
            </property>
            <item>
+            <widget class="PreviewerPushButton" name="marker">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>+</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_marker.png</normaloff>:/icons/res_icon_marker.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="writeNote">
              <property name="minimumSize">
               <size>
@@ -835,6 +858,16 @@ QMenu::item:enabled:selected {
    <extends>QWidget</extends>
    <header>gui/timelinegl.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PreviewerPushButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/previewerlabel.h</header>
+   <slots>
+    <signal>mousePressed()</signal>
+    <signal>mouseReleased()</signal>
+    <signal>mouseDoubleClick()</signal>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources>
@@ -976,7 +1009,7 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1122</x>
+     <x>1044</x>
      <y>172</y>
     </hint>
     <hint type="destinationlabel">
@@ -1001,8 +1034,59 @@ QMenu::item:enabled:selected {
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>marker</sender>
+   <signal>mouseReleased()</signal>
+   <receiver>Timeline</receiver>
+   <slot>actionMarkerAddEnd()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1158</x>
+     <y>162</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1156</x>
+     <y>421</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>marker</sender>
+   <signal>mousePressed()</signal>
+   <receiver>Timeline</receiver>
+   <slot>actionMarkerAddStart()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1123</x>
+     <y>161</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1112</x>
+     <y>440</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>legend</sender>
+   <signal>released()</signal>
+   <receiver>Timeline</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1070</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1073</x>
+     <y>304</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>action()</slot>
+  <slot>actionMarkerAddStart()</slot>
+  <slot>actionMarkerAddEnd()</slot>
+  <slot>actionMarkerAdd()</slot>
  </slots>
 </ui>

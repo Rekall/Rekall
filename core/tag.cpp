@@ -8,8 +8,9 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
     player       = 0;
     progression       = progressionDest = decounter = 0;
     isInProgress      = false;
-    mouseHover        = false;
     breathing         = false;
+    viewerFirstPos = timelineFirstPos = true;
+    viewerFirstPosVisible = timelineFirstPosVisible = false;
     blinkTime         = 0;
     timelineFilesAction = 0;
     timeStart = timeEnd = 0;
@@ -76,7 +77,7 @@ void Tag::setType(TagType _type, qreal time) {
     }
     else
         timeStart = timeEnd = time;
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    //Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
 }
 
 void Tag::setTimeStart(qreal _timeStart) {
@@ -84,7 +85,7 @@ void Tag::setTimeStart(qreal _timeStart) {
     qreal mediaOffset   = document->getMetadata("Rekall", "Media Offset").toDouble();
     if(mediaDuration <= 0) mediaDuration = timeEnd;
     timeStart = qBound(timeEnd - mediaDuration + mediaOffset, _timeStart, timeEnd);
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    //Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
 }
 void Tag::setTimeEnd(qreal _timeEnd) {
     if(type == TagTypeContextualTime) {
@@ -92,7 +93,7 @@ void Tag::setTimeEnd(qreal _timeEnd) {
         qreal mediaOffset   = document->getMetadata("Rekall", "Media Offset").toDouble();
         if(mediaDuration <= 0) mediaDuration = 999999;
         timeEnd = qBound(timeStart, _timeEnd, timeStart + mediaDuration - mediaOffset);
-        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+        //Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
     }
     else
         timeEnd = timeStart;
@@ -101,7 +102,7 @@ void Tag::moveTo(qreal _val) {
     qreal _duration = getDuration();
     timeStart = qMax(0., _val);
     timeEnd   = timeStart + _duration;
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    //Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
 }
 
 
@@ -465,6 +466,11 @@ const QRectF Tag::paintTimeline(bool before) {
         }
         glPopMatrix();
     }
+
+    if(timelineFirstPosVisible) {
+        timelineFirstPosVisible = false;
+        Global::timelineGL->ensureVisible(timelineBoundingRect.translated(timelinePos).topLeft());
+    }
     return timelineBoundingRect.translated(timelinePos);
 }
 
@@ -589,16 +595,21 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
 
         glPopMatrix();
     }
+    if(viewerFirstPosVisible) {
+        viewerFirstPosVisible = false;
+        Global::viewerGL->ensureVisible(viewerBoundingRect.translated(viewerDestPos).topLeft());
+    }
     return viewerBoundingRect.translated(viewerPos);
 }
 
-bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool action, bool press) {
+bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, bool press) {
     if(timelineContains(pos)) {
         if(press) {
-            mouseHover = true;
-
-            if(Global::selectedTag != this)
-                Global::selectedTag = this;
+            if(Global::selectedTag != this) {
+                Global::selectedTag      = this;
+                Global::selectedTagHover = this;
+                Global::mainWindow->refreshMetadata(this, true);
+            }
             else if(Global::selectedTagInAction != this) {
                 Global::selectedTagInAction  = this;
                 Global::selectedTagStartDrag = timelineProgress(pos) * getDuration();
@@ -609,8 +620,6 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
                 }
             }
 
-            if(document->chutierItem)
-                Global::chutier->setCurrentItem(document->chutierItem);
             if(dbl) {
                 if(document->chutierItem) {
                     document->chutierItem->fileShowInOS();
@@ -618,27 +627,24 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
                     tagDestScale = 1;
                 }
             }
+            return true;
         }
         if(!Global::selectedTag)
             Global::mainWindow->refreshMetadata(this, false);
         Global::selectedTagHover = this;
+        return true;
     }
-    else if(action)
-        mouseHover = false;
 
-    return mouseHover;
+    return (Global::selectedTagInAction == this);
 }
 bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool, bool press) {
     if(viewerContains(pos)) {
-        mouseHover               = true;
         Global::selectedTagHover = this;
 
         if(press) {
             Global::timeline->seek(getTimeStart(), true, false);
             Global::selectedTag         = this;
             Global::selectedTagInAction = 0;
-            if(!Global::selectedTag)
-                Global::mainWindow->refreshMetadata(this, true);
             if(document->chutierItem)
                 Global::chutier->setCurrentItem(document->chutierItem);
         }
@@ -650,10 +656,9 @@ bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool, b
             */
             Global::mainWindow->showPreviewTab();
         }
+        return true;
     }
-    else
-        mouseHover = false;
-    return mouseHover;
+    return false;
 }
 
 bool Tag::contains(qreal time) const {

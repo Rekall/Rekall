@@ -64,7 +64,7 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
         }
     }
 
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
 }
 
 Document* Project::getDocument(const QString &name) {
@@ -78,14 +78,9 @@ Document* Project::getDocumentAndSelect(const QString &name) {
     foreach(Document *document, documents) {
         if(document->file.absoluteFilePath() == name) {
             documentRetour = document;
-            foreach(Tag *tag, document->tags) {
-                tag->mouseHover = true;
-                Global::selectedTag = tag;
-            }
-        }
-        else
             foreach(Tag *tag, document->tags)
-                tag->mouseHover = false;
+                Global::selectedTag = tag;
+        }
     }
     return documentRetour;
 }
@@ -250,6 +245,7 @@ const QRectF Project::paintTimeline(bool before) {
                     //Add to timeline if displayable
                     if(tag->isAcceptableWithSortFilters(false)) {
                         QString sorting        = Tag::getCriteriaSort(tag).toLower();
+                        QString sortingRaw     = Tag::getCriteriaSort(tag);
                         QString sortingVerbose = Tag::getCriteriaSortFormated(tag);
                         if(tag->isAcceptableWithSortFilters(true)) {
                             QString phase          = Global::phases->getPhaseFor(Tag::getCriteriaPhase(tag)).toLower();
@@ -264,8 +260,12 @@ const QRectF Project::paintTimeline(bool before) {
                             }
                             timelineSortTags[phase][sorting][cluster].append(tag);
                         }
-                        if(tag->getDocument()->function != DocumentFunctionRender)
-                            Global::tagSortCriteria->addCheck(sorting, sortingVerbose);
+                        if(tag->getDocument()->function != DocumentFunctionRender) {
+                            if(Global::tagSortCriteria->asDate)
+                                Global::tagSortCriteria->addCheck(sortingRaw, sortingVerbose);
+                            else
+                                Global::tagSortCriteria->addCheck(sortingRaw, "");
+                        }
                     }
 
                 }
@@ -447,8 +447,8 @@ const QRectF Project::paintTimeline(bool before) {
                         QPointF tagPosOffset;
 
                         //Category in selection
-                        tagCategoryIsSelected |= tag->mouseHover;
                         tagCategoryIsSelected |= (tag == Global::selectedTag);
+                        tagCategoryIsSelected |= (tag == Global::selectedTagHover);
                         tagCategoryIsSelected |= (tag == Global::selectedTagInAction);
 
                         //Get info about category and analysis

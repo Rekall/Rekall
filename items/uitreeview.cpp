@@ -13,9 +13,9 @@ UiTreeView::UiTreeView(QWidget *parent) :
     showCopy     (true);
     showPaste    (true);
     showDuplicate(true);
+    showOpen     (false);
     showNewRoot  (false);
     showImport   (false);
-    showOpen     (false);
     showSave     (false);
     showSaveAs   (false);
     importAsFiles = true;

@@ -67,9 +67,9 @@ private slots:
     void closeSplash();
     void refreshAndLastMetadata();
     void refreshMetadata();
-    void chutierItemChanged(QTreeWidgetItem*,QTreeWidgetItem*);
+    void chutierItemChanged(QTreeWidgetItem*,QTreeWidgetItem*,Tag* = 0);
     void personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*);
-    void displayMetadata(Metadata *metadata, QTreeWidget*, QTreeWidgetItem*, QTreeWidgetItem*);
+    void displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget*, QTreeWidgetItem*, QTreeWidgetItem*);
     void showHelp(bool);
 
 private:

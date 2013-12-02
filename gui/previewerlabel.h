@@ -3,6 +3,7 @@
 
 #include <QLabel>
 #include <Phonon>
+#include <QPushButton>
 
 using namespace Phonon;
 
@@ -12,10 +13,12 @@ public:
     explicit PreviewerLabel(QWidget *parent = 0);
 
 signals:
+    void mousePressed();
     void mouseReleased();
     void mouseDoubleClick();
 
 protected:
+    void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void mouseDoubleClickEvent(QMouseEvent *e);
 };
@@ -27,12 +30,32 @@ public:
     explicit PreviewerVideoPlayer(QWidget *parent = 0);
 
 signals:
+    void mousePressed();
     void mouseReleased();
     void mouseDoubleClick();
 
 protected:
+    void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void mouseDoubleClickEvent(QMouseEvent *e);
 };
+
+
+class PreviewerPushButton : public QPushButton {
+    Q_OBJECT
+public:
+    explicit PreviewerPushButton(QWidget *parent = 0);
+
+signals:
+    void mousePressed();
+    void mouseReleased();
+    void mouseDoubleClick();
+
+protected:
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
+    void mouseDoubleClickEvent(QMouseEvent *e);
+};
+
 
 #endif // PREVIEWERLABEL_H

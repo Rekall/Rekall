@@ -36,6 +36,7 @@ bool         Global::timerPlay                    = false;
 void*        Global::selectedTagInAction          = 0;
 void*        Global::selectedTag                  = 0;
 void*        Global::selectedTagHover             = 0;
+void*        Global::timeMarkerAdded              = 0;
 qreal        Global::selectedTagHoverSnapped      = -1;
 QMap<QString,void*> Global::renders;
 TagSelection Global::selectedTagMode              = TagSelectionMove;
@@ -235,16 +236,20 @@ void FeedItemBase::update() {
 
 
 void GlWidget::ensureVisible(const QPointF &point, qreal ratio) {
-    QRectF rect(QPointF(0, 0), size());
-    if(!rect.translated(scrollDest).contains(point)) {
-        QPointF pseudoCenter = rect.topLeft() + QPointF(rect.width() * ratio, rect.height() * ratio);
-        if(point.y() >= 0)  scrollTo(QPointF(scrollDest.x(), point.y() - pseudoCenter.y()));
-        if(point.x() >= 0)  scrollTo(QPointF(point.x() - pseudoCenter.x(), scrollDest.y()));
+    if(point.x() && point.y()) {
+        QRectF rect(QPointF(0, 0), size());
+        if(!rect.translated(scrollDest).contains(point)) {
+            QPointF pseudoCenter = rect.topLeft() + QPointF(rect.width() * ratio, rect.height() * ratio);
+            QPointF scrollDestDest(scrollDest);
+            if(point.x() >= 0)  scrollDestDest.setX(point.x() - pseudoCenter.x());
+            if(point.y() >= 0)  scrollDestDest.setY(point.y() - pseudoCenter.y());
+            scrollTo(scrollDestDest);
+        }
     }
 }
 void GlWidget::scrollTo(const QPointF &point) {
-    scrollDest.setX(qBound(0., point.x(), qMax(0., drawingBoundingRect.right()  + 200 - width())));
-    scrollDest.setY(qBound(0., point.y(), qMax(0., drawingBoundingRect.bottom() + 200 - height())));
+    scrollDest.setX(qBound(0., point.x(), qMax(0., drawingBoundingRect.right()  + 100 - width())));
+    scrollDest.setY(qBound(0., point.y(), qMax(0., drawingBoundingRect.bottom() + 100 - height())));
 }
 
 

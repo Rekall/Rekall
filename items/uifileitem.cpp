@@ -370,6 +370,7 @@ void UiFileItem::configure(UiTreeView *tree, bool _showDateTime) {
     col3.iconCheckedOn  = QPixmap(":/items/res_item_tracked_on.png");
     tree->configureColumns(col3);
 
+    /*
     UiTreeViewOptions col4 =   UiTreeViewOptions(columnIndex++, ""        , "checkboxS", ""           , QHeaderView::Fixed,   15 , 20, 20);
     col4.iconCheckedOn = col4.iconCheckedOff = QPixmap(":/items/res_item_reveal.png");
     tree->configureColumns(col4);
@@ -380,6 +381,7 @@ void UiFileItem::configure(UiTreeView *tree, bool _showDateTime) {
 
     UiTreeViewOptions col6 =   UiTreeViewOptions(columnIndex++, ""        , ""         ,     ""       , QHeaderView::Fixed,    1 , 20, 20);
     tree->configureColumns(col6);
+    */
 }
 
 

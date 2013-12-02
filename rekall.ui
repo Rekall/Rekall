@@ -250,6 +250,17 @@ QSlider::handle:horizontal {
 	background-color: 	rgb(45, 202, 225);
 }
 
+QSlider#metadataSlider::groove {
+	background-color: 	rgb(255, 255, 255);
+	height: 					1px;
+}
+QSlider#metadataSlider::handle {
+	width: 						30px;
+	background-color: 	rgb(255, 255, 255);
+	border-radius:			3px;
+}
+
+
 
 QSplitter#conduiteSplitter::handle 				{		background: 	rgba(166,204,91,   30);	}
 QSplitter#conduiteSplitter::handle:pressed 	{		background: 	rgb(166,204,91);				}
@@ -366,7 +377,11 @@ QMenu::item:disabled {
 }
 QMenu::item:enabled:selected {
      background-color: rgb(45, 202, 225);
-}</string>
+}
+
+
+
+</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -463,8 +478,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>201</width>
-            <height>271</height>
+            <width>100</width>
+            <height>178</height>
            </rect>
           </property>
           <attribute name="label">
@@ -506,8 +521,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>201</width>
-            <height>271</height>
+            <width>100</width>
+            <height>248</height>
            </rect>
           </property>
           <attribute name="label">
@@ -549,8 +564,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>201</width>
-            <height>330</height>
+            <width>100</width>
+            <height>484</height>
            </rect>
           </property>
           <attribute name="label">
@@ -715,7 +730,7 @@ QMenu::item:enabled:selected {
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <property name="spacing">
-             <number>20</number>
+             <number>12</number>
             </property>
             <property name="leftMargin">
              <number>6</number>
@@ -787,6 +802,46 @@ QMenu::item:enabled:selected {
              </widget>
             </item>
             <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <property name="spacing">
+               <number>12</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="metadataSliderIcon">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="pixmap">
+                 <pixmap resource="icons/Rekall.qrc">:/icons/res_icon_history.png</pixmap>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="metadataSlider">
+                <property name="toolTip">
+                 <string>Navigate through document versions</string>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="tickPosition">
+                 <enum>QSlider::NoTicks</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="metadataSliderIcon2">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="pixmap">
+                 <pixmap resource="icons/Rekall.qrc">:/icons/res_icon_history_reverse.png</pixmap>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout">
               <property name="spacing">
                <number>12</number>
@@ -844,40 +899,6 @@ QMenu::item:enabled:selected {
               </item>
              </layout>
             </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <property name="spacing">
-               <number>12</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="metadataSliderLabel">
-                <property name="text">
-                 <string>Document history</string>
-                </property>
-                <property name="pixmap">
-                 <pixmap resource="icons/Rekall.qrc">:/icons/res_icon_history.png</pixmap>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="metadataSliderIcon">
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="pixmap">
-                 <pixmap resource="icons/Rekall.qrc">:/icons/res_icon_history.png</pixmap>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QSlider" name="metadataSlider">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
            </layout>
           </widget>
          </widget>
@@ -918,6 +939,8 @@ QMenu::item:enabled:selected {
      <string>Edit</string>
     </property>
     <addaction name="actionPaste"/>
+    <addaction name="separator"/>
+    <addaction name="actionMarker"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -985,6 +1008,17 @@ QMenu::item:enabled:selected {
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+H</string>
+   </property>
+  </action>
+  <action name="actionMarker">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Start mark</string>
+   </property>
+   <property name="shortcut">
+    <string>M</string>
    </property>
   </action>
  </widget>

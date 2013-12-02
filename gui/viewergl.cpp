@@ -51,14 +51,15 @@ void ViewerGL::paintGL() {
     glClear(clearFlag);
     qglClearColor(Global::colorTextBlack);
 
-    drawingBoundingRect = QRectF();
+    QRectF _drawingBoundingRect;
     scroll = scroll + (scrollDest - scroll) / Global::inertie;
     visibleRect = QRectF(scroll, size());
     glPushMatrix();
     glTranslatef(qRound(-scroll.x()), qRound(-scroll.y()), 0);
-    if(Global::currentProject)  drawingBoundingRect = drawingBoundingRect.united(Global::currentProject->paintViewer());
-    if(Global::timeline)        drawingBoundingRect = drawingBoundingRect.united(Global::timeline      ->paintViewer());
+    if(Global::currentProject)  _drawingBoundingRect = _drawingBoundingRect.united(Global::currentProject->paintViewer());
+    if(Global::timeline)        _drawingBoundingRect = _drawingBoundingRect.united(Global::timeline      ->paintViewer());
     glPopMatrix();
+    drawingBoundingRect = _drawingBoundingRect;
 }
 
 void ViewerGL::mousePressEvent(QMouseEvent *e) {
