@@ -13,13 +13,16 @@ enum DocumentStatus   { DocumentStatusWaiting, DocumentStatusProcessing, Documen
 class MetadataWaveform : public QList< QPair<qreal,qreal> > {
 public:
     explicit MetadataWaveform() { normalisation = 1; }
+
 public:
     qreal normalisation;
 };
 
+
 class PersonCardHeader : public QMap<QString, QString> {
 public:
     QString category;
+
 public:
     static PersonCardHeader fromString(const QStringList &vals) {
         PersonCardHeader header;
@@ -50,8 +53,9 @@ public:
 };
 class PersonCardValues : public QStringList {
 public:
-    QImage photo;
+    QImage    photo;
     QDateTime dateTime;
+
 public:
     static PersonCardValues fromString(const QStringList &vals) {
         PersonCardValues values;
@@ -124,24 +128,21 @@ public:
     explicit Metadata(QObject *parent = 0, bool createEmpty = false);
     ~Metadata();
 
-public:
-    UiFileItem      *chutierItem;
-    DocumentFunction function;
-    QFileInfo        file;
-    QImage           photo;
-    DocumentStatus   status;
-
-
 protected:
-    QDir dirBase;
     QList<QMetaDictionnay> metadatas;
+    QDir dirBase;
     QMutex metadataMutex;
 public:
-    qreal mediaDuration;
-    DocumentType type;
-    Thumbnails thumbnails;
+    DocumentFunction function;
+    DocumentStatus   status;
+    DocumentType     type;
+    UiFileItem      *chutierItem;
+    QFileInfo        file;
+    qreal            mediaDuration;
+    Thumbnails       thumbnails;
     MetadataWaveform waveform;
-    QColor baseColor;
+    QImage           photo;
+    QColor           baseColor;
 
 public:
     bool updateFile(const QFileInfo &file, qint16 version = -1, quint16 falseInfoForTest = 0);
@@ -150,9 +151,8 @@ public:
     void updateFeed();
     void addKeyword(const QStringList &keywords, qint16 version = -1, const QString &key = "Keywords", const QString &category = "Rekall");
     void addKeyword(const QString &keyword, qint16 version = -1, const QString &key = "Keywords", const QString &category = "Rekall");
-    const QPair<QString, QPixmap> getThumbnail(qint16 version = -1);
-    const QList< QPair<QString,QString> > getGps();
-    const QColor calcColor();
+    const QPair<QString, QPixmap>         getThumbnail(qint16 version = -1) const;
+    const QList< QPair<QString,QString> > getGps(qint16 version = -1)       const;
 
 
 public:
@@ -164,8 +164,8 @@ public:
     inline qint16 getMetadataCount()                               const { return metadatas.count(); }
     inline qint16 getMetadataCountM()                              const { return metadatas.count()-1; }
 public:
-    const MetadataElement getMetadata(const QString &key, qint16 version = -1);
-    const MetadataElement getMetadata(const QString &category,const QString &key, qint16 version = -1);
+    const MetadataElement getMetadata(const QString &key, qint16 version = -1) const;
+    const MetadataElement getMetadata(const QString &category,const QString &key, qint16 version = -1) const;
 public:
     void setMetadata(const QString &category, const QString &key, const QString &value, qint16 version);
     void setMetadata(const QString &category, const QString &key, const QDateTime &value, qint16 version);
@@ -173,27 +173,27 @@ public:
     void setMetadata(const QString &category, const QString &key, qreal value, qint16 version);
     void setMetadata(const QMetaDictionnay &metaDictionnay);
 public:
-    const QString getCriteriaSort(qint16 version = -1);
-    const QString getCriteriaSortFormated(qint16 version = -1);
-    const MetadataElement getCriteriaPhase(qint16 version);
-    const QString getCriteriaCluster(qint16 version = -1);
-    const QString getCriteriaClusterFormated(qint16 version = -1);
-    const QString getCriteriaColor(qint16 version = -1);
-    const QString getCriteriaColorFormated(qint16 version = -1);
-    const QString getCriteriaFilter(qint16 version = -1);
-    const QString getCriteriaFilterFormated(qint16 version = -1);
-    const QString getCriteriaHorizontal(qint16 version = -1);
-    const QString getCriteriaHorizontalFormated(qint16 version = -1);
-    bool isAcceptableWithSortFilters(bool strongCheck, qint16 version = -1);
-    bool isAcceptableWithColorFilters(bool strongCheck, qint16 version = -1);
-    bool isAcceptableWithClusterFilters(bool strongCheck, qint16 version = -1);
-    bool isAcceptableWithFilterFilters(bool strongCheck, qint16 version = -1);
-    bool isAcceptableWithHorizontalFilters(bool strongCheck, qint16 version = -1);
-    const QString getAcceptableWithClusterFilters(qint16 version = -1);
+    const MetadataElement getCriteriaPhase       (qint16 version = -1) const;
+    const QString getCriteriaSort                (qint16 version = -1) const;
+    const QString getCriteriaSortFormated        (qint16 version = -1) const;
+    const QString getCriteriaCluster             (qint16 version = -1) const;
+    const QString getCriteriaClusterFormated     (qint16 version = -1) const;
+    const QString getCriteriaColor               (qint16 version = -1) const;
+    const QString getCriteriaColorFormated       (qint16 version = -1) const;
+    const QString getCriteriaFilter              (qint16 version = -1) const;
+    const QString getCriteriaFilterFormated      (qint16 version = -1) const;
+    const QString getCriteriaHorizontal          (qint16 version = -1) const;
+    const QString getCriteriaHorizontalFormated  (qint16 version = -1) const;
+    const QString getAcceptableWithClusterFilters(qint16 version = -1) const;
+    bool isAcceptableWithSortFilters             (bool strongCheck, qint16 version = -1) const;
+    bool isAcceptableWithColorFilters            (bool strongCheck, qint16 version = -1) const;
+    bool isAcceptableWithClusterFilters          (bool strongCheck, qint16 version = -1) const;
+    bool isAcceptableWithFilterFilters           (bool strongCheck, qint16 version = -1) const;
+    bool isAcceptableWithHorizontalFilters       (bool strongCheck, qint16 version = -1) const;
 
 public:
     void debug();
-    QDomElement serializeMetadata(QDomDocument &xmlDoc);
+    QDomElement serializeMetadata(QDomDocument &xmlDoc) const;
     void deserializeMetadata(const QDomElement &xmlElement);
 
 public:

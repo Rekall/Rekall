@@ -478,8 +478,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>178</height>
+            <width>98</width>
+            <height>192</height>
            </rect>
           </property>
           <attribute name="label">
@@ -521,8 +521,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>248</height>
+            <width>98</width>
+            <height>262</height>
            </rect>
           </property>
           <attribute name="label">
@@ -564,8 +564,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>484</height>
+            <width>98</width>
+            <height>498</height>
            </rect>
           </property>
           <attribute name="label">
@@ -941,6 +941,7 @@ QMenu::item:enabled:selected {
     <addaction name="actionPaste"/>
     <addaction name="separator"/>
     <addaction name="actionMarker"/>
+    <addaction name="actionMarkerLong"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -1011,14 +1012,19 @@ QMenu::item:enabled:selected {
    </property>
   </action>
   <action name="actionMarker">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
-    <string>Start mark</string>
+    <string>Add a milestone marker</string>
    </property>
    <property name="shortcut">
     <string>M</string>
+   </property>
+  </action>
+  <action name="actionMarkerLong">
+   <property name="text">
+    <string>Record a period marker</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+M</string>
    </property>
   </action>
  </widget>

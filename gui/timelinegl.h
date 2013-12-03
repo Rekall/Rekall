@@ -14,10 +14,10 @@ public:
     explicit TimelineGL(QWidget *parent = 0);
 
 private:
-    qreal showLegend;
-    qreal gestureZoomInitial;
+    qreal         showLegend;
+    qreal         gestureZoomInitial;
     QList<GlText> categories;
-    QMenu *tagMenu;
+    QMenu        *tagMenu;
 
 protected:
     void timerEvent(QTimerEvent *);

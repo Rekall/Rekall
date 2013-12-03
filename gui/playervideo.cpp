@@ -45,10 +45,10 @@ void PlayerVideo::seek(qint64 time) {
 bool PlayerVideo::isDisplayed() const {
     return ui->showVideo->isChecked();
 }
-qint64 PlayerVideo::currentTime() {
+qint64 PlayerVideo::currentTime() const {
     return ui->playerVideo->currentTime();
 }
-qint64 PlayerVideo::totalTime() {
+qint64 PlayerVideo::totalTime() const {
     return ui->playerVideo->totalTime();
 }
 void PlayerVideo::setVolume(qreal _volume, qreal _masterVolume) {

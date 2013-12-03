@@ -5,7 +5,6 @@ Sorting::Sorting(const QString &title, quint16 index, bool _needWord, bool _isHo
     QWidget(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
     ui(new Ui::Sorting) {
 
-    regexp.setPatternSyntax(QRegExp::Wildcard);
     ui->setupUi(this);
     ui->title->setText(title);
     setWindowTitle(title);
@@ -185,12 +184,12 @@ const QString Sorting::getCriteriaFormated(qreal criteria) const {
         return criteriaFormatedRealCache.at(qFloor(criteria/5));
     return QString("");
 }
-qreal Sorting::getCriteriaFormatedReal(const QString &_criteria) {
+qreal Sorting::getCriteriaFormatedReal(const QString &_criteria) const {
     qreal val = (qreal)criteriaFormatedRealCache.indexOf(_criteria);
     if(val < 0) val = criteriaFormatedRealCache.count();
     return val;
 }
-bool Sorting::isAcceptable(bool strongCheck, const QString &_criteria) {
+bool Sorting::isAcceptable(bool strongCheck, const QString &_criteria) const {
     if(asTimeline)
         return true;
 
@@ -203,6 +202,8 @@ bool Sorting::isAcceptable(bool strongCheck, const QString &_criteria) {
     if(!ui->matches->text().isEmpty()) {
         QStringList matches = ui->matches->text().toLower().split(",", QString::SkipEmptyParts);
         foreach(const QString &match, matches) {
+            QRegExp regexp;
+            regexp.setPatternSyntax(QRegExp::Wildcard);
             regexp.setPattern(match.trimmed());
 
             QStringList criterias = _criteria.toLower().split(",", QString::SkipEmptyParts);
@@ -214,11 +215,13 @@ bool Sorting::isAcceptable(bool strongCheck, const QString &_criteria) {
     }
     return true;
 }
-const QString Sorting::getAcceptableWithFilters(const QString &_criteria) {
+const QString Sorting::getAcceptableWithFilters(const QString &_criteria) const {
     QString retour;
     if(!ui->matches->text().isEmpty()) {
         QStringList matches = ui->matches->text().toLower().split(",", QString::SkipEmptyParts);
         foreach(const QString &match, matches) {
+            QRegExp regexp;
+            regexp.setPatternSyntax(QRegExp::Wildcard);
             regexp.setPattern(match.trimmed());
 
             QStringList criterias = _criteria.toLower().split(",", QString::SkipEmptyParts);
@@ -285,10 +288,11 @@ void Sorting::addCheckEnd() {
 }
 
 
-QDomElement Sorting::serialize(QDomDocument &xmlDoc) {
+QDomElement Sorting::serialize(QDomDocument &xmlDoc) const {
     QDomElement xmlData = xmlDoc.createElement("sorting");
     xmlData.setAttribute("asNumber",        asNumber);
     xmlData.setAttribute("asDate",          asDate);
+    xmlData.setAttribute("asTimeline",      asTimeline);
     xmlData.setAttribute("sortAscending",   sortAscending);
     xmlData.setAttribute("tagNameCategory", tagNameCategory);
     xmlData.setAttribute("tagName",         tagName);

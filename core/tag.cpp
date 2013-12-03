@@ -32,7 +32,6 @@ void Tag::create(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
         player->load(this, ((document->type == DocumentTypeVideo) || (document->type == DocumentTypeImage)), document->file.absoluteFilePath());
         //document->setMetadata("Rekall", "Media Offset", Global::aleaF(142, 142), documentVersion);
         document->setMetadata("Rekall", "Timeline thumbnail", "picture", documentVersion);
-        connect(&document->renderActive, SIGNAL(triggered(bool)), SLOT(renderActiveChanged()));
         if(debug)
             _duration = Global::aleaF(50, 180);
     }
@@ -123,30 +122,23 @@ void Tag::fireEvents() {
 
     //Enter / Leave
     qreal progressionAbs = progressAbs(Global::time);
+    qint16 oscValue = -1;
     if(((0. <= progressionAbs) && (progressionAbs <= 1.)) && (!timelineWasInside)) {
         timelineWasInside = true;
-        Global::udp->send("127.0.0.1", 57120, "/transport", QList<QVariant>() << document->getMetadata("Rekall", "Name", documentVersion).toString() << getTimeStart() << getTimeEnd() << 1.);
         blinkTime = Global::tagBlinkTime;
-        document->renderActive = document->renderActive.val();
+         if(document->function == DocumentFunctionRender)
+            Global::video->load(this);
+        oscValue = 1;
     }
     else if(((0. > progressionAbs) || (progressionAbs > 1.)) && (timelineWasInside)) {
         timelineWasInside = false;
-        Global::udp->send("127.0.0.1", 57120, "/transport", QList<QVariant>() << document->getMetadata("Rekall", "Name", documentVersion).toString() << getTimeStart() << getTimeEnd() << 0.);
-        document->renderActive = document->renderActive.val();
+        if(document->function == DocumentFunctionRender)
+           Global::video->unload(this);
+        oscValue = 0;
     }
+    if(oscValue >= 0)
+        Global::udp->send("127.0.0.1", 57120, "/rekall", QList<QVariant>() << document->getMetadata("Rekall", "Type", documentVersion).toString() << document->getMetadata("Rekall", "Author", documentVersion).toString() << document->getMetadata("Rekall", "Name", documentVersion).toString() << getTimeStart() << getTimeEnd() << oscValue << document->baseColor.redF() << document->baseColor.greenF() << document->baseColor.blueF() << document->baseColor.alphaF());
 }
-void Tag::renderActiveChanged() {
-    if(document->function == DocumentFunctionRender) {
-        qreal progressionAbs = progressAbs(Global::time);
-        if(((0. <= progressionAbs) && (progressionAbs <= 1.)) && (document->renderActive)) {
-            Global::video->load(this);
-        }
-        else if(((0. > progressionAbs) || (progressionAbs > 1.)) || (!document->renderActive)) {
-            Global::video->unload(this);
-        }
-    }
-}
-
 
 const QRectF Tag::paintTimeline(bool before) {
     if(before) {
@@ -154,7 +146,7 @@ const QRectF Tag::paintTimeline(bool before) {
         timelinePos = timelinePos + (timelineDestPos - timelinePos) / Global::inertie;
 
 
-        if(Global::tagHorizontalCriteria->asTimeline) {
+        if(Global::tagHorizontalCriteria->isTimeline()) {
             if(type == TagTypeGlobal)   timelineBoundingRect = QRectF(QPointF(Global::timelineGL->scroll.x()-Global::timelineGlobalDocsWidth, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration() * Global::timeUnit), Global::timelineTagHeight));
             else                        timelineBoundingRect = QRectF(QPointF(getTimeStart() * Global::timeUnit, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration() * Global::timeUnit), Global::timelineTagHeight));
         }
@@ -163,7 +155,7 @@ const QRectF Tag::paintTimeline(bool before) {
             timelineBoundingRect = QRectF(QPointF(val * 5 * Global::timeUnit, 0), QSizeF(Global::timelineTagHeight, Global::timelineTagHeight));
         }
 
-        bool isLargeTag = (document->getMetadata("Rekall", "Timeline thumbnail").toString() == "picture") && (Global::tagHorizontalCriteria->asTimeline);
+        bool isLargeTag = (document->getMetadata("Rekall", "Timeline thumbnail").toString() == "picture") && (Global::tagHorizontalCriteria->isTimeline());
         if(isLargeTag)
             timelineBoundingRect.setHeight(Global::timelineTagThumbHeight);
         if(timelineBoundingRect.width() < timelineBoundingRect.height())
@@ -174,19 +166,19 @@ const QRectF Tag::paintTimeline(bool before) {
             colorDestTmp.setAlphaF(0.1);
         if((document->status == DocumentStatusProcessing) || (Global::selectedTag == this))
             colorDestTmp.setAlphaF(Global::breathingFast);
-        if(!Global::tagHorizontalCriteria->asTimeline) {
+        if(!Global::tagHorizontalCriteria->isTimeline()) {
             if((Global::timerPlay) && !((0.001 < progression) && (progression < 0.999))) colorDestTmp.setAlphaF(0.2);
             else                                                                         colorDestTmp.setAlphaF(1.0);
         }
 
         if(!((colorDestTmp.red() == 0) && (colorDestTmp.green() == 0) && (colorDestTmp.blue() == 0)))
             colorDest = colorDestTmp;
-        color.setRedF  (color.redF()   + (colorDest.redF()   - color.redF()  ) / Global::inertie);
-        color.setGreenF(color.greenF() + (colorDest.greenF() - color.greenF()) / Global::inertie);
-        color.setBlueF (color.blueF()  + (colorDest.blueF()  - color.blueF() ) / Global::inertie);
-        color.setAlphaF(color.alphaF() + (colorDest.alphaF() - color.alphaF()) / Global::inertie);
+        realTimeColor.setRedF  (realTimeColor.redF()   + (colorDest.redF()   - realTimeColor.redF()  ) / Global::inertie);
+        realTimeColor.setGreenF(realTimeColor.greenF() + (colorDest.greenF() - realTimeColor.greenF()) / Global::inertie);
+        realTimeColor.setBlueF (realTimeColor.blueF()  + (colorDest.blueF()  - realTimeColor.blueF() ) / Global::inertie);
+        realTimeColor.setAlphaF(realTimeColor.alphaF() + (colorDest.alphaF() - realTimeColor.alphaF()) / Global::inertie);
         if(breathing)
-            color = color.lighter(100 + (1-Global::breathing)*15);
+            realTimeColor = realTimeColor.lighter(100 + (1-Global::breathing)*15);
 
         glPushMatrix();
         glTranslatef(qRound(timelinePos.x()), qRound(timelinePos.y()), 0);
@@ -205,7 +197,7 @@ const QRectF Tag::paintTimeline(bool before) {
 
                 //Strip
                 if(document->function == DocumentFunctionContextual) {
-                    Global::timelineGL->qglColor(color);
+                    Global::timelineGL->qglColor(realTimeColor);
                     GlRect::drawRect(timelineBoundingRect);
                 }
 
@@ -228,7 +220,7 @@ const QRectF Tag::paintTimeline(bool before) {
                     qreal sampleMax      = getDuration() / mediaDuration;
 
                     glBegin(GL_LINES);
-                    Global::timelineGL->qglColor(color);
+                    Global::timelineGL->qglColor(realTimeColor);
                     for(qreal timeX = 0 ; timeX < timelineBoundingRect.width() ; timeX++) {
                         quint16 waveformIndex = qMin((int)((mediaOffset + timeX/timelineBoundingRect.width()*sampleMax) * document->waveform.count()), document->waveform.count()-1);
                         glVertex2f(timelineBoundingRect.left() + timeX, timelineBoundingRect.center().y() - document->waveform.at(waveformIndex).first  * document->waveform.normalisation * timelineBoundingRect.height()/2);
@@ -243,7 +235,7 @@ const QRectF Tag::paintTimeline(bool before) {
             }
             else if(document->type == DocumentTypeMarker) {
                 //Bar
-                Global::timelineGL->qglColor(color);
+                Global::timelineGL->qglColor(realTimeColor);
                 if((type == TagTypeContextualMilestone) || (type == TagTypeGlobal)) {
                     timelineBoundingRect.setWidth(3);
                     GlRect::drawRect(timelineBoundingRect);
@@ -256,7 +248,7 @@ const QRectF Tag::paintTimeline(bool before) {
             }
             else {
                 //Bar
-                Global::timelineGL->qglColor(color);
+                Global::timelineGL->qglColor(realTimeColor);
                 if(isTagLastVersion(this))
                     GlRect::drawRoundedRect(timelineBoundingRect.adjusted(1, 1, -1, -1), false, M_PI/4);
                 GlRect::drawRoundedRect(timelineBoundingRect.adjusted(1, 1, -1, -1), true, M_PI/4);
@@ -265,7 +257,7 @@ const QRectF Tag::paintTimeline(bool before) {
             //Text
             if((Global::selectedTag == this) && (type != TagTypeGlobal)) {
                 QPoint textPos;
-                Global::timelineGL->qglColor(color);
+                Global::timelineGL->qglColor(realTimeColor);
 
                 textPos = QPoint(timelineBoundingRect.left() - 2 - timelineTimeStartText.size.width(), 1 + timelineBoundingRect.center().y() - timelineTimeStartText.size.height()/2);
                 timelineTimeStartText.drawText(Sorting::timeToString(getTimeStart()), textPos);
@@ -285,7 +277,7 @@ const QRectF Tag::paintTimeline(bool before) {
 
         //History tags
         if(historyTags.count()) {
-            QColor colorAlpha = color;
+            QColor colorAlpha = realTimeColor;
 
             //Anchors
             QPointF historyChordBegCtr = timelineBoundingRect.center();
@@ -327,7 +319,7 @@ const QRectF Tag::paintTimeline(bool before) {
 
         //Hash tags
         if(hashTags.count()) {
-            QColor colorAlpha = color;
+            QColor colorAlpha = realTimeColor;
 
             //Anchors
             QPointF hashChordBegCtr = timelineBoundingRect.center();
@@ -379,7 +371,7 @@ const QRectF Tag::paintTimeline(bool before) {
 
         //Linked tags
         if((Global::timelineGL->showLinkedTags > 0.01) && (linkedTags.count())) {
-            QColor colorAlpha = color;
+            QColor colorAlpha = realTimeColor;
             colorAlpha.setAlphaF(0.4);
             Global::timelineGL->qglColor(colorAlpha);
             //Anchors
@@ -412,7 +404,7 @@ const QRectF Tag::paintTimeline(bool before) {
 
         //Linked renders
         if((Global::timelineGL->showLinkedRenders > 0.01) && (linkedRenders.count())) {
-            QColor colorSourceAlpha = color;
+            QColor colorSourceAlpha = realTimeColor;
             colorSourceAlpha.setAlphaF(0.4);
 
             Global::timelineGL->qglColor(colorSourceAlpha);
@@ -432,7 +424,7 @@ const QRectF Tag::paintTimeline(bool before) {
                         linkedRenderPoint  = QPointF(timelineBoundingRect.center().x(), Global::timelineGL->showLinkedRenders * linkedRenderRect.bottom());
                         linkedRenderAnchor = Global::timelineTagHeight/2;
                     }
-                    QColor colorDestAlpha = linkedRenderTag->color;
+                    QColor colorDestAlpha = linkedRenderTag->realTimeColor;
                     colorDestAlpha.setAlphaF(0.4 * Global::timelineGL->showLinkedRenders);
 
 
@@ -519,7 +511,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
             if(qFloor(blinkTime / 250) % 2) {
                 if(document->type == DocumentTypeMarker) {
                     isBlinking = true;
-                    Global::viewerGL->qglColor(color);
+                    Global::viewerGL->qglColor(realTimeColor);
                     GlRect::drawRect(viewerBoundingRect);
                 }
                 else {
@@ -531,7 +523,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         else if((0.001 < progression) && (progression < 0.999)) {
             isInProgress = true;
             if(document->type == DocumentTypeMarker) {
-                Global::viewerGL->qglColor(color);
+                Global::viewerGL->qglColor(realTimeColor);
                 GlRect::drawRect(QRectF(progressionRect.topLeft(), QSizeF(progressionRect.width() * progression, viewerBoundingRect.height())));
             }
             else {
@@ -541,7 +533,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         }
 
         //Bar
-        QColor barColor = color;
+        QColor barColor = realTimeColor;
         if((decounter == 0) && (!isInProgress) && (Global::timerPlay))  barColor.setAlphaF(0.2);
         else                                                            barColor.setAlphaF(1.0);
 
@@ -619,7 +611,6 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
                     else                                                                        Global::selectedTagMode = TagSelectionMove;
                 }
             }
-
             if(dbl) {
                 if(document->chutierItem) {
                     document->chutierItem->fileShowInOS();
@@ -632,9 +623,9 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
         if(!Global::selectedTag)
             Global::mainWindow->refreshMetadata(this, false);
         Global::selectedTagHover = this;
+
         return true;
     }
-
     return (Global::selectedTagInAction == this);
 }
 bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool, bool press) {
@@ -661,17 +652,8 @@ bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool, b
     return false;
 }
 
-bool Tag::contains(qreal time) const {
-    return ((getTimeStart() <= time) && (time <= (getTimeStart() + qMax(1., getDuration()))));
-}
-qreal Tag::progress(qreal time) const {
-    return qBound(0., progressAbs(time), 1.);
-}
-qreal Tag::progressAbs(qreal time) const {
-    return (time - getTimeStart()) / qMax(1., getDuration());
-}
 
-void Tag::snapTime(qreal *time) {
+void Tag::snapTime(qreal *time) const {
     if(qAbs(*time-getTimeStart()) < 1) {
         *time = getTimeStart();
         Global::selectedTagHoverSnapped = *time;
@@ -683,32 +665,32 @@ void Tag::snapTime(qreal *time) {
 }
 
 
-bool Tag::tagHistoryFilters() {
-    return (   Global::timelineGL->showHistory) ||
-            ((!Global::timelineGL->showHistory) && (isTagLastVersion(this)));
+bool Tag::tagHistoryFilters() const {
+    return (   Global::showHistory) ||
+            ((!Global::showHistory) && (isTagLastVersion(this)));
 }
-bool Tag::isAcceptableWithSortFilters(bool strongCheck) {
+bool Tag::isAcceptableWithSortFilters(bool strongCheck) const {
     return (tagHistoryFilters()) && (document->isAcceptableWithSortFilters(strongCheck, documentVersion));
 }
-bool Tag::isAcceptableWithColorFilters(bool strongCheck) {
+bool Tag::isAcceptableWithColorFilters(bool strongCheck) const {
     return (tagHistoryFilters()) && (document->isAcceptableWithColorFilters(strongCheck, documentVersion));
 }
-bool Tag::isAcceptableWithClusterFilters(bool strongCheck) {
+bool Tag::isAcceptableWithClusterFilters(bool strongCheck) const {
     return (tagHistoryFilters()) && (document->isAcceptableWithClusterFilters(strongCheck, documentVersion));
 }
-bool Tag::isAcceptableWithFilterFilters(bool strongCheck) {
+bool Tag::isAcceptableWithFilterFilters(bool strongCheck) const {
     return (tagHistoryFilters()) && (document->isAcceptableWithFilterFilters(strongCheck, documentVersion));
 }
-bool Tag::isAcceptableWithHorizontalFilters(bool strongCheck) {
+bool Tag::isAcceptableWithHorizontalFilters(bool strongCheck) const {
     return (tagHistoryFilters()) && (document->isAcceptableWithHorizontalFilters(strongCheck, documentVersion));
 }
 
-const QString Tag::getAcceptableWithClusterFilters() {
+const QString Tag::getAcceptableWithClusterFilters() const {
     return document->getAcceptableWithClusterFilters(documentVersion);
 }
 
 
-bool Tag::sortCriteriaColor(Tag *first, Tag *second) {
+bool Tag::sortCriteriaColor(const Tag *first, const Tag *second) {
     if((!first) || (!second))
         return false;
 
@@ -718,7 +700,7 @@ bool Tag::sortCriteriaColor(Tag *first, Tag *second) {
     else
         return firstStr < secondStr;
 }
-bool Tag::sortViewer(Tag *first, Tag *second) {
+bool Tag::sortViewer(const Tag *first, const Tag *second) {
     if((!first) || (!second))
         return false;
     if((first->progressionDest == second->progressionDest) || (((0. < first->progressionDest) && (first->progressionDest < 1.)) && ((0. < second->progressionDest) && (second->progressionDest < 1.))))
@@ -726,89 +708,70 @@ bool Tag::sortViewer(Tag *first, Tag *second) {
     else
         return first->progressionDest > second->progressionDest;
 }
-bool Tag::sortEvents(Tag *first, Tag *second) {
+bool Tag::sortEvents(const Tag *first, const Tag *second) {
     if((!first) || (!second))
         return false;
     return first->getTimeStart() < second->getTimeStart();
 }
-bool Tag::sortAlpha(Tag *first, Tag *second) {
+bool Tag::sortAlpha(const Tag *first, const Tag *second) {
     if((!first) || (!second))
         return false;
     return first->document->getMetadata("Rekall", "Name").toString() < second->document->getMetadata("Rekall", "Name").toString();
 }
 
 
-const QString Tag::getCriteriaSort(Tag *tag) {
+const QString Tag::getCriteriaSort(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaSort(tag->documentVersion);
 }
-const QString Tag::getCriteriaColor(Tag *tag) {
+const QString Tag::getCriteriaColor(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaColor(tag->documentVersion);
 }
-const QString Tag::getCriteriaCluster(Tag *tag) {
+const QString Tag::getCriteriaCluster(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaCluster(tag->documentVersion);
 }
-const MetadataElement Tag::getCriteriaPhase(Tag *tag) {
+const MetadataElement Tag::getCriteriaPhase(const Tag *tag) {
     return tag->document->getCriteriaPhase(tag->documentVersion);
 }
-const QString Tag::getCriteriaFilter(Tag *tag) {
+const QString Tag::getCriteriaFilter(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaFilter(tag->documentVersion);
 }
-const QString Tag::getCriteriaFilterFormated(Tag *tag) {
+const QString Tag::getCriteriaFilterFormated(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaFilterFormated(tag->documentVersion);
 }
-const QString Tag::getCriteriaHorizontal(Tag *tag) {
+const QString Tag::getCriteriaHorizontal(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaHorizontal(tag->documentVersion);
 }
-const QString Tag::getCriteriaHorizontalFormated(Tag *tag) {
+const QString Tag::getCriteriaHorizontalFormated(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaHorizontalFormated(tag->documentVersion);
 }
 
 
-const QString Tag::getCriteriaSortFormated(Tag *tag) {
+const QString Tag::getCriteriaSortFormated(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaSortFormated(tag->documentVersion);
 }
-const QString Tag::getCriteriaColorFormated(Tag *tag) {
+const QString Tag::getCriteriaColorFormated(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaColorFormated(tag->documentVersion);
 }
-const QString Tag::getCriteriaClusterFormated(Tag *tag) {
+const QString Tag::getCriteriaClusterFormated(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaClusterFormated(tag->documentVersion);
 }
 
-bool Tag::isTagLastVersion(Tag *tag) {
+bool Tag::isTagLastVersion(const Tag *tag) {
     if(tag) return (tag->documentVersion < 0) || (tag->documentVersion == tag->document->getMetadataCountM());
     else    return false;
 }
 
-
-bool Tag::timelineContains(const QPointF &pos) {
-    return (timelineBoundingRect.translated(timelinePos).translated(0, Global::timelineHeaderSize.height()).contains(pos));
-}
-bool Tag::viewerContains(const QPointF &pos) {
-    return (viewerBoundingRect.translated(viewerPos).contains(pos));
-}
-
-qreal Tag::timelineProgress(const QPointF &pos) {
-    QRectF rect = timelineBoundingRect.translated(timelinePos);
-    return qBound(0., (pos.x() - rect.x()) / rect.width(), 1.);
-}
-qreal Tag::viewerProgress(const QPointF &pos) {
-    QRectF rect = viewerBoundingRect.translated(viewerPos);
-    return qBound(0., (pos.y() - rect.y()) / rect.height(), 1.);
-}
-
-
-
-QDomElement Tag::serialize(QDomDocument &xmlDoc) {
+QDomElement Tag::serialize(QDomDocument &xmlDoc) const {
     QDomElement xmlData = xmlDoc.createElement("tag");
     xmlData.setAttribute("timeStart",       getTimeStart());
     xmlData.setAttribute("timeEnd",         getTimeEnd());

@@ -14,16 +14,14 @@ typedef QPair<QString, QString> QProcessOutput;
 
 class TaskProcessData {
 public:
-    QString command, workingDirectory;
-    QStringList arguments;
-    Metadata *metadata;
     TaskProcessType type;
-    qint16 version;
+    QString         command, workingDirectory;
+    QStringList     arguments;
+    Metadata       *metadata;
+    qint16          version;
 public:
-    QString resultCommand;
-    QStringList resultOutput;
-public:
-    void parseOutput(const QProcessOutput &result);
+    QString         resultCommand;
+    QStringList     resultOutput;
 
 public:
     explicit TaskProcessData() {}
@@ -38,6 +36,7 @@ public:
         workingDirectory = _workingDirectory;
         arguments        = _arguments;
     }
+    void parseOutput(const QProcessOutput &result);
 };
 
 
@@ -45,19 +44,21 @@ class TaskProcess : public QThread, public QTreeWidgetItem {
     Q_OBJECT
 public:
     explicit TaskProcess(const TaskProcessData &_data, QTreeWidgetItem *parentItem, QObject *parent = 0);
-    void init();
 
 public:
+    void init();
+
+private:
     TaskProcessData processedDocument;
+public:
     bool taskStarted;
+private:
+    void run();
 public:
     static QProcessOutput launchCommand(const TaskProcessData &processData);
 
-private:
-    void run();
-
 signals:
-    void finished(TaskProcess*);
+    void finished  (TaskProcess*);
     void updateList(TaskProcess*, int);
     void updateList(TaskProcess*, const QString &);
 };

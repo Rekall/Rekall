@@ -19,19 +19,20 @@ public:
     explicit Watcher(QObject *parent = 0);
 
 private:
-    WatcherFeeling *feeling;
-    QStringList watcherTracking;
-    QIcon trayIconOff, trayIconOn;
-    QSystemTrayIcon *trayMenu;
-    QPixmap lastScreenshot;
+    QIcon     trayIconOff, trayIconOn;
+    QPixmap   lastScreenshot;
     QDateTime lastScreenshotTimestamp;
+private:
+    WatcherFeeling  *feeling;
+    QStringList      watcherTracking;
+    QSystemTrayIcon *trayMenu;
 
 public:
     void sync  (const QString &file, bool inTracker = false);
     void unsync(const QString &file, bool inTracker = false);
 
 public slots:
-    void fileWatcherDirChanged(QString);
+    void fileWatcherDirChanged (QString);
     void fileWatcherFileChanged(QString);
     void takeTemporarySnapshot();
     void trayActivateApp();

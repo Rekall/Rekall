@@ -22,10 +22,10 @@ public:
 private:
     QPointF timelinePos, timelinePosDest;
     QPointF viewerPos,   viewerPosDest;
+    QTime   actionMarkerAddStarted;
     QList<GlText> ticks;
-    qreal ticksWidth;
-    GlText timeText;
-    QTime actionMarkerAddStarted;
+    qreal         ticksWidth;
+    GlText        timeText;
 private:
     void seek(qreal _time, bool forceVisibleTimeline = false, bool forceVisibleViewer = false);
 protected:
@@ -46,7 +46,7 @@ public slots:
     void actionRewind();
     void actionPlay();
     void setDuplicates(quint16 nbDuplicates);
-    void setHistories(quint16 nbHistories);
+    void setHistories (quint16 nbHistories);
 
     
 private:

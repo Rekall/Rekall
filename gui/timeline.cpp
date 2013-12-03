@@ -88,7 +88,7 @@ const QRectF Timeline::paintTimeline(bool before) {
         timelinePos = timelinePos + (timelinePosDest - timelinePos) / Global::inertie;
         QRectF timelineBoundingRect(QPointF(timelinePos.x() + 1, Global::timelineGL->scroll.y()), QSizeF(-50, Global::timelineGL->height()));
 
-        if(Global::tagHorizontalCriteria->asTimeline) {
+        if(Global::tagHorizontalCriteria->isTimeline()) {
             glBegin(GL_QUADS);
             qreal opacity = qMin(qAbs(timelinePos.x() - timelinePosDest.x()) / 200., 1.0);
             if(Global::timerPlay)
@@ -116,7 +116,7 @@ const QRectF Timeline::paintTimeline(bool before) {
             timeText.setStyle(QSize(50, Global::timelineTagHeight*1.2), Qt::AlignCenter, Global::font);
             timeText.drawText(Sorting::timeToString(Global::time), timeTextRect.topLeft().toPoint());
 
-            if((Global::timerPlay) && (Global::tagHorizontalCriteria->asTimeline))
+            if((Global::timerPlay) && (Global::tagHorizontalCriteria->isTimeline()))
                 Global::timelineGL->ensureVisible(QPointF(timelinePos.x(), -1));
         }
     }
@@ -145,7 +145,7 @@ bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *, bool dbl, bool, 
     if((action) && (press)) {
         if(dbl)
             jumpTo();
-        else if(Global::tagHorizontalCriteria->asTimeline)
+        else if(Global::tagHorizontalCriteria->isTimeline())
             seek(Global::currentProject->getTimelineCursorTime(pos), false, true);
         Global::selectedTagInAction = 0;
         Global::selectedTag         = 0;
@@ -163,7 +163,7 @@ void Timeline::seek(qreal time, bool forceVisibleTimeline, bool forceVisibleView
     Global::inertie = 1;
     Global::currentProject->fireEvents();
     Global::inertie = oldInertie;
-    if((Global::tagHorizontalCriteria->asTimeline) && ((forceVisibleTimeline) || (Global::timerPlay)))
+    if((Global::tagHorizontalCriteria->isTimeline()) && ((forceVisibleTimeline) || (Global::timerPlay)))
         Global::timelineGL->ensureVisible(QPointF(timelinePosDest.x(), -1));
     if((forceVisibleViewer) || (Global::timerPlay))
         Global::viewerGL  ->ensureVisible(QPointF(-1, viewerPosDest.y()), 0.8);
@@ -228,19 +228,22 @@ void Timeline::action() {
 }
 
 void Timeline::actionMarkerAddStart() {
-    qDebug("START");
-    Document *marker = new Document(Global::currentProject);
-    marker->updateImport(tr("Marker"));
-    Tag *tag = new Tag(marker);
-    tag->create(TagTypeContextualTime, Global::time, 0);
-    Global::timeMarkerAdded = tag;
-    marker->tags.append(tag);
-    marker->updateFeed();
+    if(Global::timeMarkerAdded)
+        actionMarkerAddEnd();
+    else {
+        Document *marker = new Document(Global::currentProject);
+        marker->updateImport(tr("Marker"));
+        Tag *tag = new Tag(marker);
+        tag->create(TagTypeContextualTime, Global::time, 0);
+        Global::timeMarkerAdded = tag;
+        marker->tags.append(tag);
+        marker->updateFeed();
 
-    actionMarkerAddStarted.restart();
-    ui->marker->setStyleSheet("background-color: rgb(255,84,79); border-color: rgb(255,84,79);");
-    ui->marker->setText("Keep pressed for long marker");
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+        actionMarkerAddStarted.restart();
+        ui->marker->setStyleSheet("background-color: rgb(255,84,79); border-color: rgb(255,84,79);");
+        ui->marker->setText("Keep pressed for long marker");
+        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    }
 }
 void Timeline::actionMarkerAddEnd() {
     if(Global::timeMarkerAdded) {

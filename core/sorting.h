@@ -16,34 +16,27 @@ public:
     explicit Sorting(const QString &title, quint16 index = 0, bool _needWord = false, bool _isHorizontal = false, QWidget *parent = 0);
     ~Sorting();
 
-
-public:
-    bool asNumber, asDate, sortAscending, asTimeline;
-    QString tagName, tagNameCategory;
-    qint16 left, leftLength;
-    bool isUpdating, needWord, isHorizontal;
-
-
 private:
-    QRegExp regexp;
+    bool sortAscending, isUpdating, needWord, isHorizontal;
+    bool asNumber, asDate, asTimeline;
+    qint16 left, leftLength;
+    QString tagNameCategory, tagName;
 public:
+    inline const QString getTagName()         const { return tagName;         }
+    inline const QString getTagNameCategory() const { return tagNameCategory; }
+    inline       qint16  getTrunctionLeft()   const { return left;            }
+    inline       qint16  getTrunctionLength() const { return leftLength;      }
+    inline       bool    isTimeline()         const { return asTimeline;      }
+    inline       bool    isNumber()           const { return asNumber;        }
+    inline       bool    isDate()             const { return asDate;          }
     void setTagname(const QString &_tagName);
-public:
-    inline bool orderBy(bool val) const {
-        if(sortAscending)   return val;
-        else                return !val;
-    }
 
-public:
-    const QString styleSheet2() const;
-    void setStyleSheet2(const QString &str);
 protected:
     void showEvent(QShowEvent *);
     void closeEvent(QCloseEvent *);
     void hideEvent(QHideEvent *);
 signals:
     void displayed(bool);
-
 
 private:
     QHash<QString,QString> criteriaFormatedCache;
@@ -52,9 +45,9 @@ private:
 public:
     const QString getCriteriaFormated(const QString &criteria);
     const QString getCriteriaFormated(qreal criteria) const;
-    qreal getCriteriaFormatedReal(const QString &criteria);
-    bool isAcceptable(bool strongCheck, const QString &criteria);
-    const QString getAcceptableWithFilters(const QString &criteria);
+    qreal getCriteriaFormatedReal(const QString &criteria) const;
+    bool isAcceptable(bool strongCheck, const QString &criteria) const;
+    const QString getAcceptableWithFilters(const QString &criteria) const;
     const QString getMatchName() const;
 
 public:
@@ -63,7 +56,7 @@ public:
     void addCheckEnd();
 
 public:
-    QDomElement serialize(QDomDocument &xmlDoc);
+    QDomElement serialize(QDomDocument &xmlDoc) const;
     void deserialize(const QDomElement &xmlElement);
 
 signals:
@@ -76,6 +69,10 @@ public slots:
 public:
     static const QString timeToString(qreal time);
     static qreal stringToTime(const QString &timeStr);
+
+public:
+    const QString styleSheet2() const;
+    void setStyleSheet2(const QString &str);
 
 private:
     Ui::Sorting *ui;

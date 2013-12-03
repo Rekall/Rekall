@@ -13,20 +13,14 @@ public:
 
 public:
     QList<Tag*> tags;
-
 private:
     ProjectBase *project;
 public:
     void createTagBasedOnPrevious(qint16 forVersion = -1);
 
 public:
-    QDomElement serialize(QDomDocument &xmlDoc);
+    QDomElement serialize(QDomDocument &xmlDoc) const;
     void deserialize(const QDomElement &xmlElement);
-
-signals:
-    
-public slots:
-    
 };
 
 #endif // DOCUMENT_H

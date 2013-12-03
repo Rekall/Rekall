@@ -9,11 +9,11 @@ Cluster::Cluster(QObject *parent) :
 
 void Cluster::add(Tag *tag) {
     tags.append(tag);
-    tag->breathing = true;
+    tag->shouldBreathe(true);
 }
 void Cluster::clear() {
     for(quint16 i = 0 ; i < tags.count() ; i++)
-        tags[i]->breathing = false;
+        tags[i]->shouldBreathe(false);
     tags.clear();
 }
 void Cluster::paintTimeline() {
@@ -22,7 +22,7 @@ void Cluster::paintTimeline() {
 
         timelineBoundingRect = QRectF(QPointF(-1, -1), QSizeF(0, 0));
         foreach(Tag *tag, tags) {
-            QRectF tagRect = tag->timelineBoundingRect.translated(tag->timelinePos);
+            QRectF tagRect = tag->getTimelineBoundingRect().translated(tag->timelinePos);
             if((timelineBoundingRect.x() < 0) && (timelineBoundingRect.y() < 0))
                 timelineBoundingRect = tagRect;
             else

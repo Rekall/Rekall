@@ -15,16 +15,15 @@ public:
     explicit TasksList(QWidget *parent = 0);
     ~TasksList();
 
-public:
-    QList<TaskProcess*> tasks;
 private:
-    QToolBox *toolbox;
-    quint16 oldToolboxIndex;
+    QList<TaskProcess*>  tasks;
+    QToolBox            *toolbox;
+    quint16              oldToolboxIndex;
+    static qint16        taskIsRunning;
 public:
     void setToolbox(QToolBox *);
-    void addTask(Metadata *metadata, TaskProcessType type, qint16 version);
-    void addTask(const TaskProcessData &data);
-    static qint16 taskIsRunning;
+    void addTask   (Metadata *metadata, TaskProcessType type, qint16 version);
+    void addTask   (const TaskProcessData &data);
 private:
     void nextTask();
 

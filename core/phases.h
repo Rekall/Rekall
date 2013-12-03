@@ -12,6 +12,7 @@ class Phases;
 class Phase : public QTreeWidgetItem {
 public:
     explicit Phase(QTreeWidget *parent, const QDateTime &date, const QString &name);
+
 public:
     void setValues(const QDateTime &date, const QString &name);
     inline const QDateTime getDate() const {
@@ -25,6 +26,7 @@ public:
     }
 };
 
+
 class Phases : public QWidget {
     Q_OBJECT
     
@@ -32,18 +34,29 @@ public:
     explicit Phases(QWidget *parent = 0);
     ~Phases();
 
-public:
+
+private:
     UiReal phasesByDaysTo;
-    QMap<QString, MetadataElement> metaElements;
+    QMap<QString, MetadataElement> elementsToProcess;
+public:
     bool needCalulation;
+public:
+    inline void addCheck(const MetadataElement &value) {
+        elementsToProcess.insert(value.toString(), value);
+    }
+    inline void addCheckStart() {
+        elementsToProcess.clear();
+    }
+    void addCheckEnd();
+
+
+private:
     QString tagNameCategory, tagName;
 public:
-    void addCheck(const MetadataElement &value) { metaElements.insert(value.toString(), value); }
+    inline const QString getTagName()         const { return tagName; }
+    inline const QString getTagNameCategory() const { return tagNameCategory; }
 
-public:
-    const QString styleSheet2() const;
-    void setStyleSheet2(const QString &str);
-    void addCheckEnd();
+
 protected:
     void showEvent(QShowEvent *);
     void closeEvent(QCloseEvent *);
@@ -52,12 +65,12 @@ signals:
     void displayed(bool);
 
 public:
-    const QString getPhaseFor(const MetadataElement &value) const;
     bool isAcceptable(bool strongCheck, const MetadataElement &value) const;
+    const QString getPhaseFor(const MetadataElement &value) const;
     const QString getVerbosePhaseFor(const QString &phaseId) const;
 
 public:
-    QDomElement serialize(QDomDocument &xmlDoc);
+    QDomElement serialize(QDomDocument &xmlDoc) const;
     void deserialize(const QDomElement &xmlElement);
 
 public slots:
@@ -66,6 +79,10 @@ public slots:
     void actionSelection();
 signals:
     void actionned(QString,QString);
+
+public:
+    const QString styleSheet2() const;
+    void setStyleSheet2(const QString &str);
 
 private:
     Ui::Phases *ui;

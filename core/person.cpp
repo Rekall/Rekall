@@ -3,11 +3,11 @@
 Person::Person(const PersonCard &card, QObject *parent) :
     Metadata(parent, true), PersonCard(card), QTreeWidgetItem() {
     updateCard(*this);
-    needGUIupdate = true;
+    updateGUINeeded = true;
 }
 void Person::updateGUI() {
-    if(needGUIupdate) {
-        needGUIupdate = false;
+    if(updateGUINeeded) {
+        updateGUINeeded = false;
         setIcon(0, QIcon(QPixmap::fromImage(getPhoto())));
         setText(1, getFullname());
     }

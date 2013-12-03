@@ -17,9 +17,9 @@ public:
 
 private:
     QToolBox *toolbox;
-    quint16 notifCounter;
+    quint16   notifCounter;
     QList<QTreeWidgetItem*> agos;
-    QList<FeedItemBase*> feeds;
+    QList<FeedItemBase*>    feeds;
     QTreeWidgetItem *agoNow, *agoSecs, *agoMin, *agoHours, *agoDays, *agoWeeks, *agoMonthes, *agoYears;
 
 public:

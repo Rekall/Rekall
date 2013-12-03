@@ -62,7 +62,7 @@ void Document::createTagBasedOnPrevious(qint16 _forVersion) {
 }
 
 
-QDomElement Document::serialize(QDomDocument &xmlDoc) {
+QDomElement Document::serialize(QDomDocument &xmlDoc) const {
     QDomElement xmlData = xmlDoc.createElement("document");
     if(tags.count()) {
         QDomElement tagsXml = xmlDoc.createElement("tags");

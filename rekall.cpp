@@ -11,7 +11,6 @@ Rekall::Rekall(QWidget *parent) :
     openProject    = true;
 
     Global::userInfos = new UserInfos();
-    updateUserInfos = -1;
 
     Global::mainWindow = this;
     QApplication::setQuitOnLastWindowClosed(false);
@@ -87,6 +86,7 @@ Rekall::Rekall(QWidget *parent) :
     connect(ui->actionSave, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionPaste, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionMarker, SIGNAL(triggered(bool)), SLOT(action()));
+    connect(ui->actionMarkerLong, SIGNAL(triggered(bool)), SLOT(action()));
     connect(&Global::showHelp, SIGNAL(triggered(bool)), SLOT(showHelp(bool)));
 
     ui->metadata->setColumnWidth(0, 135);
@@ -274,10 +274,11 @@ void Rekall::action() {
         currentDocument->chutierItem->fileShowInFinder();
 
     else if(sender() == ui->actionMarker) {
-        if(ui->actionMarker->isChecked())
-            Global::timeline->actionMarkerAddStart();
-        else
-            Global::timeline->actionMarkerAddEnd();
+        Global::timeline->actionMarkerAddStart();
+        Global::timeline->actionMarkerAddEnd();
+    }
+    else if(sender() == ui->actionMarkerLong) {
+        Global::timeline->actionMarkerAddStart();
     }
 }
 void Rekall::actionForceGL() {
@@ -335,8 +336,8 @@ void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB, T
             foreach(Tag *documentTag, currentDocument->tags) {
                 if(documentTag->getDocumentVersion() == ui->metadataSlider->value()) {
                     Global::selectedTag = documentTag;
-                    Global::timelineGL->ensureVisible(documentTag->timelineBoundingRect.translated(documentTag->timelineDestPos).topLeft());
-                    Global::viewerGL  ->ensureVisible(documentTag->viewerBoundingRect.translated(documentTag->viewerDestPos).topLeft());
+                    Global::timelineGL->ensureVisible(documentTag->getTimelineBoundingRect().translated(documentTag->timelineDestPos).topLeft());
+                    Global::viewerGL  ->ensureVisible(documentTag->getViewerBoundingRect().translated(documentTag->viewerDestPos).topLeft());
                 }
             }
         }
@@ -494,11 +495,9 @@ void Rekall::showHelp(bool visible) {
 }
 
 void Rekall::timerEvent(QTimerEvent *) {
-    if(updateUserInfos < 0) {
-        updateUserInfos = 600;
+    if(Global::userInfos->updateDecounter < 0)
         Global::userInfos->update();
-    }
-    updateUserInfos--;
+    Global::userInfos->updateDecounter--;
 
     if(openProject) {
         openProject = false;
@@ -522,14 +521,14 @@ void Rekall::closeEvent(QCloseEvent *) {
     */
 }
 
-void Rekall::setVisbility(bool sh) {
-    if(sh) {
+void Rekall::setVisbility(bool visibility) {
+    if(visibility) {
         /*
 #ifdef Q_OS_MAC
         ProcessSerialNumber psn;
         if(GetCurrentProcess(&psn) == noErr)
             TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-#endif
+#endifshow
 */
         show();
         raise();

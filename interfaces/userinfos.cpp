@@ -4,6 +4,7 @@ UserInfos::UserInfos(QObject *parent) :
     Metadata(parent, true), UserInfosBase() {
     locationManager = 0;
     weatherManager  = 0;
+    updateDecounter = -1;
 
 #ifdef Q_OS_MAC
     start_mac();
@@ -28,6 +29,8 @@ void UserInfos::update() {
 
     //Weather
     getWeather();
+
+    updateDecounter = 600;
 }
 
 const QString UserInfos::getInfo(const QString &key) {

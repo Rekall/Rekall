@@ -13,13 +13,15 @@ class Project : public ProjectBase {
 
 public:
     explicit Project(QWidget *parent = 0);
-    void open(const QFileInfoList &file, UiTreeView *view, bool debug = false);
+
 private:
     void open(const QDir &dir, const QDir &dirBase, bool debug = false);
+public:
+    void open(const QFileInfoList &file, UiTreeView *view, bool debug = false);
 
 public:
     QList<Document*> documents;
-    QList<Person*> persons;
+    QList<Person*>   persons;
 public:
     void addDocument(void *_document) {
         Document *document = (Document*)_document;
@@ -35,30 +37,25 @@ public:
         document->tags.append(tag);
     }
 
+
 private:
-    qreal categoryColorOpacity, categoryColorOpacityDest;
-public:
     QList<Tag*> viewerTags, eventsTags;
     QMap<QString, QMap<QString, QMap<QString, QList<Tag*> > > > timelineSortTags;
-    QList< QPair<QRectF,qreal> > timelineCategoriesRectCache;
-
-public:
-    qreal nbTagsPerCategories;
     QMap< QPair<QString, QString>, Cluster*> timelineClusters;
-    QList<GlText> timelineCategories, timelinePhases;
-    QList< QPair<QRectF, QPair<QString, QString> > > guiCategories;
-    GlRect textureStrips;
-    QMenu *timelineFilesMenu;
 public:
-    Document* getDocument(const QString &name);
-    Document* getDocumentAndSelect(const QString &name);
-
-public:
-    //QMap<QString, Tag*>;
+    Document* getDocument         (const QString &name) const;
+    Document* getDocumentAndSelect(const QString &name) const;
 
 public:
     void fireEvents();
     qreal totalTime() const;
+
+private:
+    QList< QPair<QRectF, QPair<QString, QString> > > guiCategories;
+    QList<GlText> timelineCategories, timelinePhases;
+    qreal categoryColorOpacity, categoryColorOpacityDest;
+    QMenu *timelineFilesMenu;
+    GlRect textureStrips;
 public:
     const QRectF paintTimeline(bool before = false);
     const QRectF paintViewer();
@@ -66,13 +63,13 @@ public:
     bool mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool);
 
 public:
-    QPointF getTimelineCursorPos(qreal);
-    QPointF getViewerCursorPos  (qreal);
-    qreal   getTimelineCursorTime(const QPointF &);
-    qreal   getViewerCursorTime  (const QPointF &);
+    const QPointF getTimelineCursorPos(qreal) const;
+    const QPointF getViewerCursorPos  (qreal) const;
+    qreal         getTimelineCursorTime(const QPointF &) const;
+    qreal         getViewerCursorTime  (const QPointF &) const;
 
 public:
-    QDomElement serialize(QDomDocument &xmlDoc);
+    QDomElement serialize(QDomDocument &xmlDoc) const;
     void deserialize(const QDomElement &xmlElement);
     void save();
 

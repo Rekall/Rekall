@@ -53,7 +53,7 @@ void Phases::addCheckEnd() {
     if(ui->allow->isChecked()) {
         QDateTime oldDate, startingDate, currentDate;
         bool firstElement = true;
-        QMapIterator<QString, MetadataElement> metaElementIterator(metaElements);
+        QMapIterator<QString, MetadataElement> metaElementIterator(elementsToProcess);
         while(metaElementIterator.hasNext()) {
             metaElementIterator.next();
             currentDate = metaElementIterator.value().toDateTime();
@@ -173,7 +173,7 @@ void Phases::actionSelection() {
     ui->invertAll ->setText(tr("Invert %1").arg(suffix));
 }
 
-QDomElement Phases::serialize(QDomDocument &xmlDoc) {
+QDomElement Phases::serialize(QDomDocument &xmlDoc) const {
     QDomElement xmlData = xmlDoc.createElement("phases");
     for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
         Phase *phase = (Phase*)ui->checks->topLevelItem(i);

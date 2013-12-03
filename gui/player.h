@@ -20,14 +20,14 @@ public:
 
 private:
     QList<Tag*> tags;
-    UiBool timeMode;
-    bool isUpdating;
-    qreal volumeMasterOld, volumeMaster;
+    UiBool      timeMode;
+    bool        isUpdating;
+    qreal       volumeMasterOld, volumeMaster;
 public:
-    void load(void* tag);
-    void play(bool state);
-    void unload(void* _tag);
-    void seek(qreal time);
+    void  load(void* tag);
+    void  play(bool state);
+    void  unload(void* _tag);
+    void  seek(qreal time);
     qreal getCurrentTime() const;
 
 public slots:

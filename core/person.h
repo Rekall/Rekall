@@ -17,8 +17,7 @@ public:
     explicit Person(const PersonCard &card, QObject *parent = 0);
 
 private:
-    bool needGUIupdate;
-
+    bool updateGUINeeded;
 public:
     void updateGUI();
 

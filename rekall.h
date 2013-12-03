@@ -11,13 +11,13 @@
 #include <QInputDialog>
 #include "core/watcher.h"
 #include "interfaces/userinfos.h"
+#include "interfaces/http/httplistener.h"
+#include "interfaces/fileuploadcontroller.h"
 #include "items/uifileitem.h"
 #include "gui/splash.h"
 #include "gui/timeline.h"
 #include "tasks/taskslist.h"
 #include "tasks/feedlist.h"
-#include "interfaces/http/httplistener.h"
-#include "interfaces/fileuploadcontroller.h"
 
 
 namespace Ui {
@@ -32,25 +32,25 @@ public:
     ~Rekall();
 
 private:
-    Splash *splash;
-    Project *currentProject;
-    bool metaIsChanging, openProject;
-    Document *currentDocument;
-    HttpListener *http;
-    FileUploadController *httpUpload;
-    QSettings *settings;
-    QWebView *gps;
+    bool          metaIsChanging, openProject;
+    Splash       *splash;
+    Project      *currentProject;
+    Document     *currentDocument;
+    QSettings    *settings;
+    QWebView     *gps;
     QPair<QString, QPixmap> picture;
-public:
-    void setVisbility(bool show);
+private:
+    HttpListener         *http;
+    FileUploadController *httpUpload;
 
-private slots:
-public:
+private:
     void displayDocumentName(const QString &documentName = "");
     void displayPixmap(DocumentType documentType, const QPair<QString, QPixmap> &picture);
     void displayPixmap(DocumentType documentType, const QString &filename, const QPixmap &picture);
     void displayGps(const QList<QPair<QString, QString> > &gps);
+public:
     void refreshMetadata(void *_tag, bool inChutier);
+    void setVisbility(bool visibility);
     void showPreviewTab();
 
 protected:
@@ -72,8 +72,6 @@ private slots:
     void displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget*, QTreeWidgetItem*, QTreeWidgetItem*);
     void showHelp(bool);
 
-private:
-    qint32 updateUserInfos;
 protected:
     void timerEvent(QTimerEvent *);
     void closeEvent(QCloseEvent *);

@@ -30,35 +30,38 @@ typedef QMap<QString, QMetaMap > QMetaDictionnay;
 
 class GlDrawable {
 public:
-    virtual void fireEvents()           {}
+    virtual void actionPlay()       {}
+    virtual void fireEvents()       {}
     virtual void seek(qreal, bool = false, bool = false) {}
-    virtual qreal totalTime() const     { return 0.; }
-    virtual void actionPlay()           {}
-    virtual bool jumpTo()               { return false; }
+    virtual bool jumpTo()           { return false; }
+    virtual qreal totalTime() const { return 0.;    }
+public:
     virtual void setDuplicates(quint16) {}
     virtual void setHistories (quint16) {}
+public:
     virtual void actionMarkerAddStart() {}
     virtual void actionMarkerAddEnd()   {}
 public:
-    virtual QPointF getTimelineCursorPos (qreal)           { return QPointF(); }
-    virtual QPointF getViewerCursorPos   (qreal)           { return QPointF(); }
-    virtual qreal   getTimelineCursorTime(const QPointF &) { return 0;         }
-    virtual qreal   getViewerCursorTime  (const QPointF &) { return 0;         }
+    virtual const QPointF getTimelineCursorPos (qreal) const           { return QPointF(); }
+    virtual const QPointF getViewerCursorPos   (qreal) const           { return QPointF(); }
+    virtual qreal         getTimelineCursorTime(const QPointF &) const { return 0;         }
+    virtual qreal         getViewerCursorTime  (const QPointF &) const { return 0;         }
 public:
-    virtual const QRectF paintTimeline(bool before = false) = 0;
-    virtual const QRectF paintViewer()   = 0;
-    virtual bool  mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool) = 0;
-    virtual bool  mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool) = 0;
+    virtual const QRectF paintTimeline(bool before = false)                                    = 0;
+    virtual const QRectF paintViewer  ()                                                       = 0;
+    virtual       bool   mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool) = 0;
+    virtual       bool   mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool) = 0;
 };
 
 class GlVideo {
 public:
-    virtual void load(void* tag) = 0;
-    virtual void play(bool state) = 0;
-    virtual void unload(void* tag) = 0;
-    virtual void seek(qreal time) = 0;
+    virtual void load  (void* tag)  = 0;
+    virtual void play  (bool state) = 0;
+    virtual void unload(void* tag)  = 0;
+    virtual void seek  (qreal time) = 0;
     virtual qreal getCurrentTime() const = 0;
 };
+
 
 class GlWidget : public QGLWidget {
 public:
@@ -67,22 +70,30 @@ public:
         showLinkedTagsDest = showLinkedRendersDest = showLegendDest = false;
         mouseTimer.setSingleShot(true);
         mouseTimerOk = false;
-        glReady = false;
+        glReady      = false;
     }
 public:
-    QTimer mouseTimer;
-    QPointF mouseTimerPos;
-    bool mouseTimerOk;
-    QRectF drawingBoundingRect, visibleRect;
+    QRectF  drawingBoundingRect, visibleRect;
     QPointF scroll, scrollDest;
-    UiBool showLegendDest, showLinkedRendersDest, showLinkedTagsDest, showHistory, showHash;
-    qreal showLinkedRenders, showLinkedTags;
-    bool glReady;
+    UiBool  showLegendDest, showLinkedRendersDest, showLinkedTagsDest;
+    qreal   showLinkedRenders, showLinkedTags;
+    bool    glReady;
+protected:
+    QTimer  mouseTimer;
+    QPointF mouseTimerPos;
+    bool    mouseTimerOk;
 public:
-    void ensureVisible(const QPointF &point, qreal ratio = 0.5);
-    void scrollTo(const QPointF &point);
+    void        ensureVisible(const QPointF &point, qreal ratio = 0.5);
+    void        scrollTo     (const QPointF &point);
     inline void scrollTo() { scrollTo(scrollDest); }
 };
+
+
+
+
+
+
+
 
 class GlText {
 public:
@@ -114,13 +125,18 @@ public:
     explicit GlRect() { init = false; texture = 0; }
     explicit GlRect(const QString &filename, const QSize &desiredSize = QSize(-1,-1)) { texture = 0; setTexture(filename, desiredSize); }
 public:
-    void setTexture(const QString &filename, const QSize &desiredSize = QSize(-1,-1));
-    void drawTexture(const QRectF &rect, qreal croppingMode = -2);
-    void drawTexture(const QString &filename, const QRectF &rect, qreal croppingMode = -2);
+    void        setTexture (const QString &filename, const QSize &desiredSize = QSize(-1,-1));
+    void        drawTexture(const QRectF &rect, qreal croppingMode = -2);
+    void        drawTexture(const QString &filename, const QRectF &rect, qreal croppingMode = -2);
     static void drawRoundedRect(const QRectF &rect, bool border, qreal precision = M_PI/4);
     static void drawRect(const QRectF &rect, qreal borderRadius = 0, const QRectF &texCoord = QRectF(0,0,1,1));
 };
 typedef QList<GlRect> Thumbnails;
+
+
+
+
+
 
 
 
@@ -133,7 +149,7 @@ public:
     virtual void sync  (const QString &file, bool inTracker = false) = 0;
     virtual void unsync(const QString &file, bool inTracker = false) = 0;
 public slots:
-    virtual void fileWatcherDirChanged(QString) = 0;
+    virtual void fileWatcherDirChanged (QString) = 0;
     virtual void fileWatcherFileChanged(QString) = 0;
     virtual void writeNote() = 0;
 };
@@ -149,12 +165,12 @@ public:
     }
 public:
     virtual void addDocument(void *document) = 0;
-    virtual void addPerson(void* person) = 0;
+    virtual void addPerson  (void* person) = 0;
 };
 class TaskListBase {
 public:
     virtual void setToolbox(QToolBox*) = 0;
-    virtual void addTask(Metadata *metadata, TaskProcessType type, qint16 version) = 0;
+    virtual void addTask   (Metadata *metadata, TaskProcessType type, qint16 version) = 0;
 };
 
 enum FeedItemBaseType { FeedItemBaseTypeCreation, FeedItemBaseTypeUpdate, FeedItemBaseTypeDelete, FeedItemBaseTypeProcessingStart, FeedItemBaseTypeProcessingEnd };
@@ -162,10 +178,12 @@ class FeedItemBase : public QTreeWidgetItem {
 public:
     explicit FeedItemBase(FeedItemBaseType _action, const QString &_author, const QString &_object, const QDateTime &_date = QDateTime::currentDateTime());
 
-public:
-    QIcon icon;
+private:
     FeedItemBaseType action;
-    QString object, author, actionStr;
+    QString          actionStr, object;
+    QIcon            icon;
+public:
+    QString   author;
     QDateTime date;
 public:
     void update();
@@ -176,11 +194,14 @@ public:
     virtual void addFeed(FeedItemBase *feedItem) = 0;
 };
 
+
 class UserInfosBase {
 public:
-    virtual const QString getInfo(const QString &key) = 0;
-    virtual void update() = 0;
-    virtual const QMetaDictionnay getInfos() = 0;
+    qint32 updateDecounter;
+public:
+    virtual const QString         getInfo(const QString &key) = 0;
+    virtual const QMetaDictionnay getInfos()                  = 0;
+    virtual void                  update()                    = 0;
 };
 
 class RekallBase : public QMainWindow {
@@ -189,21 +210,20 @@ public:
 public:
     explicit RekallBase(QWidget *parent = 0) : QMainWindow(parent) {}
 public:
-    virtual void setVisbility(bool) = 0;
-    virtual void refreshMetadata(void *_tag, bool inChutier) = 0;
-    virtual void showPreviewTab() = 0;
+    virtual void setVisbility(bool)            = 0;
+    virtual void refreshMetadata(void *, bool) = 0;
+    virtual void showPreviewTab()              = 0;
 public:
-    virtual bool parseMimeData(const QMimeData *mime, const QString &source, bool test = false) = 0;
+    virtual bool parseMimeData(const QMimeData *, const QString &, bool = false) = 0;
 };
-
-
-
 
 
 
 
 enum TagSelection { TagSelectionStart, TagSelectionEnd, TagSelectionMove };
 enum TagType      { TagTypeContextualMilestone, TagTypeContextualTime, TagTypeGlobal };
+
+
 
 
 class Global {
@@ -218,7 +238,7 @@ public:
     static QTreeWidget *chutier;
     static qreal timeUnit, timeUnitTick;
     static UiReal timeUnitDest, timelineTagHeightDest;
-    static UiBool showHelp;
+    static UiBool showHelp, showHistory, showHash;
     static qreal timelineTagHeight, timelineTagVSpacing, timelineTagVSpacingSeparator, timelineTagThumbHeight;
     static qreal viewerTagHeight, timelineGlobalDocsWidth;
     static QSizeF timelineHeaderSize;

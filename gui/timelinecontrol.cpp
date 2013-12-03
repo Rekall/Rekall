@@ -14,10 +14,10 @@ TimelineControl::TimelineControl(QWidget *parent) :
 
     //Global::timelineGL->showLinkedRendersDest.setAction(ui->linkedRenders);
     //Global::timelineGL->showLinkedTagsDest   .setAction(ui->linkedTags);
-    Global::timelineGL->showHistory.setAction(ui->history);
-    Global::timelineGL->showHash.setAction(ui->hash);
-    connect(&Global::timelineGL->showHistory, SIGNAL(triggered(bool)), SLOT(action()));
-    connect(&Global::timelineGL->showHash,    SIGNAL(triggered(bool)), SLOT(action()));
+    Global::showHistory.setAction(ui->history);
+    Global::showHash.setAction(ui->hash);
+    connect(&Global::showHistory, SIGNAL(triggered(bool)), SLOT(action()));
+    connect(&Global::showHash,    SIGNAL(triggered(bool)), SLOT(action()));
 }
 
 void TimelineControl::showEvent(QShowEvent *) {
