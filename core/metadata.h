@@ -5,11 +5,6 @@
 #include "items/uifileitem.h"
 #include "misc/global.h"
 
-enum DocumentType     { DocumentTypeFile, DocumentTypeVideo, DocumentTypeAudio, DocumentTypeImage, DocumentTypeDoc, DocumentTypeMarker, DocumentTypePeople };
-enum DocumentFunction { DocumentFunctionContextual, DocumentFunctionRender };
-enum DocumentStatus   { DocumentStatusWaiting, DocumentStatusProcessing, DocumentStatusReady };
-
-
 class MetadataWaveform : public QList< QPair<qreal,qreal> > {
 public:
     explicit MetadataWaveform() { normalisation = 1; }
@@ -128,21 +123,21 @@ public:
     explicit Metadata(QObject *parent = 0, bool createEmpty = false);
     ~Metadata();
 
-protected:
+protected: //TO SAVE
     QList<QMetaDictionnay> metadatas;
-    QDir dirBase;
-    QMutex metadataMutex;
+public: //TO CLEAN
+    QFileInfo file;
+    QDir      dirBase;
+
 public:
-    DocumentFunction function;
     DocumentStatus   status;
-    DocumentType     type;
     UiFileItem      *chutierItem;
-    QFileInfo        file;
-    qreal            mediaDuration;
     Thumbnails       thumbnails;
     MetadataWaveform waveform;
-    QImage           photo;
     QColor           baseColor;
+protected:
+    bool   metadataMutex;
+    QImage photo;
 
 public:
     bool updateFile(const QFileInfo &file, qint16 version = -1, quint16 falseInfoForTest = 0);
@@ -172,6 +167,52 @@ public:
     void setMetadata(const QString &category, const QString &key, const MetadataElement &value, qint16 version);
     void setMetadata(const QString &category, const QString &key, qreal value, qint16 version);
     void setMetadata(const QMetaDictionnay &metaDictionnay);
+
+public:
+    inline const QString getName         (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getNameCache;          }
+    inline const QString getAuthor       (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getAuthorCache;        }
+    inline const QString getTypeStr      (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getTypeStrCache;       }
+    inline       qreal   getMediaOffset  (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getMediaOffsetCache;   }
+    inline       qreal   getMediaDuration(qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getMediaDurationCache; }
+    inline const QString getSnapshot     (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getSnapshotCache;      }
+    inline const QString getUserName     (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getUserNameCache;      }
+    inline DocumentFunction getFunction  (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getFunctionCache;      }
+    inline DocumentType     getType      (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getTypeCache;          }
+    inline void getCacheRefreshed(qint16 version) {
+        metadatas[version].getNameCache     = getMetadata("Rekall", "Name",     version).toString();
+        metadatas[version].getAuthorCache   = getMetadata("Rekall", "Author",   version).toString();
+        metadatas[version].getTypeStrCache  = getMetadata("Rekall", "Type",     version).toString();
+        metadatas[version].getSnapshotCache = getMetadata("Rekall", "Snapshot", version).toString().toLower();
+        metadatas[version].getUserNameCache = getMetadata("Rekall User Infos", "User Name", version).toString();
+        metadatas[version].getMediaOffsetCache   = Sorting::toDouble(getMetadata("Rekall", "Media Offset",   version).toString());
+        metadatas[version].getMediaDurationCache = Sorting::toDouble(getMetadata("Rekall", "Media Duration", version).toString());
+
+        if(getMetadata("Rekall", "Media Function", version).toString().toLower() == "render")   metadatas[version].getFunctionCache = DocumentFunctionRender;
+        else                                                                                    metadatas[version].getFunctionCache = DocumentFunctionContextual;
+        QString metaType = getTypeStr(version).toLower();
+        if(     metaType == "video")     metadatas[version].getTypeCache = DocumentTypeVideo;
+        else if(metaType == "audio")     metadatas[version].getTypeCache = DocumentTypeAudio;
+        else if(metaType == "image")     metadatas[version].getTypeCache = DocumentTypeImage;
+        else if(metaType == "document")  metadatas[version].getTypeCache = DocumentTypeDoc;
+        else if(metaType == "cue")       metadatas[version].getTypeCache = DocumentTypeMarker;
+        else if(metaType == "people")    metadatas[version].getTypeCache = DocumentTypePeople;
+        else                             metadatas[version].getTypeCache = DocumentTypeFile;
+    }
+
+    inline void setFunction(DocumentFunction function, qint16 version = -1) {
+        if(function == DocumentFunctionRender)  setMetadata("Rekall", "Media Function", "Render",     version);
+        else                                    setMetadata("Rekall", "Media Function", "Contextual", version);
+    }
+    inline void setType(DocumentType type, qint16 version = -1) {
+        if(     type == DocumentTypeVideo)  setMetadata("Rekall", "Type", "Video",    version);
+        else if(type == DocumentTypeAudio)  setMetadata("Rekall", "Type", "Audio",    version);
+        else if(type == DocumentTypeImage)  setMetadata("Rekall", "Type", "Image",    version);
+        else if(type == DocumentTypeDoc)    setMetadata("Rekall", "Type", "Document", version);
+        else if(type == DocumentTypeMarker) setMetadata("Rekall", "Type", "Cue",      version);
+        else if(type == DocumentTypePeople) setMetadata("Rekall", "Type", "Peope",    version);
+        else                                setMetadata("Rekall", "Type", "Other",    version);
+    }
+
 public:
     const MetadataElement getCriteriaPhase       (qint16 version = -1) const;
     const QString getCriteriaSort                (qint16 version = -1) const;

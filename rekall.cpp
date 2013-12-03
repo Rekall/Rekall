@@ -445,8 +445,8 @@ void Rekall::displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget *tree, QT
             ui->metadataOpen      ->setVisible(false);
         }
 
-        displayDocumentName(QString("%1 (%2)").arg(metadata->getMetadata("Rekall", "Name").toString()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
-        displayPixmap(metadata->type, metadata->getThumbnail(ui->metadataSlider->value()));
+        displayDocumentName(QString("%1 (%2)").arg(metadata->getName()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
+        displayPixmap(metadata->getType(), metadata->getThumbnail(ui->metadataSlider->value()));
         displayGps(metadata->getGps());
     }
     metaIsChanging = false;

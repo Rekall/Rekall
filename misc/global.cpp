@@ -80,6 +80,7 @@ QColor       Global::colorTagDisabled             = QColor(126, 126, 126);
 QColor       Global::colorTimeline                = QColor( 45, 202, 225);      //QColor(50, 221, 255);
 QColor       Global::colorAlternateStrong         = QColor(  0,   0,   0, 128);
 QColor       Global::colorTextBlack               = QColor( 45,  50,  53);      //QColor( 43,  46,  47)
+QColor       Global::colorTicks                   = QColor( 43,  46,  47);
 QColor       Global::colorBackground              = QColor( 71,  77,  79);
 QColor Global::getColorScale(qreal val) {
     QList<QColor> colors;

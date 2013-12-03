@@ -30,7 +30,7 @@ void Document::createTagBasedOnPrevious(qint16 _forVersion) {
         }
         foreach(Tag *tag, tagsToDuplicate) {
             Tag *newTag = new Tag(this, forVersion);
-            newTag->create(tag->type, tag->getTimeStart(), tag->getDuration());
+            newTag->create(tag->getType(), tag->getTimeStart(), tag->getDuration());
             newTag->timelinePos     = tag->timelinePos;
             newTag->timelineDestPos = tag->timelineDestPos;
             newTag->viewerPos       = tag->viewerPos;
@@ -41,7 +41,7 @@ void Document::createTagBasedOnPrevious(qint16 _forVersion) {
     }
     else {
         qreal tS = Global::aleaF(5, 120);
-        if(function == DocumentFunctionRender)
+        if(getFunction() == DocumentFunctionRender)
             tS = Global::aleaF(0, 5);
         for(quint16 i = 0 ; i < getMetadataCount() ; i++) {
             if(getMetadataCount() > 1) {

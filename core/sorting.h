@@ -19,6 +19,7 @@ public:
 private:
     bool sortAscending, isUpdating, needWord, isHorizontal;
     bool asNumber, asDate, asTimeline;
+    QPair<qreal,qreal> asNumberRange;
     qint16 left, leftLength;
     QString tagNameCategory, tagName;
 public:
@@ -29,7 +30,6 @@ public:
     inline       bool    isTimeline()         const { return asTimeline;      }
     inline       bool    isNumber()           const { return asNumber;        }
     inline       bool    isDate()             const { return asDate;          }
-    void setTagname(const QString &_tagName);
 
 protected:
     void showEvent(QShowEvent *);
@@ -40,19 +40,24 @@ signals:
 
 private:
     QHash<QString,QString> criteriaFormatedCache;
-    QStringList criteriaFormatedRealCache;
+    QStringList criteriaFormatedRealCacheRaw, criteriaFormatedRealCacheFormated;
 
 public:
+    const QString getCriteria(const QString &criteria) const;
     const QString getCriteriaFormated(const QString &criteria);
     const QString getCriteriaFormated(qreal criteria) const;
-    qreal getCriteriaFormatedReal(const QString &criteria) const;
+    qreal getCriteriaFormatedReal(const QString &criteria, qreal timeValue) const;
+    inline qreal getCriteriaFormatedRealDuration(qreal durationValue) const {
+        if(asTimeline)  return durationValue;
+        else            return 0;
+    }
     bool isAcceptable(bool strongCheck, const QString &criteria) const;
     const QString getAcceptableWithFilters(const QString &criteria) const;
     const QString getMatchName() const;
 
 public:
     void addCheckStart();
-    void addCheck(const QString &check, const QString &value = QString());
+    void addCheck(const QString& sorting, const QString &sortingFormated, const QString &complement);
     void addCheckEnd();
 
 public:
@@ -69,6 +74,8 @@ public slots:
 public:
     static const QString timeToString(qreal time);
     static qreal stringToTime(const QString &timeStr);
+    static qreal toDouble(const MetadataElement &elmt, bool *ok = 0);
+    static qreal toDouble(const QString &str, bool *ok = 0);
 
 public:
     const QString styleSheet2() const;

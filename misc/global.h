@@ -24,8 +24,17 @@
 #include "interfaces/udp.h"
 #include "qmath.h"
 
+enum DocumentType     { DocumentTypeFile, DocumentTypeVideo, DocumentTypeAudio, DocumentTypeImage, DocumentTypeDoc, DocumentTypeMarker, DocumentTypePeople };
+enum DocumentFunction { DocumentFunctionContextual, DocumentFunctionRender };
+enum DocumentStatus   { DocumentStatusWaiting, DocumentStatusProcessing, DocumentStatusReady };
 typedef QMap<QString, MetadataElement> QMetaMap;
-typedef QMap<QString, QMetaMap > QMetaDictionnay;
+class QMetaDictionnay : public QMap<QString, QMetaMap> {
+public:
+    QString getNameCache, getAuthorCache, getTypeStrCache, getSnapshotCache, getUserNameCache;
+    DocumentFunction getFunctionCache;
+    DocumentType getTypeCache;
+    qreal   getMediaOffsetCache, getMediaDurationCache;
+};
 
 
 class GlDrawable {
@@ -258,7 +267,7 @@ public:
     static Udp *udp;
     static QFont font, fontSmall;
     static GlVideo *video;
-    static QColor colorAlternateStrong, colorAlternate, colorAlternateLight, colorAlternateMore, colorCluster, colorText, colorBackground, colorTextBlack, colorTagCaptation, colorTagDisabled, colorTimeline;
+    static QColor colorAlternateStrong, colorAlternate, colorAlternateLight, colorAlternateMore, colorCluster, colorText, colorBackground, colorTicks, colorTextBlack, colorTagCaptation, colorTagDisabled, colorTimeline;
     static QMap<QString, QPair<QColor, qreal> > colorForMeta;
     static bool timelineSortChanged, viewerSortChanged, eventsSortChanged, metaChanged, ticksChanged;
     static WatcherBase *watcher;

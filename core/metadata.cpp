@@ -9,11 +9,9 @@ QStringList Metadata::suffixesTypePeople;
 
 Metadata::Metadata(QObject *parent, bool createEmpty) :
     QObject(parent) {
+    metadataMutex = false;
     chutierItem   = 0;
     status        = DocumentStatusReady;
-    type          = DocumentTypeMarker;
-    function      = DocumentFunctionContextual;
-    mediaDuration = 0;
     if(!suffixesTypeDoc.count())
         suffixesTypeDoc << "pdf" << "ps" << "doc" << "txt" << "docx";
     if(!suffixesTypeImage.count())
@@ -38,8 +36,8 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     bool creation = false;
     file = _file;
     file.refresh();
-    type = DocumentTypeFile;
     creation = updateImport(file.baseName(), version);
+    setType(DocumentTypeFile);
 
     QFileInfoList filesContext = file.absoluteDir().entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
     QString fileContextVerbose = "";
@@ -50,10 +48,10 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     QDir dirBaseParent = dirBase;
     dirBaseParent.cdUp();
 
-    setMetadata("File",   "Basename",                    file.baseName(),         version);
-    setMetadata("File",   "Owner",                       file.owner(),            version);
-    setMetadata("File",   "File Creation Date/Time",     file.created(),          version);
-    setMetadata("File",   "File Access Date/Time",       file.lastRead(),         version);
+    setMetadata("File",   "Basename",                file.baseName(), version);
+    setMetadata("File",   "Owner",                   file.owner(),    version);
+    setMetadata("File",   "File Creation Date/Time", file.created(),  version);
+    setMetadata("File",   "File Access Date/Time",   file.lastRead(), version);
     if(falseInfoForTest > 0)    setMetadata("File", "File Modification Date/Time", file.lastModified().addMonths(falseInfoForTest), version);
     else                        setMetadata("File", "File Modification Date/Time", file.lastModified(), version);
     setMetadata("Rekall", "Date/Time", getMetadata("File", "File Modification Date/Time", version), version);
@@ -63,38 +61,12 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
 
 
     //Type
-    QString typeStr = "";
-    if(suffixesTypeDoc.contains(file.suffix().toLower())) {
-        type = DocumentTypeDoc;
-        typeStr = "Document";
-    }
-    else if(suffixesTypeAudio.contains(file.suffix().toLower())) {
-        type = DocumentTypeAudio;
-        typeStr = "Audio";
-    }
-    else if(suffixesTypeImage.contains(file.suffix().toLower())) {
-        type = DocumentTypeImage;
-        typeStr = "Image";
-    }
-    else if(suffixesTypeVideo.contains(file.suffix().toLower())) {
-        type = DocumentTypeVideo;
-        typeStr = "Video";
-    }
-    else if(suffixesTypePatches.contains(file.suffix().toLower())) {
-        type = DocumentTypeFile;
-        typeStr = "Patches";
-    }
-    else if(suffixesTypePeople.contains(file.suffix().toLower())) {
-        type = DocumentTypePeople;
-        typeStr = "People";
-    }
-    else {
-        type = DocumentTypeFile;
-        typeStr = "Other";
-    }
-    if(function == DocumentFunctionRender)
-        typeStr = "Recording";
-    setMetadata("Rekall", "Type", typeStr, version);
+    if(     suffixesTypeDoc   .contains(file.suffix().toLower()))   setType(DocumentTypeDoc,    version);
+    else if(suffixesTypeAudio .contains(file.suffix().toLower()))   setType(DocumentTypeAudio,  version);
+    else if(suffixesTypeImage .contains(file.suffix().toLower()))   setType(DocumentTypeImage,  version);
+    else if(suffixesTypeVideo .contains(file.suffix().toLower()))   setType(DocumentTypeVideo,  version);
+    else if(suffixesTypePeople.contains(file.suffix().toLower()))   setType(DocumentTypePeople, version);
+    else                                                            setType(DocumentTypeFile,   version);
 
     QStringList documentKeywords;
     QStringList fileTags = QDir(Global::pathDocuments.absoluteFilePath() + "/").relativeFilePath(file.absoluteFilePath()).remove(file.suffix()).toLower().replace("-", " ").replace("_", " ").split("/", QString::SkipEmptyParts);
@@ -124,7 +96,7 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     }
 
     if(!file.exists())
-        setMetadata("Rekall", "Type",  "Cue", version);
+        setType(DocumentTypeMarker);
     setMetadata("Rekall", "Name",         name, version);
     setMetadata("Rekall", "Author",       Global::userInfos->getInfo("User Name"), version);
     quint16 tirage = Global::alea(0, 100);
@@ -137,19 +109,19 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     setMetadata("Rekall", "Date/Time",    QDateTime::currentDateTime(), version);
     setMetadata("Rekall", "Import Date/Time",      QDateTime::currentDateTime(), version);
     setMetadata(Global::userInfos->getInfos());
-    //setMetadata("Rekall", "Danger", version);
 
+    setFunction(DocumentFunctionContextual, version);
     if(name.toLower().contains("captation"))
-        function = DocumentFunctionRender;
+        setFunction(DocumentFunctionRender, version);      
 
     return creation;
 }
 
 bool Metadata::updateCard(const PersonCard &card, qint16 version) {
     bool creation = false;
-    type = DocumentTypePeople;
+    setType(DocumentTypePeople, version);
     creation = updateImport(card.getFullname(), version);
-    setMetadata("Rekall", "Type", "People", version);
+    setType(DocumentTypePeople);
 
     QString previousLabel = "";
     for(quint16 i = 0 ; i < card.count() ; i++) {
@@ -227,16 +199,17 @@ void Metadata::updateFeed() {
     FeedItemBaseType feedAction = FeedItemBaseTypeCreation;
     if(getMetadataCount() > 1)
         feedAction = FeedItemBaseTypeUpdate;
-    Global::feedList->addFeed(new FeedItemBase(feedAction,
-                                               getMetadata("Rekall User Infos", "User Name").toString(),
-                                               getMetadata("Rekall", "Name").toString(),
-                                               getMetadata("Rekall", "Import Date/Time").toDateTime()));
+    Global::feedList->addFeed(new FeedItemBase(feedAction, getUserName(), getName(), getMetadata("Rekall", "Import Date/Time").toDateTime()));
 }
 
 
 const MetadataElement Metadata::getMetadata(const QString &key, qint16 version) const {
     MetadataElement retour;
-    //metadataMutex.lock();
+
+    while(metadataMutex) {
+        qDebug("WAIT MUTEX");
+    }
+
     if(metadatas.count()) {
         QMapIterator<QString, QMetaMap> metaIterator(getMetadata(version));
         while(metaIterator.hasNext()) {
@@ -247,14 +220,17 @@ const MetadataElement Metadata::getMetadata(const QString &key, qint16 version) 
             }
         }
     }
-    //metadataMutex.unlock();
     return retour;
 }
 const MetadataElement Metadata::getMetadata(const QString &category, const QString &key, qint16 version) const {
     if(category.isEmpty())
         return getMetadata(key, version);
     MetadataElement retour;
-    //metadataMutex.lock();
+
+    while(metadataMutex) {
+        qDebug("WAIT MUTEX");
+    }
+
     if(metadatas.count()) {
         if(key == "All") {
             QString retourStr;
@@ -272,7 +248,6 @@ const MetadataElement Metadata::getMetadata(const QString &category, const QStri
                 retour = getMetadata(version).value(category).value(key);
         }
     }
-    //metadataMutex.unlock();
     return retour;
 }
 
@@ -281,23 +256,29 @@ void Metadata::setMetadata(const QString &category, const QString &key, const QS
     if(key.toLower().contains("date"))
         setMetadata(category, key, QDateTime::fromString(value, "yyyy:MM:dd hh:mm:ss"), version);
     else if(!value.isEmpty()) {
-        //metadataMutex.lock();
-        metadatas[getMetadataIndexVersion(version)][category][key] = value;
-        //metadataMutex.unlock();
+        version = getMetadataIndexVersion(version);
+        metadataMutex = true;
+        metadatas[version][category][key] = value;
+        metadataMutex = false;
+        getCacheRefreshed(version);
     }
 }
 void Metadata::setMetadata(const QString &category, const QString &key, const QDateTime &value, qint16 version) {
     if(!value.isNull()) {
-        //metadataMutex.lock();
-        metadatas[getMetadataIndexVersion(version)][category][key] = value;
-        //metadataMutex.unlock();
+        version = getMetadataIndexVersion(version);
+        metadataMutex = true;
+        metadatas[version][category][key] = value;
+        metadataMutex = false;
+        getCacheRefreshed(version);
     }
 }
 void Metadata::setMetadata(const QString &category, const QString &key, const MetadataElement &value, qint16 version) {
     if(!value.toString().isEmpty()) {
-        //metadataMutex.lock();
-        metadatas[getMetadataIndexVersion(version)][category][key] = value;
-        //metadataMutex.unlock();
+        version = getMetadataIndexVersion(version);
+        metadataMutex = true;
+        metadatas[version][category][key] = value;
+        metadataMutex = false;
+        getCacheRefreshed(version);
     }
 }
 void Metadata::setMetadata(const QString &category, const QString &key, qreal value, qint16 version) {
@@ -318,14 +299,14 @@ void Metadata::setMetadata(const QMetaDictionnay &metaDictionnay) {
 
 
 bool Metadata::isAcceptableWithSortFilters(bool strongCheck, qint16 version) const {
-    return (function == DocumentFunctionRender) ||
+    return (getFunction() == DocumentFunctionRender) ||
             (   (Global::phases                  ->isAcceptable(true,        getCriteriaPhase(version)))
                 && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
                 && (Global::tagSortCriteria      ->isAcceptable(strongCheck, getCriteriaSort(version)))
                 && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version))));
 }
 bool Metadata::isAcceptableWithColorFilters(bool strongCheck, qint16 version) const {
-    return (function == DocumentFunctionContextual)
+    return (getFunction() == DocumentFunctionContextual)
             && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
             && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
@@ -333,7 +314,7 @@ bool Metadata::isAcceptableWithColorFilters(bool strongCheck, qint16 version) co
             && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
 bool Metadata::isAcceptableWithClusterFilters(bool strongCheck, qint16 version) const {
-    return (function == DocumentFunctionContextual)
+    return (getFunction() == DocumentFunctionContextual)
             && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
             && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
@@ -362,45 +343,45 @@ const QString Metadata::getAcceptableWithClusterFilters(qint16 version) const {
 
 
 const QString Metadata::getCriteriaColor(qint16 version) const {
-    if(function == DocumentFunctionRender) return QString();
-    return getMetadata(Global::tagColorCriteria->getTagNameCategory(), Global::tagColorCriteria->getTagName(), version).toString(Global::tagColorCriteria->getTrunctionLeft(), Global::tagColorCriteria->getTrunctionLength());
+    if(getFunction() == DocumentFunctionRender) return QString();
+    return Global::tagColorCriteria->getCriteria(getMetadata(Global::tagColorCriteria->getTagNameCategory(), Global::tagColorCriteria->getTagName(), version).toString(Global::tagColorCriteria->getTrunctionLeft(), Global::tagColorCriteria->getTrunctionLength()));
 }
 const QString Metadata::getCriteriaColorFormated(qint16 version) const {
-    if(function == DocumentFunctionRender) return QString();
+    if(getFunction() == DocumentFunctionRender) return QString();
     return Global::tagColorCriteria->getCriteriaFormated(getCriteriaColor(version));
 }
 const QString Metadata::getCriteriaCluster(qint16 version) const {
-    if(function == DocumentFunctionRender) return QString();
-    return getMetadata(Global::tagClusterCriteria->getTagNameCategory(), Global::tagClusterCriteria->getTagName(), version).toString(Global::tagClusterCriteria->getTrunctionLeft(), Global::tagClusterCriteria->getTrunctionLength());
+    if(getFunction() == DocumentFunctionRender) return QString();
+    return Global::tagClusterCriteria->getCriteria(getMetadata(Global::tagClusterCriteria->getTagNameCategory(), Global::tagClusterCriteria->getTagName(), version).toString(Global::tagClusterCriteria->getTrunctionLeft(), Global::tagClusterCriteria->getTrunctionLength()));
 }
 const QString Metadata::getCriteriaClusterFormated(qint16 version) const {
-    if(function == DocumentFunctionRender) return QString();
+    if(getFunction() == DocumentFunctionRender) return QString();
     return Global::tagClusterCriteria->getCriteriaFormated(getCriteriaCluster(version));
 }
 const QString Metadata::getCriteriaFilter(qint16 version) const {
-    if(function == DocumentFunctionRender) return QString();
-    return getMetadata(Global::tagFilterCriteria->getTagNameCategory(), Global::tagFilterCriteria->getTagName(), version).toString(Global::tagFilterCriteria->getTrunctionLeft(), Global::tagFilterCriteria->getTrunctionLength());
+    if(getFunction() == DocumentFunctionRender) return QString();
+    return Global::tagFilterCriteria->getCriteria(getMetadata(Global::tagFilterCriteria->getTagNameCategory(), Global::tagFilterCriteria->getTagName(), version).toString(Global::tagFilterCriteria->getTrunctionLeft(), Global::tagFilterCriteria->getTrunctionLength()));
 }
 const QString Metadata::getCriteriaFilterFormated(qint16 version) const {
-    if(function == DocumentFunctionRender) return QString();
+    if(getFunction() == DocumentFunctionRender) return QString();
     return Global::tagFilterCriteria->getCriteriaFormated(getCriteriaFilter(version));
 }
 const QString Metadata::getCriteriaHorizontal(qint16 version) const {
-    return getMetadata(Global::tagHorizontalCriteria->getTagNameCategory(), Global::tagHorizontalCriteria->getTagName(), version).toString(Global::tagHorizontalCriteria->getTrunctionLeft(), Global::tagHorizontalCriteria->getTrunctionLength());
+    return Global::tagHorizontalCriteria->getCriteria(getMetadata(Global::tagHorizontalCriteria->getTagNameCategory(), Global::tagHorizontalCriteria->getTagName(), version).toString(Global::tagHorizontalCriteria->getTrunctionLeft(), Global::tagHorizontalCriteria->getTrunctionLength()));
 }
 const QString Metadata::getCriteriaHorizontalFormated(qint16 version) const {
     return Global::tagHorizontalCriteria->getCriteriaFormated(getCriteriaHorizontal(version));
 }
 
 const QString Metadata::getCriteriaSort(qint16 version) const {
-    if(function == DocumentFunctionRender) {
+    if(getFunction() == DocumentFunctionRender) {
         if(Global::tagSortCriteria->isDate())
-            return getMetadata(Global::tagSortCriteria->getTagNameCategory(), Global::tagSortCriteria->getTagName(), version).toString(Global::tagSortCriteria->getTrunctionLeft(), Global::tagSortCriteria->getTrunctionLength()) + "\n" + getMetadata("Rekall", "Name", version).toString();
+            return getMetadata(Global::tagSortCriteria->getTagNameCategory(), Global::tagSortCriteria->getTagName(), version).toString(Global::tagSortCriteria->getTrunctionLeft(), Global::tagSortCriteria->getTrunctionLength()) + "\n" + getName(version);
         else
-            return "\n" + getMetadata("Rekall", "Name", version).toString();
+            return "\n" + getName(version);
     }
     else
-        return getMetadata(Global::tagSortCriteria->getTagNameCategory(), Global::tagSortCriteria->getTagName(), version).toString(Global::tagSortCriteria->getTrunctionLeft(), Global::tagSortCriteria->getTrunctionLength());
+        return Global::tagSortCriteria->getCriteria(getMetadata(Global::tagSortCriteria->getTagNameCategory(), Global::tagSortCriteria->getTagName(), version).toString(Global::tagSortCriteria->getTrunctionLeft(), Global::tagSortCriteria->getTrunctionLength()));
 }
 const QString Metadata::getCriteriaSortFormated(qint16 version) const {
     return Global::tagSortCriteria->getCriteriaFormated(getCriteriaSort(version));
@@ -413,11 +394,11 @@ const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) const {
     QPair<QString, QPixmap> retour;
     if(!photo.isNull())
         return qMakePair(QString(), QPixmap::fromImage(photo));
-    else if(getMetadata("Rekall", "Snapshot", version).toString() == "Comment")
+    else if(getSnapshot(version) == "comment")
         return qMakePair(QString("%1_%2.jpg").arg(Global::cacheFile("comment", file)).arg(version), QPixmap(QString("%1_%2.jpg").arg(Global::cacheFile("comment", file)).arg(version)));
-    else if(getMetadata("Rekall", "Snapshot", version).toString() == "Note")
+    else if(getSnapshot(version) == "note")
         return qMakePair(QString("%1_%2.jpg").arg(Global::cacheFile("note", getMetadata("Rekall", "Note ID").toString())).arg(version), QPixmap(QString("%1_%2.jpg").arg(Global::cacheFile("note", getMetadata("Rekall", "Note ID").toString())).arg(version)));
-    else if(getMetadata("Rekall", "Snapshot", version).toString() == "File")
+    else if(getSnapshot(version) == "file")
         return qMakePair(file.absoluteFilePath(), QPixmap(file.absoluteFilePath()));
     else if(thumbnails.count())
         return qMakePair(file.absoluteFilePath(), QPixmap::fromImage(thumbnails.first().image));
@@ -426,7 +407,7 @@ const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) const {
 }
 
 const QList<QPair<QString, QString> > Metadata::getGps(qint16 version) const {
-    if((type == DocumentTypePeople) && (getMetadata(version).contains("Contact details"))) {
+    if((getType() == DocumentTypePeople) && (getMetadata(version).contains("Contact details"))) {
         QMapIterator<QString, MetadataElement> metaIterator(getMetadata(version).value("Contact details"));
         QList<QPair<QString,QString> > gpsList;
         while(metaIterator.hasNext()) {
@@ -443,7 +424,7 @@ const QList<QPair<QString, QString> > Metadata::getGps(qint16 version) const {
 
     QPair<QString,QString> gps;
     gps.first  = getMetadata("GPS Coordinates", version).toString();
-    gps.second = getMetadata("Rekall", "Name", version).toString();
+    gps.second = getName(version);
     if(gps.first.isEmpty()) {
         gps.first  = getMetadata("Rekall User Infos", "Location GPS", version).toString();
         gps.second = getMetadata("Rekall User Infos", "Location Place", version).toString();
@@ -469,7 +450,6 @@ void Metadata::debug() {
 }
 QDomElement Metadata::serializeMetadata(QDomDocument &xmlDoc) const {
     QDomElement xmlData = xmlDoc.createElement("metadata");
-    xmlData.setAttribute("function", function);
     xmlData.setAttribute("file", file.absoluteFilePath());
     foreach(const QMetaDictionnay & metaDictionnay, metadatas) {
         QMapIterator<QString, QMetaMap> categoryIterator(metaDictionnay);

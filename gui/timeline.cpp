@@ -54,7 +54,7 @@ const QRectF Timeline::paintTimeline(bool before) {
         }
 
 
-        Global::timelineGL->qglColor(Global::colorTextBlack);
+        Global::timelineGL->qglColor(Global::colorTicks);
         QRectF tickRectOld(-100, 10, 10, 10);
         glBegin(GL_LINES);
         for(quint16 tickIndex = 0 ; tickIndex < ticks.count() ; tickIndex++) {

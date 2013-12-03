@@ -17,12 +17,14 @@ Sorting::Sorting(const QString &title, quint16 index, bool _needWord, bool _isHo
     ui->filter->addItem("Date (year)",  "Rekall->Date/Time | 0,4");
     ui->filter->addItem("Date (month)", "Rekall->Date/Time | 0,7");
     ui->filter->addItem("Date (day)",   "Rekall->Date/Time | 0,10");  // 1234:67:90 23:56:89
-    ui->filter->addItem("Time (hours)", "Rekall->Date/Time | 11,2f");  // 0123:56:89012:45:67
+    ui->filter->addItem("Time (hours)", "Rekall->Date/Time | 11,2");  // 0123:56:89012:45:67
     ui->filter->addItem("Type",         "Rekall->Type");
     ui->filter->addItem("Authors",      "Rekall->Author");
     ui->filter->addItem("All Keywords", "Rekall->All");
     ui->filter->addItem("Fullname",     "Rekall->Name");
     ui->filter->addItem("First letter (name)", "Rekall->Name | 0,1");
+    ui->filter->addItem("Composite->Light Value");
+    ui->filter->addItem("Rekall->Size");
     ui->filter->setCurrentIndex(index);
     ui->checks->sortByColumn(0, Qt::AscendingOrder);
     isUpdating = false;
@@ -45,28 +47,6 @@ void Sorting::setStyleSheet2(const QString &str) {
     ui->globalFrameRed->setStyleSheet(str);
 }
 
-
-
-void Sorting::setTagname(const QString &_tagName) {
-    if(_tagName.count()) {
-        QStringList tagNames = _tagName.split("->");
-        if(tagNames.count()) {
-            tagName       = tagNames.last();
-            if(tagNames.count() > 1)
-                tagNameCategory = tagNames.first();
-            if(tagName == "Time")   asTimeline = true;
-            else                    asTimeline = false;
-            leftLength    = -1;
-            asNumber      = false;
-            sortAscending = true;
-            if((tagName.toLower().contains("date")) || (tagName.toLower().contains("time")))    asDate = true;
-            else                                                                                asDate = false;
-        }
-    }
-    else
-        tagName = "";
-}
-
 void Sorting::action() {
     if(needWord) {
         bool needWordValue = !(ui->matches->text().isEmpty());
@@ -74,11 +54,15 @@ void Sorting::action() {
         ui->checkAll  ->setVisible(needWordValue);
         ui->invertAll ->setVisible(needWordValue);
         ui->uncheckAll->setVisible(needWordValue);
+        ui->sorting   ->setVisible(needWordValue);
     }
     if(isUpdating)
         return;
 
-    if((sender() == ui->checkAll) || (sender() == ui->uncheckAll) || (sender() == ui->invertAll)) {
+    if(sender() == ui->sorting) {
+        ui->checks->sortByColumn(0, Qt::AscendingOrder);
+    }
+    else if((sender() == ui->checkAll) || (sender() == ui->uncheckAll) || (sender() == ui->invertAll)) {
         QList<QTreeWidgetItem*> items;
         if(ui->checks->selectedItems().count() > 1)
             items = ui->checks->selectedItems();
@@ -88,14 +72,14 @@ void Sorting::action() {
                     items << ui->checks->topLevelItem(i);
         }
         foreach(QTreeWidgetItem *item, items) {
-            if(     (sender() == ui->checkAll)   && (item->checkState(0) == Qt::Unchecked))
-                item->setCheckState(0, Qt::Checked);
-            else if((sender() == ui->uncheckAll) && (item->checkState(0) == Qt::Checked))
-                item->setCheckState(0, Qt::Unchecked);
-            else if((sender() == ui->invertAll)  && (item->checkState(0) == Qt::Checked))
-                item->setCheckState(0, Qt::Unchecked);
-            else if((sender() == ui->invertAll)  && (item->checkState(0) == Qt::Unchecked))
-                item->setCheckState(0, Qt::Checked);
+            if(     (sender() == ui->checkAll)   && (item->checkState(1) == Qt::Unchecked))
+                item->setCheckState(1, Qt::Checked);
+            else if((sender() == ui->uncheckAll) && (item->checkState(1) == Qt::Checked))
+                item->setCheckState(1, Qt::Unchecked);
+            else if((sender() == ui->invertAll)  && (item->checkState(1) == Qt::Checked))
+                item->setCheckState(1, Qt::Unchecked);
+            else if((sender() == ui->invertAll)  && (item->checkState(1) == Qt::Unchecked))
+                item->setCheckState(1, Qt::Checked);
         }
     }
     else {
@@ -110,21 +94,36 @@ void Sorting::action() {
             }
             else if(filterText.count()) {
                 QStringList sortSplit = filterText.split("|");
-                setTagname(sortSplit.first().trimmed());
+
+                leftLength    = -1;
+                asNumber      = asDate = asTimeline = false;
+                sortAscending = true;
+                QString _tagName = sortSplit.first().trimmed();
+                if(_tagName.count()) {
+                    QStringList tagNames = _tagName.split("->");
+                    if(tagNames.count()) {
+                        tagName       = tagNames.last();
+                        if(tagNames.count() > 1)
+                            tagNameCategory = tagNames.first();
+                        if(tagName == "Time")   asTimeline = true;
+                        else                    asTimeline = false;
+                        if((tagName.toLower().contains("date")) || (tagName.toLower().contains("time")))    asDate = true;
+                        else                                                                                asDate = false;
+                    }
+                }
+                else
+                    tagName = "";
+
                 if(sortSplit.count() > 1) {
                     QString rightPart = sortSplit.at(1);
                     if(rightPart.endsWith("d")) {
                         rightPart.chop(1);
                         sortAscending = false;
                     }
-                    if(rightPart.endsWith("f")) {
-                        rightPart.chop(1);
-                        asNumber = true;
-                    }
                     QStringList lefts = rightPart.split(",");
-                    left = lefts.at(0).toDouble();
+                    left = toDouble(lefts.at(0));
                     if(lefts.count() > 1)
-                        leftLength = lefts.at(1).toDouble();
+                        leftLength = toDouble(lefts.at(1));
                 }
             }
         }
@@ -132,7 +131,7 @@ void Sorting::action() {
 
     QString text2 = ui->matches->text();
     for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++)
-        if((!ui->checks->topLevelItem(i)->isHidden()) && (ui->checks->topLevelItem(i)->checkState(0) == Qt::Unchecked))
+        if((!ui->checks->topLevelItem(i)->isHidden()) && (ui->checks->topLevelItem(i)->checkState(1) == Qt::Unchecked))
             text2 = ui->filter->currentText();
     emit(actionned(ui->filter->currentText(), text2));
 }
@@ -147,9 +146,59 @@ void Sorting::actionSelection() {
 }
 
 
+
+const QString Sorting::getCriteria(const QString &criteria) const {
+    if(criteria.isEmpty())
+        return QString();
+
+    if(asTimeline)
+        return 0;
+
+    bool asNumberGuess = false;
+    qreal criteriaReal = toDouble(criteria, &asNumberGuess);
+    if((!asDate) && (asNumberGuess))
+        return QString("%1").arg(criteriaReal, 25, 'f', 5, QChar('0')).trimmed();
+
+    return criteria;
+}
+const QString Sorting::getCriteriaFormated(qreal criteria) const {
+    if(asTimeline)
+        return timeToString(criteria);
+    else {
+        if(asNumber)
+            return QString("%1").arg((criteria / 60.) * (asNumberRange.second - asNumberRange.first) + asNumberRange.first).trimmed();
+        else if(qFloor(criteria/5) < criteriaFormatedRealCacheFormated.count())
+            return criteriaFormatedRealCacheFormated.at(qFloor(criteria/5));
+    }
+
+    return QString();
+}
+qreal Sorting::getCriteriaFormatedReal(const QString &criteria, qreal timeValue) const {
+    if(asTimeline)
+        return timeValue;
+
+    qreal val;
+    bool asNumberGuess = false;
+    qreal criteriaReal = toDouble(criteria, &asNumberGuess);
+    if((!asDate) && (asNumberGuess))
+        val = (criteriaReal - asNumberRange.first) / (asNumberRange.second - asNumberRange.first) * 60.;
+    else {
+        val = (qreal)criteriaFormatedRealCacheRaw.indexOf(criteria);
+        if(val < 0) val = criteriaFormatedRealCacheRaw.count();
+        val *= 5;
+    }
+
+    return val;
+}
 const QString Sorting::getCriteriaFormated(const QString &_criteria) {
     if(_criteria.isEmpty())
         return _criteria;
+
+
+    bool asNumberGuess = false;
+    qreal criteriaReal = toDouble(_criteria, &asNumberGuess);
+    if((!asDate) && (asNumberGuess))
+        return QString("%1").arg(criteriaReal, 'f').trimmed();
 
     QString criteria = _criteria, suffix;
     qint16 index = criteria.indexOf("\n");
@@ -177,25 +226,19 @@ const QString Sorting::getCriteriaFormated(const QString &_criteria) {
         return criteria + suffix + "...";
     return criteria + suffix;
 }
-const QString Sorting::getCriteriaFormated(qreal criteria) const {
-    if(asTimeline)
-        return timeToString(criteria);
-    else if(qFloor(criteria/5) < criteriaFormatedRealCache.count())
-        return criteriaFormatedRealCache.at(qFloor(criteria/5));
-    return QString("");
-}
-qreal Sorting::getCriteriaFormatedReal(const QString &_criteria) const {
-    qreal val = (qreal)criteriaFormatedRealCache.indexOf(_criteria);
-    if(val < 0) val = criteriaFormatedRealCache.count();
-    return val;
-}
+
+
+
 bool Sorting::isAcceptable(bool strongCheck, const QString &_criteria) const {
     if(asTimeline)
         return true;
 
+    if(_criteria.isEmpty())
+        return false;
+
     if(strongCheck) {
         for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
-            if((ui->checks->topLevelItem(i)->checkState(0) == Qt::Unchecked) && (ui->checks->topLevelItem(i)->text(0) == _criteria))
+            if((ui->checks->topLevelItem(i)->checkState(1) == Qt::Unchecked) && (ui->checks->topLevelItem(i)->text(0) == _criteria))
                 return false;
         }
     }
@@ -243,27 +286,34 @@ Sorting::~Sorting() {
 }
 
 void Sorting::addCheckStart() {
-    qDebug("%s", qPrintable(this->windowTitle()));
-    criteriaFormatedRealCache.clear();
     isUpdating = true;
+    criteriaFormatedRealCacheRaw.clear();
+    criteriaFormatedRealCacheFormated.clear();
     for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
         if(!ui->checks->topLevelItem(i)->isHidden())
             ui->checks->topLevelItem(i)->setHidden(true);
     }
-    ui->checks->setColumnHidden(1, true);
+    ui->checks->setColumnHidden(0, true);
+    ui->checks->setColumnHidden(2, true);
     isUpdating = false;
 }
-void Sorting::addCheck(const QString &check, const QString &value) {
-    if(check.isEmpty())
+void Sorting::addCheck(const QString &sorting, const QString &sortingFormated, const QString &_complement) {
+    if(sorting.isEmpty())
         return;
+
+    QString complement;
+    if(_complement != sortingFormated)
+        complement = _complement;
 
     isUpdating = true;
     for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
-        if(ui->checks->topLevelItem(i)->text(0) == check) {
-            if(ui->checks->topLevelItem(i)->isHidden())         ui->checks->topLevelItem(i)->setHidden(false);
-            if(ui->checks->topLevelItem(i)->text(1) != value)   ui->checks->topLevelItem(i)->setText(1, value);
-            if(!value.isEmpty()) {
-                ui->checks->setColumnHidden(1, false);
+        if(ui->checks->topLevelItem(i)->text(0) == sorting) {
+            if(ui->checks->topLevelItem(i)->isHidden())                    ui->checks->topLevelItem(i)->setHidden(false);
+            if((!sortingFormated.isEmpty()) && (ui->checks->topLevelItem(i)->text(1) != sortingFormated))
+                ui->checks->topLevelItem(i)->setText(1, sortingFormated);
+            if(ui->checks->topLevelItem(i)->text(2) != complement)         ui->checks->topLevelItem(i)->setText(2, complement);
+            if(!complement.isEmpty()) {
+                ui->checks->setColumnHidden(2, false);
                 ui->checks->setColumnWidth(0, 150);
             }
             isUpdating = false;
@@ -271,19 +321,33 @@ void Sorting::addCheck(const QString &check, const QString &value) {
         }
     }
 
-    QTreeWidgetItem *checkItem = new QTreeWidgetItem(ui->checks, QStringList() << check << value);
+    QTreeWidgetItem *checkItem = new QTreeWidgetItem(ui->checks, QStringList() << sorting << sortingFormated << complement);
     checkItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
-    checkItem->setCheckState(0, Qt::Checked);
-    if(!value.isEmpty()) {
-        ui->checks->setColumnHidden(1, false);
+    checkItem->setCheckState(1, Qt::Checked);
+    if(!complement.isEmpty()) {
+        ui->checks->setColumnHidden(2, false);
         ui->checks->setColumnWidth(0, 150);
     }
     isUpdating = false;
 }
 void Sorting::addCheckEnd() {
+    asNumber      = (!asDate);
+    asNumberRange = qMakePair(9999999., -9999999.);
     for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
-        if((!ui->checks->topLevelItem(i)->isHidden()) && (ui->checks->topLevelItem(i)->checkState(0) == Qt::Checked))
-            criteriaFormatedRealCache << ui->checks->topLevelItem(i)->text(0);
+        if((!ui->checks->topLevelItem(i)->isHidden()) && (ui->checks->topLevelItem(i)->checkState(1) == Qt::Checked)) {
+            criteriaFormatedRealCacheRaw << ui->checks->topLevelItem(i)->text(0);
+            if(ui->checks->topLevelItem(i)->text(1).isEmpty())  criteriaFormatedRealCacheFormated << ui->checks->topLevelItem(i)->text(0);
+            else                                                criteriaFormatedRealCacheFormated << ui->checks->topLevelItem(i)->text(1);
+            if(!asDate) {
+                bool testIfNumber = false;
+                qreal val = toDouble(ui->checks->topLevelItem(i)->text(0), &testIfNumber);
+                if(testIfNumber) {
+                    asNumberRange.first  = qMin(asNumberRange.first,  val);
+                    asNumberRange.second = qMax(asNumberRange.second, val);
+                }
+                asNumber &= testIfNumber;
+            }
+        }
     }
 }
 
@@ -328,4 +392,34 @@ qreal Sorting::stringToTime(const QString &timeStr) {
             time = timeParts.last().toDouble() + timeParts.at(timeParts.count() - 2).toDouble() * 60;
     }
     return time;
+}
+
+qreal Sorting::toDouble(const MetadataElement &elmt, bool *ok) {
+    return toDouble(elmt.toString(), ok);
+}
+qreal Sorting::toDouble(const QString &str, bool *ok) {
+    qint16 indexOfSpace = str.indexOf(" ");
+    if(indexOfSpace > 0) {
+        qreal val = str.left(indexOfSpace).toDouble(ok), factor = 1;
+        QString unit = str.mid(indexOfSpace).trimmed();
+        if(unit.length() > 1) {
+            if((unit.startsWith("n")) || (unit.startsWith("N")))
+                factor = 0.0000000001;
+            else if(unit.startsWith("µ"))
+                factor = 0.000001;
+            else if(unit.startsWith("m"))
+                factor = 0.001;
+            else if((unit.startsWith("c")) || (unit.startsWith("C")))
+                factor = 0.01;
+            else if((unit.startsWith("k")) || (unit.startsWith("K")))
+                factor = 1000;
+            else if(unit.startsWith("M"))
+                factor = 1000000;
+            else if((unit.startsWith("t")) || (unit.startsWith("T")))
+                factor = 1000000000;
+        }
+        val *= factor;
+        return val;
+    }
+    return str.toDouble(ok);
 }

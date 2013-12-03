@@ -19,15 +19,24 @@ public:
     explicit Tag(DocumentBase *_document, qint16 _documentVersion = -1);
 
 private:
-    qreal          timeStart, timeEnd;
-    qreal          progression;
-    qint16         documentVersion;
+    qreal   timeStart, timeEnd;
+    qint16  documentVersion;
+    TagType type;
+public:
     QList<QString> linkedRenders;
+    QList<Tag*>    linkedTags;
+public:
+    inline qreal getTimeStart() const { return timeStart; }
+    inline qreal getTimeEnd()   const { return timeEnd;   }
+    inline TagType getType()    const { return type;      }
+    void setType(TagType _type, qreal time);
+
+
+private:
+    qreal          progression;
     DocumentBase  *document;
 public:
     QAction       *timelineFilesAction;
-    QList<Tag*>    linkedTags;
-    TagType        type;
     PlayerVideo   *player;
 
 public:
@@ -35,7 +44,7 @@ public:
 
 public:
     void create(TagType _type, qreal _timeStart, qreal _duration = 10, bool debug = false);
-    const QString getTitle() const;
+    const QString getTitle() const { return document->getName(documentVersion); }
     inline qint16 getDocumentVersion() const {  return document->getMetadataIndexVersion(documentVersion); }
 
 private:
@@ -52,9 +61,11 @@ public:
     inline bool  contains(qreal time)      const { return (getTimeStart() <= time) && (time <= (getTimeStart() + qMax(1., getDuration()))); }
     inline qreal progress(qreal time)      const { return qBound(0., progressAbs(time), 1.); }
     inline qreal progressAbs(qreal time)   const { return (time - getTimeStart()) / qMax(1., getDuration()); }
-    inline qreal getTimeStart()            const { return timeStart; }
-    inline qreal getTimeEnd()              const { return timeEnd;   }
-    inline qreal getDuration()             const { return timeEnd - timeStart; }
+    inline qreal getDuration(bool drawable = false) const {
+        if((drawable) && (getType() == TagTypeContextualMilestone))
+            return 0;
+        return timeEnd - timeStart;
+    }
     inline DocumentBase* getDocument()     const { return document; }
     inline bool timelineContains (const QPointF &pos) const {    return (timelineBoundingRect.translated(timelinePos).translated(0, Global::timelineHeaderSize.height()).contains(pos)); }
     inline bool viewerContains   (const QPointF &pos) const {    return (viewerBoundingRect.translated(viewerPos).contains(pos));    }
@@ -67,7 +78,6 @@ public:
         return qBound(0., (pos.y() - rect.y()) / rect.height(), 1.);
     }
     void snapTime(qreal *time) const;
-    void setType(TagType _type, qreal time);
     void setTimeStart(qreal _timeStart);
     void setTimeEnd(qreal _timeEnd);
     void moveTo(qreal _val);
@@ -115,7 +125,7 @@ public:
     bool isAcceptableWithFilterFilters    (bool strongCheck) const;
     bool isAcceptableWithHorizontalFilters(bool strongCheck) const;
     const QString getAcceptableWithClusterFilters() const;
-    static bool sortCriteriaColor(const Tag *first, const Tag *second);
+    static bool sortColor (const Tag *first, const Tag *second);
     static bool sortViewer(const Tag *first, const Tag *second);
     static bool sortEvents(const Tag *first, const Tag *second);
     static bool sortAlpha (const Tag *first, const Tag *second);

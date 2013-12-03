@@ -261,8 +261,8 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
             }
             else {
                 if(stay) {
-                    if(selectedTag->type == TagTypeContextualMilestone) selectedTag->setType(TagTypeContextualTime,      Global::currentProject->getTimelineCursorTime(mousePos));
-                    else if(selectedTag->type == TagTypeContextualTime) selectedTag->setType(TagTypeContextualMilestone, Global::currentProject->getTimelineCursorTime(mousePos));
+                    if(selectedTag->getType() == TagTypeContextualMilestone) selectedTag->setType(TagTypeContextualTime,      Global::currentProject->getTimelineCursorTime(mousePos));
+                    else if(selectedTag->getType() == TagTypeContextualTime) selectedTag->setType(TagTypeContextualMilestone, Global::currentProject->getTimelineCursorTime(mousePos));
                     Global::selectedTagStartDrag = (selectedTag->getTimeEnd() - selectedTag->getTimeStart()) / 2;
                 }
                 if((e) && (mouseTimerPos != e->pos())) {

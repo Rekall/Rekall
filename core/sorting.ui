@@ -447,14 +447,19 @@ QPushButton:hover {
          <bool>true</bool>
         </property>
         <property name="columnCount">
-         <number>2</number>
+         <number>3</number>
         </property>
         <attribute name="headerVisible">
          <bool>true</bool>
         </attribute>
         <column>
          <property name="text">
-          <string notr="true">Matching values</string>
+          <string>Sorting</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string notr="true">Values</string>
          </property>
         </column>
         <column>
@@ -490,6 +495,13 @@ QPushButton:hover {
          <widget class="QPushButton" name="checkAll">
           <property name="text">
            <string>Check</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="sorting">
+          <property name="text">
+           <string>Reset sorting</string>
           </property>
          </widget>
         </item>
@@ -633,8 +645,8 @@ QPushButton:hover {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>88</x>
-     <y>238</y>
+     <x>84</x>
+     <y>237</y>
     </hint>
     <hint type="destinationlabel">
      <x>90</x>
@@ -665,8 +677,8 @@ QPushButton:hover {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>158</x>
-     <y>241</y>
+     <x>165</x>
+     <y>237</y>
     </hint>
     <hint type="destinationlabel">
      <x>158</x>
@@ -703,6 +715,22 @@ QPushButton:hover {
     <hint type="destinationlabel">
      <x>470</x>
      <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sorting</sender>
+   <signal>released()</signal>
+   <receiver>Sorting</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>274</x>
+     <y>231</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>278</x>
+     <y>378</y>
     </hint>
    </hints>
   </connection>

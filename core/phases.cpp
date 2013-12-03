@@ -47,7 +47,6 @@ void Phases::setStyleSheet2(const QString &str) {
 
 
 void Phases::addCheckEnd() {
-    qDebug("Period rules");
     quint16 index = 0;
 
     if(ui->allow->isChecked()) {

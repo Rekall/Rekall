@@ -22,11 +22,12 @@ Player::~Player() {
 void Player::load(void *_tag) {
     Tag *tag = (Tag*)_tag;
     if(!tags.contains(tag)) {
-        if(tag->player)
+        if(tag->player) {
             tags.append(tag);
-        tag->player->setParent(ui->globalFramePlayer);
-        tag->player->window = this;
-        tag->player->setVisible(true);
+            tag->player->setParent(ui->globalFramePlayer);
+            tag->player->window = this;
+            tag->player->setVisible(true);
+        }
         play(Global::timerPlay);
         seek(Global::time);
         resizeEvent(0);
@@ -36,9 +37,11 @@ void Player::unload(void *_tag) {
     Tag *tag = (Tag*)_tag;
     if(tags.contains(tag)) {
         tags.removeOne(tag);
-        tag->player->pause();
-        tag->player->setVisible(false);
-        tag->player->setParent(0);
+        if(tag->player) {
+            tag->player->pause();
+            tag->player->setVisible(false);
+            tag->player->setParent(0);
+        }
         resizeEvent(0);
     }
 }
@@ -60,7 +63,8 @@ void Player::setVolume(qreal _volumeMaster) {
     volumeMaster = _volumeMaster;
 
     foreach(Tag *tag, tags)
-        tag->player->setVolume(-1, volumeMaster);
+        if(tag->player)
+            tag->player->setVolume(-1, volumeMaster);
 
     if(sender() != ui->volume)
         ui->volume->setValue(ui->volume->maximum() * volumeMaster);
@@ -100,10 +104,12 @@ void Player::forceResizeEvent() {
 
     //Player
     foreach(Tag *tag, tags)
-        if(     (tag->player) && ( tag->player->isVideo) && (tag->player->isDisplayed()))
-            videos << tag;
-        else if (tag->player)
-            audios << tag;
+        if(tag->player) {
+            if((tag->player->isVideo) && (tag->player->isDisplayed()))
+                videos << tag;
+            else
+                audios << tag;
+        }
 
     //Space division
     QRect videoSpace(QPoint(0, 0), QSize(width(), height() - ui->globalFrameTransparent->height() - (qCeil((qreal)audios.count() / 2.) * 40)));
@@ -133,13 +139,16 @@ void Player::resizeEvent(QResizeEvent *) {
 
 void Player::seek(qreal time) {
     foreach(Tag *tag, tags)
-        tag->player->seek(qBound(0., (tag->getDocument()->getMetadata("Rekall", "Media Offset").toDouble() + time - tag->getTimeStart()) * 1000., (qreal)tag->player->totalTime()));
+        if(tag->player)
+            tag->player->seek(qBound(0., (tag->getDocument()->getMetadata("Rekall", "Media Offset").toDouble() + time - tag->getTimeStart()) * 1000., (qreal)tag->player->totalTime()));
 }
 void Player::play(bool state) {
     foreach(Tag *tag, tags) {
         if(tag->contains(Global::time)) {
-            if(state)   tag->player->play();
-            else        tag->player->pause();
+            if(tag->player) {
+                if(state)   tag->player->play();
+                else        tag->player->pause();
+            }
         }
     }
 }

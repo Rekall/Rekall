@@ -15,6 +15,7 @@ void TaskProcess::init() {
 void TaskProcess::run() {
     taskStarted = true;
     if(processedDocument.type == TaskProcessTypeMetadata) {
+        qreal mediaDuration = 0;
         processedDocument.metadata->status = DocumentStatusProcessing;
         emit(updateList(this, FeedItemBaseTypeProcessingStart));
         emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Starting analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
@@ -42,14 +43,15 @@ void TaskProcess::run() {
                 if(meta.second.first.toLower().contains("duration")) {
                     qreal duration = Global::getDurationFromString(meta.second.second);
                     if(duration) {
-                        processedDocument.metadata->mediaDuration = duration;
+                        mediaDuration = duration;
+                        processedDocument.metadata->setMetadata("Rekall", "Media Offset",   0, processedDocument.version);
                         processedDocument.metadata->setMetadata("Rekall", "Media Duration", duration, processedDocument.version);
                     }
                 }
                 if(meta.second.first.toLower().contains("author"))
-                    processedDocument.metadata->setMetadata("Rekall", "Author",   meta.second.second, processedDocument.version);
+                    processedDocument.metadata->setMetadata("Rekall", "Author", meta.second.second, processedDocument.version);
                 if(meta.second.first.toLower().contains("file size"))
-                    processedDocument.metadata->setMetadata("Rekall", "Size",     meta.second.second, processedDocument.version);
+                    processedDocument.metadata->setMetadata("Rekall", "Size",   meta.second.second, processedDocument.version);
                 if(meta.second.first.toLower().contains("keywords"))
                     processedDocument.metadata->addKeyword(meta.second.second, processedDocument.version);
             }
@@ -58,7 +60,7 @@ void TaskProcess::run() {
         QString thumbFilepath = Global::cacheFile("thumb", processedDocument.metadata->file);
 
         //Image thumb
-        if(processedDocument.metadata->type == DocumentTypeImage) {
+        if(processedDocument.metadata->getType() == DocumentTypeImage) {
             emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating picture thumbnail of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
             QString thumbFilename = thumbFilepath + ".jpg";
             if(!QFileInfo(thumbFilename).exists()) {
@@ -74,7 +76,7 @@ void TaskProcess::run() {
         }
 
         //Waveform
-        if((processedDocument.metadata->type == DocumentTypeAudio) || (processedDocument.metadata->type == DocumentTypeVideo)) {
+        if((processedDocument.metadata->getType() == DocumentTypeAudio) || (processedDocument.metadata->getType() == DocumentTypeVideo)) {
             emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating audio waveform of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
             QString thumbFilenameIntermediate = thumbFilepath + ".raw", thumbFilename = thumbFilepath + ".peak";
 
@@ -144,10 +146,10 @@ void TaskProcess::run() {
         }
 
         //Video thumbnails
-        if(processedDocument.metadata->type == DocumentTypeVideo) {
+        if(processedDocument.metadata->getType() == DocumentTypeVideo) {
             emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating video thumbnails of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
             //qDebug("===> %s", qPrintable(QDir(Global::pathCurrent.absoluteFilePath() + "/").relativeFilePath(data.metadata->file.absoluteFilePath())));
-            quint16 thumbsNumber = qCeil(processedDocument.metadata->mediaDuration / Global::thumbsEach);
+            quint16 thumbsNumber = qCeil(mediaDuration / Global::thumbsEach);
             if(!QFileInfo(thumbFilepath + "_1.jpg").exists()) {
                 launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/ffmpeg", thumbFilepath, QStringList()
                                               << "-i" << processedDocument.metadata->file.absoluteFilePath()
@@ -174,7 +176,7 @@ void TaskProcess::run() {
         }
 
         //People
-        if(processedDocument.metadata->type == DocumentTypePeople) {
+        if(processedDocument.metadata->getType() == DocumentTypePeople) {
             QList<Person*> persons = Person::fromFile(processedDocument.metadata->file.absoluteFilePath());
             foreach(Person *person, persons)
                 Global::currentProject->addPerson(person);
