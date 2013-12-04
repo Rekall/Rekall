@@ -127,7 +127,6 @@ protected: //TO SAVE
     QList<QMetaDictionnay> metadatas;
 public: //TO CLEAN
     QFileInfo file;
-    QDir      dirBase;
 
 public:
     DocumentStatus   status;
@@ -140,7 +139,7 @@ protected:
     QImage photo;
 
 public:
-    bool updateFile(const QFileInfo &file, qint16 version = -1, quint16 falseInfoForTest = 0);
+    bool updateFile(const QFileInfo &file, const QDir &dirBase = QDir(), qint16 version = -1, quint16 falseInfoForTest = 0);
     bool updateImport(const QString &name, qint16 version = -1);
     bool updateCard(const PersonCard &card, qint16 version = -1);
     void updateFeed();
@@ -172,19 +171,20 @@ public:
     inline const QString getName         (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getNameCache;          }
     inline const QString getAuthor       (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getAuthorCache;        }
     inline const QString getTypeStr      (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getTypeStrCache;       }
-    inline       qreal   getMediaOffset  (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getMediaOffsetCache;   }
-    inline       qreal   getMediaDuration(qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getMediaDurationCache; }
     inline const QString getSnapshot     (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getSnapshotCache;      }
     inline const QString getUserName     (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getUserNameCache;      }
     inline DocumentFunction getFunction  (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getFunctionCache;      }
     inline DocumentType     getType      (qint16 version = -1) const {  return metadatas.at(getMetadataIndexVersion(version)).getTypeCache;          }
+    inline       qreal   getMediaDuration(qint16 version = -1) const {
+        if(getFunction(version) == DocumentFunctionRender)  return metadatas.at(getMetadataIndexVersion(version)).getMediaDurationCache;
+        else                                                return 0;
+    }
     inline void getCacheRefreshed(qint16 version) {
         metadatas[version].getNameCache     = getMetadata("Rekall", "Name",     version).toString();
         metadatas[version].getAuthorCache   = getMetadata("Rekall", "Author",   version).toString();
         metadatas[version].getTypeStrCache  = getMetadata("Rekall", "Type",     version).toString();
         metadatas[version].getSnapshotCache = getMetadata("Rekall", "Snapshot", version).toString().toLower();
         metadatas[version].getUserNameCache = getMetadata("Rekall User Infos", "User Name", version).toString();
-        metadatas[version].getMediaOffsetCache   = Sorting::toDouble(getMetadata("Rekall", "Media Offset",   version).toString());
         metadatas[version].getMediaDurationCache = Sorting::toDouble(getMetadata("Rekall", "Media Duration", version).toString());
 
         if(getMetadata("Rekall", "Media Function", version).toString().toLower() == "render")   metadatas[version].getFunctionCache = DocumentFunctionRender;

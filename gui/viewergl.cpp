@@ -98,7 +98,7 @@ void ViewerGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
     if(Global::selectedTagInAction) {
         Tag *selectedTag = (Tag*)Global::selectedTagInAction;
         if(Global::selectedTagMode == TagSelectionMove)
-            selectedTag->moveTo(Global::currentProject->getViewerCursorTime(mousePos));
+            selectedTag->addTimeStartOffset(Global::currentProject->getViewerCursorTime(mousePos));
         action = false;
     }
     if(e) {

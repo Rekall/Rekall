@@ -7,7 +7,7 @@ Rekall::Rekall(QWidget *parent) :
     ui->setupUi(this);
     setAcceptDrops(true);
     currentProject = 0;
-    metaIsChanging = false;
+    metaIsChanging = chutierIsUpdating = false;
     openProject    = true;
 
     Global::userInfos = new UserInfos();
@@ -85,6 +85,7 @@ Rekall::Rekall(QWidget *parent) :
     Global::showHelp.setAction(ui->actionInlineHelp);
     connect(ui->actionSave, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionPaste, SIGNAL(triggered()), SLOT(action()));
+    connect(ui->actionRemove, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionMarker, SIGNAL(triggered(bool)), SLOT(action()));
     connect(ui->actionMarkerLong, SIGNAL(triggered(bool)), SLOT(action()));
     connect(&Global::showHelp, SIGNAL(triggered(bool)), SLOT(showHelp(bool)));
@@ -244,12 +245,14 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
             }
             */
             foreach(Document *droppedDocument, droppedDocuments) {
+                /*
                 Tag *tag = new Tag(droppedDocument);
-                tag->create(TagTypeContextualTime, currentProject->getTimelineCursorTime(Global::timelineGL->mapFromGlobal(QCursor::pos()) + Global::timelineGL->scroll), 10);
+                tag->init(TagTypeContextualTime, currentProject->getTimelineCursorTime(Global::timelineGL->mapFromGlobal(QCursor::pos()) + Global::timelineGL->scroll), 10);
                 currentProject->addTag(tag);
                 if(droppedDocument->chutierItem)
                     Global::chutier->setCurrentItem(droppedDocument->chutierItem);
                 retour = true;
+                */
             }
             Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
         }
@@ -279,6 +282,14 @@ void Rekall::action() {
     }
     else if(sender() == ui->actionMarkerLong) {
         Global::timeline->actionMarkerAddStart();
+    }
+    else if(sender() == ui->actionRemove) {
+        if(Global::selectedTag) {
+            Tag *tag = (Tag*)Global::selectedTag;
+            tag->getDocument()->removeTag(tag);
+            Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+            Global::selectedTag = Global::selectedTagHover = Global::selectedTagInAction = 0;
+        }
     }
 }
 void Rekall::actionForceGL() {
@@ -316,23 +327,43 @@ void Rekall::closeSplash() {
 }
 
 
+
+
 void Rekall::refreshMetadata() {
-    if(!metaIsChanging)
+    if(!metaIsChanging) {
+        chutierIsUpdating = true;
         chutierItemChanged(ui->chutier->getTree()->currentItem(), ui->chutier->getTree()->currentItem());
+        chutierIsUpdating = false;
+    }
 }
 void Rekall::refreshAndLastMetadata() {
-    if(!metaIsChanging)
+    if(!metaIsChanging) {
+        chutierIsUpdating = true;
         chutierItemChanged(ui->chutier->getTree()->currentItem(), 0);
+        chutierIsUpdating = false;
+    }
+}
+void Rekall::refreshMetadata(void *_tag, bool inChutier) {
+    Tag *tag = (Tag*)_tag;
+    if(inChutier) {
+        chutierIsUpdating = true;
+        Global::chutier->setCurrentItem(tag->getDocument()->chutierItem);
+        chutierItemChanged(ui->chutier->getTree()->currentItem(), ui->chutier->getTree()->currentItem(), tag);
+        chutierIsUpdating = false;
+    }
+    else
+        displayMetadata(tag->getDocument(), tag, ui->chutier->getTree(), 0, 0);
 }
 void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB, Tag *tag) {
     if(item) {
-        currentDocument = currentProject->getDocumentAndSelect(((UiFileItem*)item)->filename.file.absoluteFilePath());
+        if(tag) currentDocument = (Document*)tag->getDocument();
+        else    currentDocument = currentProject->getDocumentAndSelect(((UiFileItem*)item)->filename.file.absoluteFilePath());
         displayMetadata(currentDocument, tag, ui->chutier->getTree(), item, itemB);
 
         if((currentDocument) && (sender() == ui->chutier->getTree()))
             ui->metadataSlider->setValue(currentDocument->getMetadataCountM());
 
-        if(currentDocument) {
+        if((currentDocument) && (!chutierIsUpdating)) {
             foreach(Tag *documentTag, currentDocument->tags) {
                 if(documentTag->getDocumentVersion() == ui->metadataSlider->value()) {
                     Global::selectedTag = documentTag;
@@ -346,15 +377,7 @@ void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB, T
 void Rekall::showPreviewTab() {
     ui->toolBoxRight->setCurrentIndex(1);
 }
-void Rekall::refreshMetadata(void *_tag, bool inChutier) {
-    Tag *tag = (Tag*)_tag;
-    if(inChutier) {
-        Global::chutier->setCurrentItem(tag->getDocument()->chutierItem);
-        chutierItemChanged(ui->chutier->getTree()->currentItem(), ui->chutier->getTree()->currentItem(), tag);
-    }
-    else
-        displayMetadata(tag->getDocument(), tag, ui->chutier->getTree(), 0, 0);
-}
+
 
 void Rekall::personItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
     if(item)

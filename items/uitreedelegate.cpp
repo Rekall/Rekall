@@ -8,15 +8,15 @@ UiTreeDelegate::UiTreeDelegate(const UiTreeViewOptions &_options, QAbstractItemM
 QWidget *UiTreeDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const {
     if(options.type.startsWith("spin")) {
         QSpinBox *editor = new QSpinBox(parent);
-        editor->setMinimum(-999999);
-        editor->setMaximum( 999999);
+        editor->setMinimum(-9999999);
+        editor->setMaximum( 9999999);
         editor->setStyleSheet(options.styleSheet);
         return editor;
     }
     else if(options.type.startsWith("doublespin")) {
         QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
-        editor->setMinimum(-999999);
-        editor->setMaximum( 999999);
+        editor->setMinimum(-9999999);
+        editor->setMaximum( 9999999);
         editor->setDecimals(2);
         editor->setStyleSheet(options.styleSheet);
         return editor;

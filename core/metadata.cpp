@@ -32,11 +32,10 @@ Metadata::Metadata(QObject *parent, bool createEmpty) :
 Metadata::~Metadata() {
 }
 
-bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseInfoForTest) {
-    bool creation = false;
+bool Metadata::updateFile(const QFileInfo &_file, const QDir &dirBase, qint16 version, quint16 falseInfoForTest) {
     file = _file;
     file.refresh();
-    creation = updateImport(file.baseName(), version);
+    bool anEmptyMetaWasCreated = updateImport(file.baseName(), version);
     setType(DocumentTypeFile);
 
     QFileInfoList filesContext = file.absoluteDir().entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
@@ -45,9 +44,6 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
         fileContextVerbose += ((fileContext.isDir())?("[DIR] "):("")) + fileContext.fileName() + ", ";
     fileContextVerbose.chop(2);
 
-    QDir dirBaseParent = dirBase;
-    dirBaseParent.cdUp();
-
     setMetadata("File",   "Basename",                file.baseName(), version);
     setMetadata("File",   "Owner",                   file.owner(),    version);
     setMetadata("File",   "File Creation Date/Time", file.created(),  version);
@@ -55,9 +51,14 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     if(falseInfoForTest > 0)    setMetadata("File", "File Modification Date/Time", file.lastModified().addMonths(falseInfoForTest), version);
     else                        setMetadata("File", "File Modification Date/Time", file.lastModified(), version);
     setMetadata("Rekall", "Date/Time", getMetadata("File", "File Modification Date/Time", version), version);
-    setMetadata("Rekall", "Folder", QString(file.absoluteDir().absolutePath() + "/").remove(dirBaseParent.absolutePath() + "/"), version);
     setMetadata("Rekall", "Extension",                   file.suffix().toUpper(), version);
     //setMetadata("Rekall", "File context",                fileContextVerbose,      version);
+
+    if(dirBase.exists()) {
+        QDir dirBaseParent = dirBase;
+        dirBaseParent.cdUp();
+        setMetadata("Rekall", "Folder", QString(file.absoluteDir().absolutePath() + "/").remove(dirBaseParent.absolutePath() + "/"), version);
+    }
 
 
     //Type
@@ -81,18 +82,18 @@ bool Metadata::updateFile(const QFileInfo &_file, qint16 version, quint16 falseI
     }
     addKeyword(documentKeywords, version);
 
-    if(creation) {
+    if(anEmptyMetaWasCreated) {
         status = DocumentStatusWaiting;
         Global::taskList->addTask(this, TaskProcessTypeMetadata, version);
     }
 
-    return creation;
+    return anEmptyMetaWasCreated;
 }
 bool Metadata::updateImport(const QString &name, qint16 version) {
-    bool creation = false;
+    bool anEmptyMetaWasCreated = false;
     if(version < 0) {
         metadatas.append(QMetaDictionnay());
-        creation = true;
+        anEmptyMetaWasCreated = true;
     }
 
     if(!file.exists())
@@ -114,7 +115,7 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     if(name.toLower().contains("captation"))
         setFunction(DocumentFunctionRender, version);      
 
-    return creation;
+    return anEmptyMetaWasCreated;
 }
 
 bool Metadata::updateCard(const PersonCard &card, qint16 version) {

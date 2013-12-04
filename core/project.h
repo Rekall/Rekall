@@ -32,11 +32,6 @@ public:
         Global::mainWindow->personsTreeWidget->addTopLevelItem(person);
         persons.append(person);
     }
-    void addTag(Tag *tag) {
-        Document *document = (Document*)tag->getDocument();
-        document->tags.append(tag);
-    }
-
 
 private:
     QList<Tag*> viewerTags, eventsTags;

@@ -233,10 +233,7 @@ void Timeline::actionMarkerAddStart() {
     else {
         Document *marker = new Document(Global::currentProject);
         marker->updateImport(tr("Marker"));
-        Tag *tag = new Tag(marker);
-        tag->create(TagTypeContextualTime, Global::time, 0);
-        Global::timeMarkerAdded = tag;
-        marker->tags.append(tag);
+        Global::timeMarkerAdded = marker->createTag(TagTypeContextualTime, Global::time);
         marker->updateFeed();
 
         actionMarkerAddStarted.restart();

@@ -9,6 +9,7 @@
 class DocumentBase : public Metadata {
 public:
     explicit DocumentBase(QObject *parent = 0) : Metadata(parent) { }
+    virtual void removeTag(void *tag) = 0;
 };
 
 
@@ -19,17 +20,23 @@ public:
     explicit Tag(DocumentBase *_document, qint16 _documentVersion = -1);
 
 private:
-    qreal   timeStart, timeEnd;
-    qint16  documentVersion;
+    qreal   timeStart, timeEnd, timeMediaOffset;
     TagType type;
 public:
+    qint16  documentVersion;
     QList<QString> linkedRenders;
     QList<Tag*>    linkedTags;
 public:
-    inline qreal getTimeStart() const { return timeStart; }
-    inline qreal getTimeEnd()   const { return timeEnd;   }
-    inline TagType getType()    const { return type;      }
-    void setType(TagType _type, qreal time);
+    inline qreal   getTimeStart()       const { return timeStart; }
+    inline qreal   getTimeEnd()         const { return timeEnd;   }
+    inline qreal   getTimeMediaOffset() const { return timeMediaOffset; }
+    inline TagType getType()            const { return type;      }
+    void setTimeStart      (qreal _timeStart);
+    void setTimeEnd        (qreal _timeEnd);
+    void setTimeMediaOffset(qreal _timeMediaOffset);
+    void setType           (TagType _type, qreal time);
+    void addTimeStartOffset(qreal offset);
+    void addTimeMediaOffset(qreal offset);
 
 
 private:
@@ -43,9 +50,10 @@ public:
     QList<Tag*> historyTags, hashTags;
 
 public:
-    void create(TagType _type, qreal _timeStart, qreal _duration = 10, bool debug = false);
+    void init(TagType _type, qreal _timeStart, qreal _duration = 0, bool debug = false);
     const QString getTitle() const { return document->getName(documentVersion); }
     inline qint16 getDocumentVersion() const {  return document->getMetadataIndexVersion(documentVersion); }
+    inline void   setDocumentVersion()       {  documentVersion = getDocumentVersion(); }
 
 private:
     bool   timelineWasInside, isInProgress;
@@ -78,19 +86,17 @@ public:
         return qBound(0., (pos.y() - rect.y()) / rect.height(), 1.);
     }
     void snapTime(qreal *time) const;
-    void setTimeStart(qreal _timeStart);
-    void setTimeEnd(qreal _timeEnd);
-    void moveTo(qreal _val);
     void fireEvents();
 
 private:
     GlText  viewerTimeText, viewerDocumentText, timelineTimeStartText, timelineTimeEndText, timelineTimeDurationText;
     GlRect  viewerTimePastille;
-    qreal   tagScale, tagDestScale;
     bool    timelineFirstPos, timelineFirstPosVisible;
     bool    viewerFirstPos, viewerFirstPosVisible;
     QRectF  timelineBoundingRect, viewerBoundingRect;
+    qreal   tagDestScale;
 public:
+    qreal   tagScale;
     QPointF timelinePos, timelineDestPos;
     QPointF viewerPos,   viewerDestPos;
 public:

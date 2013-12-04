@@ -202,71 +202,44 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
     bool action = true;
     QCursor cursor = Qt::ArrowCursor;
 
-    //Légende
-    /*
-    if(showLegend > 0.01) {
-        qreal legendBaseSize = qBound(200., height() * 0.75, 400.);
-        QRectF legendRect = QRectF(width() - legendBaseSize * 1.2, height() - showLegend * legendBaseSize, legendBaseSize * 1.2, legendBaseSize);
-        legendBaseSize *= 0.8;
-        //glTranslatef(qRound(legendRect.center().x()), qRound(legendRect.center().y()), 0);
-        qreal angle = -M_PI/2, angleStep = 0;
-        QMapIterator<QString, QPair<QColor, qreal> > colorForMetaIterator(Global::colorForMeta);
-        while(colorForMetaIterator.hasNext()) {
-            colorForMetaIterator.next();
-            angleStep = 2 * M_PI * colorForMetaIterator.value().second * showLegend;
-
-            qreal legendRadiusL = legendBaseSize;
-            qreal legendRadiusS = legendBaseSize * 0.8;
-
-            qglColor(colorForMetaIterator.value().first);
-            for(qreal angleSmooth = angle ; angleSmooth <= angle + angleStep ; angleSmooth += 0.01) {
-                glVertex2f(qCos(angleSmooth) * legendRadiusL/2, qSin(angleSmooth) * legendRadiusL/2);
-                glVertex2f(qCos(angleSmooth) * legendRadiusS/2, qSin(angleSmooth) * legendRadiusS/2);
-            }
-            angle += angleStep;
-        }
-    }
-    */
-
     if(Global::selectedTagHover)
         cursor = Qt::PointingHandCursor;
     if(Global::selectedTagInAction) {
-        Tag *selectedTag = (Tag*)Global::selectedTagInAction;
+        Tag *tag = (Tag*)Global::selectedTagInAction;
 
         if((e) && ((e->button() & Qt::RightButton) == Qt::RightButton)) {
-            /*
-            tagMenu->clear();
-            QAction *toGlobal = 0, *toContextual = 0;
-            if(selectedTag->type == TagTypeGlobal)  toGlobal     = tagMenu->addAction("Convert to global document");
-            else                                    toContextual = tagMenu->addAction("Convert to contextual document");
-            QAction *retour = tagMenu->exec(QCursor::pos());
-            if(retour) {
-                if(retour == toGlobal) {
-
-                }
-                else if(retour == toContextual) {
-
-                }
-            }
-            */
         }
         else {
             if(Global::selectedTagMode == TagSelectionStart) {
-                selectedTag->setTimeStart(Global::currentProject->getTimelineCursorTime(mousePos));
+                tag->setTimeStart(Global::currentProject->getTimelineCursorTime(mousePos));
                 cursor = Qt::SizeHorCursor;
             }
             else if(Global::selectedTagMode == TagSelectionEnd) {
-                selectedTag->setTimeEnd(Global::currentProject->getTimelineCursorTime(mousePos));
+                tag->setTimeEnd(Global::currentProject->getTimelineCursorTime(mousePos));
                 cursor = Qt::SizeHorCursor;
+            }
+            else if(Global::selectedTagMode == TagSelectionMediaOffset) {
+                tag->addTimeMediaOffset(Global::selectedTagStartDrag - Global::currentProject->getTimelineCursorTime(mousePos));
+                Global::selectedTagStartDrag = Global::currentProject->getTimelineCursorTime(mousePos);
+                cursor = Qt::ClosedHandCursor;
+            }
+            else if(Global::selectedTagMode == TagSelectionDuplicate) {
+                Global::selectedTagHover = Global::selectedTagInAction = Global::selectedTag = ((Document*)tag->getDocument())->createTag(tag);
+                Global::selectedTagMode  = TagSelectionMove;
+                Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+                //selectedTag->addTimeMediaOffset(Global::selectedTagStartDrag - Global::currentProject->getTimelineCursorTime(mousePos));
+                //Global::selectedTagStartDrag = Global::currentProject->getTimelineCursorTime(mousePos);
+                //cursor = Qt::ClosedHandCursor;
             }
             else {
                 if(stay) {
-                    if(selectedTag->getType() == TagTypeContextualMilestone) selectedTag->setType(TagTypeContextualTime,      Global::currentProject->getTimelineCursorTime(mousePos));
-                    else if(selectedTag->getType() == TagTypeContextualTime) selectedTag->setType(TagTypeContextualMilestone, Global::currentProject->getTimelineCursorTime(mousePos));
-                    Global::selectedTagStartDrag = (selectedTag->getTimeEnd() - selectedTag->getTimeStart()) / 2;
+                    if(     tag->getType() == TagTypeContextualMilestone) tag->setType(TagTypeContextualTime,      Global::currentProject->getTimelineCursorTime(mousePos));
+                    else if(tag->getType() == TagTypeContextualTime)      tag->setType(TagTypeContextualMilestone, Global::currentProject->getTimelineCursorTime(mousePos));
+
+                    Global::selectedTagStartDrag = (tag->getTimeEnd() - tag->getTimeStart()) / 2;
                 }
                 if((e) && (mouseTimerPos != e->pos())) {
-                    selectedTag->moveTo(Global::currentProject->getTimelineCursorTime(mousePos) - Global::selectedTagStartDrag);
+                    tag->addTimeStartOffset(Global::currentProject->getTimelineCursorTime(mousePos) - Global::selectedTagStartDrag);
                     cursor = Qt::ClosedHandCursor;
                 }
             }

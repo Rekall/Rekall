@@ -942,6 +942,7 @@ QMenu::item:enabled:selected {
     <addaction name="separator"/>
     <addaction name="actionMarker"/>
     <addaction name="actionMarkerLong"/>
+    <addaction name="actionRemove"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -1025,6 +1026,14 @@ QMenu::item:enabled:selected {
    </property>
    <property name="shortcut">
     <string>Shift+M</string>
+   </property>
+  </action>
+  <action name="actionRemove">
+   <property name="text">
+    <string>Remove</string>
+   </property>
+   <property name="shortcut">
+    <string>Backspace</string>
    </property>
   </action>
  </widget>

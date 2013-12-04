@@ -123,7 +123,7 @@ void WatcherFeeling::action() {
             if(!ui->baseText->text().isEmpty()) document->updateImport(QString("Note %1: %2").arg(Global::currentProject->noteId).arg(ui->baseText->text()));
             else                                document->updateImport(QString("Note %1").arg(Global::currentProject->noteId));
             document->setMetadata("Rekall", "Note ID", Global::currentProject->noteId, document->getMetadataIndexVersion(-1));
-            document->createTagBasedOnPrevious();
+            document->createTag();
             Global::currentProject->noteId++;
         }
         foreach(Document *document, documents) {
@@ -132,7 +132,7 @@ void WatcherFeeling::action() {
                 if(document->getMetadataCount())
                     action = "Update";
                 if(document->updateFile(document->file))
-                    document->createTagBasedOnPrevious();
+                    document->createTag();
             }
             qint16 version = document->getMetadataIndexVersion(-1);
             if(!ui->baseText->text().isEmpty())

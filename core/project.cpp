@@ -20,21 +20,20 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
     foreach(const QFileInfo &file, files) {
         if((file.isFile()) && (UiFileItem::conformFile(file))) {
-            Document *document = new Document(this, dirBase);
+            Document *document = new Document(this);
             document->chutierItem = UiFileItem::find(file, Global::chutier);
             if(file.absoluteFilePath().contains("Test.txt"))
                 document->chutierItem->setData(1, Qt::EditRole, true);
 
-            if(document->updateFile(file))
-                if(debug)
-                    document->createTagBasedOnPrevious();
+            if((document->updateFile(file, dirBase)) && (debug))
+                document->createTag();
             document->updateFeed();
 
             if(debug) {
                 if(file.baseName() == "NxSimoneMorphing") {
                     for(quint16 i = 1 ; i < 10 ; i++) {
-                        if(document->updateFile(file, -1, i))
-                            document->createTagBasedOnPrevious();
+                        if(document->updateFile(file, dirBase, -1, i))
+                            document->createTag();
                         document->updateFeed();
                     }
                 }
@@ -49,7 +48,7 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
         for(quint16 i = 1 ; i < 2 ; i++) {
             Document *document = new Document(this);
             if(document->updateImport(QString("Marker #%1").arg(i)))
-                document->createTagBasedOnPrevious();
+                document->createTag();
             document->updateFeed();
         }
 

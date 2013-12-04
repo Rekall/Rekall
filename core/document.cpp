@@ -5,62 +5,58 @@ Document::Document(ProjectBase *_project) :
     project     = _project;
     project->addDocument(this);
 }
-Document::Document(ProjectBase *_project, const QDir &_dirBase) :
-    DocumentBase(_project) {
-    project     = _project;
-    project->addDocument(this);
-    dirBase = _dirBase;
-}
 
-
-
-void Document::createTagBasedOnPrevious(qint16 _forVersion) {
-    qint16 forVersion = getMetadataIndexVersion(_forVersion);
+Tag* Document::createTag(qint16 _versionSource, qint16 versionDest) {
+    qint16 versionSource = getMetadataIndexVersion(_versionSource);
+    Tag *newTag = 0;
     if(tags.count()) {
-        qint16 lastVersionWas = -1;
+        QList<Tag*> tagsSource;
         foreach(Tag *tag, tags) {
-            quint16 version = tag->getDocumentVersion();
-            if((lastVersionWas < version) && (version < forVersion))
-                lastVersionWas = version;
+            tag->setDocumentVersion();
+            if(tag->getDocumentVersion() == versionSource)
+                tagsSource << tag;
         }
-        QList<Tag*> tagsToDuplicate;
-        foreach(Tag *tag, tags) {
-            if(tag->getDocumentVersion() == lastVersionWas)
-                tagsToDuplicate << tag;
-        }
-        foreach(Tag *tag, tagsToDuplicate) {
-            Tag *newTag = new Tag(this, forVersion);
-            newTag->create(tag->getType(), tag->getTimeStart(), tag->getDuration());
-            newTag->timelinePos     = tag->timelinePos;
-            newTag->timelineDestPos = tag->timelineDestPos;
-            newTag->viewerPos       = tag->viewerPos;
-            newTag->viewerDestPos   = tag->viewerDestPos;
-            newTag->setTimeEnd(tag->getTimeEnd());
-            tags.append(newTag);
-        }
+        foreach(Tag *tagSource, tagsSource)
+            createTag(tagSource);
     }
     else {
         qreal tS = Global::aleaF(5, 120);
         if(getFunction() == DocumentFunctionRender)
             tS = Global::aleaF(0, 5);
-        for(quint16 i = 0 ; i < getMetadataCount() ; i++) {
-            if(getMetadataCount() > 1) {
-                quint16 nb = Global::alea(1, 1);
-                for(quint16 j = 0 ; j < nb ; j++) {
-                    Tag *tag = new Tag(this, i);
-                    tag->create(TagTypeContextualTime, tS, -1, true);
-                    tags.append(tag);
-                }
-            }
-            else {
-                Tag *tag = new Tag(this, forVersion);
-                tag->create(TagTypeContextualTime, tS, -1, true);
-                tags.append(tag);
-            }
-        }
+        newTag = createTag(TagTypeContextualTime, tS, -1, versionDest, true);
     }
+    /*
+    qDebug("------------------------------------------------------------");
+    foreach(Tag *tag, tags)
+        qDebug("%d (%d)", tag->documentVersion, tag->getDocumentVersion());
+    qDebug("------------------------------------------------------------");
+    */
+    return newTag;
 }
-
+Tag* Document::createTag(TagType type, qreal timeStart, qreal duration, qint16 version, bool debug) {
+    Tag *newTag = new Tag(this, version);
+    newTag->init(type, timeStart, duration, debug);
+    tags.append(newTag);
+    return newTag;
+}
+Tag* Document::createTag(Tag *tagSource) {
+    Tag *newTag = new Tag(this, tagSource->getDocumentVersion());
+    newTag = createTag(tagSource->getType(), tagSource->getTimeStart(), tagSource->getDuration());
+    newTag->setTimeMediaOffset(tagSource->getTimeMediaOffset());
+    newTag->timelinePos     = tagSource->timelinePos;
+    newTag->timelineDestPos = tagSource->timelineDestPos;
+    newTag->viewerPos       = tagSource->viewerPos;
+    newTag->viewerDestPos   = tagSource->viewerDestPos;
+    newTag->tagScale = 3;
+    return newTag;
+}
+void Document::removeTag(void *tag) {
+    removeTag((Tag*)tag);
+}
+void Document::removeTag(Tag *tag) {
+    tags.removeOne(tag);
+    //delete tag;
+}
 
 QDomElement Document::serialize(QDomDocument &xmlDoc) const {
     QDomElement xmlData = xmlDoc.createElement("document");

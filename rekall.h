@@ -32,7 +32,7 @@ public:
     ~Rekall();
 
 private:
-    bool          metaIsChanging, openProject;
+    bool          metaIsChanging, openProject, chutierIsUpdating;
     Splash       *splash;
     Project      *currentProject;
     Document     *currentDocument;

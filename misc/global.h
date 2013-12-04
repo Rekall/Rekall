@@ -33,7 +33,7 @@ public:
     QString getNameCache, getAuthorCache, getTypeStrCache, getSnapshotCache, getUserNameCache;
     DocumentFunction getFunctionCache;
     DocumentType getTypeCache;
-    qreal   getMediaOffsetCache, getMediaDurationCache;
+    qreal   getMediaDurationCache;
 };
 
 
@@ -229,7 +229,7 @@ public:
 
 
 
-enum TagSelection { TagSelectionStart, TagSelectionEnd, TagSelectionMove };
+enum TagSelection { TagSelectionStart, TagSelectionEnd, TagSelectionMove, TagSelectionMediaOffset, TagSelectionDuplicate };
 enum TagType      { TagTypeContextualMilestone, TagTypeContextualTime, TagTypeGlobal };
 
 

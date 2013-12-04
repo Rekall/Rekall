@@ -3,12 +3,13 @@
 TaskProcess::TaskProcess(const TaskProcessData &_data, QTreeWidgetItem *parentItem, QObject *parent) :
     QThread(parent), QTreeWidgetItem(parentItem) {
     processedDocument = _data;
+    processedFile = processedDocument.metadata->file;
 }
 void TaskProcess::init() {
     taskStarted = false;
     if(processedDocument.type == TaskProcessTypeMetadata) {
         processedDocument.metadata->status = DocumentStatusWaiting;
-        emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Waiting for analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
+        emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Waiting for analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(processedFile.baseName())));
     }
 }
 
@@ -18,17 +19,17 @@ void TaskProcess::run() {
         qreal mediaDuration = 0;
         processedDocument.metadata->status = DocumentStatusProcessing;
         emit(updateList(this, FeedItemBaseTypeProcessingStart));
-        emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Starting analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
+        emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Starting analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(processedFile.baseName())));
         QDir().mkpath(Global::pathCurrent.absoluteFilePath() + "/rekall_cache");
 
         //Hash
-        emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Calculating hash of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
-        processedDocument.metadata->setMetadata("File", "Hash", Global::getFileHash(processedDocument.metadata->file), processedDocument.version);
+        emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Calculating hash of <span style='color: #F5F8FA'>%1</span></span>").arg(processedFile.baseName())));
+        processedDocument.metadata->setMetadata("File", "Hash", Global::getFileHash(processedFile), processedDocument.version);
 
         //Extract meta with ExifTool
         if(true) {
-            emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Extracting metadatas of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
-            QStringList exifDatas = launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", Global::pathApplication.absoluteFilePath() + "/tools", QStringList() << "−c" << "%+.6f" << "-d" << "%Y:%m:%d %H:%M:%S" << "-G" << processedDocument.metadata->file.absoluteFilePath())).second.split("\n");
+            emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Extracting metadatas of <span style='color: #F5F8FA'>%1</span></span>").arg(processedFile.baseName())));
+            QStringList exifDatas = launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", Global::pathApplication.absoluteFilePath() + "/tools", QStringList() << "−c" << "%+.6f" << "-d" << "%Y:%m:%d %H:%M:%S" << "-G" << processedFile.absoluteFilePath())).second.split("\n");
             foreach(const QString &exifData, exifDatas) {
                 QPair<QString, QPair<QString,QString> > meta = Global::seperateMetadataAndGroup(exifData);
                 if(meta.second.first == "File Type")
@@ -40,11 +41,10 @@ void TaskProcess::run() {
                         metaTitle = "GPS Coordinates";
                     processedDocument.metadata->setMetadata(meta.first, metaTitle, meta.second.second, processedDocument.version);
                 }
-                if(meta.second.first.toLower().contains("duration")) {
+                if((meta.second.first.toLower().contains("duration")) && (!(meta.second.first.toLower().contains("value")))) {
                     qreal duration = Global::getDurationFromString(meta.second.second);
                     if(duration) {
                         mediaDuration = duration;
-                        processedDocument.metadata->setMetadata("Rekall", "Media Offset",   0, processedDocument.version);
                         processedDocument.metadata->setMetadata("Rekall", "Media Duration", duration, processedDocument.version);
                     }
                 }
@@ -57,17 +57,17 @@ void TaskProcess::run() {
             }
         }
 
-        QString thumbFilepath = Global::cacheFile("thumb", processedDocument.metadata->file);
+        QString thumbFilepath = Global::cacheFile("thumb", processedFile);
 
         //Image thumb
         if(processedDocument.metadata->getType() == DocumentTypeImage) {
-            emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating picture thumbnail of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
+            emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating picture thumbnail of <span style='color: #F5F8FA'>%1</span></span>").arg(processedFile.baseName())));
             QString thumbFilename = thumbFilepath + ".jpg";
             if(!QFileInfo(thumbFilename).exists()) {
-                QImage thumbnail(processedDocument.metadata->file.absoluteFilePath());
+                QImage thumbnail(processedFile.absoluteFilePath());
                 quint16 maxCote = 160;
                 if((thumbnail.width() > maxCote) || (thumbnail.height() > maxCote))
-                    QImage(processedDocument.metadata->file.absoluteFilePath()).scaled(QSize(maxCote, maxCote), Qt::KeepAspectRatio, Qt::SmoothTransformation).save(thumbFilename);
+                    QImage(processedFile.absoluteFilePath()).scaled(QSize(maxCote, maxCote), Qt::KeepAspectRatio, Qt::SmoothTransformation).save(thumbFilename);
             }
             if(QFileInfo(thumbFilename).exists()) {
                 processedDocument.metadata->setMetadata("Rekall", "Snapshot", "File", processedDocument.version);
@@ -77,12 +77,12 @@ void TaskProcess::run() {
 
         //Waveform
         if((processedDocument.metadata->getType() == DocumentTypeAudio) || (processedDocument.metadata->getType() == DocumentTypeVideo)) {
-            emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating audio waveform of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
+            emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating audio waveform of <span style='color: #F5F8FA'>%1</span></span>").arg(processedFile.baseName())));
             QString thumbFilenameIntermediate = thumbFilepath + ".raw", thumbFilename = thumbFilepath + ".peak";
 
             if(!QFileInfo(thumbFilename).exists()) {
                 launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/ffmpeg", thumbFilepath, QStringList()
-                                              << "-i" << processedDocument.metadata->file.absoluteFilePath()
+                                              << "-i" << processedFile.absoluteFilePath()
                                               << "-f" << "s16le" << "-ac" << "1" << "-ar" << "22050" << "-acodec" << "pcm_s16le"
                                               << thumbFilenameIntermediate));
                 if(QFileInfo(thumbFilenameIntermediate).exists()) {
@@ -147,12 +147,12 @@ void TaskProcess::run() {
 
         //Video thumbnails
         if(processedDocument.metadata->getType() == DocumentTypeVideo) {
-            emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating video thumbnails of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
+            emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating video thumbnails of <span style='color: #F5F8FA'>%1</span></span>").arg(processedFile.baseName())));
             //qDebug("===> %s", qPrintable(QDir(Global::pathCurrent.absoluteFilePath() + "/").relativeFilePath(data.metadata->file.absoluteFilePath())));
             quint16 thumbsNumber = qCeil(mediaDuration / Global::thumbsEach);
             if(!QFileInfo(thumbFilepath + "_1.jpg").exists()) {
                 launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/ffmpeg", thumbFilepath, QStringList()
-                                              << "-i" << processedDocument.metadata->file.absoluteFilePath()
+                                              << "-i" << processedFile.absoluteFilePath()
                                               << "-f" << "image2"
                                               << "-vframes" << QString::number(thumbsNumber)
                                               << "-vf" << QString("fps=fps=1/%1").arg(Global::thumbsEach)
@@ -177,14 +177,14 @@ void TaskProcess::run() {
 
         //People
         if(processedDocument.metadata->getType() == DocumentTypePeople) {
-            QList<Person*> persons = Person::fromFile(processedDocument.metadata->file.absoluteFilePath());
+            QList<Person*> persons = Person::fromFile(processedFile.absoluteFilePath());
             foreach(Person *person, persons)
                 Global::currentProject->addPerson(person);
         }
 
         processedDocument.metadata->status = DocumentStatusReady;
         emit(updateList(this, FeedItemBaseTypeProcessingEnd));
-        emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Finishing analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(processedDocument.metadata->file.baseName())));
+        emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Finishing analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(processedFile.baseName())));
     }
     emit(finished(this));
 }

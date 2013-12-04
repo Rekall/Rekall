@@ -50,6 +50,7 @@ public:
 
 private:
     TaskProcessData processedDocument;
+    QFileInfo       processedFile;
 public:
     bool taskStarted;
 private:
