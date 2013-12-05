@@ -39,7 +39,7 @@ void*        Global::selectedTagInAction          = 0;
 void*        Global::selectedTag                  = 0;
 void*        Global::selectedTagHover             = 0;
 void*        Global::timeMarkerAdded              = 0;
-qreal        Global::selectedTagHoverSnapped      = -1;
+QPair<qreal,qreal>  Global::selectedTagHoverSnapped = qMakePair(-1., -1.);
 QMap<QString,void*> Global::renders;
 TagSelection Global::selectedTagMode              = TagSelectionMove;
 qreal        Global::selectedTagStartDrag         = 0;

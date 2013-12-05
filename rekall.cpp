@@ -333,6 +333,17 @@ void Rekall::refreshMetadata() {
     if(!metaIsChanging) {
         chutierIsUpdating = true;
         chutierItemChanged(ui->chutier->getTree()->currentItem(), ui->chutier->getTree()->currentItem());
+
+        //Changemenent de méta
+        if(currentDocument) {
+            foreach(Tag *documentTag, currentDocument->tags) {
+                if(documentTag->getDocumentVersion() == ui->metadataSlider->value()) {
+                    Global::selectedTag = documentTag;
+                    Global::timelineGL->ensureVisible(documentTag->getTimelineBoundingRect().translated(documentTag->timelineDestPos).topLeft());
+                    Global::viewerGL  ->ensureVisible(documentTag->getViewerBoundingRect().translated(documentTag->viewerDestPos).topLeft());
+                }
+            }
+        }
         chutierIsUpdating = false;
     }
 }

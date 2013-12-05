@@ -634,7 +634,7 @@ const QPointF Project::getTimelineCursorPos(qreal time) const {
 }
 qreal Project::getTimelineCursorTime(const QPointF &pos) const {
     qreal cursorTime = qMax(0., (pos.x() - Global::timelineHeaderSize.width() - Global::timelineGlobalDocsWidth) / Global::timeUnit);
-    Global::selectedTagHoverSnapped = -1;
+    Global::selectedTagHoverSnapped.first = Global::selectedTagHoverSnapped.second = -1;
     if((Global::selectedTagHover) && (Global::selectedTagHover != Global::selectedTagInAction))
         ((Tag*)Global::selectedTagHover)->snapTime(&cursorTime);
     return cursorTime;
@@ -676,6 +676,7 @@ qreal Project::getViewerCursorTime(const QPointF &pos) const {
 
 bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool stay, bool action, bool press) {
     bool mouseOnTag = false;
+    Global::selectedTagHover = 0;
     QMapIterator<QString, QMap<QString, QMap<QString, QList<Tag*> > > > categoriesInPhasesIterator(timelineSortTags);
     while(categoriesInPhasesIterator.hasNext()) {
         categoriesInPhasesIterator.next();

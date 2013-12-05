@@ -22,8 +22,8 @@ public:
 private:
     qreal   timeStart, timeEnd, timeMediaOffset;
     TagType type;
-public:
     qint16  documentVersion;
+public:
     QList<QString> linkedRenders;
     QList<Tag*>    linkedTags;
 public:
@@ -35,7 +35,8 @@ public:
     void setTimeEnd        (qreal _timeEnd);
     void setTimeMediaOffset(qreal _timeMediaOffset);
     void setType           (TagType _type, qreal time);
-    void addTimeStartOffset(qreal offset);
+    void moveTimeStart(qreal _timeStart);
+    void moveTimeEnd  (qreal _timeEnd);
     void addTimeMediaOffset(qreal offset);
 
 
@@ -53,7 +54,10 @@ public:
     void init(TagType _type, qreal _timeStart, qreal _duration = 0, bool debug = false);
     const QString getTitle() const { return document->getName(documentVersion); }
     inline qint16 getDocumentVersion() const {  return document->getMetadataIndexVersion(documentVersion); }
-    inline void   setDocumentVersion()       {  documentVersion = getDocumentVersion(); }
+    inline void   setDocumentVersion(qint16 versionShift = 0) {
+        if(documentVersion < 0)
+            documentVersion = getDocumentVersion() + versionShift;
+    }
 
 private:
     bool   timelineWasInside, isInProgress;
@@ -85,7 +89,7 @@ public:
         QRectF rect = viewerBoundingRect.translated(viewerPos);
         return qBound(0., (pos.y() - rect.y()) / rect.height(), 1.);
     }
-    void snapTime(qreal *time) const;
+    bool snapTime(qreal *time) const;
     void fireEvents();
 
 private:

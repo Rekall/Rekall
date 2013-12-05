@@ -259,7 +259,7 @@ public:
     static Sorting *tagSortCriteria, *tagColorCriteria, *tagClusterCriteria, *tagFilterCriteria, *tagHorizontalCriteria;
     static Phases *phases;
     static void *selectedTagInAction, *selectedTag, *selectedTagHover, *timeMarkerAdded;
-    static qreal selectedTagHoverSnapped;
+    static QPair<qreal, qreal> selectedTagHoverSnapped;
     static QMap<QString,void*> renders;
     static qreal selectedTagStartDrag;
     static TagSelection selectedTagMode;

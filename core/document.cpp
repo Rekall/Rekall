@@ -12,9 +12,9 @@ Tag* Document::createTag(qint16 _versionSource, qint16 versionDest) {
     if(tags.count()) {
         QList<Tag*> tagsSource;
         foreach(Tag *tag, tags) {
-            tag->setDocumentVersion();
             if(tag->getDocumentVersion() == versionSource)
                 tagsSource << tag;
+            tag->setDocumentVersion(-1);
         }
         foreach(Tag *tagSource, tagsSource)
             createTag(tagSource);
@@ -25,12 +25,6 @@ Tag* Document::createTag(qint16 _versionSource, qint16 versionDest) {
             tS = Global::aleaF(0, 5);
         newTag = createTag(TagTypeContextualTime, tS, -1, versionDest, true);
     }
-    /*
-    qDebug("------------------------------------------------------------");
-    foreach(Tag *tag, tags)
-        qDebug("%d (%d)", tag->documentVersion, tag->getDocumentVersion());
-    qDebug("------------------------------------------------------------");
-    */
     return newTag;
 }
 Tag* Document::createTag(TagType type, qreal timeStart, qreal duration, qint16 version, bool debug) {
@@ -47,7 +41,6 @@ Tag* Document::createTag(Tag *tagSource) {
     newTag->timelineDestPos = tagSource->timelineDestPos;
     newTag->viewerPos       = tagSource->viewerPos;
     newTag->viewerDestPos   = tagSource->viewerDestPos;
-    newTag->tagScale = 3;
     return newTag;
 }
 void Document::removeTag(void *tag) {

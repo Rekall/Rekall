@@ -96,10 +96,16 @@ void Tag::setTimeMediaOffset(qreal _timeMediaOffset) {
     timeMediaOffset = qBound(0., _timeMediaOffset, document->getMediaDuration(documentVersion) - getDuration());
     setTimeEnd(timeEnd);
 }
-void Tag::addTimeStartOffset(qreal offset) {
+void Tag::moveTimeStart(qreal _timeStart) {
     qreal duration = getDuration();
-    timeStart = qMax(0., offset);
+    timeStart = qMax(0., _timeStart);
     timeEnd   = timeStart + duration;
+    //Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+}
+void Tag::moveTimeEnd(qreal _timeEnd) {
+    qreal duration = getDuration();
+    timeEnd   = _timeEnd;
+    timeStart = qMax(0., timeEnd - duration);
     //Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
 }
 void Tag::addTimeMediaOffset(qreal offset) {
@@ -464,16 +470,37 @@ const QRectF Tag::paintTimeline(bool before) {
         }
 
         //Snapping
-        if((Global::selectedTagHoverSnapped >= 0) && (Global::selectedTagHover == this) && (Global::selectedTagInAction)) {
+        if((Global::selectedTagInAction) && (Global::selectedTagHover == this) && ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0))) {
             Tag *snappedTag = (Tag*)Global::selectedTagInAction;
-            qint16 pos = Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * Global::selectedTagHoverSnapped - timelinePos.x();
+            qint16 posStart = Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * Global::selectedTagHoverSnapped.first  - timelinePos.x();
+            qint16 posEnd   = Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * Global::selectedTagHoverSnapped.second - timelinePos.x();
 
-            Global::timelineGL->qglColor(Global::colorAlternateStrong);
+            Global::timelineGL->qglColor(Global::colorCluster);
             glLineStipple(5, 0xAAAA);
             glEnable(GL_LINE_STIPPLE);
             glBegin(GL_LINES);
-            glVertex2f(pos, timelineBoundingRect.center().y());
-            glVertex2f(pos, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
+
+
+            if((Global::selectedTagMode == TagSelectionMove) && ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0))) {
+                if((Global::selectedTagHoverSnapped.first >= 0) && (Global::selectedTagHoverSnapped.second >= 0)) {
+                    glVertex2f(timelineBoundingRect.left(),  timelineBoundingRect.center().y());
+                    glVertex2f(posStart, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
+                    glVertex2f(timelineBoundingRect.right(), timelineBoundingRect.center().y());
+                    glVertex2f(posEnd, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
+                }
+                else if(Global::selectedTagHoverSnapped.first >= 0) {
+                    glVertex2f(timelineBoundingRect.left(),  timelineBoundingRect.center().y());
+                    glVertex2f(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).right(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
+                }
+                else if(Global::selectedTagHoverSnapped.second >= 0) {
+                    glVertex2f(timelineBoundingRect.right(), timelineBoundingRect.center().y());
+                    glVertex2f(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).left(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
+                }
+            }
+            else {
+                glVertex2f(posStart, timelineBoundingRect.center().y());
+                glVertex2f(posStart, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
+            }
             glEnd();
             glDisable(GL_LINE_STIPPLE);
         }
@@ -678,15 +705,25 @@ bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool, b
 }
 
 
-void Tag::snapTime(qreal *time) const {
+bool Tag::snapTime(qreal *time) const {
     if(qAbs(*time-getTimeStart()) < 1) {
         *time = getTimeStart();
-        Global::selectedTagHoverSnapped = *time;
+        Global::selectedTagHoverSnapped.first  = *time;
+        Global::selectedTagHoverSnapped.second = -1;
+        return true;
     }
     else if(qAbs(*time-getTimeEnd()) < 1) {
         *time = getTimeEnd();
-        Global::selectedTagHoverSnapped = *time;
+        Global::selectedTagHoverSnapped.second = *time;
+        Global::selectedTagHoverSnapped.first  = -1;
+        return true;
     }
+    else if(Global::selectedTagMode == TagSelectionMove) {
+        Global::selectedTagHoverSnapped.first  = getTimeStart();
+        Global::selectedTagHoverSnapped.second = getTimeEnd();
+        return true;
+    }
+    return false;
 }
 
 
@@ -720,8 +757,12 @@ bool Tag::sortColor(const Tag *first, const Tag *second) {
         return false;
 
     QString firstStr = Tag::getCriteriaColor(first), secondStr = Tag::getCriteriaColor(second);
-    if(firstStr == secondStr)
-        return first->document->getName(first->getDocumentVersion()) < second->document->getName(second->getDocumentVersion());
+    if(firstStr == secondStr) {
+        firstStr = first->document->getName(first->getDocumentVersion()); secondStr = second->document->getName(second->getDocumentVersion());
+        if(firstStr == secondStr)
+            return first->getDocumentVersion() < second->getDocumentVersion();
+        return firstStr < secondStr;
+    }
     else
         return firstStr < secondStr;
 }
