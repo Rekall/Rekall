@@ -75,8 +75,8 @@ public:
 class GlWidget : public QGLWidget {
 public:
     explicit GlWidget(const QGLFormat &format, QWidget *parent) : QGLWidget(format, parent) {
-        showLinkedTags = showLinkedRenders = 0;
-        showLinkedTagsDest = showLinkedRendersDest = showLegendDest = false;
+        showLinkedTags = showLinkedRenders = showHashedTags = tagSnap = tagSnapSlow = 0;
+        showLinkedTagsDest = showLinkedRendersDest = showLegendDest = showHashedTagsDest = tagSnapDest = tagSnapSlowDest = false;
         mouseTimer.setSingleShot(true);
         mouseTimerOk = false;
         glReady      = false;
@@ -84,8 +84,8 @@ public:
 public:
     QRectF  drawingBoundingRect, visibleRect;
     QPointF scroll, scrollDest;
-    UiBool  showLegendDest, showLinkedRendersDest, showLinkedTagsDest;
-    qreal   showLinkedRenders, showLinkedTags;
+    UiBool  showLegendDest, showLinkedRendersDest, showLinkedTagsDest, showHashedTagsDest, tagSnapDest, tagSnapSlowDest;
+    qreal   showLinkedRenders, showLinkedTags, showHashedTags, tagSnap, tagSnapSlow;
     bool    glReady;
 protected:
     QTimer  mouseTimer;
@@ -247,7 +247,7 @@ public:
     static QTreeWidget *chutier;
     static qreal timeUnit, timeUnitTick;
     static UiReal timeUnitDest, timelineTagHeightDest;
-    static UiBool showHelp, showHistory, showHash;
+    static UiBool showHelp, showHistory;
     static qreal timelineTagHeight, timelineTagVSpacing, timelineTagVSpacingSeparator, timelineTagThumbHeight;
     static qreal viewerTagHeight, timelineGlobalDocsWidth;
     static QSizeF timelineHeaderSize;

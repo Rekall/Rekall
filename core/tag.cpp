@@ -345,7 +345,7 @@ const QRectF Tag::paintTimeline(bool before) {
         }
 
         //Hash tags
-        if(hashTags.count()) {
+        if((Global::timelineGL->showHashedTags > 0.01) && (hashTags.count())) {
             QColor colorAlpha = realTimeColor;
 
             //Anchors
@@ -386,7 +386,7 @@ const QRectF Tag::paintTimeline(bool before) {
                 glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &hashChordPts[0][0]);
                 glEnable(GL_MAP1_VERTEX_3);
                 glBegin(GL_LINE_STRIP);
-                for(qreal t = 0 ; t <= 1.05; t += 0.05)
+                for(qreal t = 0 ; t <= (1.05 * Global::timelineGL->showHashedTags); t += 0.05)
                     glEvalCoord1f(t);
                 glEnd();
                 glDisable(GL_MAP1_VERTEX_3);
@@ -475,33 +475,56 @@ const QRectF Tag::paintTimeline(bool before) {
             qint16 posStart = Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * Global::selectedTagHoverSnapped.first  - timelinePos.x();
             qint16 posEnd   = Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * Global::selectedTagHoverSnapped.second - timelinePos.x();
 
-            Global::timelineGL->qglColor(Global::colorCluster);
-            glLineStipple(5, 0xAAAA);
-            glEnable(GL_LINE_STIPPLE);
-            glBegin(GL_LINES);
-
+            QList< QPair<QPointF, QPointF> > pointsToDraw;
+            bool progressive = true;
 
             if((Global::selectedTagMode == TagSelectionMove) && ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0))) {
                 if((Global::selectedTagHoverSnapped.first >= 0) && (Global::selectedTagHoverSnapped.second >= 0)) {
-                    glVertex2f(timelineBoundingRect.left(),  timelineBoundingRect.center().y());
-                    glVertex2f(posStart, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
-                    glVertex2f(timelineBoundingRect.right(), timelineBoundingRect.center().y());
-                    glVertex2f(posEnd, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
+                    progressive = false;
+                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.left(),  timelineBoundingRect.center().y()),
+                                                  QPointF(posStart, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.left(),  timelineBoundingRect.center().y()),
+                                                  QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).left(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.right(), timelineBoundingRect.center().y()),
+                                                  QPointF(posEnd, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.right(), timelineBoundingRect.center().y()),
+                                                  QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).right(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
                 }
-                else if(Global::selectedTagHoverSnapped.first >= 0) {
-                    glVertex2f(timelineBoundingRect.left(),  timelineBoundingRect.center().y());
-                    glVertex2f(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).right(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
-                }
-                else if(Global::selectedTagHoverSnapped.second >= 0) {
-                    glVertex2f(timelineBoundingRect.right(), timelineBoundingRect.center().y());
-                    glVertex2f(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).left(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
-                }
+                else if(Global::selectedTagHoverSnapped.first >= 0)
+                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.left(), timelineBoundingRect.center().y()),
+                                                  QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).right(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                else if(Global::selectedTagHoverSnapped.second >= 0)
+                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.right(), timelineBoundingRect.center().y()),
+                                                  QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).left(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
             }
-            else {
-                glVertex2f(posStart, timelineBoundingRect.center().y());
-                glVertex2f(posStart, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y());
+            else if(Global::selectedTagHoverSnapped.first >= 0)
+                pointsToDraw.append(qMakePair(QPointF(posStart, timelineBoundingRect.center().y()),
+                                              QPointF(posStart, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+            else if(Global::selectedTagHoverSnapped.second >= 0)
+                pointsToDraw.append(qMakePair(QPointF(posEnd, timelineBoundingRect.center().y()),
+                                              QPointF(posEnd, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+
+            Global::timelineGL->qglColor(Global::colorCluster);
+            glLineStipple(5, 0xAAAA);
+            glEnable(GL_LINE_STIPPLE);
+            GLfloat hashChordPts[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+            for(quint16 i = 0 ; i < pointsToDraw.count() ; i+=2) {
+                QPointF hashChordBeg, hashChordEnd;
+                hashChordBeg = (pointsToDraw.at(i).first  * (Global::timelineGL->tagSnapSlow)) + (pointsToDraw.at(qMin(pointsToDraw.count()-1, i+1)).first  * (1-Global::timelineGL->tagSnapSlow));
+                hashChordEnd = (pointsToDraw.at(i).second * (Global::timelineGL->tagSnapSlow)) + (pointsToDraw.at(qMin(pointsToDraw.count()-1, i+1)).second * (1-Global::timelineGL->tagSnapSlow));
+                hashChordPts[0][0] = hashChordBeg.x(); hashChordPts[0][1] = hashChordBeg.y();
+                hashChordPts[1][0] = hashChordBeg.x(); hashChordPts[1][1] = hashChordBeg.y() + (hashChordEnd.y() - hashChordBeg.y()) * 0.66;
+                hashChordPts[2][0] = hashChordEnd.x(); hashChordPts[2][1] = hashChordEnd.y() + (hashChordBeg.y() - hashChordEnd.y()) * 0.66;
+                hashChordPts[3][0] = hashChordEnd.x(); hashChordPts[3][1] = hashChordEnd.y();
+                glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &hashChordPts[0][0]);
+                glEnable(GL_MAP1_VERTEX_3);
+                glBegin(GL_LINE_STRIP);
+                qreal tMax = 1.05;  if(progressive) tMax *= Global::timelineGL->tagSnap;
+                for(qreal t = 0 ; t <= tMax; t += 0.05)
+                    glEvalCoord1f(t);
+                glEnd();
+                glDisable(GL_MAP1_VERTEX_3);
             }
-            glEnd();
             glDisable(GL_LINE_STIPPLE);
         }
         glPopMatrix();

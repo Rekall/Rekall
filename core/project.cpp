@@ -315,7 +315,7 @@ const QRectF Project::paintTimeline(bool before) {
                     }
                 }
                 //Add hash tags
-                if(Global::showHash)
+                if(Global::timelineGL->showHashedTagsDest)
                     foreach(Tag* tag, document->tags)
                         tag->hashTags.append(hashTags);
             }
@@ -637,6 +637,7 @@ qreal Project::getTimelineCursorTime(const QPointF &pos) const {
     Global::selectedTagHoverSnapped.first = Global::selectedTagHoverSnapped.second = -1;
     if((Global::selectedTagHover) && (Global::selectedTagHover != Global::selectedTagInAction))
         ((Tag*)Global::selectedTagHover)->snapTime(&cursorTime);
+    Global::timelineGL->tagSnapSlowDest = Global::timelineGL->tagSnapDest = ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0));
     return cursorTime;
 }
 

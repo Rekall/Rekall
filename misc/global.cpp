@@ -33,7 +33,6 @@ qreal        Global::breathingFastDest            = 1;
 QTime        Global::timer;
 UiBool       Global::showHelp                     = true;
 UiBool       Global::showHistory                  = false;
-UiBool       Global::showHash                     = false;
 bool         Global::timerPlay                    = false;
 void*        Global::selectedTagInAction          = 0;
 void*        Global::selectedTag                  = 0;
