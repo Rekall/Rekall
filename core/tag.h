@@ -53,7 +53,8 @@ public:
 public:
     void init(TagType _type, qreal _timeStart, qreal _duration = 0, bool debug = false);
     const QString getTitle() const { return document->getName(documentVersion); }
-    inline qint16 getDocumentVersion() const {  return document->getMetadataIndexVersion(documentVersion); }
+    inline qint16 getDocumentVersion() const    {  return document->getMetadataIndexVersion(documentVersion); }
+    inline qint16 getDocumentVersionRaw() const {  return documentVersion; }
     inline void   setDocumentVersion(qint16 versionShift = 0) {
         if(documentVersion < 0)
             documentVersion = getDocumentVersion() + versionShift;

@@ -226,7 +226,7 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press, bool
             cursor = Qt::ClosedHandCursor;
         }
         else if(Global::selectedTagMode == TagSelectionDuplicate) {
-            Global::selectedTagHover = Global::selectedTagInAction = Global::selectedTag = ((Document*)tag->getDocument())->createTag(tag, tag->getDocumentVersion());
+            Global::selectedTagHover = Global::selectedTagInAction = Global::selectedTag = ((Document*)tag->getDocument())->createTag(tag, tag->getDocumentVersionRaw());
             Global::selectedTagMode  = TagSelectionMove;
             Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
             //selectedTag->addTimeMediaOffset(Global::selectedTagStartDrag - Global::currentProject->getTimelineCursorTime(mousePos));

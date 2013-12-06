@@ -12,12 +12,12 @@ Tag* Document::createTag(qint16 _versionSource, qint16 versionDest) {
     if(tags.count()) {
         QList<Tag*> tagsSource;
         foreach(Tag *tag, tags) {
-            if(tag->getDocumentVersion() == versionSource)
-                tagsSource << tag;
             tag->setDocumentVersion(-1);
+            if(tag->getDocumentVersion() == (versionSource-1))
+                tagsSource << tag;
         }
         foreach(Tag *tagSource, tagsSource)
-            createTag(tagSource, versionDest);
+            createTag(tagSource, tagSource->getDocumentVersion()+1);
     }
     else {
         qreal tS = Global::aleaF(5, 120);
@@ -34,10 +34,9 @@ Tag* Document::createTag(TagType type, qreal timeStart, qreal duration, qint16 v
     return newTag;
 }
 Tag* Document::createTag(Tag *tagSource, qint16 version) {
-    Tag *newTag = 0;
-    if(version < -1)    newTag = new Tag(this, tagSource->getDocumentVersion());
-    else                newTag = new Tag(this, version);
-    newTag = createTag(tagSource->getType(), tagSource->getTimeStart(), tagSource->getDuration());
+    if(version < -1)
+        version = tagSource->getDocumentVersionRaw();
+    Tag *newTag = createTag(tagSource->getType(), tagSource->getTimeStart(), tagSource->getDuration(), version);
     newTag->setTimeMediaOffset(tagSource->getTimeMediaOffset());
     newTag->timelinePos     = tagSource->timelinePos;
     newTag->timelineDestPos = tagSource->timelineDestPos;
