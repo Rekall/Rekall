@@ -32,6 +32,34 @@ Metadata::Metadata(QObject *parent, bool createEmpty) :
 Metadata::~Metadata() {
 }
 
+bool Metadata::updateImport(const QString &name, qint16 version) {
+    bool anEmptyMetaWasCreated = false;
+    if(version < 0) {
+        metadatas.append(QMetaDictionnay());
+        anEmptyMetaWasCreated = true;
+    }
+
+    if(!file.exists())
+        setType(DocumentTypeMarker);
+    setMetadata("Rekall", "Name",         name, version);
+    setMetadata("Rekall", "Author",       Global::userInfos->getInfo("User Name"), version);
+    quint16 tirage = Global::alea(0, 100);
+    if(tirage < 10)        setMetadata("Rekall", "Author", "Julie Valero",         version);
+    else if(tirage < 20)   setMetadata("Rekall", "Author", "Alexandros Markeas",   version);
+    else if(tirage < 30)   setMetadata("Rekall", "Author", "Pierre Nouvel",        version);
+    else if(tirage < 50)   setMetadata("Rekall", "Author", "Jean-François Peyret", version);
+    else if(tirage < 70)   setMetadata("Rekall", "Author", "Agnès de Cayeux",      version);
+    else                   setMetadata("Rekall", "Author", "Thierry Coduys",       version);
+    setMetadata("Rekall", "Date/Time",    QDateTime::currentDateTime(), version);
+    setMetadata("Rekall", "Import Date/Time",      QDateTime::currentDateTime(), version);
+    setMetadata(Global::userInfos->getInfos());
+
+    setFunction(DocumentFunctionContextual, version);
+    if(name.toLower().contains("captation"))
+        setFunction(DocumentFunctionRender, version);
+
+    return anEmptyMetaWasCreated;
+}
 bool Metadata::updateFile(const QFileInfo &_file, const QDir &dirBase, qint16 version, quint16 falseInfoForTest) {
     file = _file;
     file.refresh();
@@ -89,40 +117,10 @@ bool Metadata::updateFile(const QFileInfo &_file, const QDir &dirBase, qint16 ve
 
     return anEmptyMetaWasCreated;
 }
-bool Metadata::updateImport(const QString &name, qint16 version) {
-    bool anEmptyMetaWasCreated = false;
-    if(version < 0) {
-        metadatas.append(QMetaDictionnay());
-        anEmptyMetaWasCreated = true;
-    }
-
-    if(!file.exists())
-        setType(DocumentTypeMarker);
-    setMetadata("Rekall", "Name",         name, version);
-    setMetadata("Rekall", "Author",       Global::userInfos->getInfo("User Name"), version);
-    quint16 tirage = Global::alea(0, 100);
-    if(tirage < 10)        setMetadata("Rekall", "Author", "Julie Valero",         version);
-    else if(tirage < 20)   setMetadata("Rekall", "Author", "Alexandros Markeas",   version);
-    else if(tirage < 30)   setMetadata("Rekall", "Author", "Pierre Nouvel",        version);
-    else if(tirage < 50)   setMetadata("Rekall", "Author", "Jean-François Peyret", version);
-    else if(tirage < 70)   setMetadata("Rekall", "Author", "Agnès de Cayeux",      version);
-    else                   setMetadata("Rekall", "Author", "Thierry Coduys",       version);
-    setMetadata("Rekall", "Date/Time",    QDateTime::currentDateTime(), version);
-    setMetadata("Rekall", "Import Date/Time",      QDateTime::currentDateTime(), version);
-    setMetadata(Global::userInfos->getInfos());
-
-    setFunction(DocumentFunctionContextual, version);
-    if(name.toLower().contains("captation"))
-        setFunction(DocumentFunctionRender, version);      
-
-    return anEmptyMetaWasCreated;
-}
 
 bool Metadata::updateCard(const PersonCard &card, qint16 version) {
-    bool creation = false;
+    bool anEmptyMetaWasCreated = updateImport(card.getFullname(), version);
     setType(DocumentTypePeople, version);
-    creation = updateImport(card.getFullname(), version);
-    setType(DocumentTypePeople);
 
     QString previousLabel = "";
     for(quint16 i = 0 ; i < card.count() ; i++) {
@@ -178,18 +176,34 @@ bool Metadata::updateCard(const PersonCard &card, qint16 version) {
     }
     photo = card.getPhoto();
 
-    return creation;
+    return anEmptyMetaWasCreated;
 }
 
+bool Metadata::updateWeb(const QString &url, qint16 version) {
+    bool anEmptyMetaWasCreated = updateImport(url, version);
+    setMetadata("Rekall", "URL", url, version);
+    setType(DocumentTypeWeb, version);
+
+    if(anEmptyMetaWasCreated) {
+        status = DocumentStatusWaiting;
+        Global::taskList->addTask(this, TaskProcessTypeMetadata, version);
+    }
+
+    return anEmptyMetaWasCreated;
+}
+
+
 void Metadata::addKeyword(const QStringList &keywords, qint16 version, const QString &key, const QString &category) {
-    QStringList documentKeywords = getMetadata(category, key, version).toString().split(",", QString::SkipEmptyParts);
-    documentKeywords << keywords;
-    documentKeywords.removeDuplicates();
-    QString documentKeywordsStr;
-    foreach(const QString &documentKeyword, documentKeywords)
-        documentKeywordsStr += documentKeyword.trimmed().toLower() + ", ";
-    documentKeywordsStr.chop(2);
-    setMetadata(category, key, documentKeywordsStr, version);
+    if(keywords.count()) {
+        QStringList documentKeywords = getMetadata(category, key, version).toString().split(",", QString::SkipEmptyParts);
+        documentKeywords << keywords;
+        documentKeywords.removeDuplicates();
+        QString documentKeywordsStr;
+        foreach(const QString &documentKeyword, documentKeywords)
+            documentKeywordsStr += documentKeyword.trimmed().toLower() + ", ";
+        documentKeywordsStr.chop(2);
+        setMetadata(category, key, documentKeywordsStr, version);
+    }
 }
 void Metadata::addKeyword(const QString &keyword, qint16 version, const QString &key, const QString &category) {
     addKeyword(QStringList() << keyword, version, key, category);
@@ -392,17 +406,20 @@ const MetadataElement Metadata::getCriteriaPhase(qint16 version) const {
 }
 
 const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) const {
-    QPair<QString, QPixmap> retour;
     if(!photo.isNull())
         return qMakePair(QString(), QPixmap::fromImage(photo));
+    else if((getType(version) == DocumentTypeWeb) && (thumbnails.count()))
+        return qMakePair(getMetadata("Rekall", "URL", version).toString(), QPixmap::fromImage(thumbnails.first().image));
     else if(getSnapshot(version) == "comment")
         return qMakePair(QString("%1_%2.jpg").arg(Global::cacheFile("comment", file)).arg(version), QPixmap(QString("%1_%2.jpg").arg(Global::cacheFile("comment", file)).arg(version)));
     else if(getSnapshot(version) == "note")
         return qMakePair(QString("%1_%2.jpg").arg(Global::cacheFile("note", getMetadata("Rekall", "Note ID").toString())).arg(version), QPixmap(QString("%1_%2.jpg").arg(Global::cacheFile("note", getMetadata("Rekall", "Note ID").toString())).arg(version)));
     else if(getSnapshot(version) == "file")
         return qMakePair(file.absoluteFilePath(), QPixmap(file.absoluteFilePath()));
-    else if(thumbnails.count())
+    else if((thumbnails.count()) && (file.exists()))
         return qMakePair(file.absoluteFilePath(), QPixmap::fromImage(thumbnails.first().image));
+    else if(thumbnails.count())
+        return qMakePair(thumbnails.first().currentFilename, QPixmap::fromImage(thumbnails.first().image));
     else
         return qMakePair(file.absoluteFilePath(), QPixmap(file.absoluteFilePath()));
 }

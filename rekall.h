@@ -36,6 +36,7 @@ private:
     Splash       *splash;
     Project      *currentProject;
     Document     *currentDocument;
+    Metadata     *currentMetadata;
     QSettings    *settings;
     QWebView     *gps;
     QPair<QString, QPixmap> picture;

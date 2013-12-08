@@ -60,6 +60,8 @@ protected:
 public slots:
     void fileShowInFinder();
     void fileShowInOS();
+    static void fileShowInFinder(const QString &uri);
+    static void fileShowInOS(const QString &uri);
     bool askForImport(UiSyncItem *i, const QFileInfoList &list);
 protected slots:
     void dataChanged() { emitDataChanged(); }

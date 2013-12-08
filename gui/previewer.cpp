@@ -100,7 +100,10 @@ void Previewer::action() {
         ui->playerVideo->seek(0);
 }
 void Previewer::actionOpen() {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
+    if(QFileInfo(filename).exists())
+        QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
+    else
+        QDesktopServices::openUrl(QUrl(filename));
 }
 void Previewer::actionFinished() {
     ui->playPause->setChecked(false);

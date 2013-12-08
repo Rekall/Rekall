@@ -3,7 +3,7 @@
 Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
     QObject(_document) {
     document          = _document;
-    documentVersion   = _documentVersion;
+    version   = _documentVersion;
     timelineWasInside = false;
     player       = 0;
     progression       = progressionDest = decounter = 0;
@@ -27,7 +27,7 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
 void Tag::init(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
     if(document->getFunction() == DocumentFunctionRender) {
         setType(_type, _timeStart);
-        Global::renders.insert(document->getName(documentVersion), this);
+        Global::renders.insert(document->getName(version), this);
         player = new PlayerVideo();
         player->load(this, ((document->getType() == DocumentTypeVideo) || (document->getType() == DocumentTypeImage)), document->file.absoluteFilePath());
         if(debug)
@@ -36,7 +36,7 @@ void Tag::init(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
     else {
         if(debug) {
             qreal val = Global::alea(0, 100);
-            if(document->getType(documentVersion) == DocumentTypeMarker)
+            if(document->getType(version) == DocumentTypeMarker)
                 val = 0;
             if(val < 50)      setType(TagTypeContextualTime,      _timeStart);
             else if(val < 80) setType(TagTypeContextualMilestone, _timeStart);
@@ -74,7 +74,7 @@ void Tag::setType(TagType _type, qreal time) {
 }
 
 void Tag::setTimeStart(qreal _timeStart) {
-    qreal mediaDuration = document->getMediaDuration(documentVersion);
+    qreal mediaDuration = document->getMediaDuration(version);
 
     if(mediaDuration <= 0)
         mediaDuration = timeEnd;
@@ -83,7 +83,7 @@ void Tag::setTimeStart(qreal _timeStart) {
 }
 void Tag::setTimeEnd(qreal _timeEnd) {
     if(getType() == TagTypeContextualTime) {
-        qreal mediaDuration = document->getMediaDuration(documentVersion);
+        qreal mediaDuration = document->getMediaDuration(version);
         if(mediaDuration <= 0)
             mediaDuration = 9999999;
         timeEnd = qBound(timeStart, _timeEnd, timeStart + mediaDuration - getTimeMediaOffset());
@@ -93,7 +93,7 @@ void Tag::setTimeEnd(qreal _timeEnd) {
         timeEnd = timeStart;
 }
 void Tag::setTimeMediaOffset(qreal _timeMediaOffset) {
-    timeMediaOffset = qBound(0., _timeMediaOffset, document->getMediaDuration(documentVersion) - getDuration());
+    timeMediaOffset = qBound(0., _timeMediaOffset, document->getMediaDuration(version) - getDuration());
     setTimeEnd(timeEnd);
 }
 void Tag::moveTimeStart(qreal _timeStart) {
@@ -147,7 +147,7 @@ void Tag::fireEvents() {
             oscValue = 0;
     }
     if(oscValue >= 0)
-        Global::udp->send("127.0.0.1", 57120, "/rekall", QList<QVariant>() << document->getTypeStr(documentVersion) << document->getAuthor(documentVersion) << document->getName(documentVersion) << getTimeStart() << getTimeEnd() << oscValue << document->baseColor.redF() << document->baseColor.greenF() << document->baseColor.blueF() << document->baseColor.alphaF());
+        Global::udp->send("127.0.0.1", 57120, "/rekall", QList<QVariant>() << document->getTypeStr(version) << document->getAuthor(version) << document->getName(version) << getTimeStart() << getTimeEnd() << oscValue << document->baseColor.redF() << document->baseColor.greenF() << document->baseColor.blueF() << document->baseColor.alphaF());
 }
 
 const QRectF Tag::paintTimeline(bool before) {
@@ -202,7 +202,7 @@ const QRectF Tag::paintTimeline(bool before) {
         if(Global::timelineGL->visibleRect.intersects(timelineBoundingRect.translated(timelinePos + QPointF(0, Global::timelineHeaderSize.height())))) {
             //Thumbnail strip
             if(isLargeTag) {
-                qreal mediaDuration = document->getMediaDuration(documentVersion);
+                qreal mediaDuration = document->getMediaDuration(version);
 
                 //Thumb adapt
                 if((document->getType() == DocumentTypeVideo) && (document->thumbnails.count()))
@@ -280,8 +280,8 @@ const QRectF Tag::paintTimeline(bool before) {
                     if(isTagLastVersion(this))
                         Global::timelineGL->qglColor(Qt::white);
                     textPos = QPoint(timelineBoundingRect.center().x() - timelineTimeDurationText.size.width()/2, 1 + timelineBoundingRect.center().y() - timelineTimeDurationText.size.height()/2);
-                    if(document->getFunction(documentVersion) == DocumentFunctionRender) {
-                        if(getTimeMediaOffset() > 0)    timelineTimeDurationText.drawText(Sorting::timeToString(getDuration()) + " / " + Sorting::timeToString(document->getMediaDuration()) + tr(" (±") + Sorting::timeToString(getTimeMediaOffset()) + ")", textPos);
+                    if(document->getFunction(version) == DocumentFunctionRender) {
+                        if(getTimeMediaOffset() > 0)    timelineTimeDurationText.drawText(Sorting::timeToString(getDuration()) + " / " + Sorting::timeToString(document->getMediaDuration()) + tr(" (-") + Sorting::timeToString(getTimeMediaOffset()) + ")", textPos);
                         else                            timelineTimeDurationText.drawText(Sorting::timeToString(getDuration()) + " / " + Sorting::timeToString(document->getMediaDuration()), textPos);
                     }
                     else
@@ -651,7 +651,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         if((isBlinking) || (isInProgress))                                                                                                  Global::viewerGL->qglColor(Qt::white);
         else if(((Global::selectedTag == this) || ((isTagLastVersion(this) && (!hasThumbnail)))) && (document->getType() != DocumentTypeMarker)) Global::viewerGL->qglColor(Qt::black);
         else                                                                                                                                Global::viewerGL->qglColor(barColor);
-        QString texte = document->getName(documentVersion);
+        QString texte = document->getName(version);
         if(getType() == TagTypeContextualTime)
             texte += QString(" (%1)").arg(Sorting::timeToString(getDuration()));
         viewerDocumentText.drawText(texte, textePos);
@@ -687,11 +687,12 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
                 }
             }
             if(dbl) {
-                if(document->chutierItem) {
+                if(document->chutierItem)
                     document->chutierItem->fileShowInOS();
-                    tagScale     = 3;
-                    tagDestScale = 1;
-                }
+                else if(document->getType(version) == DocumentTypeWeb)
+                    UiFileItem::fileShowInOS(document->getMetadata("Rekall", "URL", version).toString());
+                tagScale     = 3;
+                tagDestScale = 1;
             }
             return true;
         }
@@ -755,23 +756,23 @@ bool Tag::tagHistoryFilters() const {
             ((!Global::showHistory) && (isTagLastVersion(this)));
 }
 bool Tag::isAcceptableWithSortFilters(bool strongCheck) const {
-    return (tagHistoryFilters()) && (document->isAcceptableWithSortFilters(strongCheck, documentVersion));
+    return (tagHistoryFilters()) && (document->isAcceptableWithSortFilters(strongCheck, version));
 }
 bool Tag::isAcceptableWithColorFilters(bool strongCheck) const {
-    return (tagHistoryFilters()) && (document->isAcceptableWithColorFilters(strongCheck, documentVersion));
+    return (tagHistoryFilters()) && (document->isAcceptableWithColorFilters(strongCheck, version));
 }
 bool Tag::isAcceptableWithClusterFilters(bool strongCheck) const {
-    return (tagHistoryFilters()) && (document->isAcceptableWithClusterFilters(strongCheck, documentVersion));
+    return (tagHistoryFilters()) && (document->isAcceptableWithClusterFilters(strongCheck, version));
 }
 bool Tag::isAcceptableWithFilterFilters(bool strongCheck) const {
-    return (tagHistoryFilters()) && (document->isAcceptableWithFilterFilters(strongCheck, documentVersion));
+    return (tagHistoryFilters()) && (document->isAcceptableWithFilterFilters(strongCheck, version));
 }
 bool Tag::isAcceptableWithHorizontalFilters(bool strongCheck) const {
-    return (tagHistoryFilters()) && (document->isAcceptableWithHorizontalFilters(strongCheck, documentVersion));
+    return (tagHistoryFilters()) && (document->isAcceptableWithHorizontalFilters(strongCheck, version));
 }
 
 const QString Tag::getAcceptableWithClusterFilters() const {
-    return document->getAcceptableWithClusterFilters(documentVersion);
+    return document->getAcceptableWithClusterFilters(version);
 }
 
 
@@ -811,52 +812,52 @@ bool Tag::sortAlpha(const Tag *first, const Tag *second) {
 
 const QString Tag::getCriteriaSort(const Tag *tag) {
     if(!tag)    return "";
-    return tag->document->getCriteriaSort(tag->documentVersion);
+    return tag->document->getCriteriaSort(tag->version);
 }
 const QString Tag::getCriteriaColor(const Tag *tag) {
     if(!tag)    return "";
-    return tag->document->getCriteriaColor(tag->documentVersion);
+    return tag->document->getCriteriaColor(tag->version);
 }
 const QString Tag::getCriteriaCluster(const Tag *tag) {
     if(!tag)    return "";
-    return tag->document->getCriteriaCluster(tag->documentVersion);
+    return tag->document->getCriteriaCluster(tag->version);
 }
 const MetadataElement Tag::getCriteriaPhase(const Tag *tag) {
-    return tag->document->getCriteriaPhase(tag->documentVersion);
+    return tag->document->getCriteriaPhase(tag->version);
 }
 const QString Tag::getCriteriaFilter(const Tag *tag) {
     if(!tag)    return "";
-    return tag->document->getCriteriaFilter(tag->documentVersion);
+    return tag->document->getCriteriaFilter(tag->version);
 }
 const QString Tag::getCriteriaFilterFormated(const Tag *tag) {
     if(!tag)    return "";
-    return tag->document->getCriteriaFilterFormated(tag->documentVersion);
+    return tag->document->getCriteriaFilterFormated(tag->version);
 }
 const QString Tag::getCriteriaHorizontal(const Tag *tag) {
     if(!tag)    return "";
-    return tag->document->getCriteriaHorizontal(tag->documentVersion);
+    return tag->document->getCriteriaHorizontal(tag->version);
 }
 const QString Tag::getCriteriaHorizontalFormated(const Tag *tag) {
     if(!tag)    return "";
-    return tag->document->getCriteriaHorizontalFormated(tag->documentVersion);
+    return tag->document->getCriteriaHorizontalFormated(tag->version);
 }
 
 
 const QString Tag::getCriteriaSortFormated(const Tag *tag) {
     if(!tag)    return "";
-    return tag->document->getCriteriaSortFormated(tag->documentVersion);
+    return tag->document->getCriteriaSortFormated(tag->version);
 }
 const QString Tag::getCriteriaColorFormated(const Tag *tag) {
     if(!tag)    return "";
-    return tag->document->getCriteriaColorFormated(tag->documentVersion);
+    return tag->document->getCriteriaColorFormated(tag->version);
 }
 const QString Tag::getCriteriaClusterFormated(const Tag *tag) {
     if(!tag)    return "";
-    return tag->document->getCriteriaClusterFormated(tag->documentVersion);
+    return tag->document->getCriteriaClusterFormated(tag->version);
 }
 
 bool Tag::isTagLastVersion(const Tag *tag) {
-    if(tag) return (tag->documentVersion < 0) || (tag->documentVersion == tag->document->getMetadataCountM());
+    if(tag) return (tag->version < 0) || (tag->version == tag->document->getMetadataCountM());
     else    return false;
 }
 
@@ -865,12 +866,12 @@ QDomElement Tag::serialize(QDomDocument &xmlDoc) const {
     xmlData.setAttribute("timeStart",       getTimeStart());
     xmlData.setAttribute("timeEnd",         getTimeEnd());
     xmlData.setAttribute("type",            getType());
-    xmlData.setAttribute("documentVersion", documentVersion);
+    xmlData.setAttribute("documentVersion", version);
     if(linkedTags.count()) {
         QDomElement linkedTagsXml = xmlDoc.createElement("linkedTags");
         foreach(Tag *linkedTag, linkedTags) {
             QDomElement linkedTagXml = xmlDoc.createElement("linkedTag");
-            linkedTagXml.setAttribute("documentVersion", linkedTag->documentVersion);
+            linkedTagXml.setAttribute("documentVersion", linkedTag->version);
             linkedTagsXml.appendChild(linkedTagXml);
         }
         xmlData.appendChild(linkedTagsXml);

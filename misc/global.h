@@ -24,7 +24,7 @@
 #include "interfaces/udp.h"
 #include "qmath.h"
 
-enum DocumentType     { DocumentTypeFile, DocumentTypeVideo, DocumentTypeAudio, DocumentTypeImage, DocumentTypeDoc, DocumentTypeMarker, DocumentTypePeople };
+enum DocumentType     { DocumentTypeFile, DocumentTypeVideo, DocumentTypeAudio, DocumentTypeImage, DocumentTypeDoc, DocumentTypeMarker, DocumentTypePeople, DocumentTypeWeb };
 enum DocumentFunction { DocumentFunctionContextual, DocumentFunctionRender };
 enum DocumentStatus   { DocumentStatusWaiting, DocumentStatusProcessing, DocumentStatusReady };
 typedef QMap<QString, MetadataElement> QMetaMap;
@@ -126,9 +126,9 @@ class GlRect {
 public:
     QSize   size;
     QImage  image;
+    QString currentFilename;
 private:
     GLuint  texture;
-    QString filenameOld;
     bool    init;
 public:
     explicit GlRect() { init = false; texture = 0; }

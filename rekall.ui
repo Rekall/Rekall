@@ -86,7 +86,7 @@ QTabWidget#toolBoxRight::tab:selected, QTabWidget#toolBoxRight QTabBar::tab:sele
 	background-color: 				rgb(166,204,91);
 	border-left:							5px solid rgb(166,204,91);
 }
-QTabWidget#toolBoxLeft::tab:disabled, QTabWidget#toolBoxRight QTabBar::tab:disabled {
+QToolBox#toolBoxLeft::tab:disabled, QTabWidget#toolBoxRight QTabBar::tab:disabled {
 	color:									rgb(56, 61, 63);
 	border-left:							5px solid rgb(56, 61, 63);
 }
@@ -478,8 +478,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>192</height>
+            <width>100</width>
+            <height>178</height>
            </rect>
           </property>
           <attribute name="label">
@@ -521,8 +521,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>262</height>
+            <width>100</width>
+            <height>248</height>
            </rect>
           </property>
           <attribute name="label">
@@ -564,8 +564,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>498</height>
+            <width>100</width>
+            <height>484</height>
            </rect>
           </property>
           <attribute name="label">

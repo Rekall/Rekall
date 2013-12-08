@@ -46,15 +46,19 @@ QVariant UiFileItem::data(int column, int role) const {
                 else                       return "-";
             }
             if(column == 2) return filename.isTracked;
+            /*
             if(column == 3) return openInFinder.variant();
             if(column == 4) return openInOs.variant();
-            if(column == 5) return filename.file.absoluteFilePath();
+            */
+            if(column == 3) return filename.file.absoluteFilePath();
         }
         else {
             if(column == 1) return filename.isTracked;
+            /*
             if(column == 2) return openInFinder.variant();
             if(column == 3) return openInOs.variant();
-            if(column == 4) return filename.file.absoluteFilePath();
+            */
+            if(column == 2) return filename.file.absoluteFilePath();
         }
     }
     return QTreeWidgetItem::data(column, role);
@@ -338,9 +342,12 @@ void UiFileItem::fileWatcherFileChanged(QString file) {
 }
 
 void UiFileItem::fileShowInFinder() {
+    fileShowInFinder(filename.file.absoluteFilePath());
+}
+void UiFileItem::fileShowInFinder(const QString &uri) {
 #ifdef Q_OS_MAC
     QStringList scriptArgs;
-    scriptArgs << QLatin1String("-e") << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(filename.file.absoluteFilePath());
+    scriptArgs << QLatin1String("-e") << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(uri);
     QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
     scriptArgs.clear();
     scriptArgs << QLatin1String("-e") << QLatin1String("tell application \"Finder\" to activate");
@@ -350,6 +357,10 @@ void UiFileItem::fileShowInFinder() {
 void UiFileItem::fileShowInOS() {
     QDesktopServices::openUrl(QUrl::fromLocalFile(filename.file.absoluteFilePath()));
 }
+void UiFileItem::fileShowInOS(const QString &uri) {
+    QDesktopServices::openUrl(QUrl(uri));
+}
+
 
 void UiFileItem::configure(UiTreeView *tree, bool _showDateTime) {
     iconFolder   = QIcon(":/items/res_item_folder.png");
@@ -378,10 +389,10 @@ void UiFileItem::configure(UiTreeView *tree, bool _showDateTime) {
     UiTreeViewOptions col5 =   UiTreeViewOptions(columnIndex++, ""        , "checkboxS", ""           , QHeaderView::Fixed,   15 , 20, 20);
     col5.iconCheckedOn = col5.iconCheckedOff = QPixmap(":/items/res_item_open.png");
     tree->configureColumns(col5);
+    */
 
     UiTreeViewOptions col6 =   UiTreeViewOptions(columnIndex++, ""        , ""         ,     ""       , QHeaderView::Fixed,    1 , 20, 20);
     tree->configureColumns(col6);
-    */
 }
 
 

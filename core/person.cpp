@@ -2,7 +2,7 @@
 
 Person::Person(const PersonCard &card, QObject *parent) :
     Metadata(parent, true), PersonCard(card), QTreeWidgetItem() {
-    updateCard(*this);
+    updateCard(*this, getMetadataCountM());
     updateGUINeeded = true;
 }
 void Person::updateGUI() {

@@ -309,13 +309,13 @@ void GlText::drawText(const QPoint &pos) {
 
 
 void GlRect::setTexture(const QString &filename, const QSize &desiredSize) {
-    if(filename != filenameOld) {
+    if(filename != currentFilename) {
         init = false;
         image.load(filename);
         if((desiredSize.width() > 0) && (desiredSize.height() > 0))
             image = image.scaled(desiredSize, Qt::KeepAspectRatio);
         size = image.size();
-        filenameOld = filename;
+        currentFilename = filename;
     }
 }
 void GlRect::drawTexture(const QString &filename, const QRectF &rect, qreal croppingMode) {
@@ -327,7 +327,7 @@ void GlRect::drawTexture(const QRectF &rect, qreal croppingMode) {
         glEnable(GL_TEXTURE_2D);
         if(!texture) {
             glGenTextures(1, &texture);
-            qDebug("%s", qPrintable(QString("[OPENGL] Création de la texture #%1 => %2 (%3 x %4)").arg(texture).arg(filenameOld).arg(size.width()).arg(size.height())));
+            qDebug("%s", qPrintable(QString("[OPENGL] Création de la texture #%1 => %2 (%3 x %4)").arg(texture).arg(currentFilename).arg(size.width()).arg(size.height())));
         }
         glBindTexture  (GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

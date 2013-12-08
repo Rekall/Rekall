@@ -142,6 +142,7 @@ public:
     bool updateFile(const QFileInfo &file, const QDir &dirBase = QDir(), qint16 version = -1, quint16 falseInfoForTest = 0);
     bool updateImport(const QString &name, qint16 version = -1);
     bool updateCard(const PersonCard &card, qint16 version = -1);
+    bool updateWeb(const QString &url, qint16 version = -1);
     void updateFeed();
     void addKeyword(const QStringList &keywords, qint16 version = -1, const QString &key = "Keywords", const QString &category = "Rekall");
     void addKeyword(const QString &keyword, qint16 version = -1, const QString &key = "Keywords", const QString &category = "Rekall");
@@ -196,6 +197,7 @@ public:
         else if(metaType == "document")  metadatas[version].getTypeCache = DocumentTypeDoc;
         else if(metaType == "cue")       metadatas[version].getTypeCache = DocumentTypeMarker;
         else if(metaType == "people")    metadatas[version].getTypeCache = DocumentTypePeople;
+        else if(metaType == "web")       metadatas[version].getTypeCache = DocumentTypeWeb;
         else                             metadatas[version].getTypeCache = DocumentTypeFile;
     }
 
@@ -209,7 +211,8 @@ public:
         else if(type == DocumentTypeImage)  setMetadata("Rekall", "Type", "Image",    version);
         else if(type == DocumentTypeDoc)    setMetadata("Rekall", "Type", "Document", version);
         else if(type == DocumentTypeMarker) setMetadata("Rekall", "Type", "Cue",      version);
-        else if(type == DocumentTypePeople) setMetadata("Rekall", "Type", "Peope",    version);
+        else if(type == DocumentTypePeople) setMetadata("Rekall", "Type", "People",    version);
+        else if(type == DocumentTypeWeb)    setMetadata("Rekall", "Type", "Web",      version);
         else                                setMetadata("Rekall", "Type", "Other",    version);
     }
 

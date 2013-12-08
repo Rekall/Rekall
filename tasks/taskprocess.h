@@ -6,6 +6,9 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QTreeWidgetItem>
+#include <QWebPage>
+#include <QWebView>
+#include <QWebFrame>
 #include "misc/global.h"
 #include "core/metadata.h"
 #include "core/person.h"
@@ -49,19 +52,22 @@ public:
     void init();
 
 private:
-    TaskProcessData processedDocument;
-    QFileInfo       processedFile;
+    QFileInfo       file;
 public:
-    bool taskStarted;
+    TaskProcessData document;
+    QString         name, thumbFilepath, thumbFilename;
+    bool            started;
 private:
     void run();
 public:
     static QProcessOutput launchCommand(const TaskProcessData &processData);
+    void sendFinishedSignal();
 
 signals:
     void finished  (TaskProcess*);
     void updateList(TaskProcess*, int);
     void updateList(TaskProcess*, const QString &);
+    void analyseWebContent(TaskProcess*);
 };
 
 #endif // TASKPROCESS_H

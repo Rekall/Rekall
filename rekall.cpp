@@ -6,7 +6,10 @@ Rekall::Rekall(QWidget *parent) :
     ui(new Ui::Rekall) {
     ui->setupUi(this);
     setAcceptDrops(true);
-    currentProject = 0;
+    currentProject  = 0;
+    currentDocument = 0;
+    currentMetadata = 0;
+
     metaIsChanging = chutierIsUpdating = false;
     openProject    = true;
 
@@ -175,7 +178,7 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
             while(roleDataMapIterator.hasNext()) {
                 roleDataMapIterator.next();
                 QFileInfo file = QFileInfo(roleDataMapIterator.value().toString());
-                if((col > 3) && (file.exists())) {
+                if((col == 2) && (file.exists())) {
                     droppedFiles << file;
                     Document *document = currentProject->getDocument(file.absoluteFilePath());
                     if(document)
@@ -238,21 +241,17 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
         else {
             if(droppedFiles.count())
                 currentProject->open(droppedFiles, ui->chutier);
-            /*
+
             foreach(const QFileInfo &droppedFile, droppedFiles) {
                 Document *document = currentProject->getDocument(droppedFile.absoluteFilePath());
-                if(document)    droppedDocuments << document;
+                if(document)
+                    droppedDocuments << document;
             }
-            */
             foreach(Document *droppedDocument, droppedDocuments) {
-                /*
-                Tag *tag = new Tag(droppedDocument);
-                tag->init(TagTypeContextualTime, currentProject->getTimelineCursorTime(Global::timelineGL->mapFromGlobal(QCursor::pos()) + Global::timelineGL->scroll), 10);
-                currentProject->addTag(tag);
+                droppedDocument->createTag(TagTypeContextualTime, currentProject->getTimelineCursorTime(Global::timelineGL->mapFromGlobal(QCursor::pos()) + Global::timelineGL->scroll), 5);
                 if(droppedDocument->chutierItem)
                     Global::chutier->setCurrentItem(droppedDocument->chutierItem);
                 retour = true;
-                */
             }
             Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
         }
@@ -271,11 +270,18 @@ void Rekall::action() {
         parseMimeData(QApplication::clipboard()->mimeData(), "rekall");
     else if(sender() == ui->metadataOpenGps)
         gps->show();
-    else if((sender() == ui->metadataOpen) && (currentDocument) && (currentDocument->chutierItem))
-        currentDocument->chutierItem->fileShowInOS();
-    else if((sender() == ui->metadataOpenFinder) && (currentDocument) && (currentDocument->chutierItem))
-        currentDocument->chutierItem->fileShowInFinder();
-
+    else if((sender() == ui->metadataOpen) && (currentMetadata)) {
+        if(currentMetadata->chutierItem)
+            currentMetadata->chutierItem->fileShowInOS();
+        else
+            UiFileItem::fileShowInOS(currentMetadata->getMetadata("Rekall", "URL").toString());
+    }
+    else if((sender() == ui->metadataOpenFinder) && (currentMetadata)) {
+        if(currentMetadata->chutierItem)
+            currentMetadata->chutierItem->fileShowInFinder();
+        else if(currentMetadata->thumbnails.count())
+            UiFileItem::fileShowInFinder(currentMetadata->thumbnails.first().currentFilename);
+    }
     else if(sender() == ui->actionMarker) {
         Global::timeline->actionMarkerAddStart();
         Global::timeline->actionMarkerAddEnd();
@@ -297,17 +303,17 @@ void Rekall::actionForceGL() {
 }
 
 void Rekall::actionMetadata() {
-    if((currentDocument) && (ui->metadata->currentItem()) && (ui->metadata->currentItem()->parent())) {
+    if((currentMetadata) && (ui->metadata->currentItem()) && (ui->metadata->currentItem()->parent())) {
         QString key      = ui->metadata->currentItem()->text(0).remove(QRegExp("<[^>]*>")).trimmed();
         QString value    = ui->metadata->currentItem()->text(1).remove(QRegExp("<[^>]*>")).trimmed();
         QString category = ui->metadata->currentItem()->parent()->text(0).remove(QRegExp("<[^>]*>")).trimmed();
         if(category == "General")   category = "Rekall";
-        currentDocument->setMetadata(category, key, value, ui->metadataSlider->value());
+        currentMetadata->setMetadata(category, key, value, ui->metadataSlider->value());
         Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
     }
 }
 void Rekall::actionMetadata(QTreeWidgetItem *item, int) {
-    if((!metaIsChanging) && (item) && (currentDocument)) {
+    if((!metaIsChanging) && (item) && (currentMetadata)) {
         QString category, meta, value;
         if(item->parent())
             category = item->parent()->text(0);
@@ -371,8 +377,8 @@ void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB, T
         else    currentDocument = currentProject->getDocumentAndSelect(((UiFileItem*)item)->filename.file.absoluteFilePath());
         displayMetadata(currentDocument, tag, ui->chutier->getTree(), item, itemB);
 
-        if((currentDocument) && (sender() == ui->chutier->getTree()))
-            ui->metadataSlider->setValue(currentDocument->getMetadataCountM());
+        if((currentMetadata) && (sender() == ui->chutier->getTree()))
+            ui->metadataSlider->setValue(currentMetadata->getMetadataCountM());
 
         if((currentDocument) && (!chutierIsUpdating)) {
             foreach(Tag *documentTag, currentDocument->tags) {
@@ -396,6 +402,7 @@ void Rekall::personItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
 }
 void Rekall::displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget *tree, QTreeWidgetItem *item, QTreeWidgetItem *) {
     metaIsChanging = true;
+    currentMetadata = metadata;
 
     //Standard operations
     if((tree) && (item))
@@ -419,7 +426,6 @@ void Rekall::displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget *tree, QT
     if(expandItems.count() == 0)
         expandItems << "General" << "Contact details";
 
-
     if(metadata) {
         ui->metadata->clear();
 
@@ -441,6 +447,7 @@ void Rekall::displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget *tree, QT
         QMapIterator<QString, QMetaMap> metaIterator(metadata->getMetadata(ui->metadataSlider->value()));
         while(metaIterator.hasNext()) {
             metaIterator.next();
+
             QTreeWidgetItem *rootItem = 0;
             QString metaIteratorKey = metaIterator.key();
             if(metaIteratorKey == "Rekall")
@@ -453,6 +460,7 @@ void Rekall::displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget *tree, QT
             QMapIterator<QString,MetadataElement> ssMetaIterator(metaIterator.value());
             while(ssMetaIterator.hasNext()) {
                 ssMetaIterator.next();
+
                 QString color = "#000000";
                 if(ssMetaIterator.key() == "Name") {
                     color = metadata->baseColor.name();
@@ -470,7 +478,7 @@ void Rekall::displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget *tree, QT
             else                                         ui->metadata->collapseItem(rootItem);
         }
 
-        if(metadata->chutierItem) {
+        if((metadata->chutierItem) || (metadata->getType() == DocumentTypeWeb)) {
             ui->metadataOpenFinder->setVisible(true);
             ui->metadataOpen      ->setVisible(true);
         }

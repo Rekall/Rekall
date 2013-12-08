@@ -8,6 +8,20 @@ Project::Project(QWidget *parent) :
 }
 
 void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
+    //Web
+    Document *document = new Document(this);
+    if(document->updateWeb("http://www.youtube.com/watch?v=cufauMezz_Q"))
+        document->createTag();
+    document->updateFeed();
+
+    document = new Document(this);
+    if(document->updateWeb("https://twitter.com/arielunaa/status/393195155748315136"))
+        document->createTag();
+    document->updateFeed();
+
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+
+
     foreach(const QFileInfo &file, files) {
         QDir dir(file.absoluteFilePath());
         if(file.isFile())
@@ -45,6 +59,7 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
 
 
     if(debug) {
+        //Marker
         for(quint16 i = 1 ; i < 2 ; i++) {
             Document *document = new Document(this);
             if(document->updateImport(QString("Marker #%1").arg(i)))
@@ -52,6 +67,7 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
             document->updateFeed();
         }
 
+        //Linked
         Tag *previousTag = 0;
         foreach(Document *document, documents) {
             foreach(Tag *tag, document->tags) {

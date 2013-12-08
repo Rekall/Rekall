@@ -22,7 +22,7 @@ public:
 private:
     qreal   timeStart, timeEnd, timeMediaOffset;
     TagType type;
-    qint16  documentVersion;
+    qint16  version;
 public:
     QList<QString> linkedRenders;
     QList<Tag*>    linkedTags;
@@ -52,12 +52,12 @@ public:
 
 public:
     void init(TagType _type, qreal _timeStart, qreal _duration = 0, bool debug = false);
-    const QString getTitle() const { return document->getName(documentVersion); }
-    inline qint16 getDocumentVersion() const    {  return document->getMetadataIndexVersion(documentVersion); }
-    inline qint16 getDocumentVersionRaw() const {  return documentVersion; }
+    const QString getTitle() const { return document->getName(version); }
+    inline qint16 getDocumentVersion() const    {  return document->getMetadataIndexVersion(version); }
+    inline qint16 getDocumentVersionRaw() const {  return version; }
     inline void   setDocumentVersion(qint16 versionShift = 0) {
-        if(documentVersion < 0)
-            documentVersion = getDocumentVersion() + versionShift;
+        if(version < 0)
+            version = getDocumentVersion() + versionShift;
     }
 
 private:
