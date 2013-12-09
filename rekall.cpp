@@ -49,6 +49,7 @@ Rekall::Rekall(QWidget *parent) :
     Global::tagFilterCriteria     = new Sorting(tr("Filter rules"),     6);
     Global::tagSortCriteria       = new Sorting(tr("Sorting rules"),    2);
     Global::tagColorCriteria      = new Sorting(tr("Color rules"),      5);
+    Global::tagTextCriteria       = new Sorting(tr("Text rules"),       0);
     Global::tagClusterCriteria    = new Sorting(tr("Hightlight rules"), 7, true);
     Global::tagHorizontalCriteria = new Sorting(tr("Horizontal rules"), 1, false, true);
 
@@ -56,6 +57,7 @@ Rekall::Rekall(QWidget *parent) :
     Global::tagFilterCriteria    ->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::tagSortCriteria      ->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::tagColorCriteria     ->setStyleSheet(styleSheet() + styleAdditionnal);
+    Global::tagTextCriteria      ->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::tagClusterCriteria   ->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::tagHorizontalCriteria->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::phases               ->setStyleSheet(styleSheet() + styleAdditionnal);
@@ -67,6 +69,7 @@ Rekall::Rekall(QWidget *parent) :
     connect(Global::tagFilterCriteria,     SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(Global::tagSortCriteria,       SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(Global::tagColorCriteria,      SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::tagTextCriteria,       SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(Global::tagClusterCriteria,    SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(Global::tagHorizontalCriteria, SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(ui->timeline->timelineControl, SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
@@ -75,12 +78,14 @@ Rekall::Rekall(QWidget *parent) :
     connect(Global::tagFilterCriteria,     SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagSortCriteria,       SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagColorCriteria,      SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::tagTextCriteria,       SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagClusterCriteria,    SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagHorizontalCriteria, SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     Global::phases               ->action();
     Global::tagFilterCriteria    ->action();
     Global::tagSortCriteria      ->action();
     Global::tagColorCriteria     ->action();
+    Global::tagTextCriteria      ->action();
     Global::tagClusterCriteria   ->action();
     Global::tagHorizontalCriteria->action();
 

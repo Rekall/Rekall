@@ -59,6 +59,7 @@ bool         Global::ticksChanged                 = true;
 QMap<QString, QPair<QColor, qreal> > Global::colorForMeta;
 Sorting*     Global::tagSortCriteria       = 0;
 Sorting*     Global::tagColorCriteria      = 0;
+Sorting*     Global::tagTextCriteria       = 0;
 Sorting*     Global::tagClusterCriteria    = 0;
 Sorting*     Global::tagFilterCriteria     = 0;
 Sorting*     Global::tagHorizontalCriteria = 0;

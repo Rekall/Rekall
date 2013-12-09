@@ -2,6 +2,7 @@
 #define TAG_H
 
 #include <QObject>
+#include <QMenu>
 #include "misc/global.h"
 #include "metadata.h"
 
@@ -24,6 +25,7 @@ private:
     TagType type;
     qint16  version;
 public:
+    QString        displayText;
     QList<QString> linkedRenders;
     QList<Tag*>    linkedTags;
 public:
@@ -34,7 +36,7 @@ public:
     void setTimeStart      (qreal _timeStart);
     void setTimeEnd        (qreal _timeEnd);
     void setTimeMediaOffset(qreal _timeMediaOffset);
-    void setType           (TagType _type, qreal time);
+    void setType           (TagType _type, qreal time = -1);
     void moveTimeStart(qreal _timeStart);
     void moveTimeEnd  (qreal _timeEnd);
     void addTimeMediaOffset(qreal offset);
@@ -94,7 +96,7 @@ public:
     void fireEvents();
 
 private:
-    GlText  viewerTimeText, viewerDocumentText, timelineTimeStartText, timelineTimeEndText, timelineTimeDurationText;
+    GlText  viewerTimeText, viewerDocumentText, timelineTimeStartText, timelineTimeEndText, timelineTimeDurationText, timelineDocumentText;
     GlRect  viewerTimePastille;
     bool    timelineFirstPos, timelineFirstPosVisible;
     bool    viewerFirstPos, viewerFirstPosVisible;
@@ -132,6 +134,7 @@ public:
     bool tagHistoryFilters() const;
     bool isAcceptableWithSortFilters      (bool strongCheck) const;
     bool isAcceptableWithColorFilters     (bool strongCheck) const;
+    bool isAcceptableWithTextFilters      (bool strongCheck) const;
     bool isAcceptableWithClusterFilters   (bool strongCheck) const;
     bool isAcceptableWithFilterFilters    (bool strongCheck) const;
     bool isAcceptableWithHorizontalFilters(bool strongCheck) const;
@@ -142,12 +145,14 @@ public:
     static bool sortAlpha (const Tag *first, const Tag *second);
     static const QString getCriteriaSort              (const Tag *tag);
     static const QString getCriteriaColor             (const Tag *tag);
+    static const QString getCriteriaText              (const Tag *tag);
     static const QString getCriteriaCluster           (const Tag *tag);
     static const QString getCriteriaFilter            (const Tag *tag);
     static const QString getCriteriaHorizontal        (const Tag *tag);
     static const MetadataElement getCriteriaPhase     (const Tag *tag);
     static const QString getCriteriaSortFormated      (const Tag *tag);
     static const QString getCriteriaColorFormated     (const Tag *tag);
+    static const QString getCriteriaTextFormated      (const Tag *tag);
     static const QString getCriteriaClusterFormated   (const Tag *tag);
     static const QString getCriteriaFilterFormated    (const Tag *tag);
     static const QString getCriteriaHorizontalFormated(const Tag *tag);

@@ -52,28 +52,30 @@ void TaskProcess::run() {
                 QStringList exifDatas = launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", Global::pathApplication.absoluteFilePath() + "/tools", QStringList() << "−c" << "%+.6f" << "-d" << "%Y:%m:%d %H:%M:%S" << "-G" << file.absoluteFilePath())).second.split("\n");
                 foreach(const QString &exifData, exifDatas) {
                     QPair<QString, QPair<QString,QString> > meta = Global::seperateMetadataAndGroup(exifData);
-                    if(meta.second.first == "File Type")
-                        document.metadata->setMetadata(meta.first, meta.second.first, meta.second.second.toUpper(), document.version);
-                    else if((meta.second.first == "File Inode Change Date/Time") || (meta.second.first == "File Modification Date/Time") || (meta.second.first == "File Creation Date/Time") || (meta.second.first == "File Access Date/Time")) {}
-                    else if((meta.first != "ExifTool") && (!meta.second.second.contains("use -b option to extract"))) {
-                        QString metaTitle = meta.second.first;
-                        if(metaTitle == "GPS Position")
-                            metaTitle = "GPS Coordinates";
-                        document.metadata->setMetadata(meta.first, metaTitle, meta.second.second, document.version);
-                    }
-                    if((meta.second.first.toLower().contains("duration")) && (!(meta.second.first.toLower().contains("value")))) {
-                        qreal duration = Global::getDurationFromString(meta.second.second);
-                        if(duration) {
-                            mediaDuration = duration;
-                            document.metadata->setMetadata("Rekall", "Media Duration", duration, document.version);
+                    if((!meta.first.isEmpty()) && (!meta.second.first.isEmpty()) && (!meta.second.second.isEmpty())) {
+                        if(meta.second.first == "File Type")
+                            document.metadata->setMetadata(meta.first, meta.second.first, meta.second.second.toUpper(), document.version);
+                        else if((meta.second.first == "File Inode Change Date/Time") || (meta.second.first == "File Modification Date/Time") || (meta.second.first == "File Creation Date/Time") || (meta.second.first == "File Access Date/Time")) {}
+                        else if((meta.first != "ExifTool") && (!meta.second.second.contains("use -b option to extract"))) {
+                            QString metaTitle = meta.second.first;
+                            if(metaTitle == "GPS Position")
+                                metaTitle = "GPS Coordinates";
+                            document.metadata->setMetadata(meta.first, metaTitle, meta.second.second, document.version);
                         }
+                        if((meta.second.first.toLower().contains("duration")) && (!(meta.second.first.toLower().contains("value")))) {
+                            qreal duration = Global::getDurationFromString(meta.second.second);
+                            if(duration) {
+                                mediaDuration = duration;
+                                document.metadata->setMetadata("Rekall", "Media Duration", duration, document.version);
+                            }
+                        }
+                        if(meta.second.first.toLower().contains("author"))
+                            document.metadata->setMetadata("Rekall", "Author", meta.second.second, document.version);
+                        if(meta.second.first.toLower().contains("file size"))
+                            document.metadata->setMetadata("Rekall", "Size",   meta.second.second, document.version);
+                        if(meta.second.first.toLower().contains("keywords"))
+                            document.metadata->addKeyword(meta.second.second, document.version);
                     }
-                    if(meta.second.first.toLower().contains("author"))
-                        document.metadata->setMetadata("Rekall", "Author", meta.second.second, document.version);
-                    if(meta.second.first.toLower().contains("file size"))
-                        document.metadata->setMetadata("Rekall", "Size",   meta.second.second, document.version);
-                    if(meta.second.first.toLower().contains("keywords"))
-                        document.metadata->addKeyword(meta.second.second, document.version);
                 }
             }
 

@@ -16,12 +16,14 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
     timeStart = timeEnd = timeMediaOffset = 0;
     tagScale     = 0;
     tagDestScale = 1;
+    displayText  = "";
 
     viewerTimeText          .setStyle(QSize( 70, Global::viewerTagHeight), Qt::AlignCenter,    Global::font);
-    viewerDocumentText      .setStyle(QSize(500, Global::viewerTagHeight), Qt::AlignVCenter,   Global::font);
+    viewerDocumentText      .setStyle(QSize(300, Global::viewerTagHeight), Qt::AlignVCenter,   Global::font);
     timelineTimeStartText   .setStyle(QSize( 70, Global::timelineTagHeightDest), Qt::AlignRight | Qt::AlignVCenter, Global::fontSmall);
     timelineTimeEndText     .setStyle(QSize( 70, Global::timelineTagHeightDest), Qt::AlignLeft  | Qt::AlignVCenter, Global::fontSmall);
-    timelineTimeDurationText.setStyle(QSize(100, Global::timelineTagHeightDest), Qt::AlignCenter,  Global::fontSmall);
+    timelineTimeDurationText.setStyle(QSize(100, Global::timelineTagHeightDest), Qt::AlignCenter, Global::fontSmall);
+    timelineDocumentText    .setStyle(QSize(300, Global::timelineTagHeightDest), Qt::AlignCenter, Global::fontSmall);
 }
 
 void Tag::init(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
@@ -31,7 +33,7 @@ void Tag::init(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
         player = new PlayerVideo();
         player->load(this, ((document->getType() == DocumentTypeVideo) || (document->getType() == DocumentTypeImage)), document->file.absoluteFilePath());
         if(debug)
-            _duration = Global::aleaF(50, 180);
+            _duration = Global::alea(50, 180);
     }
     else {
         if(debug) {
@@ -53,9 +55,9 @@ void Tag::init(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
         }
         if(debug) {
             qreal tirage = Global::aleaF(0, 100);
-            if(tirage > 50)       _duration = Global::aleaF( 2,  5);
-            else if(tirage > 10)  _duration = Global::aleaF( 5, 12);
-            else                  _duration = Global::aleaF(12, 25);
+            if(tirage > 50)       _duration = Global::alea( 2,  5);
+            else if(tirage > 10)  _duration = Global::alea( 5, 12);
+            else                  _duration = Global::alea(12, 25);
         }
     }
     if(getType() == TagTypeContextualTime)
@@ -63,10 +65,11 @@ void Tag::init(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
 }
 void Tag::setType(TagType _type, qreal time) {
     type = _type;
+    if(time < 0)    time = timeStart;
     if(getType() == TagTypeContextualTime) {
         if((timeStart == 0) && (timeEnd == 0))  timeStart = time;
         else                                    timeStart = time - 5;
-        timeEnd = timeStart + 10;
+        timeEnd = timeStart + 5;
     }
     else
         timeStart = timeEnd = time;
@@ -266,26 +269,35 @@ const QRectF Tag::paintTimeline(bool before) {
             }
 
             //Text
-            if((Global::selectedTag == this) && (getType() != TagTypeGlobal)) {
-                QPoint textPos;
+            QPoint textPos;
+            if(getType() != TagTypeGlobal) {
                 Global::timelineGL->qglColor(realTimeColor);
 
-                textPos = QPoint(timelineBoundingRect.left() - 2 - timelineTimeStartText.size.width(), 1 + timelineBoundingRect.center().y() - timelineTimeStartText.size.height()/2);
-                timelineTimeStartText.drawText(Sorting::timeToString(getTimeStart()), textPos);
+                if(Global::selectedTag == this) {
+                    textPos = QPoint(timelineBoundingRect.left() - 2 - timelineTimeStartText.size.width(), 1 + timelineBoundingRect.center().y() - timelineTimeStartText.size.height()/2);
+                    timelineTimeStartText.drawText(Sorting::timeToString(getTimeStart()), textPos);
 
-                if(getType() == TagTypeContextualTime) {
-                    textPos = QPoint(timelineBoundingRect.right() + 2, 1 + timelineBoundingRect.center().y() - timelineTimeEndText.size.height()/2);
-                    timelineTimeEndText.drawText(Sorting::timeToString(getTimeEnd()), textPos);
+                    if(getType() == TagTypeContextualTime) {
+                        textPos = QPoint(timelineBoundingRect.right() + 2, 1 + timelineBoundingRect.center().y() - timelineTimeEndText.size.height()/2);
+                        if(Global::tagHorizontalCriteria->isTimeline())
+                            timelineTimeEndText.drawText(Sorting::timeToString(getTimeEnd()), textPos);
+                        else
+                            timelineTimeEndText.drawText(Sorting::timeToString(getTimeEnd()) + " (" + Sorting::timeToString(getDuration()) + ")", textPos);
 
-                    if(isTagLastVersion(this))
-                        Global::timelineGL->qglColor(Qt::white);
-                    textPos = QPoint(timelineBoundingRect.center().x() - timelineTimeDurationText.size.width()/2, 1 + timelineBoundingRect.center().y() - timelineTimeDurationText.size.height()/2);
-                    if(document->getFunction(version) == DocumentFunctionRender) {
-                        if(getTimeMediaOffset() > 0)    timelineTimeDurationText.drawText(Sorting::timeToString(getDuration()) + " / " + Sorting::timeToString(document->getMediaDuration()) + tr(" (-") + Sorting::timeToString(getTimeMediaOffset()) + ")", textPos);
-                        else                            timelineTimeDurationText.drawText(Sorting::timeToString(getDuration()) + " / " + Sorting::timeToString(document->getMediaDuration()), textPos);
+                        if(isTagLastVersion(this))
+                            Global::timelineGL->qglColor(Qt::white);
+                        textPos = QPoint(timelineBoundingRect.center().x() - timelineTimeDurationText.size.width()/2, 1 + timelineBoundingRect.center().y() - timelineTimeDurationText.size.height()/2);
+                        if(document->getFunction(version) == DocumentFunctionRender) {
+                            if(getTimeMediaOffset() > 0)    timelineTimeDurationText.drawText(Sorting::timeToString(getDuration()) + " / " + Sorting::timeToString(document->getMediaDuration()) + tr(" (-") + Sorting::timeToString(getTimeMediaOffset()) + ")", textPos);
+                            else                            timelineTimeDurationText.drawText(Sorting::timeToString(getDuration()) + " / " + Sorting::timeToString(document->getMediaDuration()), textPos);
+                        }
+                        else if(Global::tagHorizontalCriteria->isTimeline())
+                            timelineTimeDurationText.drawText(Sorting::timeToString(getDuration()), textPos);
                     }
-                    else
-                        timelineTimeDurationText.drawText(Sorting::timeToString(getDuration()), textPos);
+                }
+                if((!displayText.isEmpty()) && (document->getFunction(version) == DocumentFunctionContextual)) {
+                    textPos = QPoint(timelineBoundingRect.center().x() - timelineDocumentText.size.width()/2, timelineBoundingRect.top() - timelineDocumentText.size.height() - 1);
+                    timelineDocumentText.drawText(displayText, textPos);
                 }
             }
 
@@ -673,7 +685,7 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
                 Global::selectedTagHover = this;
                 Global::mainWindow->refreshMetadata(this, true);
             }
-            else if(Global::selectedTagInAction != this) {
+            else if((Global::selectedTagInAction != this) && (Global::tagHorizontalCriteria->isTimeline())) {
                 Global::selectedTagInAction  = this;
                 Global::selectedTagStartDrag = timelineProgress(pos) * getDuration();
                 if((e->button() & Qt::LeftButton) == Qt::LeftButton) {
@@ -686,6 +698,31 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
                     else                                                                             Global::selectedTagMode = TagSelectionMove;
                 }
             }
+
+            //Menu
+            if(((e->buttons() & Qt::RightButton) == Qt::RightButton) && (Global::tagHorizontalCriteria->isTimeline())) {
+                QMenu *menu = new QMenu(Global::mainWindow);
+                QAction *actionToContextualTime = 0, *actionToGlobal = 0, *actionToContextualMilestone = 0;
+                if(getType() == TagTypeGlobal) {
+                    actionToContextualTime      = menu->addAction(QIcon(":/icons/res_icon_toContextualDuration.png"),  tr("Convert to duration document…"));
+                    actionToContextualMilestone = menu->addAction(QIcon(":/icons/res_icon_toContextualMilestone.png"), tr("Convert to milestone document…"));
+                }
+                else {
+                    actionToGlobal = menu->addAction(QIcon(":/icons/res_icon_toGlobal.png"), tr("Convert to global…"));
+                    if(     getType() == TagTypeContextualTime)       actionToContextualMilestone = menu->addAction(QIcon(":/icons/res_icon_toContextualMilestone.png"), tr("Convert to milestone…"));
+                    else if(getType() == TagTypeContextualMilestone)  actionToContextualTime      = menu->addAction(QIcon(":/icons/res_icon_toContextualDuration.png"),  tr("Add duration…"));
+                }
+                QAction *ret = menu->exec(QCursor::pos());
+                if(     ret == actionToGlobal)                setType(TagTypeGlobal);
+                else if(ret == actionToContextualMilestone)   setType(TagTypeContextualMilestone);
+                else if(ret == actionToContextualTime)        setType(TagTypeContextualTime);
+                if(ret) {
+                    Global::timelineGL->ensureVisible(getTimelineBoundingRect().translated(timelineDestPos).topLeft());
+                    Global::viewerGL  ->ensureVisible(getViewerBoundingRect()  .translated(viewerDestPos)  .topLeft());
+                }
+            }
+
+            //Opens
             if(dbl) {
                 if(document->chutierItem)
                     document->chutierItem->fileShowInOS();
@@ -761,6 +798,9 @@ bool Tag::isAcceptableWithSortFilters(bool strongCheck) const {
 bool Tag::isAcceptableWithColorFilters(bool strongCheck) const {
     return (tagHistoryFilters()) && (document->isAcceptableWithColorFilters(strongCheck, version));
 }
+bool Tag::isAcceptableWithTextFilters(bool strongCheck) const {
+    return (tagHistoryFilters()) && (document->isAcceptableWithTextFilters(strongCheck, version));
+}
 bool Tag::isAcceptableWithClusterFilters(bool strongCheck) const {
     return (tagHistoryFilters()) && (document->isAcceptableWithClusterFilters(strongCheck, version));
 }
@@ -818,6 +858,10 @@ const QString Tag::getCriteriaColor(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaColor(tag->version);
 }
+const QString Tag::getCriteriaText(const Tag *tag) {
+    if(!tag)    return "";
+    return tag->document->getCriteriaText(tag->version);
+}
 const QString Tag::getCriteriaCluster(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaCluster(tag->version);
@@ -846,6 +890,10 @@ const QString Tag::getCriteriaHorizontalFormated(const Tag *tag) {
 const QString Tag::getCriteriaSortFormated(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaSortFormated(tag->version);
+}
+const QString Tag::getCriteriaTextFormated(const Tag *tag) {
+    if(!tag)    return "";
+    return tag->document->getCriteriaTextFormated(tag->version);
 }
 const QString Tag::getCriteriaColorFormated(const Tag *tag) {
     if(!tag)    return "";

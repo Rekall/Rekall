@@ -41,7 +41,9 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
 
     if(!file.exists())
         setType(DocumentTypeMarker);
-    setMetadata("Rekall", "Name",         name, version);
+    setMetadata("Rekall", "Name",               name, version);
+    setMetadata("Rekall", "Comments",           "",   version);
+    //setMetadata("Rekall", "Comments (details)", "",   version);
     setMetadata("Rekall", "Author",       Global::userInfos->getInfo("User Name"), version);
     quint16 tirage = Global::alea(0, 100);
     if(tirage < 10)        setMetadata("Rekall", "Author", "Julie Valero",         version);
@@ -50,8 +52,8 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     else if(tirage < 50)   setMetadata("Rekall", "Author", "Jean-François Peyret", version);
     else if(tirage < 70)   setMetadata("Rekall", "Author", "Agnès de Cayeux",      version);
     else                   setMetadata("Rekall", "Author", "Thierry Coduys",       version);
-    setMetadata("Rekall", "Date/Time",    QDateTime::currentDateTime(), version);
-    setMetadata("Rekall", "Import Date/Time",      QDateTime::currentDateTime(), version);
+    setMetadata("Rekall", "Date/Time",          QDateTime::currentDateTime(), version);
+    setMetadata("Rekall", "Import Date/Time",   QDateTime::currentDateTime(), version);
     setMetadata(Global::userInfos->getInfos());
 
     setFunction(DocumentFunctionContextual, version);
@@ -270,7 +272,7 @@ const MetadataElement Metadata::getMetadata(const QString &category, const QStri
 void Metadata::setMetadata(const QString &category, const QString &key, const QString &value, qint16 version) {
     if(key.toLower().contains("date"))
         setMetadata(category, key, QDateTime::fromString(value, "yyyy:MM:dd hh:mm:ss"), version);
-    else if(!value.isEmpty()) {
+    else if(true) {
         version = getMetadataIndexVersion(version);
         metadataMutex = true;
         metadatas[version][category][key] = value;
@@ -279,7 +281,7 @@ void Metadata::setMetadata(const QString &category, const QString &key, const QS
     }
 }
 void Metadata::setMetadata(const QString &category, const QString &key, const QDateTime &value, qint16 version) {
-    if(!value.isNull()) {
+    if(true) {
         version = getMetadataIndexVersion(version);
         metadataMutex = true;
         metadatas[version][category][key] = value;
@@ -288,7 +290,7 @@ void Metadata::setMetadata(const QString &category, const QString &key, const QD
     }
 }
 void Metadata::setMetadata(const QString &category, const QString &key, const MetadataElement &value, qint16 version) {
-    if(!value.toString().isEmpty()) {
+    if(true) {
         version = getMetadataIndexVersion(version);
         metadataMutex = true;
         metadatas[version][category][key] = value;
@@ -328,6 +330,14 @@ bool Metadata::isAcceptableWithColorFilters(bool strongCheck, qint16 version) co
             && (Global::tagColorCriteria     ->isAcceptable(strongCheck, getCriteriaColor(version)))
             && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
+bool Metadata::isAcceptableWithTextFilters(bool strongCheck, qint16 version) const {
+    return (getFunction() == DocumentFunctionContextual)
+            && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+            && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
+            && (Global::tagTextCriteria      ->isAcceptable(strongCheck, getCriteriaText(version)))
+            && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
+}
 bool Metadata::isAcceptableWithClusterFilters(bool strongCheck, qint16 version) const {
     return (getFunction() == DocumentFunctionContextual)
             && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
@@ -364,6 +374,14 @@ const QString Metadata::getCriteriaColor(qint16 version) const {
 const QString Metadata::getCriteriaColorFormated(qint16 version) const {
     if(getFunction() == DocumentFunctionRender) return QString();
     return Global::tagColorCriteria->getCriteriaFormated(getCriteriaColor(version));
+}
+const QString Metadata::getCriteriaText(qint16 version) const {
+    if(getFunction() == DocumentFunctionRender) return QString();
+    return Global::tagTextCriteria->getCriteria(getMetadata(Global::tagTextCriteria->getTagNameCategory(), Global::tagTextCriteria->getTagName(), version).toString(Global::tagTextCriteria->getTrunctionLeft(), Global::tagTextCriteria->getTrunctionLength()));
+}
+const QString Metadata::getCriteriaTextFormated(qint16 version) const {
+    if(getFunction() == DocumentFunctionRender) return QString();
+    return Global::tagTextCriteria->getCriteriaFormated(getCriteriaText(version));
 }
 const QString Metadata::getCriteriaCluster(qint16 version) const {
     if(getFunction() == DocumentFunctionRender) return QString();

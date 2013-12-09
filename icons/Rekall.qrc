@@ -48,6 +48,10 @@
         <file>res_icon_history.png</file>
         <file>res_icon_history_reverse.png</file>
         <file>res_icon_marker.png</file>
+        <file>res_icon_toContextualDuration.png</file>
+        <file>res_icon_toContextualMilestone.png</file>
+        <file>res_icon_toGlobal.png</file>
+        <file>res_icon_filter_text.png</file>
     </qresource>
     <qresource prefix="/textures">
         <file>res_texture_strips.png</file>

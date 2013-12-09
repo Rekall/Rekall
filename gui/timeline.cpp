@@ -210,6 +210,11 @@ void Timeline::action() {
         if(ui->colorBy->isChecked()) Global::tagColorCriteria->show();
         else                         Global::tagColorCriteria->hide();
     }
+    else if(sender() == ui->textBy) {
+        Global::tagTextCriteria->move(ui->textBy->parentWidget()->mapToGlobal(ui->textBy->pos())                - QPoint(23, 3 + Global::tagTextCriteria->height()));
+        if(ui->textBy->isChecked())  Global::tagTextCriteria->show();
+        else                         Global::tagTextCriteria->hide();
+    }
     else if(sender() == ui->clusterBy) {
         Global::tagClusterCriteria->move(ui->clusterBy->parentWidget()->mapToGlobal(ui->clusterBy->pos())       - QPoint(23, 3 + Global::tagClusterCriteria->height()));
         if(ui->clusterBy->isChecked())  Global::tagClusterCriteria->show();
@@ -261,6 +266,8 @@ void Timeline::actionDisplayed(bool val) {
         ui->sortBy->setChecked(val);
     else if(sender() == Global::tagColorCriteria)
         ui->colorBy->setChecked(val);
+    else if(sender() == Global::tagTextCriteria)
+        ui->textBy->setChecked(val);
     else if(sender() == Global::tagClusterCriteria)
         ui->clusterBy->setChecked(val);
     else if(sender() == Global::tagHorizontalCriteria)
@@ -303,6 +310,16 @@ void Timeline::actionChanged(QString text, QString text2) {
             else {
                 ui->colorBy->setText(text2);
                 ui->colorBy->setStyleSheet(buttonOrange);
+            }
+        }
+        else if(sender() == Global::tagTextCriteria) {
+            if(text2.isEmpty()) {
+                ui->textBy->setText(text);
+                ui->textBy->setStyleSheet("");
+            }
+            else {
+                ui->textBy->setText(text2);
+                ui->textBy->setStyleSheet(buttonOrange);
             }
         }
         else if(sender() == Global::tagFilterCriteria) {

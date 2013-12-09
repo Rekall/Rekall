@@ -11,8 +11,6 @@ TimelineGL::TimelineGL(QWidget *parent) :
     showLegend = 0;
     showLegendDest = true;
     connect(&mouseTimer, SIGNAL(timeout()), SLOT(mouseMoveLong()));
-
-    tagMenu = new QMenu(Global::mainWindow);
 }
 
 bool TimelineGL::event(QEvent *event) {

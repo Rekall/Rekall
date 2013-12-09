@@ -20,9 +20,9 @@ Tag* Document::createTag(qint16 _versionSource, qint16 versionDest) {
             createTag(tagSource, tagSource->getDocumentVersion()+1);
     }
     else {
-        qreal tS = Global::aleaF(5, 120);
+        qreal tS = Global::alea(5, 120);
         if(getFunction() == DocumentFunctionRender)
-            tS = Global::aleaF(0, 5);
+            tS = Global::alea(0, 5);
         newTag = createTag(TagTypeContextualTime, tS, -1, versionDest, true);
     }
     return newTag;

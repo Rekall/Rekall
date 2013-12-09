@@ -88,11 +88,11 @@ void Sorting::action() {
             if(filterText.isEmpty())
                 filterText = ui->filter->currentText();
 
-            if((needWord) && (ui->matches->text().isEmpty())) {
+            if(((needWord) && (ui->matches->text().isEmpty())) || (filterText.isEmpty())) {
                 tagName         = "";
                 tagNameCategory = "";
             }
-            else if(filterText.count()) {
+            else {
                 QStringList sortSplit = filterText.split("|");
 
                 leftLength    = -1;
@@ -294,6 +294,7 @@ void Sorting::addCheckStart() {
             ui->checks->topLevelItem(i)->setHidden(true);
     }
     ui->checks->setColumnHidden(0, true);
+    ui->sorting->setVisible(false);
     ui->checks->setColumnHidden(2, true);
     isUpdating = false;
 }
@@ -314,6 +315,7 @@ void Sorting::addCheck(const QString &sorting, const QString &sortingFormated, c
             if(ui->checks->topLevelItem(i)->text(2) != complement)         ui->checks->topLevelItem(i)->setText(2, complement);
             if(!complement.isEmpty()) {
                 ui->checks->setColumnHidden(2, false);
+                ui->sorting->setVisible(true);
                 ui->checks->setColumnWidth(0, 150);
             }
             isUpdating = false;
@@ -326,6 +328,7 @@ void Sorting::addCheck(const QString &sorting, const QString &sortingFormated, c
     checkItem->setCheckState(1, Qt::Checked);
     if(!complement.isEmpty()) {
         ui->checks->setColumnHidden(2, false);
+        ui->sorting->setVisible(true);
         ui->checks->setColumnWidth(0, 150);
     }
     isUpdating = false;

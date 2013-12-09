@@ -224,6 +224,8 @@ public:
     const QString getCriteriaClusterFormated     (qint16 version = -1) const;
     const QString getCriteriaColor               (qint16 version = -1) const;
     const QString getCriteriaColorFormated       (qint16 version = -1) const;
+    const QString getCriteriaText                (qint16 version = -1) const;
+    const QString getCriteriaTextFormated        (qint16 version = -1) const;
     const QString getCriteriaFilter              (qint16 version = -1) const;
     const QString getCriteriaFilterFormated      (qint16 version = -1) const;
     const QString getCriteriaHorizontal          (qint16 version = -1) const;
@@ -231,6 +233,7 @@ public:
     const QString getAcceptableWithClusterFilters(qint16 version = -1) const;
     bool isAcceptableWithSortFilters             (bool strongCheck, qint16 version = -1) const;
     bool isAcceptableWithColorFilters            (bool strongCheck, qint16 version = -1) const;
+    bool isAcceptableWithTextFilters             (bool strongCheck, qint16 version = -1) const;
     bool isAcceptableWithClusterFilters          (bool strongCheck, qint16 version = -1) const;
     bool isAcceptableWithFilterFilters           (bool strongCheck, qint16 version = -1) const;
     bool isAcceptableWithHorizontalFilters       (bool strongCheck, qint16 version = -1) const;

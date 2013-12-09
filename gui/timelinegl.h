@@ -17,7 +17,6 @@ private:
     qreal         showLegend;
     qreal         gestureZoomInitial;
     QList<GlText> categories;
-    QMenu        *tagMenu;
 
 protected:
     void timerEvent(QTimerEvent *);

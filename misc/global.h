@@ -256,7 +256,7 @@ public:
     static qreal tagBlinkTime;
     static qreal breathing, breathingDest, breathingFast, breathingFastDest, breathingPics, breathingPicsDest;
     static QTime timer;
-    static Sorting *tagSortCriteria, *tagColorCriteria, *tagClusterCriteria, *tagFilterCriteria, *tagHorizontalCriteria;
+    static Sorting *tagSortCriteria, *tagColorCriteria, *tagTextCriteria, *tagClusterCriteria, *tagFilterCriteria, *tagHorizontalCriteria;
     static Phases *phases;
     static void *selectedTagInAction, *selectedTag, *selectedTagHover, *timeMarkerAdded;
     static QPair<qreal, qreal> selectedTagHoverSnapped;

@@ -367,10 +367,11 @@ QMenuBar::item:pressed {
 
 
 QMenu {
-     border: 					1px solid rgb(46, 51, 53);;
+	border: 					1px solid rgb(46, 51, 53);;
+	padding:					4px;
 }
 QMenu::item {
-     background-color: transparent;
+	background-color: 	transparent;
 }
 QMenu::item:disabled {
      color:						rgb(131, 135, 137);

@@ -144,12 +144,25 @@ void Project::fireEvents() {
         }
         foreach(Document *document, documents) {
             QString colorMeta = document->getCriteriaColorFormated();
-            if(Global::colorForMeta.contains(colorMeta))            document->baseColor = Global::colorForMeta.value(colorMeta).first;
+            if(Global::colorForMeta.contains(colorMeta))                 document->baseColor = Global::colorForMeta.value(colorMeta).first;
             else if(document->getFunction() == DocumentFunctionRender)   document->baseColor = Global::colorTagCaptation;
-            else                                                    document->baseColor = Global::colorTagDisabled;
+            else                                                         document->baseColor = Global::colorTagDisabled;
 
         }
         Global::tagColorCriteria->addCheckEnd();
+
+        //Text
+        Global::tagTextCriteria->addCheckStart();
+        foreach(Document *document, documents)
+            foreach(Tag *tag, document->tags)
+                if(tag->isAcceptableWithTextFilters(false))
+                    Global::tagTextCriteria->addCheck(tag->getCriteriaText(tag), tag->getCriteriaTextFormated(tag), "");
+        Global::tagTextCriteria->addCheckEnd();
+        foreach(Document *document, documents)
+            foreach(Tag *tag, document->tags) {
+                if(tag->isAcceptableWithTextFilters(true))  tag->displayText = Tag::getCriteriaTextFormated(tag);
+                else                                        tag->displayText.clear();
+            }
 
 
         //Events
@@ -177,7 +190,6 @@ void Project::fireEvents() {
                     Global::tagHorizontalCriteria->addCheck(tag->getCriteriaHorizontal(tag), tag->getCriteriaHorizontalFormated(tag), "");
         Global::tagHorizontalCriteria->addCheckEnd();
         Global::ticksChanged = true;
-
 
         //Highlight
         Global::tagClusterCriteria->addCheckStart();

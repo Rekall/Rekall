@@ -544,6 +544,32 @@ QMenu::item:enabled:selected {
             </widget>
            </item>
            <item>
+            <widget class="QPushButton" name="textBy">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>TEXT</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_text.png</normaloff>:/icons/res_icon_filter_text.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="filterBy">
              <property name="minimumSize">
               <size>
@@ -881,7 +907,7 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>565</x>
+     <x>629</x>
      <y>177</y>
     </hint>
     <hint type="destinationlabel">
@@ -897,7 +923,7 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>523</x>
+     <x>587</x>
      <y>177</y>
     </hint>
     <hint type="destinationlabel">
@@ -961,7 +987,7 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>296</x>
+     <x>360</x>
      <y>172</y>
     </hint>
     <hint type="destinationlabel">
@@ -1009,7 +1035,7 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1044</x>
+     <x>1076</x>
      <y>172</y>
     </hint>
     <hint type="destinationlabel">
@@ -1025,8 +1051,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>428</x>
-     <y>160</y>
+     <x>520</x>
+     <y>172</y>
     </hint>
     <hint type="destinationlabel">
      <x>540</x>
@@ -1057,8 +1083,8 @@ QMenu::item:enabled:selected {
    <slot>actionMarkerAddStart()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1123</x>
-     <y>161</y>
+     <x>1187</x>
+     <y>172</y>
     </hint>
     <hint type="destinationlabel">
      <x>1112</x>
@@ -1073,12 +1099,28 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1070</x>
-     <y>154</y>
+     <x>1116</x>
+     <y>172</y>
     </hint>
     <hint type="destinationlabel">
      <x>1073</x>
      <y>304</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>textBy</sender>
+   <signal>released()</signal>
+   <receiver>Timeline</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>168</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>268</x>
+     <y>273</y>
     </hint>
    </hints>
   </connection>
