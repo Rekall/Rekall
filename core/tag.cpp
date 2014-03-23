@@ -26,6 +26,14 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
     timelineDocumentText    .setStyle(QSize(300, Global::timelineTagHeightDest), Qt::AlignCenter, Global::fontSmall);
 }
 
+void Tag::init() {
+    if(document->getFunction() == DocumentFunctionRender) {
+        Global::renders.insert(document->getName(version), this);
+        player = new PlayerVideo();
+        player->load(this, ((document->getType() == DocumentTypeVideo) || (document->getType() == DocumentTypeImage)), document->file.absoluteFilePath());
+    }
+}
+
 void Tag::init(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
     if(document->getFunction() == DocumentFunctionRender) {
         setType(_type, _timeStart);
@@ -914,16 +922,20 @@ QDomElement Tag::serialize(QDomDocument &xmlDoc) const {
     xmlData.setAttribute("timeStart",       getTimeStart());
     xmlData.setAttribute("timeEnd",         getTimeEnd());
     xmlData.setAttribute("type",            getType());
-    xmlData.setAttribute("documentVersion", version);
+    xmlData.setAttribute("documentVersion", getDocumentVersion());
+    /*
     if(linkedTags.count()) {
         QDomElement linkedTagsXml = xmlDoc.createElement("linkedTags");
         foreach(Tag *linkedTag, linkedTags) {
-            QDomElement linkedTagXml = xmlDoc.createElement("linkedTag");
-            linkedTagXml.setAttribute("documentVersion", linkedTag->version);
-            linkedTagsXml.appendChild(linkedTagXml);
+            if(linkedTag) {
+                QDomElement linkedTagXml = xmlDoc.createElement("linkedTag");
+                linkedTagXml.setAttribute("documentVersion", linkedTag->version);
+                linkedTagsXml.appendChild(linkedTagXml);
+            }
         }
         xmlData.appendChild(linkedTagsXml);
     }
+    */
     return xmlData;
 }
 void Tag::deserialize(const QDomElement &xmlElement) {

@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.34';
+$VERSION = '1.37';
 
 sub ConvertTimecode($);
 
@@ -327,6 +327,14 @@ my %riffMimeType = (
     LIST_exif => {
         Name => 'Exif',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Exif' },
+    },
+    EXIF => { # WEBP Exif tags
+        Name => 'EXIF',
+        Notes => 'EXIF extracted from WEBP images',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Exif::Main',
+            ProcessProc => \&Image::ExifTool::ProcessTIFF,
+        },
     },
     LIST_hdrl => { # AVI header LIST chunk
         Name => 'Hdrl',
@@ -791,6 +799,7 @@ my %riffMimeType = (
             mids => 'MIDI',
             txts => 'Text',
             vids => 'Video',
+            iavs => 'Interleaved Audio+Video',
         },
     },
     1 => [
@@ -1012,7 +1021,7 @@ sub ConvertTimecode($)
 # Notes: Sums duration of all sub-documents (concatenated AVI files)
 sub CalcDuration($@)
 {
-    my ($exifTool, @val) = @_;
+    my ($et, @val) = @_;
     my $totalDuration = 0;
     my $subDoc = 0;
     my @keyList;
@@ -1029,10 +1038,10 @@ sub CalcDuration($@)
             $dur1 = $dur2 if $rat > 1.9 and $rat < 3.1;
         }
         $totalDuration += $dur1 if defined $dur1;
-        last unless $subDoc++ < $$exifTool{DOC_COUNT};
+        last unless $subDoc++ < $$et{DOC_COUNT};
         # get tag values for next sub-document
         my @tags = qw(FrameRate FrameCount VideoFrameRate VideoFrameCount);
-        my $rawValue = $$exifTool{VALUE};
+        my $rawValue = $$et{VALUE};
         my ($i, $j, $key, $keys);
         for ($i=0; $i<@tags; ++$i) {
             if ($subDoc == 1) {
@@ -1050,7 +1059,7 @@ sub CalcDuration($@)
             # find key for tag in this sub-document
             my $grp = "Doc$subDoc";
             $grp .= ":RIFF" if $i < 2; # (tags 0 and 1 also in RIFF group)
-            $key = $exifTool->GroupMatches($grp, $keys);
+            $key = $et->GroupMatches($grp, $keys);
             $val[$i] = $key ? $$rawValue{$key} : undef;
         }
         last unless defined $val[0] and defined $val[1]; # (Require'd tags)
@@ -1064,18 +1073,18 @@ sub CalcDuration($@)
 # Returns: 1 on success
 sub ProcessStreamData($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $start = $$dirInfo{DirStart};
     my $size = $$dirInfo{DirLen};
     return 0 if $size < 4;
-    if ($exifTool->Options('Verbose')) {
-        $exifTool->VerboseDir($$dirInfo{DirName}, 0, $size);
+    if ($et->Options('Verbose')) {
+        $et->VerboseDir($$dirInfo{DirName}, 0, $size);
     }
     my $tag = substr($$dataPt, $start, 4);
-    my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+    my $tagInfo = $et->GetTagInfo($tagTablePtr, $tag);
     unless ($tagInfo) {
-        $tagInfo = $exifTool->GetTagInfo($tagTablePtr, 'unknown');
+        $tagInfo = $et->GetTagInfo($tagTablePtr, 'unknown');
         return 1 unless $tagInfo;
     }
     my $subdir = $$tagInfo{SubDirectory};
@@ -1095,14 +1104,14 @@ sub ProcessStreamData($$$)
         unless ($offset) {
             # allow processing of 2nd directory at the same address
             my $addr = $subdirInfo{DirStart} + $subdirInfo{DataPos} + $subdirInfo{Base};
-            delete $exifTool->{PROCESSED}->{$addr}
+            delete $$et{PROCESSED}{$addr}
         }
         # (we could set FIRST_EXIF_POS to $subdirInfo{Base} here to make
         #  htmlDump offsets relative to EXIF base if we wanted...)
         my $subTable = GetTagTable($$subdir{TagTable});
-        $exifTool->ProcessDirectory(\%subdirInfo, $subTable);
+        $et->ProcessDirectory(\%subdirInfo, $subTable);
     } else {
-        $exifTool->HandleTag($tagTablePtr, $tag, undef,
+        $et->HandleTag($tagTablePtr, $tag, undef,
             DataPt  => $dataPt,
             DataPos => $$dirInfo{DataPos},
             Start   => $start,
@@ -1120,22 +1129,22 @@ sub ProcessStreamData($$$)
 # Returns: 1 on success
 sub ProcessChunks($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $start = $$dirInfo{DirStart};
     my $size = $$dirInfo{DirLen};
     my $end = $start + $size;
     my $base = $$dirInfo{Base};
 
-    if ($exifTool->Options('Verbose')) {
-        $exifTool->VerboseDir($$dirInfo{DirName}, 0, $size);
+    if ($et->Options('Verbose')) {
+        $et->VerboseDir($$dirInfo{DirName}, 0, $size);
     }
     while ($start + 8 < $end) {
         my $tag = substr($$dataPt, $start, 4);
         my $len = Get32u($dataPt, $start + 4);
         $start += 8;
         if ($start + $len > $end) {
-            $exifTool->Warn("Bad $tag chunk");
+            $et->Warn("Bad $tag chunk");
             return 0;
         }
         if ($tag eq 'LIST' and $len >= 4) {
@@ -1143,7 +1152,7 @@ sub ProcessChunks($$$)
             $len -= 4;
             $start += 4;
         }
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        my $tagInfo = $et->GetTagInfo($tagTablePtr, $tag);
         my $baseShift = 0;
         my $val;
         if ($tagInfo) {
@@ -1164,12 +1173,13 @@ sub ProcessChunks($$$)
                 $val =~ s/\0+$//;   # remove trailing nulls from strings
             }
         }
-        $exifTool->HandleTag($tagTablePtr, $tag, $val,
+        $et->HandleTag($tagTablePtr, $tag, $val,
             DataPt  => $dataPt,
             DataPos => $$dirInfo{DataPos} - $baseShift,
             Start   => $start,
             Size    => $len,
             Base    => $base + $baseShift,
+            Addr    => $base + $baseShift + $start,
         );
         ++$len if $len & 0x01;  # must account for padding if odd number of bytes
         $start += $len;
@@ -1183,10 +1193,10 @@ sub ProcessChunks($$$)
 # Returns: 1 on success, 0 if this wasn't a valid RIFF file
 sub ProcessRIFF($$)
 {
-    my ($exifTool, $dirInfo) = @_;
+    my ($et, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my ($buff, $buf2, $type, $mime, $err);
-    my $verbose = $exifTool->Options('Verbose');
+    my $verbose = $et->Options('Verbose');
 
     # verify this is a valid RIFF file
     return 0 unless $raf->Read($buff, 12) == 12;
@@ -1200,8 +1210,8 @@ sub ProcessRIFF($$)
         return 0 unless $buff =~ /WAVE(.{4})?fmt /sg and $raf->Seek(pos($buff) - 4, 0);
     }
     $mime = $riffMimeType{$type} if $type;
-    $exifTool->SetFileType($type, $mime);
-    $$exifTool{RIFFStreamType} = '';    # initialize stream type
+    $et->SetFileType($type, $mime);
+    $$et{RIFFStreamType} = '';    # initialize stream type
     SetByteOrder('II');
     my $tagTablePtr = GetTagTable('Image::ExifTool::RIFF::Main');
     my $pos = 12;
@@ -1223,13 +1233,13 @@ sub ProcessRIFF($$)
             $tag .= "_$buff";
             $len -= 4;  # already read 4 bytes (the LIST type)
         }
-        $exifTool->VPrint(0, "RIFF '$tag' chunk ($len bytes of data):\n");
+        $et->VPrint(0, "RIFF '$tag' chunk ($len bytes of data):\n");
         if ($len <= 0) {
             if ($len < 0) {
-                $exifTool->Warn('Invalid chunk length');
+                $et->Warn('Invalid chunk length');
             } elsif ($tag eq "\0\0\0\0") {
                 # avoid reading through corupted files filled with nulls because it takes forever
-                $exifTool->Warn('Encountered empty null chunk. Processing aborted');
+                $et->Warn('Encountered empty null chunk. Processing aborted');
             } else {
                 next;
             }
@@ -1239,16 +1249,16 @@ sub ProcessRIFF($$)
         # --> no more because Adobe Bridge stores XMP after this!!
         # (so now we only do this on the FastScan option)
         if (($tag eq 'data' or $tag eq 'idx1' or $tag eq 'LIST_movi') and
-            $exifTool->Options('FastScan'))
+            $et->Options('FastScan'))
         {
-            $exifTool->VPrint(0, "(end of parsing)\n");
+            $et->VPrint(0, "(end of parsing)\n");
             last;
         }
         # RIFF chunks are padded to an even number of bytes
         my $len2 = $len + ($len & 0x01);
         if ($$tagTablePtr{$tag} or ($verbose and $tag !~ /^(data|idx1|LIST_movi|RIFF)$/)) {
             $raf->Read($buff, $len2) == $len2 or $err=1, last;
-            $exifTool->HandleTag($tagTablePtr, $tag, $buff,
+            $et->HandleTag($tagTablePtr, $tag, $buff,
                 DataPt  => \$buff,
                 DataPos => 0,   # (relative to Base)
                 Start   => 0,
@@ -1259,14 +1269,14 @@ sub ProcessRIFF($$)
             # don't read into RIFF chunk (ie. concatenated video file)
             $raf->Read($buff, 4) == 4 or $err=1, last;
             # extract information from remaining file as an embedded file
-            $$exifTool{DOC_NUM} = ++$$exifTool{DOC_COUNT}
+            $$et{DOC_NUM} = ++$$et{DOC_COUNT}
         } else {
             $raf->Seek($len2, 1) or $err=1, last;
         }
         $pos += $len2;
     }
-    delete $$exifTool{DOC_NUM};
-    $err and $exifTool->Warn('Error reading RIFF file (corrupted?)');
+    delete $$et{DOC_NUM};
+    $err and $et->Warn('Error reading RIFF file (corrupted?)');
     return 1;
 }
 
@@ -1290,7 +1300,7 @@ including Windows WAV audio and AVI video files.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

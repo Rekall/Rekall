@@ -8,19 +8,48 @@ Project::Project(QWidget *parent) :
 }
 
 void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
-    //Web
-    Document *document = new Document(this);
-    if(document->updateWeb("http://www.youtube.com/watch?v=cufauMezz_Q"))
-        document->createTag();
-    document->updateFeed();
+    QDomDocument xmlDoc("rekall");
 
-    document = new Document(this);
-    if(document->updateWeb("https://twitter.com/arielunaa/status/393195155748315136"))
-        document->createTag();
-    document->updateFeed();
+    if(!debug) {
+        foreach(const QFileInfo &file, files) {
+            QFile projectFile(file.absoluteFilePath() + "/rekall_cache/project.xml");
+            if((file.isDir()) && (projectFile.exists()) && (projectFile.open(QFile::ReadOnly))) {
+                xmlDoc.setContent(&projectFile);
+                projectFile.close();
+
+                QDomElement docRoot = xmlDoc.documentElement();
+
+                QDomNode documentNode = docRoot.firstChild();
+                while(!documentNode.isNull()) {
+                    QDomElement documentElement = documentNode.toElement();
+                    if((!documentElement.isNull()) && (documentElement.nodeName().toLower() == "document")) {
+                        Document *document = new Document(this);
+                        document->deserialize(documentElement);
+                        QFileInfo documentFile = QFileInfo(file.dir().absolutePath() + "/" + document->getMetadata("Rekall", "Folder", -1).toString() + document->getMetadata("File", "File Name", -1).toString());
+                        if((documentFile.isFile()) && (documentFile.exists()))
+                            document->file = documentFile;
+                    }
+                    documentNode = documentNode.nextSibling();
+                }
+                break;
+            }
+        }
+    }
+
+    //Web
+    if(debug) {
+        Document *document = new Document(this);
+        if(document->updateWeb("http://www.youtube.com/watch?v=cufauMezz_Q"))
+            document->createTag();
+        document->updateFeed();
+
+        document = new Document(this);
+        if(document->updateWeb("https://twitter.com/arielunaa/status/393195155748315136"))
+            document->createTag();
+        document->updateFeed();
+    }
 
     Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
-
 
     foreach(const QFileInfo &file, files) {
         QDir dir(file.absoluteFilePath());
@@ -34,14 +63,32 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
     foreach(const QFileInfo &file, files) {
         if((file.isFile()) && (UiFileItem::conformFile(file))) {
-            Document *document = new Document(this);
+            Document *document = 0;
+            bool documentExisted = false;
+            foreach(Document *searchDocument, documents) {
+                if(searchDocument->file == file) {
+                    documentExisted = true;
+                    document = searchDocument;
+                    break;
+                }
+            }
+            if(document == 0)
+                document = new Document(this);
+
             document->chutierItem = UiFileItem::find(file, Global::chutier);
             if(file.absoluteFilePath().contains("Test.txt"))
                 document->chutierItem->setData(1, Qt::EditRole, true);
 
-            if((document->updateFile(file, dirBase)) && (debug))
+            if(documentExisted) {
+                document->status = DocumentStatusWaiting;
+                Global::taskList->addTask(document, TaskProcessTypeMetadata, -1, false);
+                foreach(Tag *tag, document->tags)
+                    tag->init();
+            }
+            else if(document->updateFile(file, dirBase)) {
                 document->createTag();
-            document->updateFeed();
+                document->updateFeed();
+            }
 
             if(debug) {
                 if(file.baseName() == "NxSimoneMorphing") {
@@ -71,7 +118,7 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
         Tag *previousTag = 0;
         foreach(Document *document, documents) {
             foreach(Tag *tag, document->tags) {
-                if(Global::alea(0, 100) > 80)
+                if((Global::alea(0, 100) > 80) && (previousTag))
                     tag->linkedTags.append(previousTag);
                 previousTag = tag;
             }
@@ -80,6 +127,16 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
 
     Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
 }
+void Project::save() {
+    QDomDocument xmlDoc("rekall");
+    xmlDoc.appendChild(serialize(xmlDoc));
+    QFile xmlFile(Global::pathCurrent.absoluteFilePath() + "/rekall_cache/project.xml");
+    xmlFile.open(QFile::WriteOnly);
+    xmlFile.write(xmlDoc.toByteArray());
+    xmlFile.close();
+}
+
+
 
 Document* Project::getDocument(const QString &name) const {
     foreach(Document *document, documents)
@@ -127,7 +184,6 @@ void Project::fireEvents() {
                         Global::colorForMeta[colorKey] = QPair<QColor, qreal>(Qt::white, 0);
                     Global::colorForMeta.insert(colorKey, QPair<QColor, qreal>(Global::colorForMeta.value(colorKey).first, Global::colorForMeta.value(colorKey).second + 1));
                     documentPerColorCount++;
-
                 }
             }
         }
@@ -143,7 +199,7 @@ void Project::fireEvents() {
             index++;
         }
         foreach(Document *document, documents) {
-            QString colorMeta = document->getCriteriaColorFormated();
+            QString colorMeta = document->getCriteriaColor();
             if(Global::colorForMeta.contains(colorMeta))                 document->baseColor = Global::colorForMeta.value(colorMeta).first;
             else if(document->getFunction() == DocumentFunctionRender)   document->baseColor = Global::colorTagCaptation;
             else                                                         document->baseColor = Global::colorTagDisabled;
@@ -276,7 +332,7 @@ const QRectF Project::paintTimeline(bool before) {
 
                     //Add to timeline if displayable
                     if(tag->isAcceptableWithSortFilters(false)) {
-                        QString sorting = Tag::getCriteriaSort(tag).toLower();
+                        QString sorting    = Tag::getCriteriaSort(tag).toLower();
                         if(tag->isAcceptableWithSortFilters(true)) {
                             QString phase          = Global::phases->getPhaseFor(Tag::getCriteriaPhase(tag)).toLower();
                             QString cluster        = Tag::getCriteriaCluster(tag).toLower();
@@ -799,20 +855,10 @@ bool Project::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool sta
 QDomElement Project::serialize(QDomDocument &xmlDoc) const {
     QDomElement xmlData;
     xmlData = xmlDoc.createElement("project");
-    xmlData.setAttribute("attribut", "test");
     foreach(Document *document, documents)
         xmlData.appendChild(document->serialize(xmlDoc));
     return xmlData;
 }
 void Project::deserialize(const QDomElement &xmlElement) {
     QString a = xmlElement.attribute("attribut");
-}
-void Project::save() {
-    QDomDocument xmlDoc("rekall");
-    xmlDoc.appendChild(serialize(xmlDoc));
-    QFile xmlFile(Global::pathCurrent.absoluteFilePath() + "/rekall_cache/project.xml");
-    xmlFile.open(QFile::WriteOnly);
-    xmlFile.write(xmlDoc.toByteArray());
-    xmlFile.close();
-    qDebug("%s", qPrintable(xmlDoc.toString()));
 }

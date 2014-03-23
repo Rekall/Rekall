@@ -16,7 +16,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::XMP;
 
-$VERSION = '1.11';
+$VERSION = '1.14';
 
 sub RecoverTruncatedIPTC($$$);
 sub ListToString($);
@@ -292,19 +292,22 @@ my $mwgLoaded;  # flag set if we alreaded Load()ed the MWG tags
         Desire => {
             0 => 'IPTC:Country-PrimaryLocationName', # (64-character limit)
             1 => 'XMP-photoshop:Country',
-            2 => 'CurrentIPTCDigest',
-            3 => 'IPTCDigest',
+            2 => 'XMP-iptcExt:LocationShownCountryName',
+            3 => 'CurrentIPTCDigest',
+            4 => 'IPTCDigest',
         },
         RawConv => q{
-            return $val[1] if not defined $val[2] or (defined $val[1] and
-                             (not defined $val[3] or $val[2] eq $val[3]));
-            return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[0], $val[1], 64);
+            my $xmpVal = $val[2] || $val[1];
+            return $xmpVal if not defined $val[3] or (defined $xmpVal and
+                             (not defined $val[4] or $val[3] eq $val[4]));
+            return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[0], $xmpVal, 64);
         },
         DelCheck   => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteCheck => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteAlso  => {
             'IPTC:Country-PrimaryLocationName' => '$opts{EditGroup} = 1; $val',
-            'XMP-photoshop:Country'            => '$val',
+            'XMP-photoshop:Country'            => '$val', # (legacy)
+            'XMP-iptcExt:LocationShownCountryName' => '$val',
         },
     },
     State => {
@@ -313,19 +316,22 @@ my $mwgLoaded;  # flag set if we alreaded Load()ed the MWG tags
         Desire => {
             0 => 'IPTC:Province-State', # (32-character limit)
             1 => 'XMP-photoshop:State',
-            2 => 'CurrentIPTCDigest',
-            3 => 'IPTCDigest',
+            2 => 'XMP-iptcExt:LocationShownProvinceState',
+            3 => 'CurrentIPTCDigest',
+            4 => 'IPTCDigest',
         },
         RawConv => q{
-            return $val[1] if not defined $val[2] or (defined $val[1] and
-                             (not defined $val[3] or $val[2] eq $val[3]));
-            return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[0], $val[1], 32);
+            my $xmpVal = $val[2] || $val[1];
+            return $xmpVal if not defined $val[3] or (defined $xmpVal and
+                             (not defined $val[4] or $val[3] eq $val[4]));
+            return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[0], $xmpVal, 32);
         },
         DelCheck   => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteCheck => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteAlso  => {
             'IPTC:Province-State' => '$opts{EditGroup} = 1; $val',
-            'XMP-photoshop:State' => '$val',
+            'XMP-photoshop:State' => '$val', # (legacy)
+            'XMP-iptcExt:LocationShownProvinceState' => '$val',
         },
     },
     City => {
@@ -334,19 +340,22 @@ my $mwgLoaded;  # flag set if we alreaded Load()ed the MWG tags
         Desire => {
             0 => 'IPTC:City', # (32-character limit)
             1 => 'XMP-photoshop:City',
-            2 => 'CurrentIPTCDigest',
-            3 => 'IPTCDigest',
+            2 => 'XMP-iptcExt:LocationShownCity',
+            3 => 'CurrentIPTCDigest',
+            4 => 'IPTCDigest',
         },
         RawConv => q{
-            return $val[1] if not defined $val[2] or (defined $val[1] and
-                             (not defined $val[3] or $val[2] eq $val[3]));
-            return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[0], $val[1], 32);
+            my $xmpVal = $val[2] || $val[1];
+            return $xmpVal if not defined $val[3] or (defined $xmpVal and
+                             (not defined $val[4] or $val[3] eq $val[4]));
+            return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[0], $xmpVal, 32);
         },
         DelCheck   => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteCheck => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteAlso  => {
             'IPTC:City'          => '$opts{EditGroup} = 1; $val',
-            'XMP-photoshop:City' => '$val',
+            'XMP-photoshop:City' => '$val', # (legacy)
+            'XMP-iptcExt:LocationShownCity' => '$val',
         },
     },
     Location => {
@@ -355,19 +364,22 @@ my $mwgLoaded;  # flag set if we alreaded Load()ed the MWG tags
         Desire => {
             0 => 'IPTC:Sub-location', # (32-character limit)
             1 => 'XMP-iptcCore:Location',
-            2 => 'CurrentIPTCDigest',
-            3 => 'IPTCDigest',
+            2 => 'XMP-iptcExt:LocationShownSublocation',
+            3 => 'CurrentIPTCDigest',
+            4 => 'IPTCDigest',
         },
         RawConv => q{
-            return $val[1] if not defined $val[2] or (defined $val[1] and
-                             (not defined $val[3] or $val[2] eq $val[3]));
-            return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[0], $val[1], 32);
+            my $xmpVal = $val[2] || $val[1];
+            return $xmpVal if not defined $val[3] or (defined $xmpVal and
+                             (not defined $val[4] or $val[3] eq $val[4]));
+            return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[0], $xmpVal, 32);
         },
         DelCheck   => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteCheck => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteAlso  => {
             'IPTC:Sub-location'     => '$opts{EditGroup} = 1; $val',
-            'XMP-iptcCore:Location' => '$val',
+            'XMP-iptcCore:Location' => '$val', # (legacy)
+            'XMP-iptcExt:LocationShownSublocation' => '$val',
         },
     },
 );
@@ -435,7 +447,7 @@ my %sKeywordStruct;
         Name => 'RegionInfo',
         FlatName => 'Region',
         Struct => {
-            STRUCT_NAME => 'RegionInfo',
+            STRUCT_NAME => 'MWG RegionInfo',
             NAMESPACE   => 'mwg-rs',
             RegionList => {
                 FlatName => 'Region',
@@ -464,7 +476,7 @@ my %sKeywordStruct;
     Keywords => {
         Name => 'KeywordInfo',
         Struct => {
-            STRUCT_NAME => 'KeywordInfo',
+            STRUCT_NAME => 'MWG KeywordInfo',
             NAMESPACE   => 'mwg-kw',
             Hierarchy => { Struct => \%sKeywordStruct, List => 'Bag' },
         },
@@ -503,7 +515,7 @@ my %sKeywordStruct;
         FlatName => '',
         List => 'Bag',
         Struct => {
-            STRUCT_NAME => 'CollectionInfo',
+            STRUCT_NAME => 'MWG CollectionInfo',
             NAMESPACE   => 'mwg-coll',
             CollectionName => { },
             CollectionURI  => { },
@@ -563,7 +575,7 @@ sub ListToString($)
 # Notes: Sets Warning tag on error
 sub StringToList($$)
 {
-    my ($str, $exifTool) = @_;
+    my ($str, $et) = @_;
     my (@vals, $inQuotes);
     my @t = split '; ', $str, -1;
     foreach (@t) {
@@ -582,7 +594,7 @@ sub StringToList($$)
             push @vals, $_;
         }
     }
-    $exifTool->Warn('Incorrectly quoted MWG string-list value') if $inQuotes;
+    $et->Warn('Incorrectly quoted MWG string-list value') if $inQuotes;
     return @vals > 1 ? \@vals : $vals[0];
 }
 
@@ -594,11 +606,11 @@ sub StringToList($$)
 sub OverwriteStringList($$$$)
 {
     local $_;
-    my ($exifTool, $nvHash, $val, $newValuePt) = @_;
+    my ($et, $nvHash, $val, $newValuePt) = @_;
     my (@new, $delIndex);
     if ($$nvHash{DelValue} and defined $val) {
         # preserve specified old values
-        my $old = StringToList($val, $exifTool);
+        my $old = StringToList($val, $et);
         my @old = ref $old eq 'ARRAY' ? @$old : $old;
         if (@{$$nvHash{DelValue}}) {
             my %del;
@@ -634,17 +646,17 @@ sub OverwriteStringList($$$$)
 # Returns: empty string
 sub ReconcileIPTCDigest($)
 {
-    my $exifTool = shift;
+    my $et = shift;
 
     # set new value for IPTCDigest if not done already
     unless ($Image::ExifTool::Photoshop::iptcDigestInfo and
-            $exifTool->{NEW_VALUE}{$Image::ExifTool::Photoshop::iptcDigestInfo})
+            $$et{NEW_VALUE}{$Image::ExifTool::Photoshop::iptcDigestInfo})
     {
         # write new IPTCDigest only if it doesn't exist or
         # is the same as the digest of the original IPTC
         my @a; # (capture warning messages)
-        @a = $exifTool->SetNewValue('Photoshop:IPTCDigest', 'old', Protected => 1, DelValue => 1);
-        @a = $exifTool->SetNewValue('Photoshop:IPTCDigest', 'new', Protected => 1);
+        @a = $et->SetNewValue('Photoshop:IPTCDigest', 'old', Protected => 1, DelValue => 1);
+        @a = $et->SetNewValue('Photoshop:IPTCDigest', 'new', Protected => 1);
     }
     return '';
 }
@@ -715,7 +727,7 @@ must be loaded explicitly as described above.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

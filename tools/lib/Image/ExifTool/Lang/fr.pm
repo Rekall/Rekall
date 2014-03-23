@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::fr;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 %Image::ExifTool::Lang::fr::Translate = (
    'AEAperture' => 'Ouverture AE',
@@ -354,7 +354,7 @@ $VERSION = '1.21';
    'AIServoTrackingSensitivity' => {
       Description => 'Sensibili. de suivi AI Servo',
       PrintConv => {
-        'Fast' => 'Schnell',
+        'Fast' => 'Rapide',
         'Medium Fast' => 'Moyenne rapide',
         'Medium Slow' => 'Moyenne lent',
         'Moderately fast' => 'Moyennement rapide',
@@ -418,6 +418,24 @@ $VERSION = '1.21';
       PrintConv => {
         'Off' => 'Désactivé',
         'On' => 'Activé',
+      },
+    },
+   'AdvancedSceneMode' => {
+      PrintConv => {
+        'Color Select' => 'Désaturation partielle',
+        'Cross Process' => 'Dévelop. croisé',
+        'Dynamic Monochrome' => 'Monochrome dynamique',
+        'Expressive' => 'Expressif',
+        'High Dynamic' => 'Dynamique haute',
+        'High Key' => 'Tons clairs',
+        'Impressive Art' => 'Impressionisme',
+        'Low Key' => 'Clair-obscur',
+        'Miniature' => 'Effet miniature',
+        'Retro' => 'Rétro',
+        'Sepia' => 'Sépia',
+        'Soft' => 'Mise au point douce',
+        'Star' => 'Filtre étoile',
+        'Toy Effect' => 'Effet jouet',
       },
     },
    'Advisory' => 'Adversité',
@@ -4702,7 +4720,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

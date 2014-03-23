@@ -23,7 +23,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.32';
+$VERSION = '1.33';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -1879,7 +1879,7 @@ sub CalculateRGBLevels(@)
 # Returns: 1 on success
 sub ProcessKodakText($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $dirStart;
@@ -1887,12 +1887,12 @@ sub ProcessKodakText($$$)
     $data =~ s/\0.*//s;     # truncate at null if it exists
     my @lines = split /[\n\r]+/, $data;
     my ($line, $success, @other, $tagInfo);
-    $exifTool->VerboseDir('Kodak Text');
+    $et->VerboseDir('Kodak Text');
     foreach $line (@lines) {
         if ($line =~ /(.*?):\s*(.*)/) {
             my ($tag, $val) = ($1, $2);
             if ($$tagTablePtr{$tag}) {
-                $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+                $tagInfo = $et->GetTagInfo($tagTablePtr, $tag);
             } else {
                 my $tagName = $tag;
                 $tagName =~ s/([A-Z])\s+([A-Za-z])/${1}_\U$2/g;
@@ -1903,7 +1903,7 @@ sub ProcessKodakText($$$)
                 $tagInfo = { Name => $tagName };
                 AddTagToTable($tagTablePtr, $tag, $tagInfo);
             }
-            $exifTool->HandleTag($tagTablePtr, $tag, $val, TagInfo => $tagInfo);
+            $et->HandleTag($tagTablePtr, $tag, $val, TagInfo => $tagInfo);
             $success = 1;
         } else {
             # strip off leading/trailing white space and ignore blank lines
@@ -1912,11 +1912,11 @@ sub ProcessKodakText($$$)
     }
     if ($success) {
         if (@other) {
-            $tagInfo = $exifTool->GetTagInfo($tagTablePtr, '_other_info');
-            $exifTool->FoundTag($tagInfo, \@other);
+            $tagInfo = $et->GetTagInfo($tagTablePtr, '_other_info');
+            $et->FoundTag($tagInfo, \@other);
         }
     } else {
-        $exifTool->Warn("Can't parse Kodak TextualInfo data", 1);
+        $et->Warn("Can't parse Kodak TextualInfo data", 1);
     }
     return $success;
 }
@@ -1927,21 +1927,21 @@ sub ProcessKodakText($$$)
 # Returns: 1 on success, otherwise returns 0 and sets a Warning
 sub ProcessKodakIFD($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dirStart = $$dirInfo{DirStart} || 0;
     return 1 if $dirStart <= 0 or $dirStart + 2 > $$dirInfo{DataLen};
     my $byteOrder = substr(${$$dirInfo{DataPt}}, $dirStart, 2);
     unless (Image::ExifTool::SetByteOrder($byteOrder)) {
-        $exifTool->Warn("Invalid Kodak $$dirInfo{Name} directory");
+        $et->Warn("Invalid Kodak $$dirInfo{Name} directory");
         return 1;
     }
     $$dirInfo{DirStart} += 2;   # skip byte order mark
     $$dirInfo{DirLen} -= 2;
-    if ($exifTool->{HTML_DUMP}) {
+    if ($$et{HTML_DUMP}) {
         my $base = $$dirInfo{Base} + $$dirInfo{DataPos};
-        $exifTool->HDump($dirStart+$base, 2, "Byte Order Mark");
+        $et->HDump($dirStart+$base, 2, "Byte Order Mark");
     }
-    return Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
+    return Image::ExifTool::Exif::ProcessExif($et, $dirInfo, $tagTablePtr);
 }
 
 #------------------------------------------------------------------------------
@@ -1950,14 +1950,14 @@ sub ProcessKodakIFD($$$)
 # Returns: Exif data block (may be empty if no Exif data) or undef on error
 sub WriteKodakIFD($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dirStart = $$dirInfo{DirStart} || 0;
     return '' if $dirStart <= 0 or $dirStart + 2 > $$dirInfo{DataLen};
     my $byteOrder = substr(${$$dirInfo{DataPt}}, $dirStart, 2);
     return '' unless Image::ExifTool::SetByteOrder($byteOrder);
     $$dirInfo{DirStart} += 2;   # skip byte order mark
     $$dirInfo{DirLen} -= 2;
-    my $buff = Image::ExifTool::Exif::WriteExif($exifTool, $dirInfo, $tagTablePtr);
+    my $buff = Image::ExifTool::Exif::WriteExif($et, $dirInfo, $tagTablePtr);
     return $buff unless defined $buff and length $buff;
     # apply one-time fixup for length of byte order mark
     if ($$dirInfo{Fixup}) {
@@ -1987,7 +1987,7 @@ interpret Kodak maker notes EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

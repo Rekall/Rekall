@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.55';
+$VERSION = '1.56';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -634,13 +634,13 @@ sub AUTOLOAD
 # Returns: 1 on success
 sub ProcessCanonRaw($$$)
 {
-    my ($exifTool, $dirInfo, $rawTagTable) = @_;
+    my ($et, $dirInfo, $rawTagTable) = @_;
     my $blockStart = $$dirInfo{DirStart};
     my $blockSize = $$dirInfo{DirLen};
     my $raf = $$dirInfo{RAF} or return 0;
     my $buff;
-    my $verbose = $exifTool->Options('Verbose');
-    my $buildMakerNotes = $exifTool->Options('MakerNotes');
+    my $verbose = $et->Options('Verbose');
+    my $buildMakerNotes = $et->Options('MakerNotes');
 
     # 4 bytes at end of block give directory position within block
     $raf->Seek($blockStart+$blockSize-4, 0) or return 0;
@@ -652,7 +652,7 @@ sub ProcessCanonRaw($$$)
     # read the directory (10 bytes per entry)
     $raf->Read($buff, 10 * $entries) == 10 * $entries or return 0;
 
-    $verbose and $exifTool->VerboseDir('CIFF', $entries);
+    $verbose and $et->VerboseDir('CIFF', $entries);
     my $index;
     for ($index=0; $index<$entries; ++$index) {
         my $pt = 10 * $index;
@@ -661,13 +661,13 @@ sub ProcessCanonRaw($$$)
         my $valuePtr = Get32u(\$buff, $pt+6);
         my $ptr = $valuePtr + $blockStart;  # all pointers relative to block start
         if ($tag & 0x8000) {
-            $exifTool->Warn('Bad CRW directory entry');
+            $et->Warn('Bad CRW directory entry');
             return 1;
         }
         my $tagID = $tag & 0x3fff;          # get tag ID
         my $tagType = ($tag >> 8) & 0x38;   # get tag type
         my $valueInDir = ($tag & 0x4000);   # flag for value in directory
-        my $tagInfo = $exifTool->GetTagInfo($rawTagTable, $tagID);
+        my $tagInfo = $et->GetTagInfo($rawTagTable, $tagID);
         if (($tagType==0x28 or $tagType==0x30) and not $valueInDir) {
             # this type of tag specifies a raw subdirectory
             my $name;
@@ -684,13 +684,13 @@ sub ProcessCanonRaw($$$)
             );
             if ($verbose) {
                 my $fakeInfo = { Name => $name, SubDirectory => { } };
-                $exifTool->VerboseInfo($tagID, $fakeInfo,
+                $et->VerboseInfo($tagID, $fakeInfo,
                     'Index'  => $index,
                     'Size'   => $size,
                     'Start'  => $ptr,
                 );
             }
-            $exifTool->ProcessDirectory(\%subdirInfo, $rawTagTable);
+            $et->ProcessDirectory(\%subdirInfo, $rawTagTable);
             next;
         }
         my ($valueDataPos, $count, $subdir);
@@ -714,21 +714,21 @@ sub ProcessCanonRaw($$$)
             $valueDataPos = $ptr;
             if ($size <= 512 or ($verbose > 2 and $size <= 65536)
                 or ($tagInfo and ($$tagInfo{SubDirectory}
-                or grep(/^$$tagInfo{Name}$/i, $exifTool->GetRequestedTags()) )))
+                or grep(/^$$tagInfo{Name}$/i, $et->GetRequestedTags()) )))
             {
                 # read value if size is small or specifically requested
                 # or if this is a SubDirectory
                 unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size) == $size) {
-                    $exifTool->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
+                    $et->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
                     next;
                 }
             } else {
                 $value = "Binary data $size bytes";
                 if ($tagInfo) {
-                    if ($exifTool->Options('Binary') or $verbose) {
+                    if ($et->Options('Binary') or $verbose) {
                         # read the value anyway
                         unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size) == $size) {
-                            $exifTool->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
+                            $et->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
                             next;
                         }
                     }
@@ -750,7 +750,7 @@ sub ProcessCanonRaw($$$)
         if ($verbose) {
             my $val = $value;
             $format and $val = ReadValue(\$val, 0, $format, $count, $size);
-            $exifTool->VerboseInfo($tagID, $tagInfo,
+            $et->VerboseInfo($tagID, $tagInfo,
                 Table   => $rawTagTable,
                 Index   => $index,
                 Value   => $val,
@@ -763,7 +763,7 @@ sub ProcessCanonRaw($$$)
         }
         if ($buildMakerNotes) {
             # build maker notes information if requested
-            BuildMakerNotes($exifTool, $tagID, $tagInfo, \$value, $format, $count);
+            BuildMakerNotes($et, $tagID, $tagInfo, \$value, $format, $count);
         }
         next unless defined $tagInfo;
 
@@ -798,15 +798,15 @@ sub ProcessCanonRaw($$$)
             );
             #### eval Validate ($dirData, $subdirStart, $size)
             if (defined $$subdir{Validate} and not eval $$subdir{Validate}) {
-                $exifTool->Warn("Invalid $name data");
+                $et->Warn("Invalid $name data");
             } else {
-                $exifTool->ProcessDirectory(\%subdirInfo, $newTagTable, $$subdir{ProcessProc});
+                $et->ProcessDirectory(\%subdirInfo, $newTagTable, $$subdir{ProcessProc});
             }
         } else {
             # convert to specified format if necessary
             $format and $value = ReadValue(\$value, 0, $format, $count, $size);
             # save the information
-            $exifTool->FoundTag($tagInfo, $value);
+            $et->FoundTag($tagInfo, $value);
             delete $$tagInfo{RawConv} if $delRawConv;
         }
     }
@@ -819,10 +819,10 @@ sub ProcessCanonRaw($$$)
 # Returns: 1 if this was a valid Canon RAW file
 sub ProcessCRW($$)
 {
-    my ($exifTool, $dirInfo) = @_;
+    my ($et, $dirInfo) = @_;
     my ($buff, $sig);
     my $raf = $$dirInfo{RAF};
-    my $buildMakerNotes = $exifTool->Options('MakerNotes');
+    my $buildMakerNotes = $et->Options('MakerNotes');
 
     $raf->Read($buff,2) == 2      or return 0;
     SetByteOrder($buff)           or return 0;
@@ -835,10 +835,10 @@ sub ProcessCRW($$)
     my $filesize = $raf->Tell()   or return 0;
 
     # initialize maker note data if building maker notes
-    $buildMakerNotes and InitMakerNotes($exifTool);
+    $buildMakerNotes and InitMakerNotes($et);
 
     # set the FileType tag unless already done (ie. APP0 CIFF record in JPEG image)
-    $exifTool->SetFileType();
+    $et->SetFileType();
 
     # build directory information for main raw directory
     my %dirInfo = (
@@ -852,20 +852,20 @@ sub ProcessCRW($$)
 
     # process the raw directory
     my $rawTagTable = GetTagTable('Image::ExifTool::CanonRaw::Main');
-    my $oldIndent = $$exifTool{INDENT};
-    $$exifTool{INDENT} .= '| ';
-    unless (ProcessCanonRaw($exifTool, \%dirInfo, $rawTagTable)) {
-        $exifTool->Warn('CRW file format error');
+    my $oldIndent = $$et{INDENT};
+    $$et{INDENT} .= '| ';
+    unless (ProcessCanonRaw($et, \%dirInfo, $rawTagTable)) {
+        $et->Warn('CRW file format error');
     }
-    $$exifTool{INDENT} = $oldIndent;
+    $$et{INDENT} = $oldIndent;
 
     # finish building maker notes if necessary
-    $buildMakerNotes and SaveMakerNotes($exifTool);
+    $buildMakerNotes and SaveMakerNotes($et);
 
     # process trailers if they exist in CRW file (not in CIFF information!)
-    if ($$exifTool{FILE_TYPE} eq 'CRW') {
+    if ($$et{FILE_TYPE} eq 'CRW') {
         my $trailInfo = Image::ExifTool::IdentifyTrailer($raf);
-        $exifTool->ProcessTrailers($trailInfo) if $trailInfo;
+        $et->ProcessTrailers($trailInfo) if $trailInfo;
     }
 
     return 1;
@@ -898,7 +898,7 @@ tags.)
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

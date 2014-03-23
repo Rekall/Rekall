@@ -25,7 +25,7 @@ private:
     quint16              oldToolboxIndex;
 public:
     void setToolbox(QToolBox *);
-    void addTask   (Metadata *metadata, TaskProcessType type, qint16 version);
+    void addTask   (Metadata *metadata, TaskProcessType type, qint16 version, bool needCompleteScan);
     void addTask   (const TaskProcessData &data);
 private slots:
     void webPageLoaded();

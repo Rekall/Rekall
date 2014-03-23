@@ -10,6 +10,18 @@ Timeline::Timeline(QWidget *parent) :
     ticksWidth = 50;
     timelineControl = new TimelineControl();
     Global::timelineGL->showLegendDest.setAction(ui->legend);
+
+    ui->ffButton->setVisible(false);
+    ui->playButton->setVisible(false);
+
+    ui->workspace->addItem("HISTORIC VIEW",        "global_work");
+    ui->workspace->addItem("YOUR WORK",            "your_work");
+    ui->workspace->addItem("YOUR CUES",            "your_cues");
+    ui->workspace->addItem("YOUR LAST IMPORTS",    "your_last_imports");
+    ui->workspace->addItem("GLOBAL CUES",          "global_cues");
+    ui->workspace->addItem("GLOBAL LAST IMPORTS",  "global_last_imports");
+    ui->workspace->addItem("TYPE OF DOCUMENTS PUNCHCARD", "global_punchcard_type");
+    ui->workspace->addItem("PEOPLE ACTIVITY PUNCHCARD",   "global_punchcard_activity");
 }
 
 Timeline::~Timeline() {
@@ -229,6 +241,65 @@ void Timeline::action() {
         timelineControl->move(ui->viewOption->parentWidget()->mapToGlobal(ui->viewOption->pos())                - QPoint(23, 3 + timelineControl->height()));
         if(ui->viewOption->isChecked()) timelineControl->show();
         else                            timelineControl->hide();
+    }
+    else if((sender() == ui->workspace) && ((Global::tagFilterCriteria) && (Global::tagSortCriteria) && (Global::tagColorCriteria) && (Global::tagTextCriteria) && (Global::tagClusterCriteria) && (Global::tagHorizontalCriteria))) {
+        QString workspace = ui->workspace->itemData(ui->workspace->currentIndex()).toString();
+        /*
+        ui->filter->addItem(1"date (year)",  "Rekall->Date/Time | 0,4");
+        ui->filter->addItem(2"date (month)", "Rekall->Date/Time | 0,7");
+        ui->filter->addItem(3"date (day)",   "Rekall->Date/Time | 0,10");  // 1234:67:90 23:56:89
+        ui->filter->addItem(4"time (hours)", "Rekall->Date/Time | 11,2");  // 0123:56:89012:45:67
+        ui->filter->addItem(5"type",         "Rekall->Type");
+        ui->filter->addItem(6"author",       "Rekall->Author");
+        ui->filter->addItem(7"keywords",     "Rekall->All");
+        ui->filter->addItem(8"name",         "Rekall->Name");
+        ui->filter->addItem(9"import date",  "Rekall->Import Date/Time | 0,16");
+        ui->filter->addItem(10"import author","Rekall->Import Author");
+        ui->filter->addItem(11"first letter (name)", "Rekall->Name | 0,1");
+        ui->filter->addItem("Composite->Light Value");
+        ui->filter->addItem("Rekall->Size");
+        */
+
+        if(workspace == "global_work") {
+            Global::tagFilterCriteria    ->reset("author");
+            Global::tagSortCriteria      ->reset("date (month)");
+            Global::tagHorizontalCriteria->reset("time");
+        }
+        else if(workspace == "your_work") {
+            Global::tagFilterCriteria    ->reset("author", Global::userInfos->getInfo("User Name"));
+            Global::tagSortCriteria      ->reset("date (month)");
+            Global::tagHorizontalCriteria->reset("time");
+        }
+        else if(workspace == "your_cues") {
+            Global::tagFilterCriteria    ->reset("type", "cue");
+            Global::tagSortCriteria      ->reset("author", Global::userInfos->getInfo("User Name"));
+            Global::tagHorizontalCriteria->reset("time");
+        }
+        else if(workspace == "global_cues") {
+            Global::tagFilterCriteria    ->reset("type", "cue");
+            Global::tagSortCriteria      ->reset("author");
+            Global::tagHorizontalCriteria->reset("time");
+        }
+        else if(workspace == "your_last_imports") {
+            Global::tagFilterCriteria    ->reset("import author", Global::userInfos->getInfo("User Name"));
+            Global::tagSortCriteria      ->reset("import date");
+            Global::tagHorizontalCriteria->reset("time");
+        }
+        else if(workspace == "global_last_imports") {
+            Global::tagFilterCriteria    ->reset("import author");
+            Global::tagSortCriteria      ->reset("import date");
+            Global::tagHorizontalCriteria->reset("time");
+        }
+        else if(workspace == "global_punchcard_type") {
+            Global::tagFilterCriteria    ->reset("type");
+            Global::tagSortCriteria      ->reset("author");
+            Global::tagHorizontalCriteria->reset("type");
+        }
+        else if(workspace == "global_punchcard_activity") {
+            Global::tagFilterCriteria    ->reset("type");
+            Global::tagSortCriteria      ->reset("author");
+            Global::tagHorizontalCriteria->reset("date (month)");
+        }
     }
 }
 

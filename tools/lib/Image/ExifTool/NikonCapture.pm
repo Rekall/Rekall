@@ -17,7 +17,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 sub ProcessNikonCapture($$$);
 
@@ -678,18 +678,18 @@ my %unsharpColor = (
 # Returns: 1 on success
 sub WriteNikonCapture($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    $exifTool or return 1;    # allow dummy access to autoload this package
+    my ($et, $dirInfo, $tagTablePtr) = @_;
+    $et or return 1;    # allow dummy access to autoload this package
 
     # no need to edit this information unless necessary
-    unless ($exifTool->{EDIT_DIRS}->{MakerNotes} or $exifTool->{EDIT_DIRS}->{IPTC}) {
+    unless ($$et{EDIT_DIRS}{MakerNotes} or $$et{EDIT_DIRS}{IPTC}) {
         return undef;
     }
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart};
     my $dirLen = $$dirInfo{DirLen};
     if ($dirLen < 22) {
-        $exifTool->Warn('Short Nikon Capture Data',1);
+        $et->Warn('Short Nikon Capture Data',1);
         return undef;
     }
     # make sure the capture data is properly contained
@@ -699,7 +699,7 @@ sub WriteNikonCapture($$$)
     my $size = Get32u($dataPt, $dirStart + 18);
     my $pad = $dirLen - $size - 18; 
     unless ($tagID == 0x7a86a940 and ($pad >= 0 or $pad == -18)) {
-        $exifTool->Warn('Unrecognized Nikon Capture Data header');
+        $et->Warn('Unrecognized Nikon Capture Data header');
         return undef;
     }
     # determine if there is any data after this block
@@ -711,7 +711,7 @@ sub WriteNikonCapture($$$)
     }
     my $outBuff = '';
     my $pos;
-    my $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
+    my $newTags = $et->GetNewTagInfoHash($tagTablePtr);
     my $dirEnd = $dirStart + $dirLen;
 
     # loop through all entries in the Nikon Capture data
@@ -719,7 +719,7 @@ sub WriteNikonCapture($$$)
         $tagID = Get32u($dataPt, $pos);
         $size = Get32u($dataPt, $pos + 18) - 4;
         last if $size < 0 or $pos + 22 + $size > $dirEnd;
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
+        my $tagInfo = $et->GetTagInfo($tagTablePtr, $tagID);
         if ($tagInfo) {
             my $newVal;
             if ($$tagInfo{SubDirectory}) {
@@ -731,25 +731,25 @@ sub WriteNikonCapture($$$)
                 );
                 my $subTable = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
                 # ignore minor errors in IPTC since there is typically trailing garbage
-                my $oldSetting = $exifTool->Options('IgnoreMinorErrors');
-                $$tagInfo{Name} =~ /IPTC/ and $exifTool->Options(IgnoreMinorErrors => 1);
+                my $oldSetting = $et->Options('IgnoreMinorErrors');
+                $$tagInfo{Name} =~ /IPTC/ and $et->Options(IgnoreMinorErrors => 1);
                 # rewrite the directory
-                $newVal = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
+                $newVal = $et->WriteDirectory(\%subdirInfo, $subTable);
                 # restore our original options
-                $exifTool->Options(IgnoreMinorErrors => $oldSetting);
+                $et->Options(IgnoreMinorErrors => $oldSetting);
             } elsif ($$newTags{$tagID}) {
                 # get new value for this tag if we are writing it
                 my $format = $$tagInfo{Format} || $$tagInfo{Writable};
                 my $oldVal = ReadValue($dataPt,$pos+22,$format,1,$size);
-                my $nvHash = $exifTool->GetNewValueHash($tagInfo);
-                if ($exifTool->IsOverwriting($nvHash, $oldVal)) {
-                    my $val = $exifTool->GetNewValues($tagInfo);
+                my $nvHash = $et->GetNewValueHash($tagInfo);
+                if ($et->IsOverwriting($nvHash, $oldVal)) {
+                    my $val = $et->GetNewValues($tagInfo);
                     $newVal = WriteValue($val, $$tagInfo{Writable}) if defined $val;
                     if (defined $newVal and length $newVal) {
-                        ++$exifTool->{CHANGED};
+                        ++$$et{CHANGED};
                     } else {
                         undef $newVal;
-                        $exifTool->Warn("Can't delete $$tagInfo{Name}");
+                        $et->Warn("Can't delete $$tagInfo{Name}");
                     }
                 }
             }
@@ -771,7 +771,7 @@ sub WriteNikonCapture($$$)
             # (did they forget to include the size word?)
             $outBuff .= substr($$dataPt, $pos, 4);
         } else {
-            $exifTool->Warn('Nikon Capture Data improperly terminated',1);
+            $et->Warn('Nikon Capture Data improperly terminated',1);
             return undef;
         }
     }
@@ -787,17 +787,17 @@ sub WriteNikonCapture($$$)
 # Returns: 1 on success
 sub ProcessNikonCaptureEditVersions($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart};
     my $dirLen = $$dirInfo{DirLen};
     my $dirEnd = $dirStart + $dirLen;
-    my $verbose = $exifTool->Options('Verbose');
+    my $verbose = $et->Options('Verbose');
     SetByteOrder('II');
     return 0 unless $dirLen > 4;
     my $num = Get32u($dataPt, $dirStart);
     my $pos = $dirStart + 4;
-    $verbose and $exifTool->VerboseDir('NikonCaptureEditVersions', $num);
+    $verbose and $et->VerboseDir('NikonCaptureEditVersions', $num);
     while ($num) {
         last if $pos + 4 > $dirEnd;
         my $len = Get32u($dataPt, $pos);
@@ -809,12 +809,12 @@ sub ProcessNikonCaptureEditVersions($$$)
             DirStart => $pos + 4,
             DirLen   => $len,
         );
-        $$exifTool{DOC_NUM} = ++$$exifTool{DOC_COUNT};
-        $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
+        $$et{DOC_NUM} = ++$$et{DOC_COUNT};
+        $et->ProcessDirectory(\%dirInfo, $tagTablePtr);
         --$num;
         $pos += $len + 4;
     }
-    delete $$exifTool{DOC_NUM};
+    delete $$et{DOC_NUM};
     return 1;
 }
 
@@ -824,22 +824,22 @@ sub ProcessNikonCaptureEditVersions($$$)
 # Returns: 1 on success
 sub ProcessNikonCapture($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart};
     my $dirLen = $$dirInfo{DirLen};
     my $dirEnd = $dirStart + $dirLen;
-    my $verbose = $exifTool->Options('Verbose');
+    my $verbose = $et->Options('Verbose');
     my $success = 0;
     SetByteOrder('II');
-    $verbose and $exifTool->VerboseDir('NikonCapture', 0, $dirLen);
+    $verbose and $et->VerboseDir('NikonCapture', 0, $dirLen);
     my $pos;
     for ($pos=$dirStart+22; $pos+22<$dirEnd; ) {
         my $tagID = Get32u($dataPt, $pos);
         my $size = Get32u($dataPt, $pos + 18) - 4;
         $pos += 22;
         last if $size < 0 or $pos + $size > $dirEnd;
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
+        my $tagInfo = $et->GetTagInfo($tagTablePtr, $tagID);
         if ($tagInfo or $verbose) {
             my ($format, $value);
             # (note that Writable will be 0 for Unknown tags)
@@ -859,7 +859,7 @@ sub ProcessNikonCapture($$$)
             } elsif ($size == 1) {
                 $value = substr($$dataPt, $pos, $size);
             }
-            $exifTool->HandleTag($tagTablePtr, $tagID, $value,
+            $et->HandleTag($tagTablePtr, $tagID, $value,
                 DataPt => $dataPt,
                 Start  => $pos,
                 Size   => $size,
@@ -889,7 +889,7 @@ the maker notes of NEF images.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

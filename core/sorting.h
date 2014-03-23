@@ -81,6 +81,9 @@ public:
     const QString styleSheet2() const;
     void setStyleSheet2(const QString &str);
 
+public:
+    void reset(const QString &filterText = "", QString matchText = "", QStringList checks = QStringList());
+
 private:
     Ui::Sorting *ui;
 };

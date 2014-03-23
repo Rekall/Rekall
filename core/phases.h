@@ -84,6 +84,9 @@ public:
     const QString styleSheet2() const;
     void setStyleSheet2(const QString &str);
 
+public:
+    void reset(const QString &filterText = "", QStringList checks = QStringList());
+
 private:
     Ui::Phases *ui;
 };

@@ -97,7 +97,7 @@ is an explanation of the meaning of each special key:
     ifd64       - Unsigned 64-bit integer sub-IFD pointer (BigTIFF 'IFD8')
     string      - Series of 8-bit ASCII characters        (EXIF 'ASCII')
     undef       - Undefined-format binary data            (EXIF 'UNDEFINED')
-    binary      - Binary data
+    binary      - Binary data (same as 'undef')
 
   Additionally, the following variable-length Format types may be used in
   individual tag information hashes of a BinaryData table.  The 'var_' formats
@@ -299,14 +299,16 @@ numerical.
                   'BlockExtract' - set for writable directories in EXIF
                   information which are extracted by default.  Otherwise
                   writable directories are only extracted as a block if
-                  specified explicitly.
+                  specified explicitly.  Also used for Jpeg2000 and QuickTime
+                  XMP-like tags to extract as a block with a name other than
+                  'XMP'.
 
                   'DataMember' - name of exiftool data member associated with
                   this tag if it should be stored as a special data member when
                   writing information.  Necessary only if the value of the tag
                   affects other written information.  Currently only used for
                   tags in EXIF tables where it triggers the execution of the
-                  RawConv to convert and stores the value as an ExifTool data
+                  RawConv to convert and store the value as an ExifTool data
                   member when writing.
 
                   'DataTag' - associated tag name containing data for offset or
@@ -343,7 +345,7 @@ numerical.
                   is used even if the base changes for the current directory
                   (only some maker notes are this messed up).  Set to 3 if
                   absolute file offsets are used.  May be set to an expression
-                  to be evaluated.  Expression may access $val and $exifTool,
+                  to be evaluated.  Expression may access $val and $et,
                   and is evaluated only when reading.
 
                   'List' - flag indicating that duplicate entries of this tag
@@ -480,36 +482,37 @@ numerical.
                   ValueConv and PrintConv evals will no longer have access to
                   the source @val and @prt values unless the input $val is
                   returned.  RawConv may generate Warning or Error tags, while
-                  ValueConv and PrintConv may not. Note: RawConv should only be
+                  ValueConv and PrintConv may not.  Note: RawConv should only be
                   used if necessary (in general, only if the conversion may
-                  return undef to ignore the tag) because ValueConv is more
-                  efficient since it is only executed if the tag value is
-                  requested, while RawConv is executed for all extracted tags.
+                  return undef to ignore the tag, or if a Warning may be issued)
+                  because ValueConv is more efficient since it is only executed
+                  if the tag value is requested, while RawConv is executed for
+                  all extracted tags.
 
   ValueConv     : Used to convert the Raw value to a useable form. May be a hash
                   reference to act as a lookup table, a scalar which is
-                  evaluated as a Perl expression, or a code reference to a
-                  subroutine.  May also be a list reference, in which case the
-                  value is split at whitespace into a list of items and each
-                  item is converted by the associated entry in the ValueConv
-                  list.  If a hash reference is used and the Raw value doesn't
-                  appear as one of the keys, then the converted value is set to
-                  "Unknown (X)", where X is the Raw value (unless either of the
-                  special keys exist: 'BITMASK', a reference to a hash used to
-                  decode individual value bits; or 'OTHER', a reference to a
-                  subroutine used to convert unknown values.  The OTHER
-                  subroutine takes 3 arguments: the value, a flag which is set
-                  for the inverse conversion, and a reference to the PrintConv
-                  hash, and returns the converted value or undef on error.  The
-                  lookup hash may also contain a 'Notes' entry which is used for
-                  documentation if the SeparateTable flag is set).  In an
-                  expression, $self is a reference to the current ExifTool
-                  object, $val is the Raw value, and $tag is the tag key.  The
-                  subroutine takes 2 arguments: the Raw value and a reference to
-                  the current ExifTool object.  The expression or subroutine is
-                  evaluated when and if the tag value is requested (ie. only
-                  after all extraction is complete), so if necessary at this
-                  time the values of all other tags are available via calls to
+                  evaluated as a Perl expression, a code reference to a
+                  subroutine, or an ARRAY reference (in which case the value is
+                  split at whitespace into a list of items and each item is
+                  converted by the associated entry in the ValueConv list).  If
+                  a hash reference is used and the Raw value doesn't appear as
+                  one of the keys, then the converted value is set to "Unknown
+                  (X)", where X is the Raw value (unless either of the special
+                  keys exist: 'BITMASK', a reference to a hash used to decode
+                  individual value bits; or 'OTHER', a reference to a subroutine
+                  used to convert unknown values.  The OTHER subroutine takes 3
+                  arguments: the value, a flag which is set for the inverse
+                  conversion, and a reference to the PrintConv hash, and returns
+                  the converted value or undef on error.  The lookup hash may
+                  also contain a 'Notes' entry which is used for documentation
+                  if the SeparateTable flag is set).  In an expression, $self is
+                  a reference to the current ExifTool object, $val is the Raw
+                  value, and $tag is the tag key.  The subroutine takes 2
+                  arguments: the Raw value and a reference to the current
+                  ExifTool object.  The expression or subroutine is evaluated
+                  when and if the tag value is requested (ie. only after all
+                  extraction is complete), so if necessary at this time the
+                  values of all other tags are available via calls to
                   $self->GetValue("Tag","Raw"). (Note: In theory, types other
                   than "Raw" may be accessed, but they are slower and may lead
                   to cyclical dependencies so they should be avoided). When
@@ -769,12 +772,17 @@ numerical.
 
   Hook          : [BinaryData tags only] Expression to be evaluated when
                   extracting tag to allow dynamic Format, etc for BinaryData
-                  tags.  May access $self, and assign a new value to $format to
+                  tags.  May access $self, and $size (the full size of the
+                  binary data block), and assign a new value to $format to
                   dynamically set the tag format, and/or increment $varSize to
                   add a byte offset to subsequent tags.  $varSize may be set to
                   a large number to effectively abort processing of the
                   directory after this tag.  Must have corresponding DATAMEMBER
-                  entry in writable tables.
+                  entry in writable tables.  Must not have Unknown set.
+
+  SetBase       : [QuickTime and BinaryData tags only] Sets ExifTool BASE offset
+                  for use when ExtractInfo is called with the ReEntry flag from
+                  inside the RawConv of a tag.
 
   TagID         : [reserved] Used internally to save the table key for this tag.
                   Note: For XMP tables this corresponds to the XMP property

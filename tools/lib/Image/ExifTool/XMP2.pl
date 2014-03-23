@@ -13,6 +13,7 @@
 #               6) http://www.optimasc.com/products/fileid/xmp-extensions.pdf
 #               9) http://www.w3.org/TR/SVG11/
 #               11) http://www.extensis.com/en/support/kb_article.jsp?articleNumber=6102211
+#               12) XMPSpecificationPart3_May2013, page 58
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::XMP;
@@ -139,6 +140,7 @@ my %sTimecode = (
     copyright       => { Avoid => 1, Groups => { 2 => 'Author' } }, # (deprecated)
     director        => { },
     directorPhotography => { },
+    discNumber      => { }, #12
     duration        => { Struct => \%sTime },
     engineer        => { },
     fileDataRate    => { Writable => 'rational' },
@@ -156,10 +158,12 @@ my %sTimecode = (
     },
     logComment      => { },
     loop            => { Writable => 'boolean' },
+    lyrics          => { }, #12
     numberOfBeats   => { Writable => 'real' },
     markers         => { Struct => \%sMarker, List => 'Seq' },
     metadataModDate => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     outCue          => { Struct => \%sTime },
+    partOfCompilation=>{ }, #12
     projectName     => { },
     projectRef => {
         Struct => {
@@ -901,7 +905,7 @@ my %sSubVersion = (
     author     => { Avoid => 1, Groups => { 2 => 'Author' } },
     caption    => { Avoid => 1 },
     categories => { Avoid => 1 },
-    datetime   => { Avoid => 1, Groups => { 2 => 'Time' }, %dateTimeInfo },
+    datetime   => { Name => 'DateTime', Avoid => 1, Groups => { 2 => 'Time' }, %dateTimeInfo },
     keywords   => { Avoid => 1, List => 'Bag' },
     notes      => { Avoid => 1 },
     rating     => { Avoid => 1, Writable => 'real' }, # integer?
@@ -1154,6 +1158,7 @@ my %sSubVersion = (
     },
     FaceID          => { Writable => 'integer' },
     AngleInfoRoll   => { Writable => 'integer' },
+    AngleInfoYaw    => { Writable => 'integer' },
     ConfidenceLevel => { Writable => 'integer' },
 );
 
@@ -1267,7 +1272,7 @@ This file contains definitions for less common XMP namespaces.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

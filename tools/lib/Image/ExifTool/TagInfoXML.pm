@@ -15,7 +15,7 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 @ISA = qw(Exporter);
 
 # set this to a language code to generate Lang module with 'MISSING' entries
@@ -67,7 +67,7 @@ sub Write(;$$%)
     local ($_, *PTIFILE);
     my ($file, $group, %opts) = @_;
     my @groups = split ':', $group if $group;
-    my $exifTool = new Image::ExifTool;
+    my $et = new Image::ExifTool;
     my ($fp, $tableName, %langInfo, @langs, $defaultLang);
 
     Image::ExifTool::LoadAllTables();   # first load all our tables
@@ -111,7 +111,7 @@ PTILoop:    for ($index=0; $index<@infoArray; ++$index) {
                 # don't list subdirectories unless they are writable
                 next unless $$tagInfo{Writable} or not $$tagInfo{SubDirectory};
                 if (@groups) {
-                    my @tg = $exifTool->GetGroup($tagInfo);
+                    my @tg = $et->GetGroup($tagInfo);
                     foreach $group (@groups) {
                         next PTILoop unless grep /^$group$/i, @tg;
                     }
@@ -163,8 +163,10 @@ PTILoop:    for ($index=0; $index<@infoArray; ++$index) {
                 my $count = '';
                 if ($format =~ s/\[.*?(\d*)\]$//) {
                     $count = " count='$1'" if length $1;
+                } elsif ($$tagInfo{Count} and $$tagInfo{Count} > 1) {
+                    $count = " count='$$tagInfo{Count}'";
                 }
-                my @groups = $exifTool->GetGroup($tagInfo);
+                my @groups = $et->GetGroup($tagInfo);
                 my $writeGroup = $$tagInfo{WriteGroup} || $$table{WRITE_GROUP};
                 if ($writeGroup and $writeGroup ne 'Comment') {
                     $groups[1] = $writeGroup;   # use common write group for group 1
@@ -612,7 +614,7 @@ and values.
 
 ~head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -779,7 +781,7 @@ Number of modules updated, or negative on error.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

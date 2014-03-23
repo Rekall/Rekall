@@ -52,6 +52,7 @@
         <file>res_icon_toContextualMilestone.png</file>
         <file>res_icon_toGlobal.png</file>
         <file>res_icon_filter_text.png</file>
+        <file>res_icon_down2.png</file>
     </qresource>
     <qresource prefix="/textures">
         <file>res_texture_strips.png</file>

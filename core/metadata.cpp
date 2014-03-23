@@ -9,9 +9,9 @@ QStringList Metadata::suffixesTypePeople;
 
 Metadata::Metadata(QObject *parent, bool createEmpty) :
     QObject(parent) {
-    metadataMutex = false;
-    chutierItem   = 0;
-    status        = DocumentStatusReady;
+    metadataMutex    = false;
+    chutierItem      = 0;
+    status           = DocumentStatusReady;
     if(!suffixesTypeDoc.count())
         suffixesTypeDoc << "pdf" << "ps" << "doc" << "txt" << "docx";
     if(!suffixesTypeImage.count())
@@ -44,14 +44,8 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     setMetadata("Rekall", "Name",               name, version);
     setMetadata("Rekall", "Comments",           "",   version);
     //setMetadata("Rekall", "Comments (details)", "",   version);
-    setMetadata("Rekall", "Author",       Global::userInfos->getInfo("User Name"), version);
-    quint16 tirage = Global::alea(0, 100);
-    if(tirage < 10)        setMetadata("Rekall", "Author", "Julie Valero",         version);
-    else if(tirage < 20)   setMetadata("Rekall", "Author", "Alexandros Markeas",   version);
-    else if(tirage < 30)   setMetadata("Rekall", "Author", "Pierre Nouvel",        version);
-    else if(tirage < 50)   setMetadata("Rekall", "Author", "Jean-François Peyret", version);
-    else if(tirage < 70)   setMetadata("Rekall", "Author", "Agnès de Cayeux",      version);
-    else                   setMetadata("Rekall", "Author", "Thierry Coduys",       version);
+    setMetadata("Rekall", "Author",        Global::userInfos->getInfo("User Name"), version);
+    setMetadata("Rekall", "Import Author", Global::userInfos->getInfo("User Name"), version);
     setMetadata("Rekall", "Date/Time",          QDateTime::currentDateTime(), version);
     setMetadata("Rekall", "Import Date/Time",   QDateTime::currentDateTime(), version);
     setMetadata(Global::userInfos->getInfos());
@@ -319,14 +313,14 @@ bool Metadata::isAcceptableWithSortFilters(bool strongCheck, qint16 version) con
     return (getFunction() == DocumentFunctionRender) ||
             (   (Global::phases                  ->isAcceptable(true,        getCriteriaPhase(version)))
                 && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
-                && (Global::tagSortCriteria      ->isAcceptable(strongCheck, getCriteriaSort(version)))
+                && (Global::tagSortCriteria      ->isAcceptable(strongCheck, getCriteriaSort(version).toLower()))
                 && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version))));
 }
 bool Metadata::isAcceptableWithColorFilters(bool strongCheck, qint16 version) const {
     return (getFunction() == DocumentFunctionContextual)
             && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
-            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
             && (Global::tagColorCriteria     ->isAcceptable(strongCheck, getCriteriaColor(version)))
             && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
@@ -334,7 +328,7 @@ bool Metadata::isAcceptableWithTextFilters(bool strongCheck, qint16 version) con
     return (getFunction() == DocumentFunctionContextual)
             && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
-            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
             && (Global::tagTextCriteria      ->isAcceptable(strongCheck, getCriteriaText(version)))
             && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
@@ -342,20 +336,20 @@ bool Metadata::isAcceptableWithClusterFilters(bool strongCheck, qint16 version) 
     return (getFunction() == DocumentFunctionContextual)
             && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
-            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
             && (Global::tagClusterCriteria   ->isAcceptable(strongCheck, getCriteriaCluster(version)))
             && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
 bool Metadata::isAcceptableWithFilterFilters(bool strongCheck, qint16 version) const {
     return (    Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(strongCheck, getCriteriaFilter(version)))
-            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
             && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
 bool Metadata::isAcceptableWithHorizontalFilters(bool strongCheck, qint16 version) const {
     return (    Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
-            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
             && (Global::tagHorizontalCriteria->isAcceptable(strongCheck, getCriteriaHorizontal(version)));
 }
 
@@ -486,7 +480,8 @@ void Metadata::debug() {
 }
 QDomElement Metadata::serializeMetadata(QDomDocument &xmlDoc) const {
     QDomElement xmlData = xmlDoc.createElement("metadata");
-    xmlData.setAttribute("file", file.absoluteFilePath());
+    //xmlData.setAttribute("file", file.absoluteFilePath());
+    quint16 version = 0;
     foreach(const QMetaDictionnay & metaDictionnay, metadatas) {
         QMapIterator<QString, QMetaMap> categoryIterator(metaDictionnay);
         while(categoryIterator.hasNext()) {
@@ -499,14 +494,31 @@ QDomElement Metadata::serializeMetadata(QDomDocument &xmlDoc) const {
                 xmlMeta.setAttribute("tagname",  metaIterator.key());
                 xmlMeta.setAttribute("name",     QString("%1.%2").arg(categoryIterator.key()).arg(metaIterator.key()));
                 xmlMeta.setAttribute("content",  metaIterator.value().toString());
+                xmlMeta.setAttribute("documentVersion", version);
                 xmlData.appendChild(xmlMeta);
             }
         }
+        version++;
     }
     return xmlData;
 }
 void Metadata::deserializeMetadata(const QDomElement &xmlElement) {
-    QString a = xmlElement.attribute("attribut");
+    metadatas.append(QMetaDictionnay());
+    QDomNode metadataNode = xmlElement.firstChild();
+    while(!metadataNode.isNull()) {
+        QDomElement metadataElement = metadataNode.toElement();
+        if((!metadataElement.isNull()) && (metadataElement.nodeName() == "metadata")) {
+            QDomNode metaNode = metadataElement.firstChild();
+            while(!metaNode.isNull()) {
+                QDomElement metaElement = metaNode.toElement();
+                if((!metaElement.isNull()) && (metaElement.nodeName() == "meta")) {
+                    setMetadata(metaElement.attribute("category"), metaElement.attribute("tagname"), metaElement.attribute("content"), metaElement.attribute("documentVersion", "-1").toInt());
+                }
+                metaNode = metaNode.nextSibling();
+            }
+        }
+        metadataNode = metadataNode.nextSibling();
+    }
 }
 
 

@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Sigma;
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -246,13 +246,13 @@ sub ProcessX3FProperties($$$);
 # Returns: Converted string
 sub ExtractUnicodeString($$$)
 {
-    my ($exifTool, $chars, $pos) = @_;
+    my ($et, $chars, $pos) = @_;
     my $i;
     for ($i=$pos; $i<@$chars; ++$i) {
         last unless $$chars[$i];
     }
     my $buff = pack('v*', @$chars[$pos..$i-1]);
-    return $exifTool->Decode($buff, 'UCS2', 'II');
+    return $et->Decode($buff, 'UCS2', 'II');
 }
 
 #------------------------------------------------------------------------------
@@ -261,22 +261,22 @@ sub ExtractUnicodeString($$$)
 # Returns: 1 on success
 sub ProcessX3FHeader($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $hdrLen = $$dirInfo{DirLen};
-    my $verbose = $exifTool->Options('Verbose');
+    my $verbose = $et->Options('Verbose');
 
     # process the static header structure first
-    $exifTool->ProcessBinaryData($dirInfo, $tagTablePtr);
+    $et->ProcessBinaryData($dirInfo, $tagTablePtr);
 
     # process extended data if available
     if (length $$dataPt >= 232) {
         if ($verbose) {
-            $exifTool->VerboseDir('X3F HeaderExt', 32);
+            $et->VerboseDir('X3F HeaderExt', 32);
             Image::ExifTool::HexDump($dataPt, undef,
                 MaxLen => $verbose > 3 ? 1024 : 96,
-                Out    => $exifTool->Options('TextOut'),
-                Prefix => $$exifTool{INDENT},
+                Out    => $et->Options('TextOut'),
+                Prefix => $$et{INDENT},
                 Start  => $$dirInfo{DirLen},
             ) if $verbose > 2;
         }
@@ -298,14 +298,14 @@ sub ProcessX3FHeader($$$)
                 }
                 $val = $sign * 2 ** (($val - 0x3f800000) / 0x800000);
             }
-            $exifTool->HandleTag($tagTablePtr, $vals[$i], $val,
+            $et->HandleTag($tagTablePtr, $vals[$i], $val,
                 Index  => $i,
                 DataPt => $dataPt,
                 Start  => $hdrLen + 32 + $i * 4,
                 Size   => 4,
             );
         }
-        $exifTool->VPrint(0, "$exifTool->{INDENT}($unused entries unused)\n");
+        $et->VPrint(0, "$$et{INDENT}($unused entries unused)\n");
     }
     return 1;
 }
@@ -316,34 +316,34 @@ sub ProcessX3FHeader($$$)
 # Returns: 1 on success
 sub ProcessX3FProperties($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $size = length($$dataPt);
-    my $verbose = $exifTool->Options('Verbose');
-    my $unknown = $exifTool->Options('Unknown');
+    my $verbose = $et->Options('Verbose');
+    my $unknown = $et->Options('Unknown');
 
     unless ($size >= 24 and $$dataPt =~ /^SECp/) {
-        $exifTool->Warn('Bad properties header');
+        $et->Warn('Bad properties header');
         return 0;
     }
     my ($entries, $fmt, $len) = unpack('x8V2x4V', $$dataPt);
     unless ($size >= 24 + 8 * $entries + $len) {
-        $exifTool->Warn('Truncated Property directory');
+        $et->Warn('Truncated Property directory');
         return 0;
     }
-    $verbose and $exifTool->VerboseDir('Properties', $entries);
-    $fmt == 0 or $exifTool->Warn("Unsupported character format $fmt"), return 0;
+    $verbose and $et->VerboseDir('Properties', $entries);
+    $fmt == 0 or $et->Warn("Unsupported character format $fmt"), return 0;
     my $charPos = 24 + 8 * $entries;
     my @chars = unpack('v*',substr($$dataPt, $charPos, $len * 2));
     my $index;
     for ($index=0; $index<$entries; ++$index) {
         my ($namePos, $valPos) = unpack('V2',substr($$dataPt, $index*8 + 24, 8));
         if ($namePos >= @chars or $valPos >= @chars) {
-            $exifTool->Warn('Bad Property pointer');
+            $et->Warn('Bad Property pointer');
             return 0;
         }
-        my $tag = ExtractUnicodeString($exifTool, \@chars, $namePos);
-        my $val = ExtractUnicodeString($exifTool, \@chars, $valPos);
+        my $tag = ExtractUnicodeString($et, \@chars, $namePos);
+        my $val = ExtractUnicodeString($et, \@chars, $valPos);
         if (not $$tagTablePtr{$tag} and $unknown and $tag =~ /^\w+$/) {
             my $tagInfo = {
                 Name => "SigmaRaw_$tag",
@@ -355,7 +355,7 @@ sub ProcessX3FProperties($$$)
             AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
 
-        $exifTool->HandleTag($tagTablePtr, $tag, $val,
+        $et->HandleTag($tagTablePtr, $tag, $val,
             Index => $index,
             DataPt => $dataPt,
             Start => $charPos + 2 * $valPos,
@@ -372,7 +372,7 @@ sub ProcessX3FProperties($$$)
 # Notes: Writes metadata to embedded JpgFromRaw image
 sub WriteX3F($$)
 {
-    my ($exifTool, $dirInfo) = @_;
+    my ($et, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my $outfile = $$dirInfo{OutFile};
     my ($outDir, $buff, $ver, $entries, $dir, $outPos, $index, $didContain);
@@ -418,11 +418,11 @@ sub WriteX3F($$)
 
             # only rewrite full-sized JpgFromRaw (version 2.0, type 2, format 18)
             if ($buff =~ /^SECi\0\0\x02\0\x02\0\0\0\x12\0\0\0/ and
-                $$exifTool{ImageWidth} == unpack('x16V', $buff))
+                $$et{ImageWidth} == unpack('x16V', $buff))
             {
                 $raf->Read($buff, $len) == $len or return 'Error reading JpgFromRaw';
                 # use same write directories as JPEG
-                $exifTool->InitWriteDirs('JPEG');
+                $et->InitWriteDirs('JPEG');
                 # rewrite the embedded JPEG in memory
                 my $newData;
                 my %jpegInfo = (
@@ -430,14 +430,14 @@ sub WriteX3F($$)
                     RAF     => new File::RandomAccess(\$buff),
                     OutFile => \$newData,
                 );
-                $$exifTool{FILE_TYPE} = 'JPEG';
-                my $success = $exifTool->WriteJPEG(\%jpegInfo);
-                $$exifTool{FILE_TYPE} = 'X3F';
+                $$et{FILE_TYPE} = 'JPEG';
+                my $success = $et->WriteJPEG(\%jpegInfo);
+                $$et{FILE_TYPE} = 'X3F';
                 SetByteOrder('II');
                 return 'Error writing X3F JpgFromRaw' unless $success and $newData;
                 return -1 if $success < 0;
                 # write new data if anything changed, otherwise copy old image
-                my $outPt = $$exifTool{CHANGED} ? \$newData : \$buff;
+                my $outPt = $$et{CHANGED} ? \$newData : \$buff;
                 Write($outfile, $$outPt) or return -1;
                 # set $len to the total subsection data length
                 $len = length($$outPt) + 28;
@@ -462,7 +462,7 @@ sub WriteX3F($$)
         }
     }
     # warn if we couldn't add metadata to this image (should only be SD9 or SD10)
-    $didContain or $exifTool->Warn("Can't yet write SD9 or SD10 X3F images");
+    $didContain or $et->Warn("Can't yet write SD9 or SD10 X3F images");
     # write out the directory and the directory pointer, and we are done
     Write($outfile, $outDir, pack('V', $outPos)) or return -1;
     return undef;
@@ -474,9 +474,9 @@ sub WriteX3F($$)
 # Returns: error string or undef on success
 sub ProcessX3FDirectory($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $raf = $$dirInfo{RAF};
-    my $verbose = $exifTool->Options('Verbose');
+    my $verbose = $et->Options('Verbose');
 
     $raf->Seek($$dirInfo{DirStart}, 0) or return 'Error seeking to directory start';
 
@@ -485,18 +485,18 @@ sub ProcessX3FDirectory($$$)
     $raf->Read($buff, 12) == 12 or return 'Truncated X3F image';
     $buff =~ /^SECd/ or return 'Bad section header';
     ($ver, $entries) = unpack('x4V2', $buff);
-    $verbose and $exifTool->VerboseDir('X3F Subsection', $entries);
+    $verbose and $et->VerboseDir('X3F Subsection', $entries);
     $raf->Read($dir, $entries * 12) == $entries * 12 or return 'Truncated X3F directory';
     for ($index=0; $index<$entries; ++$index) {
         my $pos = $index * 12;
         my ($offset, $len, $tag) = unpack("x${pos}V2a4", $dir);
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        my $tagInfo = $et->GetTagInfo($tagTablePtr, $tag);
         if ($verbose) {
-            $exifTool->VPrint(0, "$exifTool->{INDENT}$index) $tag Subsection ($len bytes):\n");
+            $et->VPrint(0, "$$et{INDENT}$index) $tag Subsection ($len bytes):\n");
             if ($verbose > 2) {
                 $raf->Seek($offset, 0) or return 'Error seeking';
                 $raf->Read($buff, $len) == $len or return 'Truncated image';
-                $exifTool->VerboseDump(\$buff);
+                $et->VerboseDump(\$buff);
             }
         }
         next unless $tagInfo;
@@ -507,10 +507,10 @@ sub ProcessX3FDirectory($$$)
             # ignore all image data but JPEG compressed (version 2.0, type 2, format 18)
             next unless $buff =~ /^SECi\0\0\x02\0\x02\0\0\0\x12\0\0\0/;
             # check preview image size and extract full-sized preview as JpgFromRaw
-            if ($$exifTool{ImageWidth} == unpack('x16V', $buff)) {
-                $$exifTool{IsJpgFromRaw} = 1;
-                $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
-                delete $$exifTool{IsJpgFromRaw};
+            if ($$et{ImageWidth} == unpack('x16V', $buff)) {
+                $$et{IsJpgFromRaw} = 1;
+                $tagInfo = $et->GetTagInfo($tagTablePtr, $tag);
+                delete $$et{IsJpgFromRaw};
             }
             $offset += 28;
             $len -= 28;
@@ -520,7 +520,7 @@ sub ProcessX3FDirectory($$$)
         if ($subdir) {
             my %dirInfo = ( DataPt => \$buff );
             my $subTable = GetTagTable($$subdir{TagTable});
-            $exifTool->ProcessDirectory(\%dirInfo, $subTable);
+            $et->ProcessDirectory(\%dirInfo, $subTable);
         } else {
             # extract metadata from JpgFromRaw
             if ($$tagInfo{Name} eq 'JpgFromRaw') {
@@ -528,12 +528,12 @@ sub ProcessX3FDirectory($$$)
                     Parent => 'X3F',
                     RAF    => new File::RandomAccess(\$buff),
                 );
-                $$exifTool{BASE} += $offset;
-                $exifTool->ProcessJPEG(\%dirInfo);
-                $$exifTool{BASE} -= $offset;
+                $$et{BASE} += $offset;
+                $et->ProcessJPEG(\%dirInfo);
+                $$et{BASE} -= $offset;
                 SetByteOrder('II');
             }
-            $exifTool->FoundTag($tagInfo, $buff);
+            $et->FoundTag($tagInfo, $buff);
         }
     }
     return undef;
@@ -545,7 +545,7 @@ sub ProcessX3FDirectory($$$)
 # Returns: 1 on success, 0 if this wasn't a valid X3F image, or -1 on write error
 sub ProcessX3F($$)
 {
-    my ($exifTool, $dirInfo) = @_;
+    my ($et, $dirInfo) = @_;
     my $outfile = $$dirInfo{OutFile};
     my $raf = $$dirInfo{RAF};
     my $warn = $outfile ? \&Image::ExifTool::Error : \&Image::ExifTool::Warn;
@@ -555,13 +555,13 @@ sub ProcessX3F($$)
     return 0 unless $buff =~ /^FOVb/;
 
     SetByteOrder('II');
-    $exifTool->SetFileType();
+    $et->SetFileType();
 
     # check version number
     my $ver = unpack('x4V',$buff);
     $ver = ($ver >> 16) . '.' . ($ver & 0xffff);
     if ($ver > 3) {
-        &$warn($exifTool, "Untested X3F version ($ver). Please submit sample for testing", 1);
+        &$warn($et, "Untested X3F version ($ver). Please submit sample for testing", 1);
     }
     my $hdrLen = length $buff;
     # read version 2.1/2.2/2.3 extended header
@@ -570,25 +570,25 @@ sub ProcessX3F($$)
         my $more = $hdrLen - length($buff) + 160;   # (extended header is 160 bytes)
         my $buf2;
         unless ($raf->Read($buf2, $more) == $more) {
-            &$warn($exifTool, 'Error reading extended header');
+            &$warn($et, 'Error reading extended header');
             return 1;
         }
         $buff .= $buf2;
     }
     # extract ImageWidth for later
-    $$exifTool{ImageWidth} = Get32u(\$buff, 28);
+    $$et{ImageWidth} = Get32u(\$buff, 28);
     # process header information
     my $tagTablePtr = GetTagTable('Image::ExifTool::SigmaRaw::Main');
     unless ($outfile) {
-        $exifTool->HandleTag($tagTablePtr, 'Header', $buff,
+        $et->HandleTag($tagTablePtr, 'Header', $buff,
             DataPt => \$buff,
             Size   => $hdrLen,
         );
     }
     # read the directory pointer
-    $raf->Seek(-4, 2) or &$warn($exifTool, 'Seek error'), return 1;
+    $raf->Seek(-4, 2) or &$warn($et, 'Seek error'), return 1;
     unless ($raf->Read($buff, 4) == 4) {
-        &$warn($exifTool, 'Error reading X3F dir pointer');
+        &$warn($et, 'Error reading X3F dir pointer');
         return 1;
     }
     my $offset = unpack('V', $buff);
@@ -598,13 +598,13 @@ sub ProcessX3F($$)
     );
     if ($outfile) {
         $dirInfo{OutFile} = $outfile;
-        $err = WriteX3F($exifTool, \%dirInfo);
+        $err = WriteX3F($et, \%dirInfo);
         return -1 if $err and $err eq '-1';
     } else {
         # process the X3F subsections
-        $err = $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
+        $err = $et->ProcessDirectory(\%dirInfo, $tagTablePtr);
     }
-    $err and &$warn($exifTool, $err);
+    $err and &$warn($et, $err);
     return 1;
 }
 
@@ -627,7 +627,7 @@ Sigma and Foveon X3F images.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

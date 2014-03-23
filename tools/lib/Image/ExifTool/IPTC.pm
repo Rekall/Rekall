@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.48';
+$VERSION = '1.50';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -976,18 +976,18 @@ sub PrintCodedCharset($)
 # Returns: IPTC character set if translation required (or 'bad' if unknown)
 sub HandleCodedCharset($$)
 {
-    my ($exifTool, $val) = @_;
+    my ($et, $val) = @_;
     my $xlat = $iptcCharset{$val};
     unless ($xlat) {
         if ($val =~ /^\x1b\x25/) {
             # some unknown character set invoked
             $xlat = 'bad';  # flag unsupported coding
         } else {
-            $xlat = $exifTool->Options('CharsetIPTC');
+            $xlat = $et->Options('CharsetIPTC');
         }
     }
     # no need to translate if Charset is the same
-    undef $xlat if $xlat eq $exifTool->Options('Charset');
+    undef $xlat if $xlat eq $et->Options('Charset');
     return $xlat;
 }
 
@@ -998,17 +998,17 @@ sub HandleCodedCharset($$)
 # Updates value on return
 sub TranslateCodedString($$$$)
 {
-    my ($exifTool, $valPtr, $xlatPtr, $read) = @_;
+    my ($et, $valPtr, $xlatPtr, $read) = @_;
     if ($$xlatPtr eq 'bad') {
-        $exifTool->Warn('Some IPTC characters not converted (unsupported CodedCharacterSet)');
+        $et->Warn('Some IPTC characters not converted (unsupported CodedCharacterSet)');
         undef $$xlatPtr;
     } elsif (not $read) {
-        $$valPtr = $exifTool->Decode($$valPtr, undef, undef, $$xlatPtr);
+        $$valPtr = $et->Decode($$valPtr, undef, undef, $$xlatPtr);
     } elsif ($$valPtr !~ /[\x14\x15\x1b]/) {
-        $$valPtr = $exifTool->Decode($$valPtr, $$xlatPtr);
+        $$valPtr = $et->Decode($$valPtr, $$xlatPtr);
     } else {
         # don't yet support reading ISO 2022 shifted character sets
-        $exifTool->WarnOnce('Some IPTC characters not converted (ISO 2022 shifting not supported)');
+        $et->WarnOnce('Some IPTC characters not converted (ISO 2022 shifting not supported)');
     }
 }
 
@@ -1029,23 +1029,23 @@ sub IsStandardIPTC($)
 # Returns: 1 on success, 0 otherwise
 sub ProcessIPTC($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $pos = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen} || 0;
     my $dirEnd = $pos + $dirLen;
-    my $verbose = $exifTool->Options('Verbose');
+    my $verbose = $et->Options('Verbose');
     my $success = 0;
     my ($lastRec, $recordPtr, $recordName);
 
-    $verbose and $dirInfo and $exifTool->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
+    $verbose and $dirInfo and $et->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
 
     if ($tagTablePtr eq \%Image::ExifTool::IPTC::Main) {
         # calculate MD5 if Digest::MD5 is available (for standard IPTC only)
-        my $path = $exifTool->MetadataPath();
+        my $path = $et->MetadataPath();
         if (IsStandardIPTC($path)) {
             my $md5;
-            if (eval 'require Digest::MD5') {
+            if (eval { require Digest::MD5 }) {
                 if ($pos or $dirLen != length($$dataPt)) {
                     $md5 = Digest::MD5::md5(substr $$dataPt, $pos, $dirLen);
                 } else {
@@ -1055,26 +1055,26 @@ sub ProcessIPTC($$$)
                 # a zero digest indicates IPTC exists but we don't have Digest::MD5
                 $md5 = "\0" x 16;
             }
-            $exifTool->FoundTag('CurrentIPTCDigest', $md5);
-        } elsif ($Image::ExifTool::MWG::strict and $$exifTool{FILE_TYPE} =~ /^(JPEG|TIFF|PSD)$/) {
+            $et->FoundTag('CurrentIPTCDigest', $md5);
+        } elsif ($Image::ExifTool::MWG::strict and $$et{FILE_TYPE} =~ /^(JPEG|TIFF|PSD)$/) {
             # ignore non-standard IPTC while in strict MWG compatibility mode
-            $exifTool->Warn("Ignored non-standard IPTC at $path");
+            $et->Warn("Ignored non-standard IPTC at $path");
             return 1;
         }
         # set family 1 group name if multiple IPTC directories
-        my $dirCount = ($exifTool->{DIR_COUNT}->{IPTC} || 0) + 1;
-        $exifTool->{DIR_COUNT}->{IPTC} = $dirCount;
-        $exifTool->{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
+        my $dirCount = ($$et{DIR_COUNT}{IPTC} || 0) + 1;
+        $$et{DIR_COUNT}{IPTC} = $dirCount;
+        $$et{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
     }
     # begin by assuming default IPTC encoding
-    my $xlat = $exifTool->Options('CharsetIPTC');
-    undef $xlat if $xlat eq $exifTool->Options('Charset');
+    my $xlat = $et->Options('CharsetIPTC');
+    undef $xlat if $xlat eq $et->Options('Charset');
 
     # quick check for improperly byte-swapped IPTC
     if ($dirLen >= 4 and substr($$dataPt, $pos, 1) ne "\x1c" and
                          substr($$dataPt, $pos + 3, 1) eq "\x1c")
     {
-        $exifTool->Warn('IPTC data was improperly byte-swapped');
+        $et->Warn('IPTC data was improperly byte-swapped');
         my $newData = pack('N*', unpack('V*', substr($$dataPt, $pos, $dirLen) . "\0\0\0"));
         $dataPt = \$newData;
         $pos = 0;
@@ -1082,13 +1082,13 @@ sub ProcessIPTC($$$)
         # NOTE: MUST NOT access $dirInfo DataPt, DirStart or DataLen after this!
     }
     # extract IPTC as a block if specified
-    if ($exifTool->{REQ_TAG_LOOKUP}{iptc} or ($exifTool->{TAGS_FROM_FILE} and
-        not $exifTool->{EXCL_TAG_LOOKUP}{iptc}))
+    if ($$et{REQ_TAG_LOOKUP}{iptc} or ($$et{TAGS_FROM_FILE} and
+        not $$et{EXCL_TAG_LOOKUP}{iptc}))
     {
         if ($pos or $dirLen != length($$dataPt)) {
-            $exifTool->FoundTag('IPTC', substr($$dataPt, $pos, $dirLen));
+            $et->FoundTag('IPTC', substr($$dataPt, $pos, $dirLen));
         } else {
-            $exifTool->FoundTag('IPTC', $$dataPt);
+            $et->FoundTag('IPTC', $$dataPt);
         }
     }
     while ($pos + 5 <= $dirEnd) {
@@ -1101,7 +1101,7 @@ sub ProcessIPTC($$$)
                 my $remaining = substr($$dataPt, $pos, $dirEnd - $pos);
                 last unless $remaining =~ /[^\0]/;
             }
-            $exifTool->Warn(sprintf('Bad IPTC data tag (marker 0x%x)',$id));
+            $et->Warn(sprintf('Bad IPTC data tag (marker 0x%x)',$id));
             last;
         }
         $pos += 5;      # step to after field header
@@ -1109,7 +1109,7 @@ sub ProcessIPTC($$$)
         if ($len & 0x8000) {
             my $n = $len & 0x7fff; # get num bytes in length field
             if ($pos + $n > $dirEnd or $n > 8) {
-                $exifTool->VPrint(0, "Invalid extended IPTC entry (dataset $rec:$tag, len $len)\n");
+                $et->VPrint(0, "Invalid extended IPTC entry (dataset $rec:$tag, len $len)\n");
                 $success = 0;
                 last;
             }
@@ -1119,25 +1119,25 @@ sub ProcessIPTC($$$)
             }
         }
         if ($pos + $len > $dirEnd) {
-            $exifTool->VPrint(0, "Invalid IPTC entry (dataset $rec:$tag, len $len)\n");
+            $et->VPrint(0, "Invalid IPTC entry (dataset $rec:$tag, len $len)\n");
             $success = 0;
             last;
         }
         if (not defined $lastRec or $lastRec != $rec) {
             my $tableInfo = $tagTablePtr->{$rec};
             unless ($tableInfo) {
-                $exifTool->WarnOnce("Unrecognized IPTC record $rec (ignored)");
+                $et->WarnOnce("Unrecognized IPTC record $rec (ignored)");
                 $pos += $len;
                 next;   # ignore this entry
             }
             my $tableName = $tableInfo->{SubDirectory}->{TagTable};
             unless ($tableName) {
-                $exifTool->Warn("No table for IPTC record $rec!");
+                $et->Warn("No table for IPTC record $rec!");
                 last;   # this shouldn't happen
             }
             $recordName = $$tableInfo{Name};
             $recordPtr = Image::ExifTool::GetTagTable($tableName);
-            $exifTool->VPrint(0,$$exifTool{INDENT},"-- $recordName record --\n");
+            $et->VPrint(0,$$et{INDENT},"-- $recordName record --\n");
             $lastRec = $rec;
         }
         my $val = substr($$dataPt, $pos, $len);
@@ -1149,7 +1149,7 @@ sub ProcessIPTC($$$)
             AddTagToTable($recordPtr, $tag, { Unknown => 1 });
         }
 
-        my $tagInfo = $exifTool->GetTagInfo($recordPtr, $tag);
+        my $tagInfo = $et->GetTagInfo($recordPtr, $tag);
         my $format;
         # (could use $$recordPtr{FORMAT} if no Format below, but don't do this to
         #  be backward compatible with improperly written PhotoMechanic tags)
@@ -1171,11 +1171,11 @@ sub ProcessIPTC($$$)
                 $val =~ s/\0+$//;   # some braindead softwares add null terminators
                 if ($rec == 1) {
                     # handle CodedCharacterSet tag
-                    $xlat = HandleCodedCharset($exifTool, $val) if $tag == 90;
+                    $xlat = HandleCodedCharset($et, $val) if $tag == 90;
                 # translate characters if necessary and special characters exist
                 } elsif ($xlat and $rec < 7 and $val =~ /[\x80-\xff]/) {
                     # translate to specified character set
-                    TranslateCodedString($exifTool, \$val, \$xlat, 1);
+                    TranslateCodedString($et, \$val, \$xlat, 1);
                 }
             } elsif ($format =~ /^digits/) {
                 $val =~ s/\0+$//;
@@ -1183,7 +1183,7 @@ sub ProcessIPTC($$$)
                 warn("Invalid IPTC format: $format");
             }
         }
-        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
+        $verbose and $et->VerboseInfo($tag, $tagInfo,
             Table   => $tagTablePtr,
             Value   => $val,
             DataPt  => $dataPt,
@@ -1193,12 +1193,12 @@ sub ProcessIPTC($$$)
             Extra   => ", $recordName record",
             Format  => $format,
         );
-        $exifTool->FoundTag($tagInfo, $val) if $tagInfo;
+        $et->FoundTag($tagInfo, $val) if $tagInfo;
         $success = 1;
 
         $pos += $len;   # increment to next field
     }
-    delete $exifTool->{SET_GROUP1};
+    delete $$et{SET_GROUP1};
     return $success;
 }
 
@@ -1223,7 +1223,7 @@ image files.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

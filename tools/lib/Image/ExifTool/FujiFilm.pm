@@ -14,6 +14,8 @@
 #               6) http://forums.dpreview.com/forums/readflat.asp?forum=1012&thread=31350384
 #                  and http://forum.photome.de/viewtopic.php?f=2&t=353&p=742#p740
 #               7) Kai Lappalainen private communication
+#               8) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5223.0.html
+#               9) Iliah Borg private communication (LibRaw)
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -24,7 +26,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.41';
+$VERSION = '1.45';
 
 sub ProcessFujiDir($$$);
 sub ProcessFaceRec($$$);
@@ -136,16 +138,17 @@ my %faceCategories = (
         Flags => 'PrintHex',
         Writable => 'int16u',
         PrintConv => {
-            0x0   => 'Normal',
-            0x080 => 'Medium High', #2
-            0x100 => 'High',
-            0x180 => 'Medium Low', #2
+            0x0   => 'Normal', # # ("Color 0", ref 8)
+            0x080 => 'Medium High', #2 ("Color +1", ref 8)
+            0x100 => 'High', # ("Color +2", ref 8)
+            0x180 => 'Medium Low', #2 ("Color -1", ref 8)
             0x200 => 'Low',
             0x300 => 'None (B&W)', #2
-            0x301 => 'B&W Green Filter', #PH (X100)
+            0x301 => 'B&W Red Filter', #PH/8
             0x302 => 'B&W Yellow Filter', #PH (X100)
-            0x303 => 'B&W Blue Filter', #PH (X100)
+            0x303 => 'B&W Green Filter', #PH/8
             0x310 => 'B&W Sepia', #PH (X100)
+            0x400 => 'Low 2', #8 ("Color -2")
             0x8000 => 'Film Simulation', #2
         },
     },
@@ -198,9 +201,11 @@ my %faceCategories = (
         Flags => 'PrintHex',
         Writable => 'int16u',
         PrintConv => {
-            0x000 => 'Normal',
-            0x100 => 'Strong',
-            0x200 => 'Weak',
+            0x000 => 'Normal', # ("NR 0, ref 8)
+            0x100 => 'Strong', # ("NR+2, ref 8)
+            0x180 => 'Medium Strong', #8 ("NR+1")
+            0x200 => 'Weak', # ("NR-2, ref 8)
+            0x280 => 'Medium Weak', #8 ("NR-1")
         },
     },
     0x1010 => {
@@ -233,6 +238,12 @@ my %faceCategories = (
             0 => 'Auto',
             1 => 'Manual',
         },
+    },
+    0x1022 => { #8
+        Name => 'AFPointSet',
+        Writable => 'int16u',
+        Notes => '"No" for manual and AF-multi focus modes',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
     },
     0x1023 => { #2
         Name => 'FocusPixel',
@@ -277,6 +288,7 @@ my %faceCategories = (
             0x17 => 'Night (tripod)', #7
             0x18 => 'Pro Low-light', #7
             0x19 => 'Pro Focus', #7
+            0x1a => 'Portrait 2', #PH (NC, T500, maybe "Smile & Shoot"?)
             0x1b => 'Dog Face Detection', #7
             0x1c => 'Cat Face Detection', #7
             0x40 => 'Advanced Filter',
@@ -285,11 +297,11 @@ my %faceCategories = (
             0x300 => 'Manual',
         },
     },
-# this usually has a value of 1
-#    0x1032 => { #2
-#        Name => 'ShutterCount',
-#        Writable => 'int16u',
-#    },
+    0x1032 => { #8
+        Name => 'ExposureCount',
+        Writable => 'int16u',
+        Notes => 'number of exposures used for this image',
+    },
     0x1033 => { #6
         Name => 'EXRAuto',
         Writable => 'int16u',
@@ -306,6 +318,28 @@ my %faceCategories = (
             0x100 => 'HR (High Resolution)',
             0x200 => 'SN (Signal to Noise priority)',
             0x300 => 'DR (Dynamic Range priority)',
+        },
+    },
+    0x1040 => { #8
+        Name => 'ShadowTone',
+        Writable => 'int32s',
+        PrintConv => {
+            -32 => 'Hard',
+            -16 => 'Medium-hard',
+            0 => 'Normal',
+            16 => 'Medium-soft',
+            32 => 'Soft',
+        },
+    },
+    0x1041 => { #8
+        Name => 'HighlightTone',
+        Writable => 'int32s',
+        PrintConv => {
+            -32 => 'Hard',
+            -16 => 'Medium-hard',
+            0 => 'Normal',
+            16 => 'Medium-soft',
+            32 => 'Soft',
         },
     },
     0x1100 => {
@@ -433,10 +467,44 @@ my %faceCategories = (
         PrintConv => '"$val%"',
         PrintConvInv => '$val=~s/\s*\%$//; $val',
     },
-    # 0x140b - DR value for AutoDR???? (ref 6) - values: 100
-    # 0x3820 - int16u video frame rate? - PH (HS20EXR)
-    # 0x3821 - int16u video frame width? - PH (HS20EXR)
-    # 0x3822 - int16u video frame height? - PH (HS20EXR)
+    0x1422 => { #8
+        Name => 'ImageStabilization',
+        Writable => 'int16u',
+        Count => 3,
+        PrintConv => [{
+            0 => 'None',
+            1 => 'Optical', #PH
+            2 => 'Sensor-shift', #PH
+            512 => 'Digital', #PH
+        },{
+            0 => 'Off',
+            1 => 'On (mode 1, continuous)',
+            2 => 'On (mode 2, shooting only)',
+        }],
+    },
+    0x1436 => { #8
+        Name => 'ImageGeneration',
+        Format => 'int16u',
+        PrintConv => {
+            0 => 'Original Image',
+            1 => 'Re-developed from RAW',
+        },
+    },
+    0x3820 => { #PH (HS20EXR MOV)
+        Name => 'FrameRate',
+        Writable => 'int16u',
+        Groups => { 2 => 'Video' },
+    },
+    0x3821 => { #PH (HS20EXR MOV)
+        Name => 'FrameWidth',
+        Writable => 'int16u',
+        Groups => { 2 => 'Video' },
+    },
+    0x3822 => { #PH (HS20EXR MOV)
+        Name => 'FrameHeight',
+        Writable => 'int16u',
+        Groups => { 2 => 'Video' },
+    },
     0x4100 => { #PH
         Name => 'FacesDetected',
         Writable => 'int16u',
@@ -644,8 +712,10 @@ my %faceCategories = (
         OffsetPair => 0xf007,  # point to associated offsets
     },
     # 0xf009 - values: 0, 3
-    # 0xf00a-0xf00c ?
-    # 0xf00d - similar to 0xf00e
+    0xf00a => 'BlackLevel', #9
+    # 0xf00b ?
+    0xf00c => 'WB_GRBLevelsStandard', #9 (GRBXGRBX; X=17 is standard illuminant A, X=21 is D65)
+    0xf00d => 'WB_GRBLevelsDaylight', #9
     0xf00e => 'WB_GRBLevels',
     # 0xf00f ?
 );
@@ -702,7 +772,7 @@ my %faceCategories = (
 # Returns: 1
 sub ProcessFaceRec($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dataPos = $$dirInfo{DataPos} + ($$dirInfo{Base} || 0);
     my $dirStart = $$dirInfo{DirStart};
@@ -710,7 +780,7 @@ sub ProcessFaceRec($$$)
     my $pos = $dirStart;
     my $end = $dirStart + $dirLen;
     my ($i, $n, $p, $val);
-    $exifTool->VerboseDir('FaceRecInfo');
+    $et->VerboseDir('FaceRecInfo');
     for ($i=1; ; ++$i) {
         last if $pos + 8 > $end;
         my $off = Get32u($dataPt, $pos) + $dirStart;
@@ -725,7 +795,7 @@ sub ProcessFaceRec($$$)
         $p = Get32u($dataPt, $off + 34) + $dirStart;
         last if $p < $dirStart or $p + $n > $end;
         $val = substr($$dataPt, $p, $n);
-        $exifTool->HandleTag($tagTablePtr, "Face${i}Name", $val,
+        $et->HandleTag($tagTablePtr, "Face${i}Name", $val,
             DataPt  => $dataPt,
             DataPos => $dataPos,
             Start   => $p,
@@ -736,13 +806,13 @@ sub ProcessFaceRec($$$)
         last if $p < $dirStart or $p + $n > $end;
         $val = substr($$dataPt, $p, $n);
         $val =~ s/(\d{4})(\d{2})(\d{2})/$1:$2:$2/;
-        $exifTool->HandleTag($tagTablePtr, "Face${i}Birthday", $val,
+        $et->HandleTag($tagTablePtr, "Face${i}Birthday", $val,
             DataPt  => $dataPt,
             DataPos => $dataPos,
             Start   => $p,
             Size    => $n,
         );
-        $exifTool->HandleTag($tagTablePtr, "Face${i}Category", undef,
+        $et->HandleTag($tagTablePtr, "Face${i}Category", undef,
             DataPt  => $dataPt,
             DataPos => $dataPos,
             Start   => $off + 46,
@@ -759,7 +829,7 @@ sub ProcessFaceRec($$$)
 # Returns: 1 if this was a valid FujiFilm directory
 sub ProcessFujiDir($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $raf = $$dirInfo{RAF};
     my $offset = $$dirInfo{DirStart};
     $raf->Seek($offset, 0) or return 0;
@@ -767,7 +837,7 @@ sub ProcessFujiDir($$$)
     $raf->Read($buff, 4) or return 0;
     my $entries = unpack 'N', $buff;
     $entries < 256 or return 0;
-    $exifTool->Options('Verbose') and $exifTool->VerboseDir('Fuji', $entries);
+    $et->Options('Verbose') and $et->VerboseDir('Fuji', $entries);
     SetByteOrder('MM');
     my $pos = $offset + 4;
     for ($index=0; $index<$entries; ++$index) {
@@ -776,7 +846,7 @@ sub ProcessFujiDir($$$)
         my ($tag, $len) = unpack 'nn', $buff;
         my ($val, $vbuf);
         $raf->Read($vbuf, $len) or return 0;
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        my $tagInfo = $et->GetTagInfo($tagTablePtr, $tag);
         if ($tagInfo and $$tagInfo{Format}) {
             $val = ReadValue(\$vbuf, 0, $$tagInfo{Format}, $$tagInfo{Count}, $len);
             next unless defined $val;
@@ -787,7 +857,7 @@ sub ProcessFujiDir($$$)
             # treat other unknown values as binary data
             $val = \$vbuf;
         }
-        $exifTool->HandleTag($tagTablePtr, $tag, $val,
+        $et->HandleTag($tagTablePtr, $tag, $val,
             Index   => $index,
             DataPt  => \$vbuf,
             DataPos => $pos,
@@ -805,7 +875,7 @@ sub ProcessFujiDir($$$)
 # Returns: 1 on success, 0 if this wasn't a valid RAF file, or -1 on write error
 sub WriteRAF($$)
 {
-    my ($exifTool, $dirInfo) = @_;
+    my ($et, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my ($hdr, $jpeg, $outJpeg, $offset, $err, $buff);
 
@@ -818,31 +888,31 @@ sub WriteRAF($$)
     my ($jpos, $jlen) = unpack('x84NN', $hdr);
     # check to be sure the JPEG starts in the expected location
     if ($jpos > 0x94 or $jpos < 0x68 or $jpos & 0x03) {
-        $exifTool->Error("Unsupported or corrupted RAF image (version $ver)");
+        $et->Error("Unsupported or corrupted RAF image (version $ver)");
         return 1;
     }
     # check to make sure this version of RAF has been tested
     unless ($testedRAF{$ver}) {
-        $exifTool->Warn("RAF version $ver not yet tested", 1);
+        $et->Warn("RAF version $ver not yet tested", 1);
     }
     # read the embedded JPEG
     unless ($raf->Seek($jpos, 0) and $raf->Read($jpeg, $jlen) == $jlen) {
-        $exifTool->Error('Error reading RAF meta information');
+        $et->Error('Error reading RAF meta information');
         return 1;
     }
     # use same write directories as JPEG
-    $exifTool->InitWriteDirs('JPEG');
+    $et->InitWriteDirs('JPEG');
     # rewrite the embedded JPEG in memory
     my %jpegInfo = (
         Parent  => 'RAF',
         RAF     => new File::RandomAccess(\$jpeg),
         OutFile => \$outJpeg,
     );
-    $$exifTool{FILE_TYPE} = 'JPEG';
-    my $success = $exifTool->WriteJPEG(\%jpegInfo);
-    $$exifTool{FILE_TYPE} = 'RAF';
+    $$et{FILE_TYPE} = 'JPEG';
+    my $success = $et->WriteJPEG(\%jpegInfo);
+    $$et{FILE_TYPE} = 'RAF';
     unless ($success and $outJpeg) {
-        $exifTool->Error("Invalid RAF format");
+        $et->Error("Invalid RAF format");
         return 1;
     }
     return -1 if $success < 0;
@@ -863,13 +933,13 @@ sub WriteRAF($$)
             not $raf->Seek($jpos+$jlen, 0) or
             $raf->Read($buff, $oldPadLen) != $oldPadLen)
         {
-            $exifTool->Error('Bad RAF pointer at 0x5c');
+            $et->Error('Bad RAF pointer at 0x5c');
             return 1;
         }
         # make sure padding is only zero bytes (can be >100k for HS10)
         # (have seen non-null padding in X-Pro1)
         if ($buff =~ /[^\0]/) {
-            return 1 if $exifTool->Error('Non-null bytes found in padding', 2);
+            return 1 if $et->Error('Non-null bytes found in padding', 2);
         }
     }
     # calculate offset difference due to change in JPEG size
@@ -888,7 +958,7 @@ sub WriteRAF($$)
     Write($outfile, $outJpeg, $pad) or $err = 1;
     # copy over the rest of the RAF image
     unless ($raf->Seek($nextPtr, 0)) {
-        $exifTool->Error('Error reading RAF image');
+        $et->Error('Error reading RAF image');
         return 1;
     }
     while ($raf->Read($buff, 65536)) {
@@ -903,7 +973,7 @@ sub WriteRAF($$)
 # Returns: 1 if this was a valid RAF file
 sub ProcessRAF($$)
 {
-    my ($exifTool, $dirInfo) = @_;
+    my ($et, $dirInfo) = @_;
     my ($buff, $jpeg, $warn, $offset);
 
     my $raf = $$dirInfo{RAF};
@@ -914,18 +984,18 @@ sub ProcessRAF($$)
     $raf->Seek($jpos, 0)              or return 0;
     $raf->Read($jpeg, $jlen) == $jlen or return 0;
 
-    $exifTool->SetFileType();
-    $exifTool->FoundTag('RAFVersion', substr($buff, 0x3c, 4));
+    $et->SetFileType();
+    $et->FoundTag('RAFVersion', substr($buff, 0x3c, 4));
 
     # extract information from embedded JPEG
     my %dirInfo = (
         Parent => 'RAF',
         RAF    => new File::RandomAccess(\$jpeg),
     );
-    $$exifTool{BASE} += $jpos;
-    my $rtnVal = $exifTool->ProcessJPEG(\%dirInfo);
-    $$exifTool{BASE} -= $jpos;
-    $exifTool->FoundTag('PreviewImage', \$jpeg) if $rtnVal;
+    $$et{BASE} += $jpos;
+    my $rtnVal = $et->ProcessJPEG(\%dirInfo);
+    $$et{BASE} -= $jpos;
+    $et->FoundTag('PreviewImage', \$jpeg) if $rtnVal;
 
     # extract information from Fuji RAF and TIFF directories
     my ($rafNum, $ifdNum) = ('','');
@@ -943,11 +1013,11 @@ sub ProcessRAF($$)
                 RAF  => $raf,
                 Base => $start,
             );
-            $$exifTool{SET_GROUP1} = "FujiIFD$ifdNum";
+            $$et{SET_GROUP1} = "FujiIFD$ifdNum";
             my $tagTablePtr = GetTagTable('Image::ExifTool::FujiFilm::IFD');
             # this is TIFF-format data only for some models, so no warning if it fails
-            $exifTool->ProcessTIFF(\%dirInfo, $tagTablePtr, \&Image::ExifTool::ProcessTIFF);
-            delete $$exifTool{SET_GROUP1};
+            $et->ProcessTIFF(\%dirInfo, $tagTablePtr, \&Image::ExifTool::ProcessTIFF);
+            delete $$et{SET_GROUP1};
             $ifdNum = ($ifdNum || 1) + 1;
         } else {
             # parse RAF directory
@@ -955,14 +1025,14 @@ sub ProcessRAF($$)
                 RAF      => $raf,
                 DirStart => $start,
             );
-            $$exifTool{SET_GROUP1} = "RAF$rafNum";
+            $$et{SET_GROUP1} = "RAF$rafNum";
             my $tagTablePtr = GetTagTable('Image::ExifTool::FujiFilm::RAF');
-            $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr) or $warn = 1;
-            delete $$exifTool{SET_GROUP1};
+            $et->ProcessDirectory(\%dirInfo, $tagTablePtr) or $warn = 1;
+            delete $$et{SET_GROUP1};
             $rafNum = ($rafNum || 1) + 1;
         }
     }
-    $warn and $exifTool->Warn('Possibly corrupt RAF information');
+    $warn and $et->Warn('Possibly corrupt RAF information');
 
     return $rtnVal;
 }
@@ -987,7 +1057,7 @@ FujiFilm maker notes in EXIF information, and to read/write FujiFilm RAW
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

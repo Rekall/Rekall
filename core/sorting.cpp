@@ -13,16 +13,18 @@ Sorting::Sorting(const QString &title, quint16 index, bool _needWord, bool _isHo
 
     ui->filter->addItem("", "");
     if(isHorizontal)
-        ui->filter->addItem("Time", "Time");
-    ui->filter->addItem("Date (year)",  "Rekall->Date/Time | 0,4");
-    ui->filter->addItem("Date (month)", "Rekall->Date/Time | 0,7");
-    ui->filter->addItem("Date (day)",   "Rekall->Date/Time | 0,10");  // 1234:67:90 23:56:89
-    ui->filter->addItem("Time (hours)", "Rekall->Date/Time | 11,2");  // 0123:56:89012:45:67
-    ui->filter->addItem("Type",         "Rekall->Type");
-    ui->filter->addItem("Authors",      "Rekall->Author");
-    ui->filter->addItem("All Keywords", "Rekall->All");
-    ui->filter->addItem("Fullname",     "Rekall->Name");
-    ui->filter->addItem("First letter (name)", "Rekall->Name | 0,1");
+        ui->filter->addItem("time", "Time");
+    ui->filter->addItem("date (year)",  "Rekall->Date/Time | 0,4");
+    ui->filter->addItem("date (month)", "Rekall->Date/Time | 0,7");
+    ui->filter->addItem("date (day)",   "Rekall->Date/Time | 0,10");  // 1234:67:90 23:56:89
+    ui->filter->addItem("time (hours)", "Rekall->Date/Time | 11,2");  // 0123:56:89012:45:67
+    ui->filter->addItem("type",         "Rekall->Type");
+    ui->filter->addItem("author",       "Rekall->Author");
+    ui->filter->addItem("keywords",     "Rekall->All");
+    ui->filter->addItem("name",         "Rekall->Name");
+    ui->filter->addItem("import date",  "Rekall->Import Date/Time | 0,16");
+    ui->filter->addItem("import author","Rekall->Import Author");
+    ui->filter->addItem("first letter (name)", "Rekall->Name | 0,1");
     ui->filter->addItem("Composite->Light Value");
     ui->filter->addItem("Rekall->Size");
     ui->filter->setCurrentIndex(index);
@@ -159,7 +161,7 @@ const QString Sorting::getCriteria(const QString &criteria) const {
     if((!asDate) && (asNumberGuess))
         return QString("%1").arg(criteriaReal, 25, 'f', 5, QChar('0')).trimmed();
 
-    return criteria;
+    return criteria.toLower();
 }
 const QString Sorting::getCriteriaFormated(qreal criteria) const {
     if(asTimeline)
@@ -236,8 +238,17 @@ bool Sorting::isAcceptable(bool strongCheck, const QString &_criteria) const {
     if(_criteria.isEmpty())
         return false;
 
+    /*
+    if(ui->filter->currentText().contains("author")) {
+        for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
+            qDebug("%s - %s - %s", qPrintable(_criteria), qPrintable(ui->checks->topLevelItem(i)->text(0)), qPrintable(ui->checks->topLevelItem(i)->text(1)));
+        }
+    }
+    */
+
     if(strongCheck) {
         for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
+            //if((ui->checks->topLevelItem(i)->checkState(1) == Qt::Unchecked) && ((ui->checks->topLevelItem(i)->text(0) == _criteria) || (ui->checks->topLevelItem(i)->text(1) == _criteria)))
             if((ui->checks->topLevelItem(i)->checkState(1) == Qt::Unchecked) && (ui->checks->topLevelItem(i)->text(0) == _criteria))
                 return false;
         }
@@ -425,4 +436,31 @@ qreal Sorting::toDouble(const QString &str, bool *ok) {
         return val;
     }
     return str.toDouble(ok);
+}
+
+void Sorting::reset(const QString &filterText, QString matchText, QStringList checksOnly) {
+    for(quint16 i = 0 ; i < ui->filter->count() ; i++)
+        if(ui->filter->itemText(i) == filterText) {
+            ui->filter->setCurrentIndex(i);
+            break;
+        }
+    action();
+    QApplication::processEvents();
+
+    ui->matches->setText(matchText);
+    action();
+    QApplication::processEvents();
+
+    if(checksOnly.count()) {
+        for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
+            if(!ui->checks->topLevelItem(i)->isHidden()) {
+                if(checksOnly.contains(ui->checks->topLevelItem(i)->text(0)))
+                    ui->checks->topLevelItem(i)->setCheckState(0, Qt::Checked);
+                else
+                    ui->checks->topLevelItem(i)->setCheckState(0, Qt::Unchecked);
+            }
+        }
+    }
+    action();
+    QApplication::processEvents();
 }

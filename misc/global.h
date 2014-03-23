@@ -179,7 +179,7 @@ public:
 class TaskListBase {
 public:
     virtual void setToolbox(QToolBox*) = 0;
-    virtual void addTask   (Metadata *metadata, TaskProcessType type, qint16 version) = 0;
+    virtual void addTask   (Metadata *metadata, TaskProcessType type, qint16 version, bool needCompleteScan = true) = 0;
 };
 
 enum FeedItemBaseType { FeedItemBaseTypeCreation, FeedItemBaseTypeUpdate, FeedItemBaseTypeDelete, FeedItemBaseTypeProcessingStart, FeedItemBaseTypeProcessingEnd };

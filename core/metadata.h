@@ -123,9 +123,9 @@ public:
     explicit Metadata(QObject *parent = 0, bool createEmpty = false);
     ~Metadata();
 
-protected: //TO SAVE
+protected:
     QList<QMetaDictionnay> metadatas;
-public: //TO CLEAN
+public:
     QFileInfo file;
 
 public:

@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.38';
+$VERSION = '1.40';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -38,6 +38,7 @@ my %coordConv = (
     0x0001 => {
         Name => 'GPSLatitudeRef',
         Writable => 'string',
+        Notes => 'tags 0x0001-0x0006 used for camera location according to MWG 2.0',
         Count => 2,
         PrintConv => {
             # extract N/S if written from Composite:GPSLatitude
@@ -209,6 +210,7 @@ my %coordConv = (
     0x0013 => {
         Name => 'GPSDestLatitudeRef',
         Writable => 'string',
+        Notes => 'tags 0x0013-0x001a used for subject location according to MWG 2.0',
         Count => 2,
         PrintConv => {
             N => 'North',
@@ -314,6 +316,7 @@ my %coordConv = (
         PrintConvInv => '$val=~s/\s*m$//; $val',
         Writable => 'rational64u',
     },
+    # 0xea1c - Nokia Lumina 1020 writes this (padding) in GPS IFD - PH
 );
 
 # Composite GPS tags
@@ -405,7 +408,7 @@ sub ConvertTimeStamp($)
 # Returns: DMS string
 sub ToDMS($$;$$)
 {
-    my ($exifTool, $val, $doPrintConv, $ref) = @_;
+    my ($et, $val, $doPrintConv, $ref) = @_;
     my ($fmt, $num, $sign);
 
     if ($ref) {
@@ -423,7 +426,7 @@ sub ToDMS($$;$$)
     }
     if ($doPrintConv) {
         if ($doPrintConv eq '1') {
-            $fmt = $exifTool->Options('CoordFormat');
+            $fmt = $et->Options('CoordFormat');
             if (not $fmt) {
                 $fmt = q{%d deg %d' %.2f"} . $ref;
             } elsif ($ref) {
@@ -489,7 +492,7 @@ GPS (Global Positioning System) meta information in EXIF data.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

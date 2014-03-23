@@ -116,27 +116,7 @@ void UiFileItem::populate(const QFileInfo &file) {
 
 
 bool UiFileItem::askForDeletion(UiSyncItem *, bool dialog) {
-    if(dialog) {
-        /*
-        int rep = (new UiMessageBox())->display(tr("Score deletion"), tr("You are about to delete this file. Are you sure?"), QDialogButtonBox::Yes | QDialogButtonBox::No);
-        if(rep) {
-#ifdef Q_OS_MAC
-            fileRename(filename.file, QFileInfo(QDesktopServices::storageLocation(QDesktopServices::HomeLocation) + "/.Trash/" + filename.file.fileName()));
-#else
-            QFile::remove(filename.file.absoluteFilePath());
-#endif
-            delete this;
-        }
-        */
-    }
-    else if(!isOpened) {
-        if(dialog) {
-            delete this;
-        }
-        else
-            delete this;
-        return true;
-    }
+    setHidden(true);
     return false;
 }
 
@@ -316,12 +296,13 @@ void UiFileItem::fileWatcherDirChanged(QString dir) {
         itemConcerned->fileWatcherDirChanged(dir);
         return;
     }
-    if(filename.lastWatcherUpdate.msecsTo(QDateTime::currentDateTime()) > 1000) {
+    if((filename.lastWatcherUpdate.msecsTo(QDateTime::currentDateTime()) >= 0) && (!dir.isEmpty())) {
         filename.lastWatcherUpdate = QDateTime::currentDateTime();
         watcher->fileWatcherDirChanged(filename.file.absoluteFilePath());
-        qDebug("DIR CHANGED %s", qPrintable(dir));
+        qDebug("File(s) changed in directory %s", qPrintable(dir));
         if(filename.file.isDir()) {
-            if(QDir(filename.file.absoluteFilePath()).exists())     syncWith(currentDepth);
+            currentDepth = -1;
+            if(QDir(filename.file.absoluteFilePath()).exists())     syncWith(0);
             else                                                    askForDeletion(this);
         }
     }
@@ -332,10 +313,10 @@ void UiFileItem::fileWatcherFileChanged(QString file) {
         itemConcerned->fileWatcherFileChanged(file);
         return;
     }
-    if(filename.lastWatcherUpdate.msecsTo(QDateTime::currentDateTime()) > 1000) {
+    if(filename.lastWatcherUpdate.msecsTo(QDateTime::currentDateTime()) > 100) {
         filename.lastWatcherUpdate = QDateTime::currentDateTime();
         watcher->fileWatcherFileChanged(filename.file.absoluteFilePath());
-        qDebug("FILE CHANGED %s", qPrintable(file));
+        qDebug("File %s has been modified", qPrintable(file));
         if(isOpened)
             fileReload();
     }

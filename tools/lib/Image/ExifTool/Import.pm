@@ -12,7 +12,7 @@ require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(ReadCSV ReadJSON);
 
@@ -192,6 +192,11 @@ Tok: for (;;) {
             # unescape characters
             $rtnVal =~ s/\\u([0-9a-f]{4})/ToUTF8(hex $1)/ige;
             $rtnVal =~ s/\\(.)/$unescapeJSON{$1}||$1/sge;
+            # decode base64 (binary data) values
+            if ($rtnVal =~ /^base64:[A-Za-z0-9+\/]*={0,2}$/ and length($rtnVal) % 4 == 3) {
+                require Image::ExifTool::XMP;
+                $rtnVal = ${Image::ExifTool::XMP::DecodeBase64(substr($rtnVal,7))};
+            }
         } elsif ($tok eq ']' or $tok eq '}' or $tok eq ',') {
             # return undef for empty object, array, or list item
             # (empty list item actually not valid JSON)
@@ -296,7 +301,7 @@ stored as hash lookups of tag name/value for each SourceFile.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -1010,7 +1010,7 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::FlashPix');
 # Returns: list of hyperlinks
 sub ProcessHyperlinks($$)
 {
-    my ($val, $exifTool) = @_;
+    my ($val, $et) = @_;
 
     # process as an array of VT_VARIANT's
     my $dirEnd = length $val;
@@ -1020,7 +1020,7 @@ sub ProcessHyperlinks($$)
     my ($i, @vals);
     for ($i=0; $i<$num; ++$i) {
         # read VT_BLOB entries as an array of VT_VARIANT's
-        my $value = ReadFPXValue($exifTool, \$val, $valPos, VT_VARIANT, $dirEnd);
+        my $value = ReadFPXValue($et, \$val, $valPos, VT_VARIANT, $dirEnd);
         last unless defined $value;
         push @vals, $value;
     }
@@ -1041,7 +1041,7 @@ sub ProcessHyperlinks($$)
 #          value offset to end of value if successful, or returns undef on error
 sub ReadFPXValue($$$$$;$$)
 {
-    my ($exifTool, $dataPt, $valPos, $type, $dirEnd, $noPad, $codePage) = @_;
+    my ($et, $dataPt, $valPos, $type, $dirEnd, $noPad, $codePage) = @_;
     my @vals;
 
     my $format = $oleFormat{$type & 0x0fff};
@@ -1077,7 +1077,7 @@ sub ReadFPXValue($$$$$;$$)
             if ($format eq 'VT_VARIANT') {
                 my $subType = Get32u($dataPt, $valPos);
                 $valPos += $size;
-                $val = ReadFPXValue($exifTool, $dataPt, $valPos, $subType, $dirEnd, $noPad, $codePage);
+                $val = ReadFPXValue($et, $dataPt, $valPos, $subType, $dirEnd, $noPad, $codePage);
                 last unless defined $val;
                 push @vals, $val;
                 next;   # avoid adding $size to $valPos again
@@ -1102,13 +1102,13 @@ sub ReadFPXValue($$$$$;$$)
                 $val = substr($$dataPt, $valPos + 4, $len);
                 if ($format eq 'VT_LPWSTR') {
                     # convert wide string from Unicode
-                    $val = $exifTool->Decode($val, 'UCS2');
+                    $val = $et->Decode($val, 'UCS2');
                 } elsif ($codePage) {
                     my $charset = $Image::ExifTool::charsetName{"cp$codePage"};
                     if ($charset) {
-                        $val = $exifTool->Decode($val, $charset);
+                        $val = $et->Decode($val, $charset);
                     } elsif ($codePage eq 1200) {   # UTF-16, little endian
-                        $val = $exifTool->Decode(undef, 'UCS2', 'II');
+                        $val = $et->Decode(undef, 'UCS2', 'II');
                     }
                 }
                 $val =~ s/\0.*//s;  # truncate at null terminator
@@ -1130,7 +1130,7 @@ sub ReadFPXValue($$$$$;$$)
             push @vals, $val;
         }
         # join VT_ values with commas unless we want an array
-        @vals = ( join $exifTool->Options('ListSep'), @vals ) if @vals > 1 and not wantarray;
+        @vals = ( join $et->Options('ListSep'), @vals ) if @vals > 1 and not wantarray;
         last;   # didn't really want to loop
     }
     $_[2] = $valPos;    # return updated value position
@@ -1152,7 +1152,7 @@ sub ReadFPXValue($$$$$;$$)
 #        so this routine is entirely based on observations from sample files
 sub ProcessContents($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $isFLA;
 
@@ -1169,13 +1169,13 @@ sub ProcessContents($$$)
         $$dirInfo{DirStart} = pos($$dataPt) - 36;
         if ($$dataPt =~ /<\0\?\0x\0p\0a\0c\0k\0e\0t\0 \0e\0n\0d\0=\0['"]\0[wr]\0['"]\0\?\0>\0?/g) {
             $$dirInfo{DirLen} = pos($$dataPt) - $$dirInfo{DirStart};
-            Image::ExifTool::XMP::ProcessXMP($exifTool, $dirInfo, $tagTablePtr);
+            Image::ExifTool::XMP::ProcessXMP($et, $dirInfo, $tagTablePtr);
             # override format if not already FLA but XMP-dc:Format indicates it is
-            $isFLA = 1 if $$exifTool{FILE_TYPE} ne 'FLA' and $$exifTool{VALUE}{Format} and
-                          $$exifTool{VALUE}{Format} eq 'application/vnd.adobe.fla';
+            $isFLA = 1 if $$et{FILE_TYPE} ne 'FLA' and $$et{VALUE}{Format} and
+                          $$et{VALUE}{Format} eq 'application/vnd.adobe.fla';
         }
     }
-    $exifTool->OverrideFileType('FLA') if $isFLA;
+    $et->OverrideFileType('FLA') if $isFLA;
     return 1;
 }
 
@@ -1199,27 +1199,27 @@ sub CheckBOM($$)
 # Returns: 1 on success
 sub ProcessProperties($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $pos = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $pos;
     my $dirEnd = $pos + $dirLen;
-    my $verbose = $exifTool->Options('Verbose');
+    my $verbose = $et->Options('Verbose');
     my $n;
 
     if ($dirLen < 48) {
-        $exifTool->Warn('Truncated FPX properties');
+        $et->Warn('Truncated FPX properties');
         return 0;
     }
     # check and set our byte order if necessary
     unless (CheckBOM($dataPt, $pos)) {
-        $exifTool->Warn('Bad FPX property byte order mark');
+        $et->Warn('Bad FPX property byte order mark');
         return 0;
     }
     # get position of start of section
     $pos = Get32u($dataPt, $pos + 44);
     if ($pos < 48) {
-        $exifTool->Warn('Bad FPX property section offset');
+        $et->Warn('Bad FPX property section offset');
         return 0;
     }
     for ($n=0; $n<2; ++$n) {
@@ -1230,9 +1230,9 @@ sub ProcessProperties($$$)
         my $size = Get32u($dataPt, $pos);
         last unless $size;
         my $numEntries = Get32u($dataPt, $pos + 4);
-        $verbose and $exifTool->VerboseDir('Property Info', $numEntries, $size);
+        $verbose and $et->VerboseDir('Property Info', $numEntries, $size);
         if ($pos + 8 + 8 * $numEntries > $dirEnd) {
-            $exifTool->Warn('Truncated property list');
+            $et->Warn('Truncated property list');
             last;
         }
         my $index;
@@ -1262,7 +1262,7 @@ sub ProcessProperties($$$)
                     $name =~ s/(^| )([a-z])/\U$2/g; # start with uppercase
                     $name =~ tr/-_a-zA-Z0-9//dc;    # remove illegal characters
                     next unless length $name;
-                    $exifTool->VPrint(0, "$$exifTool{INDENT}\[adding $name]\n") if $verbose;
+                    $et->VPrint(0, "$$et{INDENT}\[adding $name]\n") if $verbose;
                     AddTagToTable($tagTablePtr, $tag, { Name => $name });
                 }
                 next;
@@ -1273,8 +1273,8 @@ sub ProcessProperties($$$)
                 $tag = $dictionary{$tag};
                 $custom = 1;
             }
-            my @vals = ReadFPXValue($exifTool, $dataPt, $valPos, $type, $dirEnd, undef, $codePage);
-            @vals or $exifTool->Warn('Error reading property value');
+            my @vals = ReadFPXValue($et, $dataPt, $valPos, $type, $dirEnd, undef, $codePage);
+            @vals or $et->Warn('Error reading property value');
             $val = @vals > 1 ? \@vals : $vals[0];
             my $format = $type & 0x0fff;
             my $flags = $type & 0xf000;
@@ -1286,25 +1286,25 @@ sub ProcessProperties($$$)
             if (not $custom and ($tag == 1 or $tag == 0x80000000)) {
                 # get tagInfo from SummaryInfo table
                 my $summaryTable = GetTagTable('Image::ExifTool::FlashPix::SummaryInfo');
-                $tagInfo = $exifTool->GetTagInfo($summaryTable, $tag);
+                $tagInfo = $et->GetTagInfo($summaryTable, $tag);
                 if ($tag == 1) {
                     $val += 0x10000 if $val < 0; # (may be incorrectly stored as int16s)
                     $codePage = $val;            # save code page for translating values
                 }
             } elsif ($$tagTablePtr{$tag}) {
-                $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+                $tagInfo = $et->GetTagInfo($tagTablePtr, $tag);
             } elsif ($$tagTablePtr{VARS} and not $custom) {
                 # mask off insignificant bits of tag ID if necessary
                 my $masked = $$tagTablePtr{VARS};
                 my $mask;
                 foreach $mask (keys %$masked) {
                     if ($masked->{$mask}->{$tag & $mask}) {
-                        $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag & $mask);
+                        $tagInfo = $et->GetTagInfo($tagTablePtr, $tag & $mask);
                         last;
                     }
                 }
             }
-            $exifTool->HandleTag($tagTablePtr, $tag, $val,
+            $et->HandleTag($tagTablePtr, $tag, $val,
                 DataPt  => $dataPt,
                 Start   => $valStart,
                 Size    => $valPos - $valStart,
@@ -1315,7 +1315,7 @@ sub ProcessProperties($$$)
             );
         }
         # issue warning if we hit end of property section prematurely
-        $exifTool->Warn('Truncated property data') if $index < $numEntries;
+        $et->Warn('Truncated property data') if $index < $numEntries;
         last unless $$dirInfo{Multi};
         $pos += $size;
     }
@@ -1354,14 +1354,14 @@ sub LoadChain($$$$$)
 # Returns: 1 on success
 sub ProcessFPXR($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart};
     my $dirLen = $$dirInfo{DirLen};
-    my $verbose = $exifTool->Options('Verbose');
+    my $verbose = $et->Options('Verbose');
 
     if ($dirLen < 13) {
-        $exifTool->Warn('FPXR segment to small');
+        $et->Warn('FPXR segment to small');
         return 0;
     }
 
@@ -1370,19 +1370,19 @@ sub ProcessFPXR($$$)
 
     if ($type == 1) {   # a "Contents List" segment
 
-        $vers != 0 and $exifTool->Warn("Untested FPXR version $vers");
-        if ($$exifTool{FPXR}) {
-            $exifTool->Warn('Multiple FPXR contents lists');
-            delete $$exifTool{FPXR};
+        $vers != 0 and $et->Warn("Untested FPXR version $vers");
+        if ($$et{FPXR}) {
+            $et->Warn('Multiple FPXR contents lists');
+            delete $$et{FPXR};
         }
         my $numEntries = unpack('x7n', $$dataPt);
         my @contents;
-        $verbose and $exifTool->VerboseDir('Contents List', $numEntries);
+        $verbose and $et->VerboseDir('Contents List', $numEntries);
         my $pos = 9;
         my $entry;
         for ($entry = 0; $entry < $numEntries; ++$entry) {
             if ($pos + 4 > $dirLen) {
-                $exifTool->Warn('Truncated FPXR contents');
+                $et->Warn('Truncated FPXR contents');
                 return 0;
             }
             my ($size, $default) = unpack("x${pos}Na", $$dataPt);
@@ -1391,14 +1391,14 @@ sub ProcessFPXR($$$)
             # (very odd, since the size word is big-endian),
             # and the first char must be '/'
             unless ($$dataPt =~ m{\G(/\0(..)*?)\0\0}sg) {
-                $exifTool->Warn('Invalid FPXR stream name');
+                $et->Warn('Invalid FPXR stream name');
                 return 0;
             }
             # convert stream pathname to ascii
             my $name = Image::ExifTool::Decode(undef, $1, 'UCS2', 'II', 'Latin');
             if ($verbose) {
                 my $psize = ($size == 0xffffffff) ? 'storage' : "$size bytes";
-                $exifTool->VPrint(0,"  |  $entry) Name: '$name' [$psize]\n");
+                $et->VPrint(0,"  |  $entry) Name: '$name' [$psize]\n");
             }
             # remove directory specification
             $name =~ s{.*/}{}s;
@@ -1406,7 +1406,7 @@ sub ProcessFPXR($$$)
             my $classID;
             if ($size == 0xffffffff) {
                 unless ($$dataPt =~ m{(.{16})}sg) {
-                    $exifTool->Warn('Truncated FPXR storage class ID');
+                    $et->Warn('Truncated FPXR storage class ID');
                     return 0;
                 }
                 # unpack class ID in case we want to use it sometime
@@ -1422,15 +1422,15 @@ sub ProcessFPXR($$$)
                 ClassID => $classID,
             };
         }
-        # save contents list as $exifTool member variable
+        # save contents list as $et member variable
         # (must do this last so we don't save list on error)
-        $$exifTool{FPXR} = \@contents;
+        $$et{FPXR} = \@contents;
 
     } elsif ($type == 2) {  # a "Stream Data" segment
 
         # get the contents list index and stream data offset
         my ($index, $offset) = unpack('x7nN', $$dataPt);
-        my $fpxr = $$exifTool{FPXR};
+        my $fpxr = $$et{FPXR};
         if ($fpxr and $$fpxr[$index]) {
             my $obj = $$fpxr[$index];
             # extract stream data (after 13-byte header)
@@ -1444,17 +1444,17 @@ sub ProcessFPXR($$$)
                 if ($pad >= 0) {
                     if ($pad) {
                         if ($pad > 0x10000) {
-                            $exifTool->Warn("Bad FPXR stream offset ($offset)");
+                            $et->Warn("Bad FPXR stream offset ($offset)");
                         } else {
                             # pad with default value to specified offset
-                            $exifTool->Warn("Padding FPXR stream with $pad default bytes",1);
+                            $et->Warn("Padding FPXR stream with $pad default bytes",1);
                             $$obj{Stream} .= ($$obj{Default} x $pad);
                         }
                     }
                     # concatenate data with this stream
                     $$obj{Stream} .= substr($$dataPt, $dirStart+13);
                 } else {
-                    $exifTool->Warn("Duplicate FPXR stream data at offset $offset");
+                    $et->Warn("Duplicate FPXR stream data at offset $offset");
                     substr($$obj{Stream}, $offset, -$pad) = substr($$dataPt, $dirStart+13);
                 }
             }
@@ -1462,62 +1462,62 @@ sub ProcessFPXR($$$)
             my $len = length $$obj{Stream};
             if ($len >= $$obj{Size}) {
                 if ($verbose) {
-                    $exifTool->VPrint(0, "  + [FPXR stream, Contents index $index, $len bytes]\n");
+                    $et->VPrint(0, "  + [FPXR stream, Contents index $index, $len bytes]\n");
                 }
                 if ($len > $$obj{Size}) {
-                    $exifTool->Warn('Extra data in FPXR segment (truncated)');
+                    $et->Warn('Extra data in FPXR segment (truncated)');
                     $$obj{Stream} = substr($$obj{Stream}, 0, $$obj{Size});
                 }
                 my $tag = $$obj{Name};
                 my $tagInfo;
                 unless ($$tagTablePtr{$tag}) {
                     # remove instance number or class ID from tag if necessary
-                    $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $1) if
+                    $tagInfo = $et->GetTagInfo($tagTablePtr, $1) if
                         ($tag =~ /(.*) \d{6}$/s and $$tagTablePtr{$1}) or
                         ($tag =~ /(.*)_[0-9a-f]{16}$/s and $$tagTablePtr{$1});
                 }
                 # save the data for this tag
-                $exifTool->HandleTag($tagTablePtr, $tag, $$obj{Stream},
+                $et->HandleTag($tagTablePtr, $tag, $$obj{Stream},
                     DataPt => \$$obj{Stream},
                     TagInfo => $tagInfo,
                 );
                 delete $$obj{Stream}; # done with this stream
             }
         # hack for improperly stored FujiFilm PreviewImage (stored with no contents list)
-        } elsif ($index == 512 and $dirLen > 60 and ($$exifTool{FujiPreview} or
+        } elsif ($index == 512 and $dirLen > 60 and ($$et{FujiPreview} or
             ($dirLen > 64 and substr($$dataPt, $dirStart+60, 4) eq "\xff\xd8\xff\xdb")))
         {
             # recombine PreviewImage, skipping unknown 60 byte header
-            if ($$exifTool{FujiPreview}) {
-                $$exifTool{FujiPreview} .= substr($$dataPt, $dirStart+60);
+            if ($$et{FujiPreview}) {
+                $$et{FujiPreview} .= substr($$dataPt, $dirStart+60);
             } else {
-                $$exifTool{FujiPreview} = substr($$dataPt, $dirStart+60);
+                $$et{FujiPreview} = substr($$dataPt, $dirStart+60);
             }
         } else {
             # (Kodak uses index 255 for a free segment in images from some cameras)
-            $exifTool->Warn("Unlisted FPXR segment (index $index)") if $index != 255;
+            $et->Warn("Unlisted FPXR segment (index $index)") if $index != 255;
         }
 
     } elsif ($type ne 3) {  # not a "Reserved" segment
 
-        $exifTool->Warn("Unknown FPXR segment (type $type)");
+        $et->Warn("Unknown FPXR segment (type $type)");
 
     }
 
     # clean up if this was the last FPXR segment
     if ($$dirInfo{LastFPXR}) {
-        if ($$exifTool{FPXR}) {
+        if ($$et{FPXR}) {
             my $obj;
             my $i = 0;
-            foreach $obj (@{$$exifTool{FPXR}}) {
-                $exifTool->Warn("Missing stream for FPXR object $i") if defined $$obj{Stream};
+            foreach $obj (@{$$et{FPXR}}) {
+                $et->Warn("Missing stream for FPXR object $i") if defined $$obj{Stream};
                 ++$i;
             }
-            delete $$exifTool{FPXR};    # delete our temporary variables
+            delete $$et{FPXR};    # delete our temporary variables
         }
-        if ($$exifTool{FujiPreview}) {
-            $exifTool->FoundTag('PreviewImage', $$exifTool{FujiPreview});
-            delete $$exifTool{FujiPreview};
+        if ($$et{FujiPreview}) {
+            $et->FoundTag('PreviewImage', $$et{FujiPreview});
+            delete $$et{FujiPreview};
         }
     }
     return 1;
@@ -1558,7 +1558,7 @@ sub SetDocNum($$;$$$)
 # Returns: 1 on success, 0 if this wasn't a valid FPX-format file
 sub ProcessFPX($$)
 {
-    my ($exifTool, $dirInfo) = @_;
+    my ($et, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my ($buff, $out, %dumpParms, $oldIndent, $miniStreamBuff);
     my ($tag, %hier, %objIndex);
@@ -1569,14 +1569,14 @@ sub ProcessFPX($$)
     return 0 unless $buff =~ /^\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1/;
 
     # set FileType initially based on file extension (we may override this later)
-    my $fileType = $exifTool->{FILE_EXT};
+    my $fileType = $$et{FILE_EXT};
     $fileType = 'FPX' unless $fileType and $fpxFileType{$fileType};
-    $exifTool->SetFileType($fileType);
+    $et->SetFileType($fileType);
     SetByteOrder(substr($buff, 0x1c, 2) eq "\xff\xfe" ? 'MM' : 'II');
     my $tagTablePtr = GetTagTable('Image::ExifTool::FlashPix::Main');
-    my $verbose = $exifTool->Options('Verbose');
+    my $verbose = $et->Options('Verbose');
     # copy LargeFileSupport option to RAF for use in LoadChain
-    $$raf{LargeFileSupport} = $exifTool->Options('LargeFileSupport');
+    $$raf{LargeFileSupport} = $et->Options('LargeFileSupport');
 
     my $sectSize = 1 << Get16u(\$buff, 0x1e);
     my $miniSize = 1 << Get16u(\$buff, 0x20);
@@ -1589,7 +1589,7 @@ sub ProcessFPX($$)
     my $difCount   = Get32u(\$buff, 0x48);  # number of DIF sectors
 
     if ($verbose) {
-        $out = $exifTool->Options('TextOut');
+        $out = $et->Options('TextOut');
         $dumpParms{Out} = $out;
         $dumpParms{MaxLen} = 96 if $verbose == 3;
         print $out "  Sector size=$sectSize\n  FAT: Count=$fatCount\n";
@@ -1614,7 +1614,7 @@ sub ProcessFPX($$)
             unless ($raf->Seek($offset, 0) and
                     $raf->Read($fatSect, $sectSize) == $sectSize)
             {
-                $exifTool->Error("Error reading FAT from sector $sect");
+                $et->Error("Error reading FAT from sector $sect");
                 return 1;
             }
             $fat .= $fatSect;
@@ -1624,7 +1624,7 @@ sub ProcessFPX($$)
         # read next DIF (Dual Indirect FAT) sector
         my $offset = $difStart * $sectSize + HDR_SIZE;
         unless ($raf->Seek($offset, 0) and $raf->Read($buff, $sectSize) == $sectSize) {
-            $exifTool->Error("Error reading DIF sector $difStart");
+            $et->Error("Error reading DIF sector $difStart");
             return 1;
         }
         # set end of sector information in this DIF
@@ -1634,7 +1634,7 @@ sub ProcessFPX($$)
         $difStart = Get32u(\$buff, $endPos);
     }
     if ($fatCountCheck != $fatCount) {
-        $exifTool->Warn("Bad number of FAT sectors (expected $fatCount but found $fatCountCheck)");
+        $et->Warn("Bad number of FAT sectors (expected $fatCount but found $fatCountCheck)");
     }
 #
 # load the mini-FAT and the directory
@@ -1642,7 +1642,7 @@ sub ProcessFPX($$)
     my $miniFat = LoadChain($raf, $miniStart, \$fat, $sectSize, HDR_SIZE);
     my $dir = LoadChain($raf, $dirStart, \$fat, $sectSize, HDR_SIZE);
     unless (defined $miniFat and defined $dir) {
-        $exifTool->Error('Error reading mini-FAT or directory stream');
+        $et->Error('Error reading mini-FAT or directory stream');
         return 1;
     }
     if ($verbose) {
@@ -1657,9 +1657,9 @@ sub ProcessFPX($$)
 # process the directory
 #
     if ($verbose) {
-        $oldIndent = $exifTool->{INDENT};
-        $exifTool->{INDENT} .= '| ';
-        $exifTool->VerboseDir('FPX', undef, length $dir);
+        $oldIndent = $$et{INDENT};
+        $$et{INDENT} .= '| ';
+        $et->VerboseDir('FPX', undef, length $dir);
     }
     my $miniStream;
     $endPos = length($dir);
@@ -1672,7 +1672,7 @@ sub ProcessFPX($$)
         my $type = Get8u(\$dir, $pos + 0x42);
         next if $type == 0; # skip invalid entries
         if ($type > 5) {
-            $exifTool->Warn("Invalid directory entry type $type");
+            $et->Warn("Invalid directory entry type $type");
             last;   # rest of directory is probably garbage
         }
         # get entry name (note: this is supposed to be length in 2-byte
@@ -1690,7 +1690,7 @@ sub ProcessFPX($$)
         unless ($miniStream) {
             $miniStreamBuff = LoadChain($raf, $sect, \$fat, $sectSize, HDR_SIZE);
             unless (defined $miniStreamBuff) {
-                $exifTool->Warn('Error loading Mini-FAT stream');
+                $et->Warn('Error loading Mini-FAT stream');
                 last;
             }
             $miniStream = new File::RandomAccess(\$miniStreamBuff);
@@ -1698,10 +1698,10 @@ sub ProcessFPX($$)
 
         my $tagInfo;
         if ($$tagTablePtr{$tag}) {
-            $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+            $tagInfo = $et->GetTagInfo($tagTablePtr, $tag);
         } else {
             # remove instance number or class ID from tag if necessary
-            $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $1) if
+            $tagInfo = $et->GetTagInfo($tagTablePtr, $1) if
                 ($tag =~ /(.*) \d{6}$/s and $$tagTablePtr{$1}) or
                 ($tag =~ /(.*)_[0-9a-f]{16}$/s and $$tagTablePtr{$1});
         }
@@ -1738,7 +1738,7 @@ sub ProcessFPX($$)
             }
             unless (defined $buff) {
                 my $name = $tagInfo ? $$tagInfo{Name} : 'unknown';
-                $exifTool->Warn("Error reading $name stream");
+                $et->Warn("Error reading $name stream");
                 $buff = '';
             }
         } elsif ($typeStr eq 'ROOT') {
@@ -1755,7 +1755,7 @@ sub ProcessFPX($$)
             $extra .= " Left=$lSib" unless $lSib == FREE_SECT;
             $extra .= " Right=$rSib" unless $rSib == FREE_SECT;
             $extra .= " Child=$chld" unless $chld == FREE_SECT;
-            $exifTool->VerboseInfo($tag, $tagInfo,
+            $et->VerboseInfo($tag, $tagInfo,
                 Index  => $index,
                 Value  => $buff,
                 DataPt => \$buff,
@@ -1764,7 +1764,7 @@ sub ProcessFPX($$)
             );
         }
         if ($tagInfo and $buff) {
-            my $num = $$exifTool{NUM_FOUND};
+            my $num = $$et{NUM_FOUND};
             my $subdir = $$tagInfo{SubDirectory};
             if ($subdir) {
                 my %dirInfo = (
@@ -1774,21 +1774,21 @@ sub ProcessFPX($$)
                     Multi    => $$tagInfo{Multi},
                 );
                 my $subTablePtr = GetTagTable($$subdir{TagTable});
-                $exifTool->ProcessDirectory(\%dirInfo, $subTablePtr,  $$subdir{ProcessProc});
+                $et->ProcessDirectory(\%dirInfo, $subTablePtr,  $$subdir{ProcessProc});
             } else {
-                $exifTool->FoundTag($tagInfo, $buff);
+                $et->FoundTag($tagInfo, $buff);
             }
             # save object index number for all found tags
-            my $num2 = $$exifTool{NUM_FOUND};
+            my $num2 = $$et{NUM_FOUND};
             $objIndex{++$num} = $index while $num < $num2;
         }
     }
     # set document numbers for tags extracted from embedded documents
-    unless ($$exifTool{DOC_NUM}) {
+    unless ($$et{DOC_NUM}) {
         # initialize document number for all objects, beginning at root (index 0)
         SetDocNum(\%hier, 0);
         # set family 3 group name for all tags in embedded documents
-        my $order = $$exifTool{FILE_ORDER};
+        my $order = $$et{FILE_ORDER};
         my (@pri, $copy, $member);
         foreach $tag (keys %$order) {
             my $num = $$order{$tag};
@@ -1796,18 +1796,18 @@ sub ProcessFPX($$)
             my $obj = $hier{$objIndex{$num}} or next;
             my $docNums = $$obj{DocNum};
             next unless $docNums and @$docNums;
-            $$exifTool{TAG_EXTRA}{$tag}{G3} = join '-', @$docNums;
+            $$et{TAG_EXTRA}{$tag}{G3} = join '-', @$docNums;
             push @pri, $tag unless $tag =~ / /; # save keys for priority sub-doc tags
         }
         # swap priority sub-document tags with main document tags if they exist
         foreach $tag (@pri) {
             for ($copy=1; ;++$copy) {
                 my $key = "$tag ($copy)";
-                last unless defined $$exifTool{VALUE}{$key};
-                my $extra = $$exifTool{TAG_EXTRA}{$key};
+                last unless defined $$et{VALUE}{$key};
+                my $extra = $$et{TAG_EXTRA}{$key};
                 next if $extra and $$extra{G3}; # not Main if family 3 group is set
                 foreach $member ('PRIORITY','VALUE','FILE_ORDER','TAG_INFO','TAG_EXTRA') {
-                    my $pHash = $$exifTool{$member};
+                    my $pHash = $$et{$member};
                     my $t = $$pHash{$tag};
                     $$pHash{$tag} = $$pHash{$key};
                     $$pHash{$key} = $t;
@@ -1816,16 +1816,16 @@ sub ProcessFPX($$)
             }
         }
     }
-    $exifTool->{INDENT} = $oldIndent if $verbose;
+    $$et{INDENT} = $oldIndent if $verbose;
     # try to better identify the file type
-    if ($$exifTool{VALUE}{FileType} eq 'FPX') {
-        my $val = $$exifTool{CompObjUserType} || $$exifTool{Software};
+    if ($$et{VALUE}{FileType} eq 'FPX') {
+        my $val = $$et{CompObjUserType} || $$et{Software};
         if ($val) {
             my %type = ( Word => 'DOC', PowerPoint => 'PPT', Excel => 'XLS' );
             my $pat;
             foreach $pat (sort keys %type) {
                 next unless $val =~ /$pat/;
-                $exifTool->OverrideFileType($type{$pat});
+                $et->OverrideFileType($type{$pat});
                 last;
             }
         }
@@ -1853,7 +1853,7 @@ JPEG images.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

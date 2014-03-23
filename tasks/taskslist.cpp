@@ -29,8 +29,8 @@ void TasksList::setToolbox(QToolBox *_toolbox) {
     //connect(toolbox, SIGNAL(currentChanged(int)), SLOT(timerEvent()));
 }
 
-void TasksList::addTask(Metadata *metadata, TaskProcessType type, qint16 version) {
-    addTask(TaskProcessData(metadata, type, version));
+void TasksList::addTask(Metadata *metadata, TaskProcessType type, qint16 version, bool needCompleteScan) {
+    addTask(TaskProcessData(metadata, type, version, needCompleteScan));
     if(toolbox->currentIndex() != 2)
         oldToolboxIndex = toolbox->currentIndex();
     toolbox->setCurrentIndex(2);

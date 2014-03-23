@@ -37,7 +37,7 @@
 #              22) Tanel Kuusk private communication
 #              23) Alexandre Naaman private communication (D3)
 #              24) Geert De Soete private communication
-#              25) Niels Kristian private communication
+#              25) Niels Kristian Bech Jensen private communication
 #              26) Bozi (http://www.cpanforum.com/posts/8983)
 #              27) Jens Kriese private communication
 #              28) Warren Hatch private communication (D3v2.00 with SB-800 and SB-900)
@@ -45,6 +45,7 @@
 #              30) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3833.30.html
 #              31) Michael Relt private communication
 #              32) Stefan http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4494.0.html
+#              33) Iliah Borg private communication
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -55,7 +56,7 @@ use vars qw($VERSION %nikonLensIDs %nikonTextEncoding);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.75';
+$VERSION = '2.86';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -281,6 +282,10 @@ sub PrintAFPointsInv($$;$);
     'B4 40 37 62 2C 34 B6 0E' => 'AF-S VR Zoom-Nikkor 24-85mm f/3.5-4.5G IF-ED', #30
     'B5 4C 3C 3C 14 14 B7 06' => 'AF-S Nikkor 28mm f/1.8G', #30
     'B7 44 60 98 34 3C B9 0E' => 'AF-S Nikkor 80-400mm f/4.5-5.6G ED VR',
+    'B8 40 2D 44 2C 34 BA 06' => 'AF-S Nikkor 18-35mm f/3.5-4.5G ED',
+    'A0 40 2D 74 2C 3C BB 0E' => 'AF-S DX Nikkor 18-140mm f/3.5-5.6G ED VR', #PH
+    'A1 54 55 55 0C 0C BC 06' => 'AF-S Nikkor 58mm f/1.4G', #33
+    'A2 40 2D 53 2C 3C BD 0E' => 'AF-S DX VR Nikkor 18-55mm f/3.5-5.6G II',
     '01 00 00 00 00 00 02 00' => 'TC-16A',
     '01 00 00 00 00 00 08 00' => 'TC-16A',
     '00 00 00 00 00 00 F1 0C' => 'TC-14E [II] or Sigma APO Tele Converter 1.4x EX DG or Kenko Teleplus PRO 300 DG 1.4x',
@@ -293,6 +298,7 @@ sub PrintAFPointsInv($$;$);
     '02 3F 24 24 2C 2C 02 00' => 'Sigma 14mm F3.5',
     '48 48 24 24 24 24 4B 02' => 'Sigma 14mm F2.8 EX Aspherical HSM',
     '26 48 27 27 24 24 1C 02' => 'Sigma 15mm F2.8 EX Diagonal Fisheye',
+    'EA 48 27 27 24 24 1C 02' => 'Sigma 15mm F2.8 EX Diagonal Fisheye', #30
     '26 58 31 31 14 14 1C 02' => 'Sigma 20mm F1.8 EX DG Aspherical RF',
     '26 58 37 37 14 14 1C 02' => 'Sigma 24mm F1.8 EX DG Aspherical Macro',
     'E1 58 37 37 14 14 1C 02' => 'Sigma 24mm F1.8 EX DG Aspherical Macro',
@@ -300,6 +306,7 @@ sub PrintAFPointsInv($$;$);
     '26 58 3C 3C 14 14 1C 02' => 'Sigma 28mm F1.8 EX DG Aspherical Macro',
     '48 54 3E 3E 0C 0C 4B 06' => 'Sigma 30mm F1.4 EX DC HSM',
     'F8 54 3E 3E 0C 0C 4B 06' => 'Sigma 30mm F1.4 EX DC HSM', #JD
+    '91 54 44 44 0C 0C 4B 06' => 'Sigma 35mm F1.4 DG HSM', #30
     'DE 54 50 50 0C 0C 4B 06' => 'Sigma 50mm F1.4 EX DG HSM',
     '02 48 50 50 24 24 02 00' => 'Sigma Macro 50mm F2.8', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4027.0.html
     '32 54 50 50 24 24 35 02' => 'Sigma Macro 50mm F2.8 EX DG',
@@ -309,9 +316,9 @@ sub PrintAFPointsInv($$;$);
     '02 48 65 65 24 24 02 00' => 'Sigma Macro 90mm F2.8',
     '32 54 6A 6A 24 24 35 02.2' => 'Sigma Macro 105mm F2.8 EX DG', #JD
     'E5 54 6A 6A 24 24 35 02' => 'Sigma Macro 105mm F2.8 EX DG',
-    '48 48 76 76 24 24 4B 06' => 'Sigma 150mm F2.8 EX DG APO Macro HSM',
-    'F5 48 76 76 24 24 4B 06' => 'Sigma 150mm F2.8 EX DG APO Macro HSM', #24
-    '48 4C 7C 7C 2C 2C 4B 02' => 'Sigma 180mm F3.5 EX DG Macro',
+    '48 48 76 76 24 24 4B 06' => 'Sigma APO Macro 150mm F2.8 EX DG HSM',
+    'F5 48 76 76 24 24 4B 06' => 'Sigma APO Macro 150mm F2.8 EX DG HSM', #24
+    '48 4C 7C 7C 2C 2C 4B 02' => 'Sigma APO Macro 180mm F3.5 EX DG HSM',
     '48 4C 7D 7D 2C 2C 4B 02' => 'Sigma APO Macro 180mm F3.5 EX DG HSM',
     '48 54 8E 8E 24 24 4B 02' => 'Sigma APO 300mm F2.8 EX DG HSM',
     'FB 54 8E 8E 24 24 4B 02' => 'Sigma APO 300mm F2.8 EX DG HSM', #26
@@ -330,6 +337,7 @@ sub PrintAFPointsInv($$;$);
     'F9 3C 19 31 30 3C 4B 06' => 'Sigma 10-20mm F4-5.6 EX DC HSM', #JD
     '48 38 1F 37 34 3C 4B 06' => 'Sigma 12-24mm F4.5-5.6 EX DG Aspherical HSM',
     'F0 38 1F 37 34 3C 4B 06' => 'Sigma 12-24mm F4.5-5.6 EX DG Aspherical HSM',
+    '96 38 1F 37 34 3C 4B 06' => 'Sigma 12-24mm F4.5-5.6 II DG HSM', #Jurgen Sahlberg
     '26 40 27 3F 2C 34 1C 02' => 'Sigma 15-30mm F3.5-4.5 EX DG Aspherical DF',
     '48 48 2B 44 24 30 4B 06' => 'Sigma 17-35mm F2.8-4 EX DG  Aspherical HSM',
     '26 54 2B 44 24 30 1C 02' => 'Sigma 17-35mm F2.8-4 EX Aspherical',
@@ -337,7 +345,10 @@ sub PrintAFPointsInv($$;$);
     '7A 47 2B 5C 24 34 4B 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF HSM',
     '7A 48 2B 5C 24 34 4B 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF HSM',
     '7F 48 2B 5C 24 34 1C 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF',
-    '26 40 2D 44 2B 34 1C 02' => 'Sigma 18-35 F3.5-4.5 Aspherical',
+    '8E 3C 2B 5C 24 30 4B 0E' => 'Sigma 17-70mm F2.8-4 DC Macro OS HSM Contemporary',
+    'A0 48 2A 5C 24 30 4B 0E' => 'Sigma 17-70mm F2.8-4 DC Macro OS HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5170.0.html
+    '8B 4C 2D 44 14 14 4B 06' => 'Sigma 18-35mm F1.8 DC HSM', #30/25
+    '26 40 2D 44 2B 34 1C 02' => 'Sigma 18-35mm F3.5-4.5 Aspherical',
     '26 48 2D 50 24 24 1C 06' => 'Sigma 18-50mm F2.8 EX DC',
     '7F 48 2D 50 24 24 1C 06' => 'Sigma 18-50mm F2.8 EX DC Macro', #25
     '7A 48 2D 50 24 24 4B 06' => 'Sigma 18-50mm F2.8 EX DC Macro',
@@ -350,6 +361,7 @@ sub PrintAFPointsInv($$;$);
     '26 40 2D 80 2C 40 1C 06' => 'Sigma 18-200mm F3.5-6.3 DC',
     '7A 40 2D 80 2C 40 4B 0E' => 'Sigma 18-200mm F3.5-6.3 DC OS HSM',
     'ED 40 2D 80 2C 40 4B 0E' => 'Sigma 18-200mm F3.5-6.3 DC OS HSM', #JD
+    'FF 40 2D 80 2C 40 4B 06' => 'Sigma 18-200mm F3.5-6.3 DC', #30
     'A5 40 2D 88 2C 40 4B 0E' => 'Sigma 18-250mm F3.5-6.3 DC OS HSM',
   #  LensFStops varies with FocalLength for this lens (ref 2):
     '92 2C 2D 88 2C 40 4B 0E' => 'Sigma 18-250mm F3.5-6.3 DC Macro OS HSM', #2
@@ -380,6 +392,7 @@ sub PrintAFPointsInv($$;$);
     '02 46 3C 5C 25 25 02 00' => 'Sigma 28-70mm F2.8',
     '26 54 3C 5C 24 24 1C 02' => 'Sigma 28-70mm F2.8 EX',
     '26 48 3C 5C 24 24 1C 06' => 'Sigma 28-70mm F2.8 EX DG',
+    '79 48 3C 5C 24 24 1C 06' => 'Sigma 28-70mm F2.8 EX DG', #30 ("D" removed)
     '26 48 3C 5C 24 30 1C 02' => 'Sigma 28-70mm F2.8-4 DG',
     '02 3F 3C 5C 2D 35 02 00' => 'Sigma 28-70mm F3.5-4.5 UC',
     '26 40 3C 60 2C 3C 1C 02' => 'Sigma 28-80mm F3.5-5.6 Mini Zoom Macro II Aspherical',
@@ -405,6 +418,7 @@ sub PrintAFPointsInv($$;$);
     'EE 48 5C 80 24 24 4B 06' => 'Sigma 70-200mm F2.8 EX APO DG Macro HSM II', #JD
     '9C 48 5C 80 24 24 4B 0E' => 'Sigma 70-200mm F2.8 EX DG OS HSM', #Rolando Ruzic
     '02 46 5C 82 25 25 02 00' => 'Sigma 70-210mm F2.8 APO', #JD
+    '02 40 5C 82 2C 35 02 00' => 'Sigma APO 70-210mm F3.5-4.5',
     '26 3C 5C 82 30 3C 1C 02' => 'Sigma 70-210mm F4-5.6 UC-II',
     '26 3C 5C 8E 30 3C 1C 02' => 'Sigma 70-300mm F4-5.6 DG Macro',
     '56 3C 5C 8E 30 3C 1C 02' => 'Sigma 70-300mm F4-5.6 APO Macro Super II',
@@ -433,6 +447,7 @@ sub PrintAFPointsInv($$;$);
     '32 53 64 64 24 24 35 02' => 'Tamron SP AF 90mm f/2.8 [Di] Macro 1:1 (172E/272E)',
     'F8 55 64 64 24 24 84 06' => 'Tamron SP AF 90mm f/2.8 Di Macro 1:1 (272NII)',
     'F8 54 64 64 24 24 DF 06' => 'Tamron SP AF 90mm f/2.8 Di Macro 1:1 (272NII)',
+    'FE 54 64 64 24 24 DF 0E' => 'Tamron SP 90mm f/2.8 Di VC USD Macro 1:1 (F004)', #Jurgen Sahlberg
     '00 4C 7C 7C 2C 2C 00 02' => 'Tamron SP AF 180mm f/3.5 Di Model (B01)',
     '21 56 8E 8E 24 24 14 00' => 'Tamron SP AF 300mm f/2.8 LD-IF (60E)',
     '27 54 8E 8E 24 24 1D 02' => 'Tamron SP AF 300mm f/2.8 LD-IF (360E)',
@@ -455,11 +470,11 @@ sub PrintAFPointsInv($$;$);
     '07 40 30 45 2D 35 03 02' => 'Tamron AF 19-35mm f/3.5-4.5 (A10)',
     '00 49 30 48 22 2B 00 02' => 'Tamron SP AF 20-40mm f/2.7-3.5 (166D)',
     '0E 4A 31 48 23 2D 0E 02' => 'Tamron SP AF 20-40mm f/2.7-3.5 (166D)',
-    'FE 48 37 5C 24 24 DF 0E' => 'Tamron SP 24-70mm f/2.8 Di VC USD', #24
+    'FE 48 37 5C 24 24 DF 0E' => 'Tamron SP 24-70mm f/2.8 Di VC USD (A007)', #24
     '45 41 37 72 2C 3C 48 02' => 'Tamron SP AF 24-135mm f/3.5-5.6 AD Aspherical (IF) Macro (190D)',
     '33 54 3C 5E 24 24 62 02' => 'Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical (IF) Macro (A09)',
     'FA 54 3C 5E 24 24 84 06' => 'Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical (IF) Macro (A09NII)', #JD
-    'FA 54 3C 5E 24 24 DF 06' => 'Tamron SP AF 28-75mm F/2.8 XR Di LD Aspherical (IF) Macro (A09NII)',
+    'FA 54 3C 5E 24 24 DF 06' => 'Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical (IF) Macro (A09NII)',
     '10 3D 3C 60 2C 3C D2 02' => 'Tamron AF 28-80mm f/3.5-5.6 Aspherical (177D)',
     '45 3D 3C 60 2C 3C 48 02' => 'Tamron AF 28-80mm f/3.5-5.6 Aspherical (177D)',
     '00 48 3C 6A 24 24 00 02' => 'Tamron SP AF 28-105mm f/2.8 LD Aspherical IF (176D)',
@@ -473,7 +488,9 @@ sub PrintAFPointsInv($$;$);
     'F7 53 5C 80 24 24 84 06' => 'Tamron SP AF 70-200mm f/2.8 Di LD (IF) Macro (A001)',
     'FE 53 5C 80 24 24 84 06' => 'Tamron SP AF 70-200mm f/2.8 Di LD (IF) Macro (A001)',
     'F7 53 5C 80 24 24 40 06' => 'Tamron SP AF 70-200mm f/2.8 Di LD (IF) Macro (A001)',
-    '69 48 5C 8E 30 3C 6F 02' => 'Tamron AF 70-300mm f/4-5.6 LD Macro 1:2 (772D)',
+  # 'FE 54 5C 80 24 24 DF 0E' => 'Tamron SP AF 70-200mm f/2.8 Di VC USD (A009)',
+    'FE 54 5C 80 24 24 DF 0E' => 'Tamron SP 70-200mm f/2.8 Di VC USD (A009)', #25
+    '69 48 5C 8E 30 3C 6F 02' => 'Tamron AF 70-300mm f/4-5.6 LD Macro 1:2 (572D/772D)',
     '69 47 5C 8E 30 3C 00 02' => 'Tamron AF 70-300mm f/4-5.6 Di LD Macro 1:2 (A17N)',
     '00 48 5C 8E 30 3C 00 06' => 'Tamron AF 70-300mm f/4-5.6 Di LD Macro 1:2 (A17NII)', #JD
     'F1 47 5C 8E 30 3C DF 0E' => 'Tamron SP 70-300mm f/4-5.6 Di VC USD (A005)',
@@ -483,11 +500,11 @@ sub PrintAFPointsInv($$;$);
 #
     '00 40 2B 2B 2C 2C 00 02' => 'Tokina AT-X 17 AF PRO (AF 17mm f/3.5)',
     '00 47 44 44 24 24 00 06' => 'Tokina AT-X M35 PRO DX (AF 35mm f/2.8 Macro)',
-    '00 54 68 68 24 24 00 02' => 'Tokina AT-X M100 PRO D (AF 100mm f/2.8 Macro)',
+    '00 54 68 68 24 24 00 02' => 'Tokina AT-X M100 AF PRO D (AF 100mm f/2.8 Macro)',
     '27 48 8E 8E 30 30 1D 02' => 'Tokina AT-X 304 AF (AF 300mm f/4.0)',
     '00 54 8E 8E 24 24 00 02' => 'Tokina AT-X 300 AF PRO (AF 300mm f/2.8)',
     '12 3B 98 98 3D 3D 09 00' => 'Tokina AT-X 400 AF SD (AF 400mm f/5.6)',
-    '00 40 18 2B 2C 34 00 06' => 'Tokina AT-X 107 DX Fisheye (AF 10-17mm f/3.5-4.5)',
+    '00 40 18 2B 2C 34 00 06' => 'Tokina AT-X 107 AF DX Fisheye (AF 10-17mm f/3.5-4.5)',
     '00 48 1C 29 24 24 00 06' => 'Tokina AT-X 116 PRO DX (AF 11-16mm f/2.8)',
     '00 3C 1F 37 30 30 00 06' => 'Tokina AT-X 124 AF PRO DX (AF 12-24mm f/4)',
     '7A 3C 1F 37 30 30 7E 06.2' => 'Tokina AT-X 124 AF PRO DX II (AF 12-24mm f/4)',
@@ -536,7 +553,6 @@ sub PrintAFPointsInv($$;$);
 #
     '00 54 56 56 30 30 00 00' => 'Coastal Optical Systems 60mm 1:4 UV-VIS-IR Macro Apo',
 #
-    '00 40 11 11 2C 2C 00 00' => 'Samyang 8mm f/3.5 Fish-Eye',
     '4A 40 11 11 2C 0C 4D 02' => 'Samyang 8mm f/3.5 Fish-Eye CS',
     '4A 48 24 24 24 0C 4D 02' => 'Samyang AE 14mm f/2.8 ED AS IF UMC', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3150.0.html
     '4A 60 44 44 0C 0C 4D 02' => 'Samyang 35mm f/1.4 AS UMC',
@@ -555,10 +571,11 @@ sub PrintAFPointsInv($$;$);
     '00 47 10 10 24 24 00 00' => 'Fisheye Nikkor 8mm f/2.8 AiS',
     '00 54 44 44 0C 0C 00 00' => 'Nikkor 35mm f/1.4 AiS',
     '00 48 50 50 18 18 00 00' => 'Nikkor H 50mm f/2',
-    '00 58 64 64 20 20 00 00' => 'Soligor C/D Macro MC 90mm f/2.5',
     '00 48 68 68 24 24 00 00' => 'Series E 100mm f/2.8',
     '00 4C 6A 6A 20 20 00 00' => 'Nikkor 105mm f/2.5 AiS',
     '00 48 80 80 30 30 00 00' => 'Nikkor 200mm f/4 AiS',
+    '00 40 11 11 2C 2C 00 00' => 'Samyang 8mm f/3.5 Fish-Eye',
+    '00 58 64 64 20 20 00 00' => 'Soligor C/D Macro MC 90mm f/2.5',
 );
 
 # text encoding used in LocationInfo (ref PH)
@@ -584,6 +601,7 @@ my %flashFirmware = (
     '4 4' => '4.04 (SB-400)',
     '5 1' => '5.01 (SB-900)',
     '5 2' => '5.02 (SB-900)',
+    '6 1' => '6.01 (SB-700)', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5034.0.html
     '7 1' => '7.01 (SB-910)', #PH
     OTHER => sub {
         my ($val, $inv) = @_;
@@ -954,6 +972,8 @@ my %binaryDataAttrs = (
     },
     0x001d => { #4
         Name => 'SerialNumber',
+        # Note: this has been known to change even if the serial number on the body
+        # stays the same if some parts of the camera were replaced by Nikon service
         Writable => 'string',
         Protected => 1,
         Notes => q{
@@ -1058,6 +1078,12 @@ my %binaryDataAttrs = (
     0x0039 => {
         Name => 'LocationInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::LocationInfo' },
+    },
+    0x003d => { #33
+        Name => 'BlackLevel',
+        Writable => 'int16u',
+        Count => 4,
+        # (may need to divide by 4 for some images, ie. D3300/D5300, 12 bit - ref 33)
     },
     0x0080 => { Name => 'ImageAdjustment',  Writable => 'string' },
     0x0081 => { Name => 'ToneComp',         Writable => 'string' }, #2
@@ -1508,7 +1534,7 @@ my %binaryDataAttrs = (
         },
         {   # (D5200/D7100=0218, 1J1/1J2/1V1=0400, 1V2=0401, 1J3/1S1=0402, CoolpixA=0601)
             Name => 'ColorBalanceUnknown',
-            Writable => 0,
+            SubDirectory => { TagTable => 'Image::ExifTool::Nikon::ColorBalanceUnknown' },
         },
     ],
     0x0098 => [
@@ -2767,6 +2793,15 @@ my %binaryDataAttrs = (
         Name => 'WB_GRBGLevels',
         Format => 'int16u[4]',
         Protected => 1,
+    },
+);
+
+%Image::ExifTool::Nikon::ColorBalanceUnknown = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'ColorBalanceVersion',
+        Format => 'undef[4]',
     },
 );
 
@@ -5204,8 +5239,17 @@ my %nikonFocalConversions = (
     },
     NCTH => { Name => 'ThumbnailImage', Format => 'undef', Binary => 1 },
     NCVW => { Name => 'PreviewImage',   Format => 'undef', Binary => 1 },
-    # NCDB - 0 bytes long, or 4 null bytes, or 328 bytes for Nikon D600/D3200/D5200
-    # (when 328 bytes, the first 4 bytes are the long integer 328)
+    NCDB => { # (often 0 bytes long, or 4 null bytes)
+        Name => 'NikonNCDB',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::NCDB' },
+    }
+);
+
+# Nikon NCDB tags from MOV videos (ref PH)
+%Image::ExifTool::Nikon::NCDB = (
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Nikon', 2 => 'Video' },
+    # OP01 - 320 bytes, starts with "0200" (D600,D610,D3200,D5200)
+    #      - 638 bytes, starts with "0200" (D7100)
 );
 
 # Nikon NCTG tags from MOV videos (ref PH)
@@ -5501,18 +5545,18 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::Nikon');
 # Returns: 1 on success
 sub ProcessNikonAVI($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $pos = $$dirInfo{DirStart} || 0;
     my $dirEnd = $pos + $$dirInfo{DirLen};
-    $exifTool->VerboseDir($dirInfo, undef, $$dirInfo{DirLen});
+    $et->VerboseDir($dirInfo, undef, $$dirInfo{DirLen});
     SetByteOrder('II');
     while ($pos + 4 <= $dirEnd) {
         my $tag = Get16u($dataPt, $pos);
         my $size = Get16u($dataPt, $pos + 2);
         $pos += 4;
         last if $pos + $size > $dirEnd;
-        $exifTool->HandleTag($tagTablePtr, $tag, undef,
+        $et->HandleTag($tagTablePtr, $tag, undef,
             DataPt => $dataPt,
             Start  => $pos,
             Size   => $size,
@@ -5749,10 +5793,10 @@ sub Decrypt($$$;$$)
 # Returns: serial key integer or undef if no serial number provided
 sub SerialKey($$)
 {
-    my ($exifTool, $serial) = @_;
+    my ($et, $serial) = @_;
     # use serial number as key if integral
     return $serial if not defined $serial or $serial =~ /^\d+$/;
-    return 0x22 if $$exifTool{Model} =~ /\bD50$/; # D50 (ref 8)
+    return 0x22 if $$et{Model} =~ /\bD50$/; # D50 (ref 8)
     return 0x60; # D200 (ref 10), D40X (ref PH), etc
 }
 
@@ -5762,12 +5806,12 @@ sub SerialKey($$)
 # Returns: 1 on success
 sub ProcessNikonMOV($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dataPos = $$dirInfo{DataPos};
     my $pos = $$dirInfo{DirStart};
     my $end = $pos + $$dirInfo{DirLen};
-    $exifTool->VerboseDir($$dirInfo{DirName}, 0, $$dirInfo{DirLen});
+    $et->VerboseDir($$dirInfo{DirName}, 0, $$dirInfo{DirLen});
     while ($pos + 8 < $end) {
         my $tag = Get32u($dataPt, $pos);
         my $fmt = Get16u($dataPt, $pos + 4); # (same format code as EXIF)
@@ -5775,24 +5819,24 @@ sub ProcessNikonMOV($$$)
         $pos += 8;
         my $fmtStr = $Image::ExifTool::Exif::formatName[$fmt];
         unless ($fmtStr) {
-            $exifTool->Warn(sprintf("Unknown format ($fmt) for $$dirInfo{DirName} tag 0x%x",$tag));
+            $et->Warn(sprintf("Unknown format ($fmt) for $$dirInfo{DirName} tag 0x%x",$tag));
             last;
         }
         my $size = $count * $Image::ExifTool::Exif::formatSize[$fmt];
         if ($pos + $size > $end) {
-            $exifTool->Warn(sprintf("Truncated data for $$dirInfo{DirName} tag 0x%x",$tag));
+            $et->Warn(sprintf("Truncated data for $$dirInfo{DirName} tag 0x%x",$tag));
             last;
         }
         my $rational;
         my $val = ReadValue($dataPt, $pos, $fmtStr, $count, $size, \$rational);
-        my $key = $exifTool->HandleTag($tagTablePtr, $tag, $val,
+        my $key = $et->HandleTag($tagTablePtr, $tag, $val,
             DataPt  => $dataPt,
             DataPos => $dataPos,
             Format  => $fmtStr,
             Start   => $pos,
             Size    => $size,
         );
-        $$exifTool{RATIONAL}{$key} = $rational if $rational and $key;
+        $$et{RATIONAL}{$key} = $rational if $rational and $key;
         $pos += $size;  # is this padded to an even offset????
     }
     return 1;
@@ -5804,20 +5848,20 @@ sub ProcessNikonMOV($$$)
 # Returns: 1 on success when reading, or new directory when writing (IsWriting set)
 sub ProcessNikonEncrypted($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    $exifTool or return 1;    # allow dummy access
-    my $serial = $$exifTool{NikonSerialKey};
-    my $count = $$exifTool{NikonCountKey};
+    my ($et, $dirInfo, $tagTablePtr) = @_;
+    $et or return 1;    # allow dummy access
+    my $serial = $$et{NikonSerialKey};
+    my $count = $$et{NikonCountKey};
     unless (defined $serial and defined $count) {
         if (defined $serial or defined $count) {
             my $missing = defined $serial ? 'ShutterCount' : 'SerialNumber';
-            $exifTool->Warn("Can't decrypt Nikon information (no $missing key)");
+            $et->Warn("Can't decrypt Nikon information (no $missing key)");
         }
-        delete $$exifTool{NikonSerialKey};
-        delete $$exifTool{NikonCountKey};
+        delete $$et{NikonSerialKey};
+        delete $$et{NikonCountKey};
         return 0;
     }
-    my $verbose = $$dirInfo{IsWriting} ? 0 : $exifTool->Options('Verbose');
+    my $verbose = $$dirInfo{IsWriting} ? 0 : $et->Options('Verbose');
     my $tagInfo = $$dirInfo{TagInfo};
     my $data = substr(${$$dirInfo{DataPt}}, $$dirInfo{DirStart}, $$dirInfo{DirLen});
 
@@ -5825,23 +5869,23 @@ sub ProcessNikonEncrypted($$$)
 
     # must re-encrypt when writing if serial number or shutter count changes
     if ($$dirInfo{IsWriting}) {
-        if ($$exifTool{NewNikonSerialKey}) {
-            $newSerial = $$exifTool{NewNikonSerialKey};
+        if ($$et{NewNikonSerialKey}) {
+            $newSerial = $$et{NewNikonSerialKey};
             $recrypt = 1;
         }
-        if ($$exifTool{NewNikonCountKey}) {
-            $newCount = $$exifTool{NewNikonCountKey};
+        if ($$et{NewNikonCountKey}) {
+            $newCount = $$et{NewNikonCountKey};
             $recrypt = 1;
         }
     }
     if ($tagInfo and $$tagInfo{SubDirectory}) {
-        $start = $tagInfo->{SubDirectory}->{DecryptStart};
+        $start = $$tagInfo{SubDirectory}{DecryptStart};
         # may decrypt only part of the information to save time
-        if ($verbose < 3 and $exifTool->Options('Unknown') < 2 and not $recrypt) {
-            $len = $tagInfo->{SubDirectory}->{DecryptLen};
+        if ($verbose < 3 and $et->Options('Unknown') < 2 and not $recrypt) {
+            $len = $$tagInfo{SubDirectory}{DecryptLen};
         }
-        $offset = $tagInfo->{SubDirectory}->{DirOffset};
-        $byteOrder = $tagInfo->{SubDirectory}->{ByteOrder};
+        $offset = $$tagInfo{SubDirectory}{DirOffset};
+        $byteOrder = $$tagInfo{SubDirectory}{ByteOrder};
     }
     $start or $start = 0;
     if (defined $offset) {
@@ -5857,9 +5901,9 @@ sub ProcessNikonEncrypted($$$)
     $data = Decrypt(\$data, $serial, $count, $start, $len);
 
     if ($verbose > 2) {
-        $exifTool->VerboseDir("Decrypted $$tagInfo{Name}");
-        $exifTool->VerboseDump(\$data,
-            Prefix  => $exifTool->{INDENT} . '  ',
+        $et->VerboseDir("Decrypted $$tagInfo{Name}");
+        $et->VerboseDump(\$data,
+            Prefix  => $$et{INDENT} . '  ',
             DataPos => $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base} || 0),
         );
     }
@@ -5876,15 +5920,15 @@ sub ProcessNikonEncrypted($$$)
     my $oldOrder = GetByteOrder();
     SetByteOrder($byteOrder) if $byteOrder;
     if ($$dirInfo{IsWriting}) {
-        my $changed = $$exifTool{CHANGED};
-        $rtnVal = $exifTool->WriteBinaryData(\%subdirInfo, $tagTablePtr);
+        my $changed = $$et{CHANGED};
+        $rtnVal = $et->WriteBinaryData(\%subdirInfo, $tagTablePtr);
         # must re-encrypt if serial number or shutter count changes
         if ($recrypt) {
             $serial = $newSerial if defined $newSerial;
             $count = $newCount if defined $newCount;
-            ++$$exifTool{CHANGED};
+            ++$$et{CHANGED};
         }
-        if ($changed == $$exifTool{CHANGED}) {
+        if ($changed == $$et{CHANGED}) {
             undef $rtnVal;  # nothing changed so use original data
         } else {
             # add back any un-encrypted data at start
@@ -5893,7 +5937,7 @@ sub ProcessNikonEncrypted($$$)
             $rtnVal = Decrypt(\$rtnVal, $serial, $count, $start, $len);
         }
     } else {
-        $rtnVal = $exifTool->ProcessBinaryData(\%subdirInfo, $tagTablePtr);
+        $rtnVal = $et->ProcessBinaryData(\%subdirInfo, $tagTablePtr);
     }
     SetByteOrder($oldOrder);
     return $rtnVal;
@@ -5905,7 +5949,7 @@ sub ProcessNikonEncrypted($$$)
 # Returns: 1 if directory was scanned successfully
 sub PrescanExif($$$)
 {
-    my ($exifTool, $dirInfo, $tagHash) = @_;
+    my ($et, $dirInfo, $tagHash) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dataPos = $$dirInfo{DataPos} || 0;
     my $dataLen = $$dirInfo{DataLen};
@@ -5971,9 +6015,9 @@ sub PrescanExif($$$)
 # Returns: 1 on success
 sub ProcessNikonCaptureEditVersions($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     require Image::ExifTool::NikonCapture;
-    return Image::ExifTool::NikonCapture::ProcessNikonCaptureEditVersions($exifTool, $dirInfo, $tagTablePtr);
+    return Image::ExifTool::NikonCapture::ProcessNikonCaptureEditVersions($et, $dirInfo, $tagTablePtr);
 }
 
 #------------------------------------------------------------------------------
@@ -5983,7 +6027,7 @@ sub ProcessNikonCaptureEditVersions($$$)
 # Notes: This isn't a normal IFD, but is close...
 sub ProcessNikonCaptureOffsets($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart};
     my $dirLen = $$dirInfo{DirLen};
@@ -5991,15 +6035,15 @@ sub ProcessNikonCaptureOffsets($$$)
     return 0 unless $dirLen > 2;
     my $count = Get16u($dataPt, $dirStart);
     return 0 unless $count and $count * 12 + 2 <= $dirLen;
-    if ($exifTool->Options('Verbose')) {
-        $exifTool->VerboseDir('NikonCaptureOffsets', $count);
+    if ($et->Options('Verbose')) {
+        $et->VerboseDir('NikonCaptureOffsets', $count);
     }
     my $index;
     for ($index=0; $index<$count; ++$index) {
         my $pos = $dirStart + 12 * $index + 2;
         my $tagID = Get32u($dataPt, $pos);
         my $value = Get32u($dataPt, $pos + 4);
-        $exifTool->HandleTag($tagTablePtr, $tagID, $value,
+        $et->HandleTag($tagTablePtr, $tagID, $value,
             Index  => $index,
             DataPt => $dataPt,
             Start  => $pos,
@@ -6016,31 +6060,31 @@ sub ProcessNikonCaptureOffsets($$$)
 #          or new directory when writing (IsWriting set in dirInfo)
 sub ProcessNikon($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    $exifTool or return 1;    # allow dummy access
+    my ($et, $dirInfo, $tagTablePtr) = @_;
+    $et or return 1;    # allow dummy access
 
     # pre-scan IFD to get SerialNumber (0x001d) and ShutterCount (0x00a7) for use in decryption
     my %needTags = ( 0x001d => 0, 0x00a7 => undef );
-    PrescanExif($exifTool, $dirInfo, \%needTags);
-    $$exifTool{NikonSerialKey} = SerialKey($exifTool, $needTags{0x001d});
-    $$exifTool{NikonCountKey} = $needTags{0x00a7};
+    PrescanExif($et, $dirInfo, \%needTags);
+    $$et{NikonSerialKey} = SerialKey($et, $needTags{0x001d});
+    $$et{NikonCountKey} = $needTags{0x00a7};
 
     # process Nikon makernotes
     my $rtnVal;
     if ($$dirInfo{IsWriting}) {
         # get new decryptino keys if they are being changed
-        my $serial = $exifTool->GetNewValues($Image::ExifTool::Nikon::Main{0x001d});
-        my $count = $exifTool->GetNewValues($Image::ExifTool::Nikon::Main{0x00a7});
-        $$exifTool{NewNikonSerialKey} = SerialKey($exifTool, $serial);
-        $$exifTool{NewNikonCountKey} = $count;
-        $rtnVal = Image::ExifTool::Exif::WriteExif($exifTool, $dirInfo, $tagTablePtr);
-        delete $$exifTool{NewNikonSerialKey};
-        delete $$exifTool{NewNikonCountKey};
+        my $serial = $et->GetNewValues($Image::ExifTool::Nikon::Main{0x001d});
+        my $count = $et->GetNewValues($Image::ExifTool::Nikon::Main{0x00a7});
+        $$et{NewNikonSerialKey} = SerialKey($et, $serial);
+        $$et{NewNikonCountKey} = $count;
+        $rtnVal = Image::ExifTool::Exif::WriteExif($et, $dirInfo, $tagTablePtr);
+        delete $$et{NewNikonSerialKey};
+        delete $$et{NewNikonCountKey};
     } else {
-        $rtnVal = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
+        $rtnVal = Image::ExifTool::Exif::ProcessExif($et, $dirInfo, $tagTablePtr);
     }
-    delete $$exifTool{NikonSerialKey};
-    delete $$exifTool{NikonCountKey};
+    delete $$et{NikonSerialKey};
+    delete $$et{NikonCountKey};
     return $rtnVal;
 }
 
@@ -6063,7 +6107,7 @@ Nikon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

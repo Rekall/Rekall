@@ -64,6 +64,23 @@ QDomElement Document::serialize(QDomDocument &xmlDoc) const {
     return xmlData;
 }
 void Document::deserialize(const QDomElement &xmlElement) {
-    QString a = xmlElement.attribute("attribut");
+    deserializeMetadata(xmlElement);
+    QDomNode tagsNode = xmlElement.firstChild();
+    while(!tagsNode.isNull()) {
+        QDomElement tagsElement = tagsNode.toElement();
+        if((!tagsElement.isNull()) && (tagsElement.nodeName() == "tags")) {
+            QDomNode tagNode = tagsElement.firstChild();
+            while(!tagNode.isNull()) {
+                QDomElement tagElement = tagNode.toElement();
+                if((!tagElement.isNull()) && (tagElement.nodeName() == "tag")) {
+                    qreal timeStart = tagElement.attribute("timeStart").toDouble();
+                    qreal timeEnd   = tagElement.attribute("timeEnd").toDouble();
+                    createTag((TagType)tagElement.attribute("type").toInt(), timeStart, timeEnd-timeStart, tagElement.attribute("documentVersion").toInt());
+                }
+                tagNode = tagNode.nextSibling();
+            }
+        }
+        tagsNode = tagsNode.nextSibling();
+    }
 }
 

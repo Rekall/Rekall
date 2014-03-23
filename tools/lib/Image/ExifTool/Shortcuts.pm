@@ -3,11 +3,15 @@
 #
 # Description:  ExifTool shortcut tags
 #
-# Revisions:    02/07/2004 - P. Harvey Moved out of Exif.pm
-#               09/15/2004 - P. Harvey Added D70Boring from Greg Troxel
-#               01/11/2005 - P. Harvey Added Canon20D from Christian Koller
-#               03/03/2005 - P. Harvey Added user defined shortcuts
-#               03/26/2005 - P. Harvey Added Nikon from Tom Christiansen
+# Revisions:    02/07/2004 - PH Moved out of Exif.pm
+#               09/15/2004 - PH Added D70Boring from Greg Troxel
+#               01/11/2005 - PH Added Canon20D from Christian Koller
+#               03/03/2005 - PH Added user defined shortcuts
+#               03/26/2005 - PH Added Nikon from Tom Christiansen
+#               02/28/2007 - PH Removed model-dependent shortcuts
+#                            --> this is what UserDefined::Shortcuts is for
+#               02/25/2009 - PH Added Unsafe
+#               07/03/2010 - PH Added CommonIFD0
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Shortcuts;
@@ -15,9 +19,10 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.45';
+$VERSION = '1.49';
 
 # this is a special table used to define command-line shortcuts
+# (documentation Notes may be added for these via %shortcutNotes in BuildTagLookup.pm)
 %Image::ExifTool::Shortcuts::Main = (
     # this shortcut allows the three common date/time tags to be shifted at once
     AllDates => [
@@ -108,6 +113,7 @@ $VERSION = '1.45';
     # copy the maker notes as a block or prevent it from being copied
     MakerNotes => [
         'MakerNotes',   # (for RIFF MakerNotes)
+        'MakerNoteApple',
         'MakerNoteCanon',
         'MakerNoteCasio',
         'MakerNoteCasio2',
@@ -134,6 +140,7 @@ $VERSION = '1.45';
         'MakerNoteKodak7',
         'MakerNoteKodak8a',
         'MakerNoteKodak8b',
+        'MakerNoteKodak8c',
         'MakerNoteKodak9',
         'MakerNoteKodak10',
         'MakerNoteKodakUnknown',
@@ -175,6 +182,7 @@ $VERSION = '1.45';
         'MakerNoteSony2',
         'MakerNoteSony3',
         'MakerNoteSony4',
+        'MakerNoteSony5',
         'MakerNoteSonyEricsson',
         'MakerNoteSonySRF',
         'MakerNoteUnknownText',
@@ -193,6 +201,14 @@ $VERSION = '1.45';
         'InteropIFD:InteropVersion',
         'InteropIFD:RelatedImageWidth',
         'InteropIFD:RelatedImageHeight',
+    ],
+    # standard tags used to define the color space of an image
+    # (useful to preserve color space when deleting all meta information)
+    ColorSpaceTags => [
+        'ExifIFD:ColorSpace',
+        'ExifIFD:Gamma',
+        'InteropIFD:InteropIndex',
+        'ICC_Profile',
     ],
     # common metadata tags found in IFD0 of TIFF images
     CommonIFD0 => [
@@ -279,7 +295,7 @@ FocalLengthIn35mmFormat.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

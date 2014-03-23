@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.07';
+$VERSION = '1.10';
 
 sub ProcessXtra($$$);
 
@@ -135,7 +135,7 @@ my %sRegions = (
     Rectangle         => { },
     PersonDisplayName => { },
     PersonEmailDigest => { },
-    PersonLiveIdCID   => { },
+    PersonLiveIdCID   => { },  # (see http://130.15.24.88/exiftool/forum/index.php?topic=4274.msg20368#msg20368)
     PersonSourceID    => { },
 );
 %Image::ExifTool::Microsoft::MP = (
@@ -604,7 +604,7 @@ my %sRegions = (
     '{3F8472B5-E0AF-4DB2-8071-C53FE76AE7CE} 100'   => 'DueDate',
     '{C75FAA05-96FD-49E7-9CB4-9F601082D553} 100'   => 'EndDate',
     '{28636AA6-953D-11D2-B5D6-00C04FD918D0} 12'    => 'FileCount',
-    '{41CF5AE0-F75A-4806-BD87-59C7D9248EB9} 100'   => 'Filename',
+    '{41CF5AE0-F75A-4806-BD87-59C7D9248EB9} 100'   => 'WindowsFileName',
     '{67DF94DE-0CA7-4D6F-B792-053A3E4F03CF} 100'   => 'FlagColor',
     '{E3E0584C-B788-4A5A-BB20-7F5A44C9ACDD} 12'    => 'FlagStatus',
     '{9B174B35-40FF-11D2-A27E-00C04FC30871} 2'     => 'SpaceFree',
@@ -654,7 +654,7 @@ my %sRegions = (
     '{64440492-4C8B-11D1-8B70-080036B11A03} 36'    => 'EncodedBy',
     '{64440492-4C8B-11D1-8B70-080036B11A03} 22'    => 'Producers',
     '{64440492-4C8B-11D1-8B70-080036B11A03} 30'    => 'Publisher',
-    '{56A3372E-CE9C-11D2-9F0E-006097C686F6} 38'    => 'Subtitle',
+    '{56A3372E-CE9C-11D2-9F0E-006097C686F6} 38'    => 'SubTitle',
     '{64440492-4C8B-11D1-8B70-080036B11A03} 34'    => 'UserWebURL',
     '{64440492-4C8B-11D1-8B70-080036B11A03} 23'    => 'Writers',
     '{E3E0584C-B788-4A5A-BB20-7F5A44C9ACDD} 21'    => 'Attachments',
@@ -752,12 +752,12 @@ my %sRegions = (
 # Reference: http://code.google.com/p/mp4v2/
 sub ProcessXtra($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dataPos = $$dirInfo{Base} || 0;
     my $dataLen = $$dirInfo{DataLen};
     my $pos = 0;
-    $exifTool->VerboseDir('Xtra', 0, $dataLen);
+    $et->VerboseDir('Xtra', 0, $dataLen);
     for (;;) {
         last if $pos + 4 > $dataLen;
         my $size = Get32u($dataPt, $pos); # (includes $size word)
@@ -768,7 +768,7 @@ sub ProcessXtra($$$)
         my $version = Get32u($dataPt, $pos + $tagLen + 8);
         # (have seen a vers=2 type=8 tag that seems to work just like vers=1 - PH)
         if ($version > 2) {
-            $exifTool->WarnOnce("Unsupported Xtra version ($version)");
+            $et->WarnOnce("Unsupported Xtra version ($version)");
             $pos += $size;
             next;
         }
@@ -784,7 +784,7 @@ sub ProcessXtra($$$)
         SetByteOrder('II');
         if ($valType == 8) {
             $format = 'Unicode';
-            $val = $exifTool->Decode($val, 'UCS2');
+            $val = $et->Decode($val, 'UCS2');
         } elsif ($valType == 19 and $valLen == 8) {
             $format = 'int64u';
             $val = Get64u(\$val, 0);
@@ -804,7 +804,7 @@ sub ProcessXtra($$$)
             require Image::ExifTool::FlashPix;
             my $vPos = $valPos; # (necessary because ReadFPXValue updates this)
             # read entry as a VT_VARIANT (use FlashPix module for this)
-            $val = Image::ExifTool::FlashPix::ReadFPXValue($exifTool, $dataPt, $vPos,
+            $val = Image::ExifTool::FlashPix::ReadFPXValue($et, $dataPt, $vPos,
                    Image::ExifTool::FlashPix::VT_VARIANT(), $valPos+$valLen, 1);
         } else {
             $format = "Unknown($valType)";
@@ -812,7 +812,7 @@ sub ProcessXtra($$$)
         SetByteOrder('MM'); # back to native QuickTime byte ordering
         
         if ($tagLen > 0 and $valLen > 0) {
-            my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+            my $tagInfo = $et->GetTagInfo($tagTablePtr, $tag);
             unless ($tagInfo) {
                 # generate tag information for unrecognized tags
                 my $name = $tag;
@@ -823,7 +823,7 @@ sub ProcessXtra($$$)
                     AddTagToTable($tagTablePtr, $tag, $tagInfo);
                 }
             }
-            $exifTool->HandleTag($tagTablePtr, $tag, $val,
+            $et->HandleTag($tagTablePtr, $tag, $val,
                 TagInfo => $tagInfo,
                 DataPt  => $dataPt,
                 DataPos => $dataPos,
@@ -857,7 +857,7 @@ Microsoft-specific EXIF and XMP tags.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -9,7 +9,7 @@
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               2) Joachim Loehr private communication
 #               3) http://homepage3.nifty.com/kamisaka/makernote/makernote_casio.htm
-#               4) http://www.gvsoft.homedns.org/exif/makernote-casio.html
+#               4) http://gvsoft.homedns.org/exif/makernote-casio-type1.html
 #               5) Robert Chi private communication (EX-F1)
 #               6) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3701.html
 #               JD) Jens Duttke private communication
@@ -1987,7 +1987,7 @@ Casio maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

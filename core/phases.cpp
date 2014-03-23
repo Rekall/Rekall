@@ -185,3 +185,23 @@ QDomElement Phases::serialize(QDomDocument &xmlDoc) const {
 void Phases::deserialize(const QDomElement &xmlElement) {
     QString a = xmlElement.attribute("attribut");
 }
+
+
+void Phases::reset(const QString &filterText, QStringList checksOnly) {
+    for(quint16 i = 0 ; i < ui->filter->count() ; i++)
+        if(ui->filter->itemText(i) == filterText) {
+            ui->filter->setCurrentIndex(i);
+            break;
+        }
+    QApplication::processEvents();
+    if(checksOnly.count()) {
+        for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
+            if(!ui->checks->topLevelItem(i)->isHidden()) {
+                if(checksOnly.contains(ui->checks->topLevelItem(i)->text(0)))
+                    ui->checks->topLevelItem(i)->setCheckState(0, Qt::Checked);
+                else
+                    ui->checks->topLevelItem(i)->setCheckState(0, Qt::Unchecked);
+            }
+        }
+    }
+}

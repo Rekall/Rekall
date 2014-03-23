@@ -18,36 +18,44 @@ void TaskProcess::init() {
 void TaskProcess::run() {
     started = true;
     if(document.type == TaskProcessTypeMetadata) {
-        qreal mediaDuration = 0;
         document.metadata->status = DocumentStatusProcessing;
         emit(updateList(this, FeedItemBaseTypeProcessingStart));
         emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Starting analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
         QDir().mkpath(Global::pathCurrent.absoluteFilePath() + "/rekall_cache");
         bool shouldSendFinishedSignal = true;
 
-        if(document.metadata->getType(document.version) == DocumentTypeWeb) {
+        if((document.needCompleteScan) && (document.metadata->getType(document.version) == DocumentTypeWeb)) {
             thumbFilepath = Global::cacheFile("thumb", QCryptographicHash::hash(qPrintable(document.metadata->getMetadata("Rekall", "URL", document.version).toString()), QCryptographicHash::Sha1).toHex().toUpper());
             thumbFilename = thumbFilepath + ".jpg";
-            emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Loading web page <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
-            emit(analyseWebContent(this));
-            shouldSendFinishedSignal = false;
-        }
-        else if(document.metadata->getType(document.version) == DocumentTypePeople) {
-            //People
-            QList<Person*> persons = Person::fromFile(file.absoluteFilePath());
-            foreach(Person *person, persons)
-                Global::currentProject->addPerson(person);
+            if(!QFile(thumbFilename).exists()) {
+                emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Loading web page <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
+                emit(analyseWebContent(this));
+                shouldSendFinishedSignal = false;
+            }
         }
         else {
+            if((document.needCompleteScan) && (document.metadata->getType(document.version) == DocumentTypePeople)) {
+                //People
+                QList<Person*> persons = Person::fromFile(file.absoluteFilePath());
+                foreach(Person *person, persons)
+                    Global::currentProject->addPerson(person);
+            }
+
             thumbFilepath = Global::cacheFile("thumb", file);
             thumbFilename = thumbFilepath + ".jpg";
 
             //Hash
-            emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Calculating hash of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
-            document.metadata->setMetadata("File", "Hash", Global::getFileHash(file), document.version);
+            if(file.exists()) {
+                emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Calculating hash of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
+                QString documentHash = Global::getFileHash(file);
+                if(documentHash != document.metadata->getMetadata("File", "Hash", document.version).toString()) {
+                    document.needCompleteScan = true;
+                    document.metadata->setMetadata("File", "Hash", documentHash, document.version);
+                }
+            }
 
             //Extract meta with ExifTool
-            if(true) {
+            if(document.needCompleteScan) {
                 emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Extracting metadatas of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
                 QStringList exifDatas = launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", Global::pathApplication.absoluteFilePath() + "/tools", QStringList() << "−c" << "%+.6f" << "-d" << "%Y:%m:%d %H:%M:%S" << "-G" << file.absoluteFilePath())).second.split("\n");
                 foreach(const QString &exifData, exifDatas) {
@@ -64,10 +72,8 @@ void TaskProcess::run() {
                         }
                         if((meta.second.first.toLower().contains("duration")) && (!(meta.second.first.toLower().contains("value")))) {
                             qreal duration = Global::getDurationFromString(meta.second.second);
-                            if(duration) {
-                                mediaDuration = duration;
+                            if(duration)
                                 document.metadata->setMetadata("Rekall", "Media Duration", duration, document.version);
-                            }
                         }
                         if(meta.second.first.toLower().contains("author"))
                             document.metadata->setMetadata("Rekall", "Author", meta.second.second, document.version);
@@ -166,6 +172,8 @@ void TaskProcess::run() {
 
             //Video thumbnails
             if(document.metadata->getType() == DocumentTypeVideo) {
+                qreal mediaDuration = document.metadata->getMetadata("Rekall", "Media Duration", document.version).toDouble();
+
                 emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating video thumbnails of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
                 //qDebug("===> %s", qPrintable(QDir(Global::pathCurrent.absoluteFilePath() + "/").relativeFilePath(data.metadata->file.absoluteFilePath())));
                 quint16 thumbsNumber = qCeil(mediaDuration / Global::thumbsEach);

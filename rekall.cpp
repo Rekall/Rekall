@@ -46,12 +46,12 @@ Rekall::Rekall(QWidget *parent) :
     connect(currentProject, SIGNAL(refreshMetadata()), SLOT(refreshAndLastMetadata()));
 
     Global::phases                = new Phases(0);
-    Global::tagFilterCriteria     = new Sorting(tr("Filter rules"),     6);
-    Global::tagSortCriteria       = new Sorting(tr("Sorting rules"),    2);
-    Global::tagColorCriteria      = new Sorting(tr("Color rules"),      5);
-    Global::tagTextCriteria       = new Sorting(tr("Text rules"),       0);
-    Global::tagClusterCriteria    = new Sorting(tr("Hightlight rules"), 7, true);
-    Global::tagHorizontalCriteria = new Sorting(tr("Horizontal rules"), 1, false, true);
+    Global::tagFilterCriteria     = new Sorting(tr("Filter by documents"),     6);
+    Global::tagSortCriteria       = new Sorting(tr("Sort by documents"),    2);
+    Global::tagColorCriteria      = new Sorting(tr("Color depends on documents"),      5);
+    Global::tagTextCriteria       = new Sorting(tr("Text on timeline is documents"),       0);
+    Global::tagClusterCriteria    = new Sorting(tr("Hightlight on documents"), 7, true);
+    Global::tagHorizontalCriteria = new Sorting(tr("Horizontal scale is documents"), 1, false, true);
 
     QString styleAdditionnal = "QWidget#Sorting, QWidget#Phases, QWidget#TimelineControl { background-color: transparent;}";
     Global::tagFilterCriteria    ->setStyleSheet(styleSheet() + styleAdditionnal);
@@ -548,7 +548,7 @@ void Rekall::timerEvent(QTimerEvent *) {
 
     if(openProject) {
         openProject = false;
-        currentProject->open(QFileInfoList() << Global::pathCurrent, ui->chutier, true);
+        currentProject->open(QFileInfoList() << Global::pathCurrent, ui->chutier, false);
         ui->chutier->getTree()->collapseAll();
         for(quint16 i = 0 ; i < ui->chutier->getTree()->topLevelItemCount() ; i++)
             ui->chutier->getTree()->expandItem(ui->chutier->getTree()->topLevelItem(i));
