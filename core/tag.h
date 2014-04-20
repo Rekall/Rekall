@@ -128,8 +128,8 @@ public:
     inline const QRectF getViewerBoundingRect()   const { return viewerBoundingRect;   }
     const QRectF paintTimeline(bool before = false);
     const QRectF paintViewer(quint16 tagIndex);
-    bool  mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool);
-    bool  mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool);
+    bool  mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool);
+    bool  mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool);
 
 public:
     bool tagHistoryFilters() const;

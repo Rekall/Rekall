@@ -933,6 +933,7 @@ QMenu::item:enabled:selected {
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -1035,6 +1036,14 @@ QMenu::item:enabled:selected {
    </property>
    <property name="shortcut">
     <string>Backspace</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open a folder</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
  </widget>

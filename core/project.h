@@ -37,6 +37,7 @@ private:
     QList<Tag*> viewerTags, eventsTags;
     QMap<QString, QMap<QString, QMap<QString, QList<Tag*> > > > timelineSortTags;
     QMap< QPair<QString, QString>, Cluster*> timelineClusters;
+    QPolygonF lassoPoints;
 public:
     Document* getDocument         (const QString &name) const;
     Document* getDocumentAndSelect(const QString &name) const;
@@ -54,8 +55,8 @@ private:
 public:
     const QRectF paintTimeline(bool before = false);
     const QRectF paintViewer();
-    bool mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool);
-    bool mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool);
+    bool mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool);
+    bool mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool);
 
 public:
     const QPointF getTimelineCursorPos(qreal) const;

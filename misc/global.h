@@ -58,8 +58,8 @@ public:
 public:
     virtual const QRectF paintTimeline(bool before = false)                                    = 0;
     virtual const QRectF paintViewer  ()                                                       = 0;
-    virtual       bool   mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool) = 0;
-    virtual       bool   mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool) = 0;
+    virtual       bool   mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool) = 0;
+    virtual       bool   mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool) = 0;
 };
 
 class GlVideo {
@@ -259,7 +259,8 @@ public:
     static QTime timer;
     static Sorting *tagSortCriteria, *tagColorCriteria, *tagTextCriteria, *tagClusterCriteria, *tagFilterCriteria, *tagHorizontalCriteria;
     static Phases *phases;
-    static void *selectedTagInAction, *selectedTag, *selectedTagHover, *timeMarkerAdded;
+    static void *selectedTagHover, *timeMarkerAdded;
+    static QList<void*> selectedTags, selectedTagsInAction;
     static QPair<qreal, qreal> selectedTagHoverSnapped;
     static QMap<QString,void*> renders;
     static qreal selectedTagStartDrag;

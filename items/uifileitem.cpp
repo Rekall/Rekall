@@ -115,7 +115,7 @@ void UiFileItem::populate(const QFileInfo &file) {
 
 
 
-bool UiFileItem::askForDeletion(UiSyncItem *, bool dialog) {
+bool UiFileItem::askForDeletion(UiSyncItem *, bool) {
     setHidden(true);
     return false;
 }

@@ -49,8 +49,6 @@ void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
         document->updateFeed();
     }
 
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
-
     foreach(const QFileInfo &file, files) {
         QDir dir(file.absoluteFilePath());
         if(file.isFile())
@@ -58,6 +56,11 @@ void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
         UiFileItem::syncWith(QFileInfoList() << dir.absolutePath(), view->getTree());
         open(dir, dir, debug);
     }
+
+    foreach(Person *person, persons)
+        person->updateGUI();
+
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
 }
 void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
@@ -86,7 +89,7 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
                     tag->init();
             }
             else if(document->updateFile(file, dirBase)) {
-                document->createTag();
+                document->createTag(TagTypeGlobal);
                 document->updateFeed();
             }
 
@@ -149,8 +152,9 @@ Document* Project::getDocumentAndSelect(const QString &name) const {
     foreach(Document *document, documents) {
         if(document->file.absoluteFilePath() == name) {
             documentRetour = document;
+            Global::selectedTags.clear();
             foreach(Tag *tag, document->tags)
-                Global::selectedTag = tag;
+                Global::selectedTags.append(tag);
         }
     }
     return documentRetour;
@@ -265,8 +269,8 @@ void Project::fireEvents() {
     }
 
     //Opacity
-    if((Global::selectedTag) && (Global::timelineGL->showLegendDest))  categoryColorOpacityDest = 0.3;
-    else                                                               categoryColorOpacityDest = 1;
+    if((Global::selectedTags.count()) && (Global::timelineGL->showLegendDest))  categoryColorOpacityDest = 0.3;
+    else                                                                        categoryColorOpacityDest = 1;
     categoryColorOpacity = categoryColorOpacity + (categoryColorOpacityDest - categoryColorOpacity) / Global::inertie;
     QMutableMapIterator<QString, QPair<QColor, qreal> > colorForMetaIterator(Global::colorForMeta);
     while(colorForMetaIterator.hasNext()) {
@@ -275,8 +279,8 @@ void Project::fireEvents() {
         if((color.alphaF() == 1) && (categoryColorOpacityDest == 1)) {}
         else
             color.setAlphaF(categoryColorOpacity);
-        if(Global::selectedTag) {
-            if(Tag::getCriteriaColorFormated((Tag*)Global::selectedTag) == colorForMetaIterator.key())
+        foreach(void *selectedTag, Global::selectedTags) {
+            if(Tag::getCriteriaColorFormated((Tag*)selectedTag) == colorForMetaIterator.key())
                 color.setAlphaF(1);
         }
         colorForMetaIterator.setValue(qMakePair(color, colorForMetaIterator.value().second));
@@ -496,9 +500,9 @@ const QRectF Project::paintTimeline(bool before) {
                         QPointF tagPosOffset;
 
                         //Category in selection
-                        tagCategoryIsSelected |= (tag == Global::selectedTag);
+                        tagCategoryIsSelected |= (Global::selectedTags.contains(tag) == true);
+                        tagCategoryIsSelected |= (Global::selectedTagsInAction.contains(tag) == true);
                         tagCategoryIsSelected |= (tag == Global::selectedTagHover);
-                        tagCategoryIsSelected |= (tag == Global::selectedTagInAction);
 
                         //Get info about category and analysis
                         if(tagCategory.isEmpty()) {
@@ -671,6 +675,17 @@ const QRectF Project::paintTimeline(bool before) {
                 tag->paintTimeline(before);
     }
     glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height());
+
+
+    //Selection lasso
+    if(lassoPoints.count()) {
+        glBegin(GL_LINE_STRIP);
+        Global::timelineGL->qglColor(Global::colorCluster);
+        foreach(const QPointF &lassoPoint, lassoPoints)
+            glVertex2f(lassoPoint.x(), lassoPoint.y());
+        glEnd();
+    }
+
     return retour;
 }
 
@@ -708,6 +723,7 @@ const QRectF Project::paintViewer() {
             previousTag = tag;
         }
     }
+
     return retour;
 }
 
@@ -719,7 +735,7 @@ const QPointF Project::getTimelineCursorPos(qreal time) const {
 qreal Project::getTimelineCursorTime(const QPointF &pos) const {
     qreal cursorTime = qMax(0., (pos.x() - Global::timelineHeaderSize.width() - Global::timelineGlobalDocsWidth) / Global::timeUnit);
     Global::selectedTagHoverSnapped.first = Global::selectedTagHoverSnapped.second = -1;
-    if((Global::selectedTagHover) && (Global::selectedTagHover != Global::selectedTagInAction))
+    if((Global::selectedTagHover) && (!Global::selectedTagsInAction.contains(Global::selectedTagHover)))
         ((Tag*)Global::selectedTagHover)->snapTime(&cursorTime);
     Global::timelineGL->tagSnapSlowDest = Global::timelineGL->tagSnapDest = ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0));
     return cursorTime;
@@ -759,8 +775,9 @@ qreal Project::getViewerCursorTime(const QPointF &pos) const {
     return time;
 }
 
-bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool stay, bool action, bool press) {
+bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool stay, bool action, bool press, bool release) {
     bool mouseOnTag = false;
+    QList<void*> tagsInLasso;
     Global::selectedTagHover = 0;
     QMapIterator<QString, QMap<QString, QMap<QString, QList<Tag*> > > > categoriesInPhasesIterator(timelineSortTags);
     while(categoriesInPhasesIterator.hasNext()) {
@@ -771,15 +788,31 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
             QMapIterator<QString, QList<Tag*> > tagsInClusterIterator(clustersInCategoriesIterator.value());
             while(tagsInClusterIterator.hasNext()) {
                 tagsInClusterIterator.next();
-                foreach(Tag *tag, tagsInClusterIterator.value())
-                    mouseOnTag |= tag->mouseTimeline(pos, e, dbl, stay, action, press);
+                foreach(Tag *tag, tagsInClusterIterator.value()) {
+                    mouseOnTag |= tag->mouseTimeline(pos, e, dbl, stay, action, press, release);
+                    if(lassoPoints.containsPoint(tag->getTimelineBoundingRect().translated(tag->timelinePos).translated(0, Global::timelineHeaderSize.height()).center(), Qt::WindingFill)) {
+                        tagsInLasso << tag;
+                    }
+                }
             }
         }
     }
 
+    if((e) && (!mouseOnTag) && (release || ((e->buttons() & Qt::LeftButton) == Qt::LeftButton))) {
+        if(press)
+            lassoPoints.clear();
+        else if(release) {
+            lassoPoints.clear();
+            Global::selectedTags = tagsInLasso;
+        }
+        else
+            lassoPoints << pos;
+    }
+
+
     if(!mouseOnTag) {
-        Global::selectedTagInAction = 0;
-        Global::selectedTagHover    = 0;
+        Global::selectedTagsInAction.clear();
+        Global::selectedTagHover = 0;
         if(press) {
             for(quint16 i = 0 ; i < guiCategories.count() ; i++) {
                 if(guiCategories.at(i).first.contains(pos)) {
@@ -837,14 +870,14 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
     }
     return mouseOnTag;
 }
-bool Project::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool stay, bool action, bool press) {
+bool Project::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool stay, bool action, bool press, bool release) {
     bool mouseOnTag = false;
     foreach(Tag *tag, viewerTags)
-        mouseOnTag |= tag->mouseViewer(pos, e, dbl, stay, action, press);
+        mouseOnTag |= tag->mouseViewer(pos, e, dbl, stay, action, press, release);
 
     if(!mouseOnTag) {
-        Global::selectedTagInAction = 0;
-        Global::selectedTag         = 0;
+        Global::selectedTagsInAction.clear();
+        Global::selectedTags.clear();
     }
     return mouseOnTag;
 }

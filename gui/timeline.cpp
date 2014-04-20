@@ -50,6 +50,15 @@ const QRectF Timeline::paintTimeline(bool before) {
     glLineWidth(1);
 
     if(before) {
+        //First init
+        if(ticks.count() == 0) {
+            for(quint16 i = 0 ; i < 100 ; i++) {
+                GlText text;
+                text.setStyle(QSize(50., Global::timelineHeaderSize.height()), Qt::AlignCenter, Global::fontSmall);
+                ticks.append(text);
+            }
+        }
+
         //Ticks
         while(ticks.count() < qFloor(Global::currentProject->totalTime() / Global::timeUnitTick)) {
             GlText text;
@@ -153,19 +162,19 @@ bool Timeline::jumpTo() {
         seek(time, true, true);
     return ok;
 }
-bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool action, bool press) {
+bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool action, bool press, bool) {
     if((action) && (press)) {
         if(dbl)
             jumpTo();
         else if(Global::tagHorizontalCriteria->isTimeline())
             seek(Global::currentProject->getTimelineCursorTime(pos), false, true);
-        Global::selectedTagInAction = 0;
-        Global::selectedTag         = 0;
+        Global::selectedTagsInAction.clear();
+        Global::selectedTags.clear();
         return true;
     }
     return false;
 }
-bool Timeline::mouseViewer(const QPointF &, QMouseEvent *, bool, bool, bool, bool) {
+bool Timeline::mouseViewer(const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool) {
     return false;
 }
 

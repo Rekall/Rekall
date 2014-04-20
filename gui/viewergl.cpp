@@ -77,13 +77,13 @@ void ViewerGL::mouseReleaseEvent(QMouseEvent *e) {
     mouseTimerOk = false;
     mouseTimer.stop();
     mouseMove(e, false, false, false);
-    Global::selectedTagInAction = 0;
+    Global::selectedTagsInAction.clear();
 }
 void ViewerGL::mouseDoubleClickEvent(QMouseEvent *e) {
     mouseMove(e, true, false, true);
 }
 void ViewerGL::leaveEvent(QEvent *) {
-    Global::selectedTagInAction = 0;
+    Global::selectedTagsInAction.clear();
     Global::selectedTagHover    = 0;
 }
 void ViewerGL::mouseMoveLong() {
@@ -95,16 +95,16 @@ void ViewerGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press) {
     if(e)   mousePos += e->posF();
     else    mousePos += mouseTimerPos;
     bool action = true;
-    if(Global::selectedTagInAction) {
-        Tag *selectedTag = (Tag*)Global::selectedTagInAction;
+    foreach(void *selectedTagInAction, Global::selectedTagsInAction) {
+        Tag *selectedTag = (Tag*)selectedTagInAction;
         if(Global::selectedTagMode == TagSelectionMove)
             selectedTag->moveTimeStart(Global::currentProject->getViewerCursorTime(mousePos));
         action = false;
     }
     if(e) {
         bool ok = false;
-        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseViewer(mousePos, e, dbl, stay, action, press);
-        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseViewer(mousePos, e, dbl, stay, action, press);
+        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseViewer(mousePos, e, dbl, stay, action, press, false);
+        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseViewer(mousePos, e, dbl, stay, action, press, false);
     }
 }
 void ViewerGL::wheelEvent(QWheelEvent *e) {

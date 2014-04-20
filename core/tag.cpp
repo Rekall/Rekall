@@ -183,10 +183,10 @@ const QRectF Tag::paintTimeline(bool before) {
         if(timelineBoundingRect.width() < timelineBoundingRect.height())
             timelineBoundingRect.adjust(-(timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0, (timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0);
 
-        QColor colorDestTmp = (Global::selectedTag == this)?(Global::colorTimeline):(document->baseColor);
+        QColor colorDestTmp = (Global::selectedTags.contains(this) == true)?(Global::colorTimeline):(document->baseColor);
         if(document->status == DocumentStatusWaiting)
             colorDestTmp.setAlphaF(0.1);
-        if((document->status == DocumentStatusProcessing) || (Global::selectedTag == this))
+        if((document->status == DocumentStatusProcessing) || (Global::selectedTags.contains(this) == true))
             colorDestTmp.setAlphaF(Global::breathingFast);
         if(!Global::tagHorizontalCriteria->isTimeline()) {
             if((Global::timerPlay) && !((0.001 < progression) && (progression < 0.999))) colorDestTmp.setAlphaF(0.2);
@@ -281,7 +281,7 @@ const QRectF Tag::paintTimeline(bool before) {
             if(getType() != TagTypeGlobal) {
                 Global::timelineGL->qglColor(realTimeColor);
 
-                if(Global::selectedTag == this) {
+                if(Global::selectedTags.contains(this)) {
                     textPos = QPoint(timelineBoundingRect.left() - 2 - timelineTimeStartText.size.width(), 1 + timelineBoundingRect.center().y() - timelineTimeStartText.size.height()/2);
                     timelineTimeStartText.drawText(Sorting::timeToString(getTimeStart()), textPos);
 
@@ -310,7 +310,7 @@ const QRectF Tag::paintTimeline(bool before) {
             }
 
             //Selection anchors
-            if((Global::selectedTag == this) && (getType() == TagTypeContextualTime) && (document->getFunction() == DocumentFunctionContextual)) {
+            if((Global::selectedTags.contains(this)) && (getType() == TagTypeContextualTime) && (document->getFunction() == DocumentFunctionContextual)) {
                 Global::timelineGL->qglColor(Global::colorBackground);
                 glBegin(GL_LINES);
                 glVertex2f(timelineBoundingRect.topLeft()    .x() + 10, timelineBoundingRect.topLeft()    .y());
@@ -490,62 +490,64 @@ const QRectF Tag::paintTimeline(bool before) {
         }
 
         //Snapping
-        if((Global::selectedTagInAction) && (Global::selectedTagHover == this) && ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0))) {
-            Tag *snappedTag = (Tag*)Global::selectedTagInAction;
-            qint16 posStart = Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * Global::selectedTagHoverSnapped.first  - timelinePos.x();
-            qint16 posEnd   = Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * Global::selectedTagHoverSnapped.second - timelinePos.x();
+        if((Global::selectedTagsInAction.count()) && (Global::selectedTagHover == this) && ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0))) {
+            foreach(void *selectedTagInAction, Global::selectedTagsInAction) {
+                Tag *snappedTag = (Tag*)selectedTagInAction;
+                qint16 posStart = Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * Global::selectedTagHoverSnapped.first  - timelinePos.x();
+                qint16 posEnd   = Global::timelineHeaderSize.width() + Global::timelineGlobalDocsWidth + Global::timeUnit * Global::selectedTagHoverSnapped.second - timelinePos.x();
 
-            QList< QPair<QPointF, QPointF> > pointsToDraw;
-            bool progressive = true;
+                QList< QPair<QPointF, QPointF> > pointsToDraw;
+                bool progressive = true;
 
-            if((Global::selectedTagMode == TagSelectionMove) && ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0))) {
-                if((Global::selectedTagHoverSnapped.first >= 0) && (Global::selectedTagHoverSnapped.second >= 0)) {
-                    progressive = false;
-                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.left(),  timelineBoundingRect.center().y()),
-                                                  QPointF(posStart, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
-                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.left(),  timelineBoundingRect.center().y()),
-                                                  QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).left(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
-                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.right(), timelineBoundingRect.center().y()),
-                                                  QPointF(posEnd, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
-                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.right(), timelineBoundingRect.center().y()),
-                                                  QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).right(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                if((Global::selectedTagMode == TagSelectionMove) && ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0))) {
+                    if((Global::selectedTagHoverSnapped.first >= 0) && (Global::selectedTagHoverSnapped.second >= 0)) {
+                        progressive = false;
+                        pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.left(),  timelineBoundingRect.center().y()),
+                                                      QPointF(posStart, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                        pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.left(),  timelineBoundingRect.center().y()),
+                                                      QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).left(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                        pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.right(), timelineBoundingRect.center().y()),
+                                                      QPointF(posEnd, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                        pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.right(), timelineBoundingRect.center().y()),
+                                                      QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).right(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                    }
+                    else if(Global::selectedTagHoverSnapped.first >= 0)
+                        pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.left(), timelineBoundingRect.center().y()),
+                                                      QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).right(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                    else if(Global::selectedTagHoverSnapped.second >= 0)
+                        pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.right(), timelineBoundingRect.center().y()),
+                                                      QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).left(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
                 }
                 else if(Global::selectedTagHoverSnapped.first >= 0)
-                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.left(), timelineBoundingRect.center().y()),
-                                                  QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).right(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                    pointsToDraw.append(qMakePair(QPointF(posStart, timelineBoundingRect.center().y()),
+                                                  QPointF(posStart, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
                 else if(Global::selectedTagHoverSnapped.second >= 0)
-                    pointsToDraw.append(qMakePair(QPointF(timelineBoundingRect.right(), timelineBoundingRect.center().y()),
-                                                  QPointF(snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).left(), snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
-            }
-            else if(Global::selectedTagHoverSnapped.first >= 0)
-                pointsToDraw.append(qMakePair(QPointF(posStart, timelineBoundingRect.center().y()),
-                                              QPointF(posStart, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
-            else if(Global::selectedTagHoverSnapped.second >= 0)
-                pointsToDraw.append(qMakePair(QPointF(posEnd, timelineBoundingRect.center().y()),
-                                              QPointF(posEnd, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
+                    pointsToDraw.append(qMakePair(QPointF(posEnd, timelineBoundingRect.center().y()),
+                                                  QPointF(posEnd, snappedTag->timelineBoundingRect.translated(snappedTag->timelinePos).translated(-timelinePos).center().y())));
 
-            Global::timelineGL->qglColor(Global::colorCluster);
-            glLineStipple(5, 0xAAAA);
-            glEnable(GL_LINE_STIPPLE);
-            GLfloat hashChordPts[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-            for(quint16 i = 0 ; i < pointsToDraw.count() ; i+=2) {
-                QPointF hashChordBeg, hashChordEnd;
-                hashChordBeg = (pointsToDraw.at(i).first  * (Global::timelineGL->tagSnapSlow)) + (pointsToDraw.at(qMin(pointsToDraw.count()-1, i+1)).first  * (1-Global::timelineGL->tagSnapSlow));
-                hashChordEnd = (pointsToDraw.at(i).second * (Global::timelineGL->tagSnapSlow)) + (pointsToDraw.at(qMin(pointsToDraw.count()-1, i+1)).second * (1-Global::timelineGL->tagSnapSlow));
-                hashChordPts[0][0] = hashChordBeg.x(); hashChordPts[0][1] = hashChordBeg.y();
-                hashChordPts[1][0] = hashChordBeg.x(); hashChordPts[1][1] = hashChordBeg.y() + (hashChordEnd.y() - hashChordBeg.y()) * 0.66;
-                hashChordPts[2][0] = hashChordEnd.x(); hashChordPts[2][1] = hashChordEnd.y() + (hashChordBeg.y() - hashChordEnd.y()) * 0.66;
-                hashChordPts[3][0] = hashChordEnd.x(); hashChordPts[3][1] = hashChordEnd.y();
-                glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &hashChordPts[0][0]);
-                glEnable(GL_MAP1_VERTEX_3);
-                glBegin(GL_LINE_STRIP);
-                qreal tMax = 1.05;  if(progressive) tMax *= Global::timelineGL->tagSnap;
-                for(qreal t = 0 ; t <= tMax; t += 0.05)
-                    glEvalCoord1f(t);
-                glEnd();
-                glDisable(GL_MAP1_VERTEX_3);
+                Global::timelineGL->qglColor(Global::colorCluster);
+                glLineStipple(5, 0xAAAA);
+                glEnable(GL_LINE_STIPPLE);
+                GLfloat hashChordPts[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+                for(quint16 i = 0 ; i < pointsToDraw.count() ; i+=2) {
+                    QPointF hashChordBeg, hashChordEnd;
+                    hashChordBeg = (pointsToDraw.at(i).first  * (Global::timelineGL->tagSnapSlow)) + (pointsToDraw.at(qMin(pointsToDraw.count()-1, i+1)).first  * (1-Global::timelineGL->tagSnapSlow));
+                    hashChordEnd = (pointsToDraw.at(i).second * (Global::timelineGL->tagSnapSlow)) + (pointsToDraw.at(qMin(pointsToDraw.count()-1, i+1)).second * (1-Global::timelineGL->tagSnapSlow));
+                    hashChordPts[0][0] = hashChordBeg.x(); hashChordPts[0][1] = hashChordBeg.y();
+                    hashChordPts[1][0] = hashChordBeg.x(); hashChordPts[1][1] = hashChordBeg.y() + (hashChordEnd.y() - hashChordBeg.y()) * 0.66;
+                    hashChordPts[2][0] = hashChordEnd.x(); hashChordPts[2][1] = hashChordEnd.y() + (hashChordBeg.y() - hashChordEnd.y()) * 0.66;
+                    hashChordPts[3][0] = hashChordEnd.x(); hashChordPts[3][1] = hashChordEnd.y();
+                    glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &hashChordPts[0][0]);
+                    glEnable(GL_MAP1_VERTEX_3);
+                    glBegin(GL_LINE_STRIP);
+                    qreal tMax = 1.05;  if(progressive) tMax *= Global::timelineGL->tagSnap;
+                    for(qreal t = 0 ; t <= tMax; t += 0.05)
+                        glEvalCoord1f(t);
+                    glEnd();
+                    glDisable(GL_MAP1_VERTEX_3);
+                }
+                glDisable(GL_LINE_STIPPLE);
             }
-            glDisable(GL_LINE_STIPPLE);
         }
         glPopMatrix();
     }
@@ -578,9 +580,9 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         glTranslatef(-qRound(viewerBoundingRect.center().x()), -qRound(viewerBoundingRect.center().y()), 0);
 
         //Selection
-        if(Global::selectedTag == this) {
+        if(Global::selectedTags.contains(this)) {
             QColor color = Global::colorTimeline;
-            if((document->status == DocumentStatusProcessing) || (Global::selectedTag == this))
+            if((document->status == DocumentStatusProcessing) || (Global::selectedTags.contains(this)))
                 color.setAlphaF(Global::breathingFast);
             Global::viewerGL->qglColor(color);
             GlRect::drawRect(viewerBoundingRect);
@@ -668,9 +670,9 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
         }
 
         //Texte
-        if((isBlinking) || (isInProgress))                                                                                                  Global::viewerGL->qglColor(Qt::white);
-        else if(((Global::selectedTag == this) || ((isTagLastVersion(this) && (!hasThumbnail)))) && (document->getType() != DocumentTypeMarker)) Global::viewerGL->qglColor(Qt::black);
-        else                                                                                                                                Global::viewerGL->qglColor(barColor);
+        if((isBlinking) || (isInProgress))                                                                                                               Global::viewerGL->qglColor(Qt::white);
+        else if(((Global::selectedTags.contains(this)) || ((isTagLastVersion(this) && (!hasThumbnail)))) && (document->getType() != DocumentTypeMarker)) Global::viewerGL->qglColor(Qt::black);
+        else                                                                                                                                             Global::viewerGL->qglColor(barColor);
         QString texte = document->getName(version);
         if(getType() == TagTypeContextualTime)
             texte += QString(" (%1)").arg(Sorting::timeToString(getDuration()));
@@ -685,16 +687,18 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
     return viewerBoundingRect.translated(viewerPos);
 }
 
-bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, bool press) {
+bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, bool press, bool) {
     if(timelineContains(pos)) {
         if(press) {
-            if(Global::selectedTag != this) {
-                Global::selectedTag      = this;
+            if(!Global::selectedTags.contains(this)) {
+                Global::selectedTags.clear();
+                Global::selectedTags.append(this);
                 Global::selectedTagHover = this;
                 Global::mainWindow->refreshMetadata(this, true);
             }
-            else if((Global::selectedTagInAction != this) && (Global::tagHorizontalCriteria->isTimeline())) {
-                Global::selectedTagInAction  = this;
+            else if((!Global::selectedTagsInAction.contains(this)) && (Global::tagHorizontalCriteria->isTimeline())) {
+                Global::selectedTagsInAction.clear();
+                Global::selectedTagsInAction.append(this);
                 Global::selectedTagStartDrag = timelineProgress(pos) * getDuration();
                 if((e->button() & Qt::LeftButton) == Qt::LeftButton) {
                     qreal pixelPos      = qMax(getDuration(), Global::timelineTagHeight / Global::timeUnit) * Global::timeUnit * timelineProgress(pos);
@@ -741,22 +745,23 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
             }
             return true;
         }
-        if(!Global::selectedTag)
+        if(!Global::selectedTags.count())
             Global::mainWindow->refreshMetadata(this, false);
         Global::selectedTagHover = this;
 
         return true;
     }
-    return (Global::selectedTagInAction == this);
+    return (Global::selectedTagsInAction.contains(this));
 }
-bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool, bool press) {
+bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool, bool press, bool) {
     if(viewerContains(pos)) {
         Global::selectedTagHover = this;
 
         if(press) {
             Global::timeline->seek(getTimeStart(), true, false);
-            Global::selectedTag         = this;
-            Global::selectedTagInAction = 0;
+            Global::selectedTags.clear();
+            Global::selectedTags.append(this);
+            Global::selectedTagsInAction.clear();
             if(document->chutierItem)
                 Global::chutier->setCurrentItem(document->chutierItem);
         }

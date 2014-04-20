@@ -185,14 +185,14 @@ void TimelineGL::mouseReleaseEvent(QMouseEvent *e) {
     mouseTimerOk = false;
     mouseTimer.stop();
     mouseMove(e, false, false, false, true);
-    Global::selectedTagInAction = 0;
+    Global::selectedTagsInAction.clear();
 }
 void TimelineGL::mouseDoubleClickEvent(QMouseEvent *e) {
     mouseMove(e, true, false, true, false);
 }
 void TimelineGL::leaveEvent(QEvent *) {
-    Global::selectedTagInAction = 0;
-    Global::selectedTagHover    = 0;
+    Global::selectedTagsInAction.clear();
+    Global::selectedTagHover = 0;
 }
 void TimelineGL::mouseMoveLong() {
     if(mouseTimerOk)
@@ -207,61 +207,66 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press, bool
 
     if(Global::selectedTagHover)
         cursor = Qt::PointingHandCursor;
-    if(Global::selectedTagInAction) {
-        Tag *tag = (Tag*)Global::selectedTagInAction;
-
-        if(Global::selectedTagMode == TagSelectionStart) {
-            tag->setTimeStart(Global::currentProject->getTimelineCursorTime(mousePos));
-            cursor = Qt::SizeHorCursor;
-        }
-        else if(Global::selectedTagMode == TagSelectionEnd) {
-            tag->setTimeEnd(Global::currentProject->getTimelineCursorTime(mousePos));
-            cursor = Qt::SizeHorCursor;
-        }
-        else if(Global::selectedTagMode == TagSelectionMediaOffset) {
-            tag->addTimeMediaOffset(Global::selectedTagStartDrag - Global::currentProject->getTimelineCursorTime(mousePos));
-            Global::selectedTagStartDrag = Global::currentProject->getTimelineCursorTime(mousePos);
-            cursor = Qt::ClosedHandCursor;
-        }
-        else if(Global::selectedTagMode == TagSelectionDuplicate) {
-            Global::selectedTagHover = Global::selectedTagInAction = Global::selectedTag = ((Document*)tag->getDocument())->createTag(tag, tag->getDocumentVersionRaw());
-            Global::selectedTagMode  = TagSelectionMove;
-            Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
-            //selectedTag->addTimeMediaOffset(Global::selectedTagStartDrag - Global::currentProject->getTimelineCursorTime(mousePos));
-            //Global::selectedTagStartDrag = Global::currentProject->getTimelineCursorTime(mousePos);
-            //cursor = Qt::ClosedHandCursor;
-        }
-        else if(Global::selectedTagMode == TagSelectionMove) {
-            if(stay) {
-                if(     tag->getType() == TagTypeContextualMilestone) tag->setType(TagTypeContextualTime,      Global::currentProject->getTimelineCursorTime(mousePos));
-                else if(tag->getType() == TagTypeContextualTime)      tag->setType(TagTypeContextualMilestone, Global::currentProject->getTimelineCursorTime(mousePos));
-
-                Global::selectedTagStartDrag = (tag->getTimeEnd() - tag->getTimeStart()) / 2;
+    if(Global::selectedTagsInAction.count()) {
+        foreach(void *selectedTagInAction, Global::selectedTagsInAction) {
+            Tag *tag = (Tag*)selectedTagInAction;
+            if(Global::selectedTagMode == TagSelectionStart) {
+                tag->setTimeStart(Global::currentProject->getTimelineCursorTime(mousePos));
+                cursor = Qt::SizeHorCursor;
             }
-            if((e) && (mouseTimerPos != e->pos())) {
-                qreal mousePosSnappedOrNot = Global::currentProject->getTimelineCursorTime(mousePos);
-                if((release) && ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0))) {
-                    if((Global::selectedTagHoverSnapped.first >= 0) && (Global::selectedTagHoverSnapped.second >= 0)) {
-                        tag->setTimeStart(Global::selectedTagHoverSnapped.first);
-                        tag->setTimeEnd  (Global::selectedTagHoverSnapped.second);
-                    }
-                    else if(Global::selectedTagHoverSnapped.first >= 0)
-                        tag->moveTimeEnd(Global::selectedTagHoverSnapped.first);
-                    else if(Global::selectedTagHoverSnapped.second >= 0)
-                        tag->moveTimeStart(Global::selectedTagHoverSnapped.second);
-                }
-                else
-                    tag->moveTimeStart(mousePosSnappedOrNot - Global::selectedTagStartDrag);
+            else if(Global::selectedTagMode == TagSelectionEnd) {
+                tag->setTimeEnd(Global::currentProject->getTimelineCursorTime(mousePos));
+                cursor = Qt::SizeHorCursor;
+            }
+            else if(Global::selectedTagMode == TagSelectionMediaOffset) {
+                tag->addTimeMediaOffset(Global::selectedTagStartDrag - Global::currentProject->getTimelineCursorTime(mousePos));
+                Global::selectedTagStartDrag = Global::currentProject->getTimelineCursorTime(mousePos);
                 cursor = Qt::ClosedHandCursor;
             }
-        }
+            else if(Global::selectedTagMode == TagSelectionDuplicate) {
+                Global::selectedTagHover = ((Document*)tag->getDocument())->createTag(tag, tag->getDocumentVersionRaw());
+                Global::selectedTags.clear();
+                Global::selectedTagsInAction.clear();
+                Global::selectedTags.append(Global::selectedTagHover);
+                Global::selectedTagsInAction.append(Global::selectedTagHover);
+                Global::selectedTagMode  = TagSelectionMove;
+                Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+                //selectedTag->addTimeMediaOffset(Global::selectedTagStartDrag - Global::currentProject->getTimelineCursorTime(mousePos));
+                //Global::selectedTagStartDrag = Global::currentProject->getTimelineCursorTime(mousePos);
+                //cursor = Qt::ClosedHandCursor;
+            }
+            else if(Global::selectedTagMode == TagSelectionMove) {
+                if(stay) {
+                    if(     tag->getType() == TagTypeContextualMilestone) tag->setType(TagTypeContextualTime,      Global::currentProject->getTimelineCursorTime(mousePos));
+                    else if(tag->getType() == TagTypeContextualTime)      tag->setType(TagTypeContextualMilestone, Global::currentProject->getTimelineCursorTime(mousePos));
+                    else if(tag->getType() == TagTypeGlobal)              tag->setType(TagTypeContextualTime,      Global::currentProject->getTimelineCursorTime(mousePos));
 
+                    Global::selectedTagStartDrag = (tag->getTimeEnd() - tag->getTimeStart()) / 2;
+                }
+                if((e) && (mouseTimerPos != e->pos())) {
+                    qreal mousePosSnappedOrNot = Global::currentProject->getTimelineCursorTime(mousePos);
+                    if((release) && ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0))) {
+                        if((Global::selectedTagHoverSnapped.first >= 0) && (Global::selectedTagHoverSnapped.second >= 0)) {
+                            tag->setTimeStart(Global::selectedTagHoverSnapped.first);
+                            tag->setTimeEnd  (Global::selectedTagHoverSnapped.second);
+                        }
+                        else if(Global::selectedTagHoverSnapped.first >= 0)
+                            tag->moveTimeEnd(Global::selectedTagHoverSnapped.first);
+                        else if(Global::selectedTagHoverSnapped.second >= 0)
+                            tag->moveTimeStart(Global::selectedTagHoverSnapped.second);
+                    }
+                    else
+                        tag->moveTimeStart(mousePosSnappedOrNot - Global::selectedTagStartDrag);
+                    cursor = Qt::ClosedHandCursor;
+                }
+            }
+        }
         action = false;
     }
     if(e) {
         bool ok = false;
-        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseTimeline(mousePos, e, dbl, stay, action, press);
-        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseTimeline(mousePos, e, dbl, stay, action, press);
+        if((!ok) && (Global::currentProject))  ok |= Global::currentProject->mouseTimeline(mousePos, e, dbl, stay, action, press, release);
+        if((!ok) && (Global::timeline))        ok |= Global::timeline      ->mouseTimeline(mousePos, e, dbl, stay, action, press, release);
     }
     setCursor(cursor);
 }

@@ -11,7 +11,7 @@ Rekall::Rekall(QWidget *parent) :
     currentMetadata = 0;
 
     metaIsChanging = chutierIsUpdating = false;
-    openProject    = true;
+    openProject    = false;
 
     Global::userInfos = new UserInfos();
 
@@ -91,6 +91,7 @@ Rekall::Rekall(QWidget *parent) :
 
 
     Global::showHelp.setAction(ui->actionInlineHelp);
+    connect(ui->actionOpen, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionSave, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionPaste, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionRemove, SIGNAL(triggered()), SLOT(action()));
@@ -269,7 +270,17 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
 
 
 void Rekall::action() {
-    if(sender() == ui->actionSave)
+    if(sender() == ui->actionOpen) {
+        QString dir = QFileDialog::getExistingDirectory(0, tr("Select a folder where you store your files"), Global::pathCurrent.absoluteFilePath());
+        if(!dir.isEmpty()) {
+            Global::pathCurrent = QFileInfo(dir);
+            currentProject->open(QFileInfoList() << Global::pathCurrent, ui->chutier);
+            ui->chutier->getTree()->collapseAll();
+            for(quint16 i = 0 ; i < ui->chutier->getTree()->topLevelItemCount() ; i++)
+                ui->chutier->getTree()->expandItem(ui->chutier->getTree()->topLevelItem(i));
+        }
+    }
+    else if(sender() == ui->actionSave)
         currentProject->save();
     else if(sender() == ui->actionPaste)
         parseMimeData(QApplication::clipboard()->mimeData(), "rekall");
@@ -295,12 +306,14 @@ void Rekall::action() {
         Global::timeline->actionMarkerAddStart();
     }
     else if(sender() == ui->actionRemove) {
-        if(Global::selectedTag) {
-            Tag *tag = (Tag*)Global::selectedTag;
+        foreach(void* selectedTag, Global::selectedTags) {
+            Tag *tag = (Tag*)selectedTag;
             tag->getDocument()->removeTag(tag);
-            Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
-            Global::selectedTag = Global::selectedTagHover = Global::selectedTagInAction = 0;
         }
+        Global::selectedTagHover = 0;
+        Global::selectedTags.clear();
+        Global::selectedTagsInAction.clear();
+        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
     }
 }
 void Rekall::actionForceGL() {
@@ -349,7 +362,8 @@ void Rekall::refreshMetadata() {
         if(currentDocument) {
             foreach(Tag *documentTag, currentDocument->tags) {
                 if(documentTag->getDocumentVersion() == ui->metadataSlider->value()) {
-                    Global::selectedTag = documentTag;
+                    Global::selectedTags.clear();
+                    Global::selectedTags.append(documentTag);
                     Global::timelineGL->ensureVisible(documentTag->getTimelineBoundingRect().translated(documentTag->timelineDestPos).topLeft());
                     Global::viewerGL  ->ensureVisible(documentTag->getViewerBoundingRect().translated(documentTag->viewerDestPos).topLeft());
                 }
@@ -388,7 +402,8 @@ void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB, T
         if((currentDocument) && (!chutierIsUpdating)) {
             foreach(Tag *documentTag, currentDocument->tags) {
                 if(documentTag->getDocumentVersion() == ui->metadataSlider->value()) {
-                    Global::selectedTag = documentTag;
+                    Global::selectedTags.clear();
+                    Global::selectedTags.append(documentTag);
                     Global::timelineGL->ensureVisible(documentTag->getTimelineBoundingRect().translated(documentTag->timelineDestPos).topLeft());
                     Global::viewerGL  ->ensureVisible(documentTag->getViewerBoundingRect().translated(documentTag->viewerDestPos).topLeft());
                 }
@@ -553,9 +568,6 @@ void Rekall::timerEvent(QTimerEvent *) {
         for(quint16 i = 0 ; i < ui->chutier->getTree()->topLevelItemCount() ; i++)
             ui->chutier->getTree()->expandItem(ui->chutier->getTree()->topLevelItem(i));
     }
-
-    foreach(Person *person, currentProject->persons)
-        person->updateGUI();
 }
 
 void Rekall::closeEvent(QCloseEvent *) {
