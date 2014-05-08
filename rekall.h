@@ -55,7 +55,7 @@ public:
     ~Rekall();
 
 private:
-    bool          chutierIsUpdating;
+    bool          chutierIsUpdating, metadataIsUpdating;
     Splash       *splash;
     Project      *currentProject;
     QList<Metadata*> currentMetadatas;

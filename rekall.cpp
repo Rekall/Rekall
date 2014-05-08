@@ -31,7 +31,7 @@ Rekall::Rekall(QWidget *parent) :
     setAcceptDrops(true);
     currentProject  = 0;
 
-    chutierIsUpdating = false;
+    chutierIsUpdating = metadataIsUpdating = false;
 
     Global::userInfos = new UserInfos();
 
@@ -487,152 +487,167 @@ void Rekall::displayMetadata(QTreeWidgetItem *, QTreeWidgetItem *) {
     }
     chutierIsUpdating = false;
 
-    ui->metadata->clear();
-    if(currentMetadatas.count()) {
-        QStringList expandItems;
-        QString metadataPrefixGlobal = QString("<span style='font-family: Calibri, Arial; font-size: %1px; ").arg(Global::font.pixelSize());;
-        QString metadataPrefix0 = metadataPrefixGlobal + "color: #F5F8FA'>";
-        QString metadataPrefix1 = metadataPrefixGlobal + "color: %1'>";
-        QString metadataSuffix = "</span>";
-        for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++) {
-            if(ui->metadata->topLevelItem(i)->isExpanded())
-                expandItems << HtmlDelegate::removeHtml(ui->metadata->topLevelItem(i)->text(0));
-            for(quint16 j = 0 ; j < ui->metadata->topLevelItem(i)->childCount() ; j++) {
-                if(ui->metadata->topLevelItem(i)->child(j)->isExpanded())
-                    expandItems << HtmlDelegate::removeHtml(ui->metadata->topLevelItem(i)->child(j)->text(0));
+    if(!metadataIsUpdating) {
+        metadataIsUpdating = true;
+        ui->metadata->clear();
+        if(currentMetadatas.count()) {
+            QStringList expandItems;
+            QString metadataPrefixGlobal = QString("<span style='font-family: Calibri, Arial; font-size: %1px; ").arg(Global::font.pixelSize());;
+            QString metadataPrefix0 = metadataPrefixGlobal + "color: #F5F8FA'>";
+            QString metadataPrefix1 = metadataPrefixGlobal + "color: %1'>";
+            QString metadataSuffix = "</span>";
+            for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++) {
+                if(ui->metadata->topLevelItem(i)->isExpanded())
+                    expandItems << HtmlDelegate::removeHtml(ui->metadata->topLevelItem(i)->text(0));
+                for(quint16 j = 0 ; j < ui->metadata->topLevelItem(i)->childCount() ; j++) {
+                    if(ui->metadata->topLevelItem(i)->child(j)->isExpanded())
+                        expandItems << HtmlDelegate::removeHtml(ui->metadata->topLevelItem(i)->child(j)->text(0));
+                }
             }
-        }
-        if(expandItems.count() == 0)
-            expandItems << "General" << "Contact details";
+            if(expandItems.count() == 0)
+                expandItems << "General" << "Contact details";
 
-        QTreeWidgetItem *metadataRootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + tr("Details") + metadataSuffix);
-        metadataRootItem->setFlags(Qt::ItemIsEnabled);
-        if(expandItems.contains("Details"))
-            ui->metadata->expandItem(metadataRootItem);
+            QTreeWidgetItem *metadataRootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + tr("Details") + metadataSuffix);
+            metadataRootItem->setFlags(Qt::ItemIsEnabled);
+            if(expandItems.contains("Details"))
+                ui->metadata->expandItem(metadataRootItem);
 
-        //Versions
-        if(currentMetadatas.count() == 1) {
-            ui->metadataSlider->setMaximum(currentMetadatas.first()->getMetadataCountM());
-            if(Global::selectedTags.count()) {
-                Tag *tag = (Tag*)Global::selectedTags.first();
-                if(tag)
-                    ui->metadataSlider->setValue(tag->getDocumentVersion());
-            }
-        }
-
-        if((currentMetadatas.count() == 1) && (currentMetadatas.first()->getMetadataCount() > 1)) ui->metadataSlider->setVisible(true);
-        else                                                                                      ui->metadataSlider->setVisible(false);
-        ui->metadataSliderIcon ->setVisible(ui->metadataSlider->isVisible());
-        ui->metadataSliderIcon2->setVisible(ui->metadataSlider->isVisible());
-
-        //Sum up
-        foreach(Metadata *currentMetadata, currentMetadatas) {
-            QMapIterator<QString, QMetaMap> metaIterator(currentMetadata->getMetadata(findDocumentVersionWithMetadata(currentMetadata)));
-            while(metaIterator.hasNext()) {
-                metaIterator.next();
-
-                QTreeWidgetItem *rootItem = 0;
-                QString metaIteratorKey = metaIterator.key();
-                if(metaIteratorKey == "Rekall")
-                    metaIteratorKey = "General";
-
-                QStringList itemText;
-                if(metaIteratorKey == "General")  itemText << metadataPrefix0 + "General" + metadataSuffix;
-                else                              itemText << metadataPrefix0 + metaIteratorKey + metadataSuffix;
-
-                for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++) {
-                    bool itemExists = true;
-                    for(quint16 j = 0 ; j < itemText.count() ; j++) {
-                        if(HtmlDelegate::removeHtml(ui->metadata->topLevelItem(i)->text(j)) != HtmlDelegate::removeHtml(itemText.at(j)))
-                            itemExists = false;
-                    }
-                    if(itemExists) {
-                        rootItem = ui->metadata->topLevelItem(i);
-                        break;
+            //Versions
+            if(sender() != ui->metadataSlider) {
+                if(currentMetadatas.count() == 1) {
+                    ui->metadataSlider->setMaximum(currentMetadatas.first()->getMetadataCountM());
+                    if(Global::selectedTags.count()) {
+                        Tag *tag = (Tag*)Global::selectedTags.first();
+                        if(tag)
+                            ui->metadataSlider->setValue(tag->getDocumentVersion());
                     }
                 }
-                if(!rootItem) {
-                    if(metaIteratorKey == "General")  rootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), itemText);
-                    else                              rootItem = new QTreeWidgetItem(metadataRootItem, itemText);
-                    rootItem->setFlags(Qt::ItemIsEnabled);
+
+                if((currentMetadatas.count() == 1) && (currentMetadatas.first()->getMetadataCount() > 1)) ui->metadataSlider->setVisible(true);
+                else                                                                                      ui->metadataSlider->setVisible(false);
+                ui->metadataSliderIcon ->setVisible(ui->metadataSlider->isVisible());
+                ui->metadataSliderIcon2->setVisible(ui->metadataSlider->isVisible());
+            }
+            else if((ui->metadataSlider->isVisible()) && (Global::selectedTags.count() == 1) && (currentMetadatas.count())) {
+                Tag *tag = (Tag*)currentMetadatas.first()->tempStorage;
+                if(tag) {
+                    Document *document = (Document*)tag->getDocument();
+                    foreach(Tag *tag, document->tags)
+                        if(tag->getDocumentVersion() == ui->metadataSlider->value())
+                            Global::selectedTags = QList<void*>() << tag;
                 }
+            }
 
-                QMapIterator<QString,MetadataElement> ssMetaIterator(metaIterator.value());
-                while(ssMetaIterator.hasNext()) {
-                    ssMetaIterator.next();
+            //Sum up
+            foreach(Metadata *currentMetadata, currentMetadatas) {
+                QMapIterator<QString, QMetaMap> metaIterator(currentMetadata->getMetadata(findDocumentVersionWithMetadata(currentMetadata)));
+                while(metaIterator.hasNext()) {
+                    metaIterator.next();
 
-                    QString color = "#000000", defaultColor = "#C8C8C8";
-                    if(ssMetaIterator.key() == "Name") {
-                        if(currentMetadatas.count() == 1) {
-                            ui->metadataTitle->setText(ssMetaIterator.value().toString().toUpper());
-                            color = currentMetadata->baseColor.name();
-                        }
-                        else {
-                            ui->metadataTitle->setText(QString("Multiple selection (%1)").arg(currentMetadatas.count()));
-                            color = defaultColor;
-                        }
-                        ui->metadataTitle->setStyleSheet(QString("border-bottom: 1px solid %1; color: %1; margin: 0px 20px 0px 20px;").arg(color));
-                        ui->metadataSlider->setStyleSheet(QString("QSlider::handle { background-color: %1; }").arg(color));
-                        color = currentMetadata->baseColor.name();
-                    }
-                    else if(ssMetaIterator.key() == Global::tagColorCriteria->getTagName()) {
-                        color = currentMetadata->baseColor.name();
-                        ui->metadataSubTitle->setStyleSheet(QString("color: %1; font-size: %2px").arg(color).arg(Global::fontSmall.pixelSize()));
-                        if(currentMetadatas.count() == 1)
-                            ui->metadataSubTitle->setText(ssMetaIterator.value().toString().toUpper());
-                        else
-                            ui->metadataSubTitle->setText("");
-                    }
+                    QTreeWidgetItem *rootItem = 0;
+                    QString metaIteratorKey = metaIterator.key();
+                    if(metaIteratorKey == "Rekall")
+                        metaIteratorKey = "General";
 
-                    if(color == "#000000")
-                        color = defaultColor;
+                    QStringList itemText;
+                    if(metaIteratorKey == "General")  itemText << metadataPrefix0 + "General" + metadataSuffix;
+                    else                              itemText << metadataPrefix0 + metaIteratorKey + metadataSuffix;
 
-                    itemText = QStringList() << metadataPrefix0 + ssMetaIterator.key() + metadataSuffix
-                                             << metadataPrefix1.arg(color) + ssMetaIterator.value().toString() + metadataSuffix;
-
-                    QTreeWidgetItem *item = 0;
-                    for(quint16 i = 0 ; i < rootItem->childCount() ; i++) {
+                    for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++) {
                         bool itemExists = true;
-                        for(quint16 j = 0 ; j < /*itemText.count()*/1 ; j++) {
-                            if(HtmlDelegate::removeHtml(rootItem->child(i)->text(j)) != HtmlDelegate::removeHtml(itemText.at(j)))
+                        for(quint16 j = 0 ; j < itemText.count() ; j++) {
+                            if(HtmlDelegate::removeHtml(ui->metadata->topLevelItem(i)->text(j)) != HtmlDelegate::removeHtml(itemText.at(j)))
                                 itemExists = false;
                         }
                         if(itemExists) {
-                            item = rootItem->child(i);
+                            rootItem = ui->metadata->topLevelItem(i);
                             break;
                         }
                     }
-                    if(item) {
-                        if(HtmlDelegate::removeHtml(item->text(1)) != HtmlDelegate::removeHtml(itemText.at(1))) {
-                            item->setText(0, "<i>" + item->text(0) + "</i>");
-                            item->setText(1, "<i>" + item->text(1) + "</i>");
+                    if(!rootItem) {
+                        if(metaIteratorKey == "General")  rootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), itemText);
+                        else                              rootItem = new QTreeWidgetItem(metadataRootItem, itemText);
+                        rootItem->setFlags(Qt::ItemIsEnabled);
+                    }
+
+                    QMapIterator<QString,MetadataElement> ssMetaIterator(metaIterator.value());
+                    while(ssMetaIterator.hasNext()) {
+                        ssMetaIterator.next();
+
+                        QString color = "#000000", defaultColor = "#C8C8C8";
+                        if(ssMetaIterator.key() == "Name") {
+                            if(currentMetadatas.count() == 1) {
+                                ui->metadataTitle->setText(ssMetaIterator.value().toString().toUpper());
+                                color = currentMetadata->baseColor.name();
+                            }
+                            else {
+                                ui->metadataTitle->setText(QString("Multiple selection (%1)").arg(currentMetadatas.count()));
+                                color = defaultColor;
+                            }
+                            ui->metadataTitle->setStyleSheet(QString("border-bottom: 1px solid %1; color: %1; margin: 0px 20px 0px 20px;").arg(color));
+                            ui->metadataSlider->setStyleSheet(QString("QSlider::handle { background-color: %1; }").arg(color));
+                            color = currentMetadata->baseColor.name();
+                        }
+                        else if(ssMetaIterator.key() == Global::tagColorCriteria->getTagName()) {
+                            color = currentMetadata->baseColor.name();
+                            ui->metadataSubTitle->setStyleSheet(QString("color: %1; font-size: %2px").arg(color).arg(Global::fontSmall.pixelSize()));
+                            if(currentMetadatas.count() == 1)
+                                ui->metadataSubTitle->setText(ssMetaIterator.value().toString().toUpper());
+                            else
+                                ui->metadataSubTitle->setText("");
+                        }
+
+                        if(color == "#000000")
+                            color = defaultColor;
+
+                        itemText = QStringList() << metadataPrefix0 + ssMetaIterator.key() + metadataSuffix
+                                                 << metadataPrefix1.arg(color) + ssMetaIterator.value().toString() + metadataSuffix;
+
+                        QTreeWidgetItem *item = 0;
+                        for(quint16 i = 0 ; i < rootItem->childCount() ; i++) {
+                            bool itemExists = true;
+                            for(quint16 j = 0 ; j < /*itemText.count()*/1 ; j++) {
+                                if(HtmlDelegate::removeHtml(rootItem->child(i)->text(j)) != HtmlDelegate::removeHtml(itemText.at(j)))
+                                    itemExists = false;
+                            }
+                            if(itemExists) {
+                                item = rootItem->child(i);
+                                break;
+                            }
+                        }
+                        if(item) {
+                            if(HtmlDelegate::removeHtml(item->text(1)) != HtmlDelegate::removeHtml(itemText.at(1))) {
+                                item->setText(0, "<i>" + item->text(0) + "</i>");
+                                item->setText(1, "<i>" + item->text(1) + "</i>");
+                            }
+                        }
+                        else {
+                            item = new QTreeWidgetItem(rootItem, itemText);
+                            item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
                         }
                     }
-                    else {
-                        item = new QTreeWidgetItem(rootItem, itemText);
-                        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-                    }
+
+                    if(expandItems.contains(metaIteratorKey))    ui->metadata->expandItem(rootItem);
+                    else                                         ui->metadata->collapseItem(rootItem);
                 }
 
-                if(expandItems.contains(metaIteratorKey))    ui->metadata->expandItem(rootItem);
-                else                                         ui->metadata->collapseItem(rootItem);
-            }
+                if((currentMetadata->chutierItem) || (currentMetadata->getType() == DocumentTypeWeb)) {
+                    ui->metadataOpenFinder->setVisible(true);
+                    ui->metadataOpen      ->setVisible(true);
+                }
+                else {
+                    ui->metadataOpenFinder->setVisible(false);
+                    ui->metadataOpen      ->setVisible(false);
+                }
 
-            if((currentMetadata->chutierItem) || (currentMetadata->getType() == DocumentTypeWeb)) {
-                ui->metadataOpenFinder->setVisible(true);
-                ui->metadataOpen      ->setVisible(true);
-            }
-            else {
-                ui->metadataOpenFinder->setVisible(false);
-                ui->metadataOpen      ->setVisible(false);
-            }
-
-            if(currentMetadatas.last() == currentMetadata) {
-                displayDocumentName(QString("%1 (%2)").arg(currentMetadata->getName()).arg(currentMetadata->getMetadata("Rekall", "Folder").toString()));
-                displayPixmap(currentMetadata->getType(), currentMetadata->getThumbnail(findDocumentVersionWithMetadata(currentMetadata)));
-                displayGps(currentMetadata->getGps());
+                if(currentMetadatas.last() == currentMetadata) {
+                    displayDocumentName(QString("%1 (%2)").arg(currentMetadata->getName()).arg(currentMetadata->getMetadata("Rekall", "Folder").toString()));
+                    displayPixmap(currentMetadata->getType(), currentMetadata->getThumbnail(findDocumentVersionWithMetadata(currentMetadata)));
+                    displayGps(currentMetadata->getGps());
+                }
             }
         }
+        metadataIsUpdating = false;
     }
 }
 
