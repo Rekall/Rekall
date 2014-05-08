@@ -38,9 +38,9 @@ public:
     explicit Project(QWidget *parent = 0);
 
 private:
-    void open(const QDir &dir, const QDir &dirBase, bool debug = false);
+    void open(const QDir &dir, const QDir &dirBase);
 public:
-    void open(const QFileInfoList &file, UiTreeView *view, bool debug = false);
+    void open(const QFileInfoList &file, UiTreeView *view);
 
 public:
     QList<Document*> documents;
@@ -60,10 +60,9 @@ private:
     QList<Tag*> viewerTags, eventsTags;
     QMap<QString, QMap<QString, QMap<QString, QList<Tag*> > > > timelineSortTags;
     QMap< QPair<QString, QString>, Cluster*> timelineClusters;
-    QPolygonF lassoPoints;
+    QPolygonF lassoPoints, lassoPointsDest;
 public:
-    Document* getDocument         (const QString &name) const;
-    Document* getDocumentAndSelect(const QString &name) const;
+    Document* getDocument(const QString &name) const;
 
 public:
     void fireEvents();
@@ -91,9 +90,10 @@ public:
     QDomElement serialize(QDomDocument &xmlDoc) const;
     void deserialize(const QDomElement &xmlElement);
     void save();
+    void close();
 
 signals:
-    void refreshMetadata();
+    void displayMetadata();
 };
 
 #endif // PROJECT_H

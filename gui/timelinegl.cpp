@@ -205,6 +205,7 @@ void TimelineGL::mouseMoveEvent(QMouseEvent *e) {
     mouseMove(e, false, false, false, false);
 }
 void TimelineGL::mouseReleaseEvent(QMouseEvent *e) {
+    Global::timeline->closePopups();
     mouseTimerOk = false;
     mouseTimer.stop();
     mouseMove(e, false, false, false, true);
@@ -254,6 +255,7 @@ void TimelineGL::mouseMove(QMouseEvent *e, bool dbl, bool stay, bool press, bool
                 Global::selectedTagsInAction.append(Global::selectedTagHover);
                 Global::selectedTagMode  = TagSelectionMove;
                 Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+                Global::mainWindow->displayMetadataAndSelect(Global::selectedTagHover);
                 //selectedTag->addTimeMediaOffset(Global::selectedTagStartDrag - Global::currentProject->getTimelineCursorTime(mousePos));
                 //Global::selectedTagStartDrag = Global::currentProject->getTimelineCursorTime(mousePos);
                 //cursor = Qt::ClosedHandCursor;

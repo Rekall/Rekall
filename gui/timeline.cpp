@@ -28,6 +28,7 @@ Timeline::Timeline(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Timeline) {
     ui->setupUi(this);
+    tagHorizontalCriteriaWasTimeline = false;
     Global::timeline = this;
     startTimer(40);
     ticksWidth = 50;
@@ -41,8 +42,8 @@ Timeline::Timeline(QWidget *parent) :
     ui->workspace->addItem("YOUR WORK",            "your_work");
     ui->workspace->addItem("YOUR CUES",            "your_cues");
     ui->workspace->addItem("YOUR LAST IMPORTS",    "your_last_imports");
-    ui->workspace->addItem("GLOBAL CUES",          "global_cues");
-    ui->workspace->addItem("GLOBAL LAST IMPORTS",  "global_last_imports");
+    ui->workspace->addItem("ALL THE CUES",         "global_cues");
+    ui->workspace->addItem("ALL THE LAST IMPORTS", "global_last_imports");
     ui->workspace->addItem("TYPE OF DOCUMENTS PUNCHCARD", "global_punchcard_type");
     ui->workspace->addItem("PEOPLE ACTIVITY PUNCHCARD",   "global_punchcard_activity");
 }
@@ -62,6 +63,16 @@ void Timeline::timerEvent(QTimerEvent *) {
     Global::currentProject->fireEvents();
     Global::timeUnit          = Global::timeUnit          + (Global::timeUnitDest          - Global::timeUnit)          / Global::inertie;
     Global::timelineTagHeight = Global::timelineTagHeight + (Global::timelineTagHeightDest - Global::timelineTagHeight) / Global::inertie;
+
+
+    if((tagHorizontalCriteriaWasTimeline) && (!Global::tagHorizontalCriteria->isTimeline())) {
+        tagHorizontalCriteriaWasTimeline = Global::tagHorizontalCriteria->isTimeline();
+        Global::timelineGL->ensureVisible(QPointF(1, 1));
+    }
+    else if((!tagHorizontalCriteriaWasTimeline) && (Global::tagHorizontalCriteria->isTimeline())) {
+        tagHorizontalCriteriaWasTimeline = Global::tagHorizontalCriteria->isTimeline();
+        Global::timelineGL->ensureVisible(QPointF(timelinePosDest.x(), -1));
+    }
 }
 
 const QRectF Timeline::paintTimeline(bool before) {
@@ -157,8 +168,8 @@ const QRectF Timeline::paintTimeline(bool before) {
             GlRect::drawRoundedRect(timeTextRect, false);
             GlRect::drawRoundedRect(timeTextRect, true);
             Global::timelineGL->qglColor(Qt::white);
-            timeText.setStyle(QSize(50, Global::timelineTagHeight*1.2), Qt::AlignCenter, Global::font);
-            timeText.drawText(Sorting::timeToString(Global::time), timeTextRect.topLeft().toPoint());
+            timeText.setStyle(QSize(60, Global::timelineHeaderSize.height()*0.7), Qt::AlignCenter, Global::font);
+            timeText.drawText(Sorting::timeToString(Global::time, true), timeTextRect.topLeft().toPoint());
 
             if((Global::timerPlay) && (Global::tagHorizontalCriteria->isTimeline()))
                 Global::timelineGL->ensureVisible(QPointF(timelinePos.x(), -1));
@@ -180,21 +191,21 @@ const QRectF Timeline::paintViewer() {
 
 bool Timeline::jumpTo() {
     bool ok = false;
-    qreal time = Sorting::stringToTime(QInputDialog::getText(0, tr("Jump to…"), tr("Jump to specific timecode"), QLineEdit::Normal, Sorting::timeToString(Global::time), &ok));
+    qreal time = Sorting::stringToTime(QInputDialog::getText(0, tr("Jump to…"), tr("Jump to specific timecode"), QLineEdit::Normal, Sorting::timeToString(Global::time, true), &ok));
     if(ok)
         seek(time, true, true);
     return ok;
 }
-bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool action, bool press, bool) {
-    if((action) && (press)) {
-        if(dbl)
-            jumpTo();
-        else if(Global::tagHorizontalCriteria->isTimeline())
-            seek(Global::currentProject->getTimelineCursorTime(pos), false, true);
-        Global::selectedTagsInAction.clear();
-        Global::selectedTags.clear();
+bool Timeline::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool action, bool press, bool) {
+    if((action) && (dbl)) {
+        jumpTo();
         return true;
     }
+    if((e) && (press || ((e->buttons() & Qt::LeftButton) == Qt::LeftButton)) && (Global::tagHorizontalCriteria->isTimeline()) && (e->pos().y() <= (Global::timelineHeaderSize.height()*1.1))) {
+        seek(Global::currentProject->getTimelineCursorTime(pos), false, true);
+        return true;
+    }
+
     return false;
 }
 bool Timeline::mouseViewer(const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool) {
@@ -212,7 +223,6 @@ void Timeline::seek(qreal time, bool forceVisibleTimeline, bool forceVisibleView
     if((forceVisibleViewer) || (Global::timerPlay))
         Global::viewerGL  ->ensureVisible(QPointF(-1, viewerPosDest.y()), 0.8);
 }
-
 
 void Timeline::actionRewind() {
     seek(0, true, true);
@@ -265,7 +275,7 @@ void Timeline::action() {
         else                            Global::tagClusterCriteria->hide();
     }
     else if(sender() == ui->horizontalBy) {
-        Global::tagHorizontalCriteria->move(ui->clusterBy->parentWidget()->mapToGlobal(ui->horizontalBy->pos()) - QPoint(23, 3 + Global::tagHorizontalCriteria->height()));
+        Global::tagHorizontalCriteria->move(ui->horizontalBy->parentWidget()->mapToGlobal(ui->horizontalBy->pos()) - QPoint(23, 3 + Global::tagHorizontalCriteria->height()));
         if(ui->horizontalBy->isChecked())  Global::tagHorizontalCriteria->show();
         else                               Global::tagHorizontalCriteria->hide();
     }
@@ -459,4 +469,15 @@ void Timeline::actionChanged(QString text, QString text2) {
     Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
     Global::timelineGL->scrollTo();
     Global::viewerGL  ->scrollTo();
+}
+
+void Timeline::closePopups() {
+    Global::tagSortCriteria->close();
+    Global::tagColorCriteria->close();
+    Global::tagTextCriteria->close();
+    Global::tagFilterCriteria->close();
+    Global::tagClusterCriteria->close();
+    Global::tagHorizontalCriteria->close();
+    Global::phases->close();
+    timelineControl->close();
 }

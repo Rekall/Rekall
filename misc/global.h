@@ -67,6 +67,7 @@ public:
     virtual void seek(qreal, bool = false, bool = false) {}
     virtual bool jumpTo()           { return false; }
     virtual qreal totalTime() const { return 0.;    }
+    virtual void closePopups()      {}
 public:
     virtual void setDuplicates(quint16) {}
     virtual void setHistories (quint16) {}
@@ -203,6 +204,7 @@ class TaskListBase {
 public:
     virtual void setToolbox(QToolBox*) = 0;
     virtual void addTask   (Metadata *metadata, TaskProcessType type, qint16 version, bool needCompleteScan = true) = 0;
+    virtual void clearTasks() = 0;
 };
 
 enum FeedItemBaseType { FeedItemBaseTypeCreation, FeedItemBaseTypeUpdate, FeedItemBaseTypeDelete, FeedItemBaseTypeProcessingStart, FeedItemBaseTypeProcessingEnd };
@@ -242,9 +244,10 @@ public:
 public:
     explicit RekallBase(QWidget *parent = 0) : QMainWindow(parent) {}
 public:
-    virtual void setVisbility(bool)            = 0;
-    virtual void refreshMetadata(void *, bool) = 0;
-    virtual void showPreviewTab()              = 0;
+    virtual void setVisbility(bool) = 0;
+    virtual void displayMetadataAndSelect(void *tag = 0)  = 0;
+    virtual void displayMetadata(QTreeWidgetItem * = 0, QTreeWidgetItem * = 0)  = 0;
+    virtual void showPreviewTab()   = 0;
 public:
     virtual bool parseMimeData(const QMimeData *, const QString &, bool = false) = 0;
 };
@@ -260,10 +263,11 @@ enum TagType      { TagTypeContextualMilestone, TagTypeContextualTime, TagTypeGl
 
 class Global {
 public:
+    static bool falseProject;
     static UserInfosBase *userInfos;
     static QImage temporaryScreenshot;
     static qreal thumbsEach, waveEach;
-    static QFileInfo pathApplication, pathDocuments, pathCurrent;
+    static QFileInfo pathApplication, pathDocuments, pathCurrent, pathCurrentDefault;
     static GlWidget *timelineGL, *viewerGL;
     static ProjectBase *currentProject;
     static GlDrawable *timeline;
@@ -342,6 +346,8 @@ private:
     bool editable;
 public:
     explicit HtmlDelegate(bool _editable = false, QObject *parent = 0);
+public:
+    static QString removeHtml(QString html);
 protected:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;

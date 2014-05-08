@@ -52,6 +52,10 @@ void TasksList::setToolbox(QToolBox *_toolbox) {
     //connect(toolbox, SIGNAL(currentChanged(int)), SLOT(timerEvent()));
 }
 
+void TasksList::clearTasks() {
+    tasks.clear();
+}
+
 void TasksList::addTask(Metadata *metadata, TaskProcessType type, qint16 version, bool needCompleteScan) {
     addTask(TaskProcessData(metadata, type, version, needCompleteScan));
     if(toolbox->currentIndex() != 2)
@@ -77,7 +81,7 @@ void TasksList::nextTask() {
             runningTasks++;
             foreach(TaskProcess *task, tasks) {
                 if(!task->started) {
-                    if(task->document.metadata->getType(task->document.version) == DocumentTypeWeb) {
+                    if((task->document.metadata) && (task->document.metadata->getType(task->document.version) == DocumentTypeWeb)) {
                         if(!runningWebTasks) {
                             runningWebTasks = 1;
                             task->start();

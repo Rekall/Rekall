@@ -34,6 +34,7 @@ Metadata::Metadata(QObject *parent, bool createEmpty) :
     QObject(parent) {
     metadataMutex    = false;
     chutierItem      = 0;
+    tempStorage      = 0;
     status           = DocumentStatusReady;
     if(!suffixesTypeDoc.count())
         suffixesTypeDoc << "pdf" << "ps" << "doc" << "txt" << "docx";
@@ -72,6 +73,14 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     setMetadata("Rekall", "Date/Time",          QDateTime::currentDateTime(), version);
     setMetadata("Rekall", "Import Date/Time",   QDateTime::currentDateTime(), version);
     setMetadata(Global::userInfos->getInfos());
+
+    if(Global::falseProject) {
+        quint16 tirage = Global::alea(0, 100);
+        if(tirage < 10)        setMetadata("Rekall", "Author", "Julie Valero",         version);
+        else if(tirage < 50)   setMetadata("Rekall", "Author", "Jean-François Peyret", version);
+        else if(tirage < 70)   setMetadata("Rekall", "Author", "Agnès de Cayeux",      version);
+        else                   setMetadata("Rekall", "Author", "Thierry Coduys",       version);
+    }
 
     setFunction(DocumentFunctionContextual, version);
     if(name.toLower().contains("captation"))
@@ -348,12 +357,12 @@ bool Metadata::isAcceptableWithColorFilters(bool strongCheck, qint16 version) co
             && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
 bool Metadata::isAcceptableWithTextFilters(bool strongCheck, qint16 version) const {
-    return (getFunction() == DocumentFunctionContextual)
-            && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
-            && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
-            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
-            && (Global::tagTextCriteria      ->isAcceptable(strongCheck, getCriteriaText(version)))
-            && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
+    return (getType() == DocumentTypeMarker) || ((getFunction() == DocumentFunctionContextual)
+                                                 && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+                                                 && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
+                                                 && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
+                                                 && (Global::tagTextCriteria      ->isAcceptable(strongCheck, getCriteriaText(version)))
+                                                 && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version))));
 }
 bool Metadata::isAcceptableWithClusterFilters(bool strongCheck, qint16 version) const {
     return (getFunction() == DocumentFunctionContextual)
@@ -434,7 +443,10 @@ const QString Metadata::getCriteriaSort(qint16 version) const {
         return Global::tagSortCriteria->getCriteria(getMetadata(Global::tagSortCriteria->getTagNameCategory(), Global::tagSortCriteria->getTagName(), version).toString(Global::tagSortCriteria->getTrunctionLeft(), Global::tagSortCriteria->getTrunctionLength()));
 }
 const QString Metadata::getCriteriaSortFormated(qint16 version) const {
-    return Global::tagSortCriteria->getCriteriaFormated(getCriteriaSort(version));
+    QString retour = Global::tagSortCriteria->getCriteriaFormated(getCriteriaSort(version));
+    if((Global::tagSortCriteria->isDate()) && (retour.isEmpty()))
+        retour = tr("Undated");
+    return retour;
 }
 const MetadataElement Metadata::getCriteriaPhase(qint16 version) const {
     return getMetadata(Global::phases->getTagNameCategory(), Global::phases->getTagName(), version);

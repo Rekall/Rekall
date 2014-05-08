@@ -25,7 +25,7 @@
 #include "ui_timelinecontrol.h"
 
 TimelineControl::TimelineControl(QWidget *parent) :
-    QWidget(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
+    QWidget(parent, Qt::Tool | Qt::FramelessWindowHint),
     ui(new Ui::TimelineControl) {
     ui->setupUi(this);
 
@@ -77,4 +77,8 @@ void TimelineControl::action() {
 
 TimelineControl::~TimelineControl() {
     delete ui;
+}
+
+void TimelineControl::mouseReleaseEvent(QMouseEvent *) {
+    close();
 }

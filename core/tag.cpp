@@ -57,17 +57,17 @@ void Tag::init() {
     }
 }
 
-void Tag::init(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
+void Tag::init(TagType _type, qreal _timeStart, qreal _duration) {
     if(document->getFunction() == DocumentFunctionRender) {
         setType(_type, _timeStart);
         Global::renders.insert(document->getName(version), this);
         player = new PlayerVideo();
         player->load(this, ((document->getType() == DocumentTypeVideo) || (document->getType() == DocumentTypeImage)), document->file.absoluteFilePath());
-        if(debug)
+        if(Global::falseProject)
             _duration = Global::alea(50, 180);
     }
     else {
-        if(debug) {
+        if(Global::falseProject) {
             qreal val = Global::alea(0, 100);
             if(document->getType(version) == DocumentTypeMarker)
                 val = 0;
@@ -78,13 +78,13 @@ void Tag::init(TagType _type, qreal _timeStart, qreal _duration, bool debug) {
         else
             setType(_type, _timeStart);
 
-        if((debug) && (Global::aleaF(0, 100) > 80)) {
+        if((Global::falseProject) && (Global::aleaF(0, 100) > 80)) {
             qreal tirage = Global::aleaF(0, 100);
             if(tirage > 66)       linkedRenders << "Captation 1";
             else if(tirage > 33)  linkedRenders << "Captation 2";
             else                  linkedRenders << "Captation 3";
         }
-        if(debug) {
+        if(Global::falseProject) {
             qreal tirage = Global::aleaF(0, 100);
             if(tirage > 50)       _duration = Global::alea( 2,  5);
             else if(tirage > 10)  _duration = Global::alea( 5, 12);
@@ -206,7 +206,8 @@ const QRectF Tag::paintTimeline(bool before) {
         if(timelineBoundingRect.width() < timelineBoundingRect.height())
             timelineBoundingRect.adjust(-(timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0, (timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0);
 
-        QColor colorDestTmp = (Global::selectedTags.contains(this) == true)?(Global::colorTimeline):(document->baseColor);
+        //QColor colorDestTmp = (Global::selectedTags.contains(this) == true)?(Global::colorTimeline):(document->baseColor);
+        QColor colorDestTmp = (Global::selectedTags.contains(this) == true)?(document->baseColor):(document->baseColor);
         if(document->status == DocumentStatusWaiting)
             colorDestTmp.setAlphaF(0.1);
         if((document->status == DocumentStatusProcessing) || (Global::selectedTags.contains(this) == true))
@@ -714,10 +715,11 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
     if(timelineContains(pos)) {
         if(press) {
             if(!Global::selectedTags.contains(this)) {
-                Global::selectedTags.clear();
+                if(!((e) && (((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier) || ((e->modifiers() & Qt::ControlModifier) == Qt::ControlModifier))))
+                    Global::selectedTags.clear();
                 Global::selectedTags.append(this);
                 Global::selectedTagHover = this;
-                Global::mainWindow->refreshMetadata(this, true);
+                Global::mainWindow->displayMetadataAndSelect(this);
             }
             else if((!Global::selectedTagsInAction.contains(this)) && (Global::tagHorizontalCriteria->isTimeline())) {
                 Global::selectedTagsInAction.clear();
@@ -768,21 +770,22 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
             }
             return true;
         }
-        if(!Global::selectedTags.count())
-            Global::mainWindow->refreshMetadata(this, false);
         Global::selectedTagHover = this;
+        if(!Global::selectedTags.count())
+            Global::mainWindow->displayMetadata();
 
         return true;
     }
     return (Global::selectedTagsInAction.contains(this));
 }
-bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *, bool dbl, bool, bool, bool press, bool) {
+bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, bool press, bool) {
     if(viewerContains(pos)) {
         Global::selectedTagHover = this;
 
         if(press) {
             Global::timeline->seek(getTimeStart(), true, false);
-            Global::selectedTags.clear();
+            if(!((e) && (((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier) || ((e->modifiers() & Qt::ControlModifier) == Qt::ControlModifier))))
+                Global::selectedTags.clear();
             Global::selectedTags.append(this);
             Global::selectedTagsInAction.clear();
             if(document->chutierItem)

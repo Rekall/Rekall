@@ -971,8 +971,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>793</x>
-     <y>177</y>
+     <x>943</x>
+     <y>174</y>
     </hint>
     <hint type="destinationlabel">
      <x>493</x>
@@ -987,8 +987,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>751</x>
-     <y>177</y>
+     <x>901</x>
+     <y>174</y>
     </hint>
     <hint type="destinationlabel">
      <x>518</x>
@@ -1003,8 +1003,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>314</x>
-     <y>172</y>
+     <x>375</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>100</x>
@@ -1019,8 +1019,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>388</x>
-     <y>172</y>
+     <x>700</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>121</x>
@@ -1035,8 +1035,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>524</x>
-     <y>172</y>
+     <x>447</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>233</x>
@@ -1051,8 +1051,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>619</x>
-     <y>172</y>
+     <x>859</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>313</x>
@@ -1067,8 +1067,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1076</x>
-     <y>172</y>
+     <x>1203</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>657</x>
@@ -1083,8 +1083,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>684</x>
-     <y>172</y>
+     <x>512</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>540</x>
@@ -1099,8 +1099,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1116</x>
-     <y>172</y>
+     <x>1163</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>1073</x>
@@ -1115,8 +1115,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>452</x>
-     <y>172</y>
+     <x>764</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>268</x>
@@ -1131,8 +1131,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>172</y>
+     <x>309</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>156</x>
@@ -1163,8 +1163,8 @@ QMenu::item:enabled:selected {
    <slot>actionMarkerAddStart()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1187</x>
-     <y>172</y>
+     <x>1274</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>1112</x>
@@ -1179,8 +1179,8 @@ QMenu::item:enabled:selected {
    <slot>actionMarkerAddEnd()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1158</x>
-     <y>162</y>
+     <x>1274</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>1156</x>
@@ -1195,12 +1195,28 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1269</x>
-     <y>172</y>
+     <x>1356</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
      <y>406</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>workspace</sender>
+   <signal>activated(QString)</signal>
+   <receiver>Timeline</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>146</x>
+     <y>151</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-107</x>
+     <y>129</y>
     </hint>
    </hints>
   </connection>

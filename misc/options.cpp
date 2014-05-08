@@ -328,7 +328,7 @@ UiFile::UiFile(const QFileInfo &_value) :
     UiString() {
     isTracked = false;
     file      = _value;
-    value     = file.completeBaseName();
+    value     = file.fileName();
 }
 UiFile& UiFile::operator= (const UiFile &_value) {
     UiString::operator =(_value.value);
@@ -340,7 +340,7 @@ UiFile& UiFile::operator= (const QString &_value) {
 }
 UiFile& UiFile::operator= (const QFileInfo &_value) {
     file = _value;
-    UiString::operator =(file.completeBaseName());
+    UiString::operator =(file.fileName());
     return *this;
 }
 UiFile::operator QString() const {     return value;    }

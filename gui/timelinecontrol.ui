@@ -121,7 +121,7 @@
         <item row="1" column="0">
          <widget class="QLabel" name="vZoomLabel">
           <property name="text">
-           <string>OVERALL SIZE</string>
+           <string>VERTICAL SIZE</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

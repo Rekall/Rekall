@@ -93,14 +93,15 @@ int main(int argc, char *argv[]) {
     if(projects.count()) {
         if((projects.contains(defaultProject)) && (projects.count() > 1))
             projects.removeOne(defaultProject);
-        Global::pathCurrent = projects.first();
+        Global::pathCurrentDefault = projects.first();
     }
     else {
         QDir().mkpath(defaultProject.absoluteFilePath());
         QFile file(Global::pathDocuments.absoluteFilePath() + "/Empty project/Drop files here.txt");
         file.open(QFile::WriteOnly);
         file.close();
-        Global::pathCurrent = QFileInfo(Global::pathDocuments.absoluteFilePath() + "/Empty project");
+        Global::pathCurrentDefault = QFileInfo(Global::pathDocuments.absoluteFilePath() + "/Empty project");
+        Global::pathCurrent = QFileInfo();
     }
 
     if(Global::pathApplication.absoluteFilePath().contains("/Rekall-build"))

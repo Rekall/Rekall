@@ -43,6 +43,7 @@ public:
 public:
     TimelineControl *timelineControl;
 private:
+    bool tagHorizontalCriteriaWasTimeline;
     QPointF timelinePos, timelinePosDest;
     QPointF viewerPos,   viewerPosDest;
     QTime   actionMarkerAddStarted;
@@ -59,6 +60,7 @@ protected:
     bool mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool);
 public:
     bool jumpTo();
+    void closePopups();
 
 public slots:
     void action();

@@ -110,6 +110,9 @@ public:
 public:
     void reset(const QString &filterText = "", QStringList checks = QStringList());
 
+protected:
+    void mouseReleaseEvent(QMouseEvent *);
+
 private:
     Ui::Phases *ui;
 };

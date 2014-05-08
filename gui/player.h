@@ -49,7 +49,7 @@ private:
 public:
     void  load(void* tag);
     void  play(bool state);
-    void  unload(void* _tag);
+    void  unload(void* _tag = 0);
     void  seek(qreal time);
     qreal getCurrentTime() const;
 

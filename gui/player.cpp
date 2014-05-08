@@ -57,15 +57,16 @@ void Player::load(void *_tag) {
     }
 }
 void Player::unload(void *_tag) {
-    Tag *tag = (Tag*)_tag;
-    if(tags.contains(tag)) {
-        tags.removeOne(tag);
-        if(tag->player) {
-            tag->player->pause();
-            tag->player->setVisible(false);
-            tag->player->setParent(0);
+    foreach(Tag *tag, tags) {
+        if((tag == _tag) || (!_tag)) {
+            tags.removeOne(tag);
+            if(tag->player) {
+                tag->player->pause();
+                tag->player->setVisible(false);
+                tag->player->setParent(0);
+            }
+            resizeEvent(0);
         }
-        resizeEvent(0);
     }
 }
 

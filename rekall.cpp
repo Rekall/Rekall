@@ -30,11 +30,8 @@ Rekall::Rekall(QWidget *parent) :
     ui->setupUi(this);
     setAcceptDrops(true);
     currentProject  = 0;
-    currentDocument = 0;
-    currentMetadata = 0;
 
-    metaIsChanging = chutierIsUpdating = false;
-    openProject    = false;
+    chutierIsUpdating = false;
 
     Global::userInfos = new UserInfos();
 
@@ -59,14 +56,14 @@ Rekall::Rekall(QWidget *parent) :
     Global::font.setFamily("Calibri");
     Global::font.setPixelSize(11);
     Global::fontSmall.setFamily("Calibri");
-    Global::fontSmall.setPixelSize(9);
+    Global::fontSmall.setPixelSize(10);
 
     UiFileItem::configure(ui->chutier, false);
     UiFileItem::forbiddenDirs << "rekall_cache";
 
     currentProject = new Project(this);
     Global::currentProject = currentProject;
-    connect(currentProject, SIGNAL(refreshMetadata()), SLOT(refreshAndLastMetadata()));
+    connect(currentProject, SIGNAL(displayMetadata()), SLOT(displayMetadata()));
 
     Global::phases                = new Phases(0);
     Global::tagFilterCriteria     = new Sorting(tr("Filter by documents"),     6);
@@ -115,7 +112,10 @@ Rekall::Rekall(QWidget *parent) :
 
     Global::showHelp.setAction(ui->actionInlineHelp);
     connect(ui->actionOpen, SIGNAL(triggered()), SLOT(action()));
+    connect(ui->actionOpenRandom, SIGNAL(triggered()), SLOT(action()));
+    connect(ui->actionOpenRecentClear, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionSave, SIGNAL(triggered()), SLOT(action()));
+    connect(ui->actionClose, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionPaste, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionRemove, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionMarker, SIGNAL(triggered(bool)), SLOT(action()));
@@ -138,6 +138,7 @@ Rekall::Rekall(QWidget *parent) :
     ui->chutier->showRemove(false);
     ui->chutier->showDuplicate(false);
     connect(ui->chutier->getTree(), SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(chutierItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
+    connect(ui->chutier->getTree(), SIGNAL(itemSelectionChanged()), SLOT(chutierItemChanged()));
     connect(ui->actionPlay, SIGNAL(triggered()), ui->timeline, SLOT(actionPlay()));
     connect(ui->actionRewind, SIGNAL(triggered()), ui->timeline, SLOT(actionRewind()));
 
@@ -162,6 +163,8 @@ Rekall::Rekall(QWidget *parent) :
     splash->show();
     QTimer::singleShot(1500, this, SLOT(closeSplash()));
     QCoreApplication::processEvents();
+
+    refreshMenus();
 
     startTimer(1000);
 }
@@ -293,33 +296,64 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
 
 
 void Rekall::action() {
-    if(sender() == ui->actionOpen) {
-        QString dir = QFileDialog::getExistingDirectory(0, tr("Select a folder where you store your files"), Global::pathCurrent.absoluteFilePath());
-        if(!dir.isEmpty()) {
-            Global::pathCurrent = QFileInfo(dir);
+    if((sender() == 0) || (sender() == ui->actionOpen) || (sender() == ui->actionOpenRandom) || (sender() == ui->actionSave) || (sender() == ui->actionClose) || (openRecentAction.contains((QAction*)sender()))) {
+        QString dirToOpen;
+        bool shouldClose = false;
+        if(sender() == ui->actionSave) {
+            currentProject->save();
+        }
+        else if(sender() == ui->actionClose)
+            shouldClose = true;
+        else {
+            Global::falseProject = (sender() == ui->actionOpenRandom);
+            if(openRecentAction.contains((QAction*)sender()))
+                dirToOpen = ((QAction*)sender())->text();
+            else if(sender())
+                dirToOpen = QFileDialog::getExistingDirectory(0, tr("Select a folder where you store your files"), Global::pathCurrentDefault.absoluteFilePath());
+            if((!dirToOpen.isEmpty()) && (QFileInfo(dirToOpen).exists()))
+                shouldClose = true;
+        }
+
+        if(shouldClose) {
+            currentMetadatas.clear();
+            currentProject->close();
+            ui->chutier->getTree()->clear();
+            Global::pathCurrent = QFileInfo();
+            displayMetadata();
+            ui->player->unload();
+        }
+
+        if((!dirToOpen.isEmpty()) && (QFileInfo(dirToOpen).exists())) {
+            Global::pathCurrent = QFileInfo(dirToOpen);
+            refreshMenus(Global::pathCurrent);
             currentProject->open(QFileInfoList() << Global::pathCurrent, ui->chutier);
             ui->chutier->getTree()->collapseAll();
             for(quint16 i = 0 ; i < ui->chutier->getTree()->topLevelItemCount() ; i++)
                 ui->chutier->getTree()->expandItem(ui->chutier->getTree()->topLevelItem(i));
         }
+        refreshMenus();
     }
-    else if(sender() == ui->actionSave)
-        currentProject->save();
+    else if(sender() == ui->actionOpenRecentClear)
+        refreshMenus(QFileInfo(), true);
     else if(sender() == ui->actionPaste)
         parseMimeData(QApplication::clipboard()->mimeData(), "rekall");
     else if(sender() == ui->metadataOpenGps)
         gps->show();
-    else if((sender() == ui->metadataOpen) && (currentMetadata)) {
-        if(currentMetadata->chutierItem)
-            currentMetadata->chutierItem->fileShowInOS();
-        else
-            UiFileItem::fileShowInOS(currentMetadata->getMetadata("Rekall", "URL").toString());
+    else if((sender() == ui->metadataOpen) && (currentMetadatas.count())) {
+        foreach(Metadata *currentMetadata, currentMetadatas) {
+            if(currentMetadata->chutierItem)
+                currentMetadata->chutierItem->fileShowInOS();
+            else
+                UiFileItem::fileShowInOS(currentMetadata->getMetadata("Rekall", "URL").toString());
+        }
     }
-    else if((sender() == ui->metadataOpenFinder) && (currentMetadata)) {
-        if(currentMetadata->chutierItem)
-            currentMetadata->chutierItem->fileShowInFinder();
-        else if(currentMetadata->thumbnails.count())
-            UiFileItem::fileShowInFinder(currentMetadata->thumbnails.first().currentFilename);
+    else if((sender() == ui->metadataOpenFinder) && (currentMetadatas.count())) {
+        foreach(Metadata *currentMetadata, currentMetadatas) {
+            if(currentMetadata->chutierItem)
+                currentMetadata->chutierItem->fileShowInFinder();
+            else if(currentMetadata->thumbnails.count())
+                UiFileItem::fileShowInFinder(currentMetadata->thumbnails.first().currentFilename);
+        }
     }
     else if(sender() == ui->actionMarker) {
         Global::timeline->actionMarkerAddStart();
@@ -336,31 +370,32 @@ void Rekall::action() {
         Global::selectedTagHover = 0;
         Global::selectedTags.clear();
         Global::selectedTagsInAction.clear();
+        Global::mainWindow->displayMetadataAndSelect();
         Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
     }
 }
 void Rekall::actionForceGL() {
     ui->toolBoxRight->resize(ui->toolBoxRight->width()+1, ui->toolBoxRight->height());
 }
-
-void Rekall::actionMetadata() {
-    if((currentMetadata) && (ui->metadata->currentItem()) && (ui->metadata->currentItem()->parent())) {
-        QString key      = ui->metadata->currentItem()->text(0).remove(QRegExp("<[^>]*>")).trimmed();
-        QString value    = ui->metadata->currentItem()->text(1).remove(QRegExp("<[^>]*>")).trimmed();
-        QString category = ui->metadata->currentItem()->parent()->text(0).remove(QRegExp("<[^>]*>")).trimmed();
-        if(category == "General")   category = "Rekall";
-        currentMetadata->setMetadata(category, key, value, ui->metadataSlider->value());
-        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
-    }
+qint16 Rekall::findDocumentVersionWithMetadata(Metadata* metadata) {
+    if(ui->metadataSlider->isVisible())
+        return ui->metadataSlider->value();
+    else if(metadata->tempStorage)
+        return ((Tag*)metadata->tempStorage)->getDocumentVersion();
+    return -1;
 }
-void Rekall::actionMetadata(QTreeWidgetItem *item, int) {
-    if((!metaIsChanging) && (item) && (currentMetadata)) {
-        QString category, meta, value;
-        if(item->parent())
-            category = item->parent()->text(0);
-        meta  = item->text(0);
-        value = item->text(1);
+void Rekall::actionMetadata() {
+    if((ui->metadata->currentItem()) && (ui->metadata->currentItem()->parent())) {
+        QString key      = HtmlDelegate::removeHtml(ui->metadata->currentItem()->text(0));
+        QString value    = HtmlDelegate::removeHtml(ui->metadata->currentItem()->text(1));
+        QString category = HtmlDelegate::removeHtml(ui->metadata->currentItem()->parent()->text(0));
+        if(category == "General")   category = "Rekall";
+        foreach(Metadata *currentMetadata, currentMetadatas)
+            currentMetadata->setMetadata(category, key, value, findDocumentVersionWithMetadata(currentMetadata));
+        ui->metadata->currentItem()->setText(0, ui->metadata->currentItem()->text(0).remove("<i>").remove("</i>"));
+        ui->metadata->currentItem()->setText(1, ui->metadata->currentItem()->text(1).remove("<i>").remove("</i>"));
     }
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
 }
 
 void Rekall::closeSplash() {
@@ -368,109 +403,107 @@ void Rekall::closeSplash() {
     showMaximized();
     updateGeometry();
     ui->timelineSplitter->setSizes(QList<int>() << ui->timelineSplitter->height() * 0.50 << ui->timelineSplitter->height() * 0.50);
-    ui->fileSplitter->setSizes(QList<int>()     << 200                                   << ui->fileSplitter->width()      - 200);
+    ui->fileSplitter    ->setSizes(QList<int>() << 200                                   << ui->fileSplitter->width()      - 200);
     ui->conduiteSplitter->setSizes(QList<int>() << ui->conduiteSplitter->width()  - 300  << 300);
+    ui->previewSplitter ->setSizes(QList<int>() << ui->previewSplitter->height() * 0.30  << ui->previewSplitter->height() * 0.70);
     //trayMenu->showMessage("Rekall", "Ready!", QSystemTrayIcon::NoIcon);
 }
 
 
 
 
-void Rekall::refreshMetadata() {
-    if(!metaIsChanging) {
-        chutierIsUpdating = true;
-        chutierItemChanged(ui->chutier->getTree()->currentItem(), ui->chutier->getTree()->currentItem());
-
-        //Changemenent de méta
-        if(currentDocument) {
-            foreach(Tag *documentTag, currentDocument->tags) {
-                if(documentTag->getDocumentVersion() == ui->metadataSlider->value()) {
-                    Global::selectedTags.clear();
-                    Global::selectedTags.append(documentTag);
-                    Global::timelineGL->ensureVisible(documentTag->getTimelineBoundingRect().translated(documentTag->timelineDestPos).topLeft());
-                    Global::viewerGL  ->ensureVisible(documentTag->getViewerBoundingRect().translated(documentTag->viewerDestPos).topLeft());
+void Rekall::chutierItemChanged(QTreeWidgetItem *, QTreeWidgetItem *) {
+    if(!chutierIsUpdating) {
+        QList<QTreeWidgetItem*> items = ui->chutier->getTree()->selectedItems();
+        Global::selectedTags.clear();
+        foreach(QTreeWidgetItem *item, items) {
+            Document *document = currentProject->getDocument(((UiFileItem*)item)->filename.file.absoluteFilePath());
+            if(document) {
+                foreach(Tag *tag, document->tags) {
+                    if(tag->getDocumentVersion() == document->getMetadataCountM()) {
+                        Global::selectedTags.append(tag);
+                        Global::timelineGL->ensureVisible(tag->getTimelineBoundingRect().translated(tag->timelineDestPos).topLeft());
+                        Global::viewerGL  ->ensureVisible(tag->getViewerBoundingRect().translated(tag->viewerDestPos).topLeft());
+                    }
                 }
             }
         }
-        chutierIsUpdating = false;
+        displayMetadata();
     }
 }
-void Rekall::refreshAndLastMetadata() {
-    if(!metaIsChanging) {
-        chutierIsUpdating = true;
-        chutierItemChanged(ui->chutier->getTree()->currentItem(), 0);
-        chutierIsUpdating = false;
-    }
+void Rekall::personItemChanged(QTreeWidgetItem *, QTreeWidgetItem *) {
+    displayMetadata();
 }
-void Rekall::refreshMetadata(void *_tag, bool inChutier) {
-    Tag *tag = (Tag*)_tag;
-    if(inChutier) {
-        chutierIsUpdating = true;
-        Global::chutier->setCurrentItem(tag->getDocument()->chutierItem);
-        chutierItemChanged(ui->chutier->getTree()->currentItem(), ui->chutier->getTree()->currentItem(), tag);
-        chutierIsUpdating = false;
+void Rekall::displayMetadataAndSelect(void *tag) {
+    chutierIsUpdating = true;
+    ui->chutier->getTree()->clearSelection();
+    if(tag) {
+        DocumentBase *metadata = ((Tag*)tag)->getDocument();
+        if(metadata) {
+            UiFileItem *chutierItem = metadata->chutierItem;
+            if(chutierItem)
+                ui->chutier->getTree()->setCurrentItem(chutierItem);
+        }
     }
-    else
-        displayMetadata(tag->getDocument(), tag, ui->chutier->getTree(), 0, 0);
+    chutierIsUpdating = false;
+    displayMetadata();
 }
-void Rekall::chutierItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB, Tag *tag) {
-    if(item) {
-        if(tag) currentDocument = (Document*)tag->getDocument();
-        else    currentDocument = currentProject->getDocumentAndSelect(((UiFileItem*)item)->filename.file.absoluteFilePath());
-        displayMetadata(currentDocument, tag, ui->chutier->getTree(), item, itemB);
+void Rekall::displayMetadata(QTreeWidgetItem *, QTreeWidgetItem *) {
+    currentMetadatas.clear();
 
-        if((currentMetadata) && (sender() == ui->chutier->getTree()))
-            ui->metadataSlider->setValue(currentMetadata->getMetadataCountM());
+    chutierIsUpdating = true;
 
-        if((currentDocument) && (!chutierIsUpdating)) {
-            foreach(Tag *documentTag, currentDocument->tags) {
-                if(documentTag->getDocumentVersion() == ui->metadataSlider->value()) {
-                    Global::selectedTags.clear();
-                    Global::selectedTags.append(documentTag);
-                    Global::timelineGL->ensureVisible(documentTag->getTimelineBoundingRect().translated(documentTag->timelineDestPos).topLeft());
-                    Global::viewerGL  ->ensureVisible(documentTag->getViewerBoundingRect().translated(documentTag->viewerDestPos).topLeft());
-                }
+    //Ajoute la sélection de tags
+    foreach(void *tag, Global::selectedTags) {
+        Metadata *metadata = ((Tag*)tag)->getDocument();
+        if((metadata) && (!currentMetadatas.contains(metadata))) {
+            UiFileItem *chutierItem = ((Document*)metadata)->chutierItem;
+            if(chutierItem) {
+                //ui->chutier->getTree()->setCurrentItem(chutierItem);
+                ((Document*)metadata)->chutierItem->setSelected(true);
+            }
+
+            metadata->tempStorage = tag;
+            currentMetadatas << metadata;
+        }
+    }
+
+    //Ajoute la sélection au survol
+    if((!currentMetadatas.count()) && (Global::selectedTagHover)) {
+        Metadata *metadata = ((Tag*)Global::selectedTagHover)->getDocument();
+        if((metadata) && (!currentMetadatas.contains(metadata))) {
+            metadata->tempStorage = 0;
+            currentMetadatas << metadata;
+        }
+    }
+
+    //Ajoute la sélection de chutier
+    foreach(QTreeWidgetItem *item, ui->chutier->getTree()->selectedItems()) {
+        Metadata *metadata = currentProject->getDocument(((UiFileItem*)item)->filename.file.absoluteFilePath());
+        if((metadata) && (!currentMetadatas.contains(metadata))) {
+            metadata->tempStorage = 0;
+            currentMetadatas << metadata;
+        }
+    }
+    chutierIsUpdating = false;
+
+    ui->metadata->clear();
+    if(currentMetadatas.count()) {
+        QStringList expandItems;
+        QString metadataPrefixGlobal = QString("<span style='font-family: Calibri, Arial; font-size: %1px; ").arg(Global::font.pixelSize());;
+        QString metadataPrefix0 = metadataPrefixGlobal + "color: #F5F8FA'>";
+        QString metadataPrefix1 = metadataPrefixGlobal + "color: %1'>";
+        QString metadataSuffix = "</span>";
+        for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++) {
+            if(ui->metadata->topLevelItem(i)->isExpanded())
+                expandItems << HtmlDelegate::removeHtml(ui->metadata->topLevelItem(i)->text(0));
+            for(quint16 j = 0 ; j < ui->metadata->topLevelItem(i)->childCount() ; j++) {
+                if(ui->metadata->topLevelItem(i)->child(j)->isExpanded())
+                    expandItems << HtmlDelegate::removeHtml(ui->metadata->topLevelItem(i)->child(j)->text(0));
             }
         }
-    }
-}
-void Rekall::showPreviewTab() {
-    ui->toolBoxRight->setCurrentIndex(1);
-}
-
-
-void Rekall::personItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *itemB) {
-    if(item)
-        displayMetadata((Person*)item, 0, ui->chutier->getTree(), item, itemB);
-}
-void Rekall::displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget *tree, QTreeWidgetItem *item, QTreeWidgetItem *) {
-    metaIsChanging = true;
-    currentMetadata = metadata;
-
-    //Standard operations
-    if((tree) && (item))
-        tree->setCurrentItem(item);
-
-    QStringList expandItems;
-
-    QString metadataPrefix0 = "<span style='font-family: Calibri, Arial; font-size: 11px; color: #F5F8FA'>";
-    QString metadataPrefix1 = "<span style='font-family: Calibri, Arial; font-size: 11px; color: %1'>";
-    QString metadataSuffix = "</span>";
-
-
-    for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++) {
-        if(ui->metadata->topLevelItem(i)->isExpanded())
-            expandItems << ui->metadata->topLevelItem(i)->text(0).remove(QRegExp("<[^>]*>")).trimmed();
-        for(quint16 j = 0 ; j < ui->metadata->topLevelItem(i)->childCount() ; j++) {
-            if(ui->metadata->topLevelItem(i)->child(j)->isExpanded())
-                expandItems << ui->metadata->topLevelItem(i)->child(j)->text(0).remove(QRegExp("<[^>]*>")).trimmed();
-        }
-    }
-    if(expandItems.count() == 0)
-        expandItems << "General" << "Contact details";
-
-    if(metadata) {
-        ui->metadata->clear();
+        if(expandItems.count() == 0)
+            expandItems << "General" << "Contact details";
 
         QTreeWidgetItem *metadataRootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + tr("Details") + metadataSuffix);
         metadataRootItem->setFlags(Qt::ItemIsEnabled);
@@ -478,64 +511,133 @@ void Rekall::displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget *tree, QT
             ui->metadata->expandItem(metadataRootItem);
 
         //Versions
-        ui->metadataSlider->setMaximum(metadata->getMetadataCountM());
-        if(tag) ui->metadataSlider->setValue(tag->getDocumentVersion());
+        if(currentMetadatas.count() == 1) {
+            ui->metadataSlider->setMaximum(currentMetadatas.first()->getMetadataCountM());
+            if(Global::selectedTags.count()) {
+                Tag *tag = (Tag*)Global::selectedTags.first();
+                if(tag)
+                    ui->metadataSlider->setValue(tag->getDocumentVersion());
+            }
+        }
 
-        if(metadata->getMetadataCount() > 1) ui->metadataSlider->setVisible(true);
-        else                                 ui->metadataSlider->setVisible(false);
+        if((currentMetadatas.count() == 1) && (currentMetadatas.first()->getMetadataCount() > 1)) ui->metadataSlider->setVisible(true);
+        else                                                                                      ui->metadataSlider->setVisible(false);
         ui->metadataSliderIcon ->setVisible(ui->metadataSlider->isVisible());
         ui->metadataSliderIcon2->setVisible(ui->metadataSlider->isVisible());
 
         //Sum up
-        QMapIterator<QString, QMetaMap> metaIterator(metadata->getMetadata(ui->metadataSlider->value()));
-        while(metaIterator.hasNext()) {
-            metaIterator.next();
+        foreach(Metadata *currentMetadata, currentMetadatas) {
+            QMapIterator<QString, QMetaMap> metaIterator(currentMetadata->getMetadata(findDocumentVersionWithMetadata(currentMetadata)));
+            while(metaIterator.hasNext()) {
+                metaIterator.next();
 
-            QTreeWidgetItem *rootItem = 0;
-            QString metaIteratorKey = metaIterator.key();
-            if(metaIteratorKey == "Rekall")
-                metaIteratorKey = "General";
+                QTreeWidgetItem *rootItem = 0;
+                QString metaIteratorKey = metaIterator.key();
+                if(metaIteratorKey == "Rekall")
+                    metaIteratorKey = "General";
 
-            if(metaIteratorKey == "General")  rootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), QStringList() << metadataPrefix0 + "General" + metadataSuffix);
-            else                              rootItem = new QTreeWidgetItem(metadataRootItem, QStringList() << metadataPrefix0 + metaIteratorKey + metadataSuffix);
-            rootItem->setFlags(Qt::ItemIsEnabled);
+                QStringList itemText;
+                if(metaIteratorKey == "General")  itemText << metadataPrefix0 + "General" + metadataSuffix;
+                else                              itemText << metadataPrefix0 + metaIteratorKey + metadataSuffix;
 
-            QMapIterator<QString,MetadataElement> ssMetaIterator(metaIterator.value());
-            while(ssMetaIterator.hasNext()) {
-                ssMetaIterator.next();
-
-                QString color = "#000000";
-                if(ssMetaIterator.key() == "Name") {
-                    color = metadata->baseColor.name();
-                    ui->metadataSlider->setStyleSheet(QString("QSlider::handle { background-color: %1; }").arg(color));
+                for(quint16 i = 0 ; i < ui->metadata->topLevelItemCount() ; i++) {
+                    bool itemExists = true;
+                    for(quint16 j = 0 ; j < itemText.count() ; j++) {
+                        if(HtmlDelegate::removeHtml(ui->metadata->topLevelItem(i)->text(j)) != HtmlDelegate::removeHtml(itemText.at(j)))
+                            itemExists = false;
+                    }
+                    if(itemExists) {
+                        rootItem = ui->metadata->topLevelItem(i);
+                        break;
+                    }
                 }
-                if(color == "#000000")
-                    color = "#C8C8C8";
-                QTreeWidgetItem *item = new QTreeWidgetItem(rootItem, QStringList()
-                                                            << metadataPrefix0 + ssMetaIterator.key() + metadataSuffix
-                                                            << metadataPrefix1.arg(color) + ssMetaIterator.value().toString() + metadataSuffix);
-                item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+                if(!rootItem) {
+                    if(metaIteratorKey == "General")  rootItem = new QTreeWidgetItem(ui->metadata->invisibleRootItem(), itemText);
+                    else                              rootItem = new QTreeWidgetItem(metadataRootItem, itemText);
+                    rootItem->setFlags(Qt::ItemIsEnabled);
+                }
+
+                QMapIterator<QString,MetadataElement> ssMetaIterator(metaIterator.value());
+                while(ssMetaIterator.hasNext()) {
+                    ssMetaIterator.next();
+
+                    QString color = "#000000", defaultColor = "#C8C8C8";
+                    if(ssMetaIterator.key() == "Name") {
+                        if(currentMetadatas.count() == 1) {
+                            ui->metadataTitle->setText(ssMetaIterator.value().toString().toUpper());
+                            color = currentMetadata->baseColor.name();
+                        }
+                        else {
+                            ui->metadataTitle->setText(QString("Multiple selection (%1)").arg(currentMetadatas.count()));
+                            color = defaultColor;
+                        }
+                        ui->metadataTitle->setStyleSheet(QString("border-bottom: 1px solid %1; color: %1; margin: 0px 20px 0px 20px;").arg(color));
+                        ui->metadataSlider->setStyleSheet(QString("QSlider::handle { background-color: %1; }").arg(color));
+                        color = currentMetadata->baseColor.name();
+                    }
+                    else if(ssMetaIterator.key() == Global::tagColorCriteria->getTagName()) {
+                        color = currentMetadata->baseColor.name();
+                        ui->metadataSubTitle->setStyleSheet(QString("color: %1; font-size: %2px").arg(color).arg(Global::fontSmall.pixelSize()));
+                        if(currentMetadatas.count() == 1)
+                            ui->metadataSubTitle->setText(ssMetaIterator.value().toString().toUpper());
+                        else
+                            ui->metadataSubTitle->setText("");
+                    }
+
+                    if(color == "#000000")
+                        color = defaultColor;
+
+                    itemText = QStringList() << metadataPrefix0 + ssMetaIterator.key() + metadataSuffix
+                                             << metadataPrefix1.arg(color) + ssMetaIterator.value().toString() + metadataSuffix;
+
+                    QTreeWidgetItem *item = 0;
+                    for(quint16 i = 0 ; i < rootItem->childCount() ; i++) {
+                        bool itemExists = true;
+                        for(quint16 j = 0 ; j < /*itemText.count()*/1 ; j++) {
+                            if(HtmlDelegate::removeHtml(rootItem->child(i)->text(j)) != HtmlDelegate::removeHtml(itemText.at(j)))
+                                itemExists = false;
+                        }
+                        if(itemExists) {
+                            item = rootItem->child(i);
+                            break;
+                        }
+                    }
+                    if(item) {
+                        if(HtmlDelegate::removeHtml(item->text(1)) != HtmlDelegate::removeHtml(itemText.at(1))) {
+                            item->setText(0, "<i>" + item->text(0) + "</i>");
+                            item->setText(1, "<i>" + item->text(1) + "</i>");
+                        }
+                    }
+                    else {
+                        item = new QTreeWidgetItem(rootItem, itemText);
+                        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+                    }
+                }
+
+                if(expandItems.contains(metaIteratorKey))    ui->metadata->expandItem(rootItem);
+                else                                         ui->metadata->collapseItem(rootItem);
             }
 
-            if(expandItems.contains(metaIteratorKey))    ui->metadata->expandItem(rootItem);
-            else                                         ui->metadata->collapseItem(rootItem);
-        }
+            if((currentMetadata->chutierItem) || (currentMetadata->getType() == DocumentTypeWeb)) {
+                ui->metadataOpenFinder->setVisible(true);
+                ui->metadataOpen      ->setVisible(true);
+            }
+            else {
+                ui->metadataOpenFinder->setVisible(false);
+                ui->metadataOpen      ->setVisible(false);
+            }
 
-        if((metadata->chutierItem) || (metadata->getType() == DocumentTypeWeb)) {
-            ui->metadataOpenFinder->setVisible(true);
-            ui->metadataOpen      ->setVisible(true);
+            if(currentMetadatas.last() == currentMetadata) {
+                displayDocumentName(QString("%1 (%2)").arg(currentMetadata->getName()).arg(currentMetadata->getMetadata("Rekall", "Folder").toString()));
+                displayPixmap(currentMetadata->getType(), currentMetadata->getThumbnail(findDocumentVersionWithMetadata(currentMetadata)));
+                displayGps(currentMetadata->getGps());
+            }
         }
-        else {
-            ui->metadataOpenFinder->setVisible(false);
-            ui->metadataOpen      ->setVisible(false);
-        }
-
-        displayDocumentName(QString("%1 (%2)").arg(metadata->getName()).arg(metadata->getMetadata("Rekall", "Folder").toString()));
-        displayPixmap(metadata->getType(), metadata->getThumbnail(ui->metadataSlider->value()));
-        displayGps(metadata->getGps());
     }
-    metaIsChanging = false;
 }
+
+
+
 void Rekall::displayDocumentName(const QString &documentName) {
     gps->setWindowTitle(tr("Location — %1").arg(documentName));
 }
@@ -546,6 +648,10 @@ void Rekall::displayPixmap(DocumentType documentType, const QString &filename, c
     ui->preview->setMaximumHeight(ui->toolBoxRight->height() / 2.5);
     ui->preview->preview(documentType, filename, picture);
 }
+void Rekall::showPreviewTab() {
+    ui->toolBoxRight->setCurrentIndex(1);
+}
+
 
 void Rekall::displayGps(const QList< QPair<QString,QString> > &gpsCoords) {
     QString mapsParam;
@@ -583,14 +689,6 @@ void Rekall::timerEvent(QTimerEvent *) {
     if(Global::userInfos->updateDecounter < 0)
         Global::userInfos->update();
     Global::userInfos->updateDecounter--;
-
-    if(openProject) {
-        openProject = false;
-        currentProject->open(QFileInfoList() << Global::pathCurrent, ui->chutier, false);
-        ui->chutier->getTree()->collapseAll();
-        for(quint16 i = 0 ; i < ui->chutier->getTree()->topLevelItemCount() ; i++)
-            ui->chutier->getTree()->expandItem(ui->chutier->getTree()->topLevelItem(i));
-    }
 }
 
 void Rekall::closeEvent(QCloseEvent *) {
@@ -618,4 +716,57 @@ void Rekall::setVisbility(bool visibility) {
     else {
         close();
     }
+}
+
+
+void Rekall::refreshMenus(const QFileInfo &path, bool clear) {
+    QFileInfoList recentPaths;
+    if(path.exists())
+        recentPaths << path;
+
+    if(true) {
+        QSettings settings;
+        quint16 recentsCount = settings.beginReadArray("recents");
+        for(quint16 recentsIndex = 0 ; recentsIndex < recentsCount ; recentsIndex++) {
+            settings.setArrayIndex(recentsIndex);
+            QFileInfo recentPath(settings.value("path").toString());
+            if((recentPath.exists()) && (!recentPaths.contains(recentPath)))
+                recentPaths << recentPath;
+        }
+        settings.endArray();
+    }
+
+    if(clear)
+        recentPaths.clear();
+
+    if(true) {
+        QSettings settings;
+        settings.beginWriteArray("recents", recentPaths.count());
+        for(quint16 recentsIndex = 0 ; recentsIndex < recentPaths.count() ; recentsIndex++) {
+            settings.setArrayIndex(recentsIndex);
+            settings.setValue("path", recentPaths.at(recentsIndex).absoluteFilePath());
+        }
+        settings.endArray();
+    }
+
+    foreach(QAction *action, openRecentAction)
+        delete action;
+    openRecentAction.clear();
+    if(recentPaths.count()) {
+        foreach(const QFileInfo &recentPath, recentPaths) {
+            QAction *action = new QAction(recentPath.absoluteFilePath(), this);
+            connect(action, SIGNAL(triggered()), SLOT(action()));
+            openRecentAction << action;
+        }
+        ui->menuOpen->insertActions(ui->actionOpenRecentNo, openRecentAction);
+        ui->actionOpenRecentNo   ->setVisible(false);
+        ui->actionOpenRecentClear->setVisible(true);
+    }
+    else {
+        ui->actionOpenRecentNo   ->setVisible(true);
+        ui->actionOpenRecentClear->setVisible(false);
+    }
+
+    ui->actionSave ->setEnabled(Global::pathCurrent.exists());
+    ui->actionClose->setEnabled(Global::pathCurrent.exists());
 }

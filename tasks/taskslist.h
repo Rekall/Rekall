@@ -50,6 +50,7 @@ public:
     void setToolbox(QToolBox *);
     void addTask   (Metadata *metadata, TaskProcessType type, qint16 version, bool needCompleteScan);
     void addTask   (const TaskProcessData &data);
+    void clearTasks();
 private slots:
     void webPageLoaded();
 private:

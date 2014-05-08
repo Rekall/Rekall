@@ -57,7 +57,6 @@ QList<Person*> Person::fromString(const QString &text, QObject *parent) {
                     personCard.append(personCardInfo);
                 }
             }
-            //personCard.debug();
             persons.append(new Person(personCard, parent));
         }
     }

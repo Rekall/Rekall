@@ -56,6 +56,9 @@ QLabel#visibilityLabel, QLabel#filtersLabel, QLabel#label {
 	border: 		0px solid black;
 	border-top: 	1px solid white;
 } 
+QLabel#metadataTitle {
+	
+}
 
 
 QToolBox, QTabWidget {
@@ -268,7 +271,7 @@ QSplitter#fileSplitter::handle 						{		background: 	rgba(255,147,102, 30);	}
 QSplitter#fileSplitter::handle:pressed 			{		background: 	rgb(255,147,102);			}
 QSplitter#timelineSplitter::handle 				{		background: 	rgb(71, 77, 79);				}
 QSplitter#timelineSplitter::handle:pressed 	{		background: 	rgb(226,226,226);			}
-QSplitter#previewSplitter::handle 				{		background: 	rgb(71, 77, 79);				}
+QSplitter#previewSplitter::handle 				{		background: 	rgb(91, 97, 99);				}
 QSplitter#previewSplitter::handle:pressed 	{		background: 	rgb(226,226,226);			}
 QSplitter::handle:horizontal	 						{		width: 	4px; 											}
 QSplitter::handle:vertical     							{		height:	4px; 											}
@@ -729,9 +732,9 @@ QMenu::item:enabled:selected {
            <attribute name="title">
             <string>INFOS</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
+           <layout class="QVBoxLayout" name="verticalLayout_7">
             <property name="spacing">
-             <number>12</number>
+             <number>6</number>
             </property>
             <property name="leftMargin">
              <number>6</number>
@@ -761,44 +764,88 @@ QMenu::item:enabled:selected {
                <enum>Qt::Vertical</enum>
               </property>
               <widget class="Previewer" name="preview" native="true"/>
-              <widget class="QTreeWidget" name="metadata">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>20</height>
-                </size>
-               </property>
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="editTriggers">
-                <set>QAbstractItemView::DoubleClicked</set>
-               </property>
-               <property name="alternatingRowColors">
-                <bool>false</bool>
-               </property>
-               <property name="indentation">
-                <number>10</number>
-               </property>
-               <property name="animated">
-                <bool>true</bool>
-               </property>
-               <property name="wordWrap">
-                <bool>true</bool>
-               </property>
-               <attribute name="headerVisible">
-                <bool>false</bool>
-               </attribute>
-               <column>
-                <property name="text">
-                 <string notr="true">Key</string>
+              <widget class="QWidget" name="layoutWidget1">
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <property name="spacing">
+                 <number>0</number>
                 </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Value</string>
+                <property name="topMargin">
+                 <number>10</number>
                 </property>
-               </column>
+                <item>
+                 <widget class="QLabel" name="metadataTitle">
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="metadataSubTitle">
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QTreeWidget" name="metadata">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::NoFocus</enum>
+                  </property>
+                  <property name="editTriggers">
+                   <set>QAbstractItemView::DoubleClicked</set>
+                  </property>
+                  <property name="alternatingRowColors">
+                   <bool>false</bool>
+                  </property>
+                  <property name="indentation">
+                   <number>15</number>
+                  </property>
+                  <property name="animated">
+                   <bool>true</bool>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                  <attribute name="headerVisible">
+                   <bool>false</bool>
+                  </attribute>
+                  <column>
+                   <property name="text">
+                    <string notr="true">Key</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Value</string>
+                   </property>
+                  </column>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </widget>
             </item>
@@ -933,8 +980,19 @@ QMenu::item:enabled:selected {
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen"/>
+    <widget class="QMenu" name="menuOpen">
+     <property name="title">
+      <string>Open project</string>
+     </property>
+     <addaction name="actionOpen"/>
+     <addaction name="actionOpenRandom"/>
+     <addaction name="separator"/>
+     <addaction name="actionOpenRecentNo"/>
+     <addaction name="actionOpenRecentClear"/>
+    </widget>
+    <addaction name="menuOpen"/>
     <addaction name="actionSave"/>
+    <addaction name="actionClose"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -973,20 +1031,9 @@ QMenu::item:enabled:selected {
     <string>F</string>
    </property>
   </action>
-  <action name="actionInspector">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Inspector</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Alt+I</string>
-   </property>
-  </action>
   <action name="actionSave">
    <property name="text">
-    <string>Save</string>
+    <string>Save project</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -1038,12 +1085,41 @@ QMenu::item:enabled:selected {
     <string>Backspace</string>
    </property>
   </action>
+  <action name="actionOpenRecentNo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>No recent project</string>
+   </property>
+  </action>
+  <action name="actionOpenRecentClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
   <action name="actionOpen">
    <property name="text">
-    <string>Open a folder</string>
+    <string>Open a folder…</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionOpenRandom">
+   <property name="text">
+    <string>Open a folder (random mode)…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
  </widget>
@@ -1097,46 +1173,14 @@ QMenu::item:enabled:selected {
  </resources>
  <connections>
   <connection>
-   <sender>metadata</sender>
-   <signal>itemChanged(QTreeWidgetItem*,int)</signal>
-   <receiver>Rekall</receiver>
-   <slot>actionMetadata(QTreeWidgetItem*,int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>793</x>
-     <y>413</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>916</x>
-     <y>135</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>metadataSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>Rekall</receiver>
-   <slot>refreshMetadata()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>793</x>
-     <y>500</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>69</x>
-     <y>-62</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>metadataOpenGps</sender>
    <signal>released()</signal>
    <receiver>Rekall</receiver>
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>558</x>
-     <y>461</y>
+     <x>793</x>
+     <y>496</y>
     </hint>
     <hint type="destinationlabel">
      <x>1145</x>
@@ -1167,8 +1211,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>793</x>
-     <y>461</y>
+     <x>481</x>
+     <y>496</y>
     </hint>
     <hint type="destinationlabel">
      <x>981</x>
@@ -1183,8 +1227,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>432</x>
-     <y>445</y>
+     <x>637</x>
+     <y>496</y>
     </hint>
     <hint type="destinationlabel">
      <x>945</x>
@@ -1192,11 +1236,27 @@ QMenu::item:enabled:selected {
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>metadataSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>Rekall</receiver>
+   <slot>displayMetadata()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>386</x>
+     <y>441</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>235</x>
+     <y>558</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>action()</slot>
   <slot>actionMetadata(QTreeWidgetItem*,int)</slot>
-  <slot>refreshMetadata()</slot>
+  <slot>displayMetadata()</slot>
   <slot>personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
   <slot>actionForceGL()</slot>
  </slots>

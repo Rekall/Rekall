@@ -55,7 +55,8 @@ public slots:
     void setDuplicates(quint16 nbDuplicates);
     void setHistories(quint16 nbHistories);
     void action();
-
+protected:
+    void mouseReleaseEvent(QMouseEvent *);
 };
 
 #endif // TIMELINECONTROL_H

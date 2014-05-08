@@ -25,7 +25,7 @@
 #include "ui_sorting.h"
 
 Sorting::Sorting(const QString &title, quint16 index, bool _needWord, bool _isHorizontal, QWidget *parent) :
-    QWidget(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
+    QWidget(parent, Qt::Tool | Qt::FramelessWindowHint),
     ui(new Ui::Sorting) {
 
     ui->setupUi(this);
@@ -121,7 +121,7 @@ void Sorting::action() {
                 QStringList sortSplit = filterText.split("|");
 
                 leftLength    = -1;
-                asNumber      = asDate = asTimeline = false;
+                asNumber = asDate = asTimeline = false;
                 sortAscending = true;
                 QString _tagName = sortSplit.first().trimmed();
                 if(_tagName.count()) {
@@ -236,7 +236,7 @@ const QString Sorting::getCriteriaFormated(const QString &_criteria) {
             return criteriaFormatedCache.value(criteria);
         else {
             QString retour;
-            if(     criteria.length() <= 3)   retour = criteria;
+            if     (criteria.length() <= 3)   retour = criteria;
             else if(criteria.length() <= 4)   retour = tr("%1's").arg(criteria.left(4), -4, '0');
             else if(criteria.length() <= 8)   retour = QDateTime::fromString(criteria, QString("yyyy:MM:dd hh:mm:ss").left(criteria.length())).toString("MMMM yyyy");
             else if(criteria.length() <= 11)  retour = QDateTime::fromString(criteria, QString("yyyy:MM:dd hh:mm:ss").left(criteria.length())).toString("dddd dd MMMM yyyy");
@@ -258,7 +258,7 @@ bool Sorting::isAcceptable(bool strongCheck, const QString &_criteria) const {
     if(asTimeline)
         return true;
 
-    if(_criteria.isEmpty())
+    if((_criteria.isEmpty()) && (!asDate))
         return false;
 
     /*
@@ -333,7 +333,7 @@ void Sorting::addCheckStart() {
     isUpdating = false;
 }
 void Sorting::addCheck(const QString &sorting, const QString &sortingFormated, const QString &_complement) {
-    if(sorting.isEmpty())
+    if((sorting.isEmpty()) && (sortingFormated.isEmpty()))
         return;
 
     QString complement;
@@ -407,7 +407,7 @@ void Sorting::deserialize(const QDomElement &xmlElement) {
 
 
 
-const QString Sorting::timeToString(qreal time) {
+const QString Sorting::timeToString(qreal time, bool millisec) {
     QString timeStr = "";
 
     quint16 min = time / 60;
@@ -419,14 +419,27 @@ const QString Sorting::timeToString(qreal time) {
     if(sec < 10) timeStr += "0";
     timeStr += QString::number(sec);
 
+    if(millisec)
+        timeStr += QString(":%1").arg((qint16)((time - (qreal)sec - (qreal)min * 60) * 1000), 3, 10, QChar('0'));
+
     return timeStr;
 }
 qreal Sorting::stringToTime(const QString &timeStr) {
     qreal time = 0;
     if(timeStr.count()) {
         QStringList timeParts = timeStr.split(":");
-        if(timeParts.count() > 1)
-            time = timeParts.last().toDouble() + timeParts.at(timeParts.count() - 2).toDouble() * 60;
+        if(timeParts.count() > 2) {
+            qreal millisec = timeParts.at(2).toDouble();
+            if(timeParts.at(2).count() == 1)
+                millisec *= 100;
+            else if(timeParts.at(2).count() == 2)
+                millisec *= 10;
+            time = timeParts.at(0).toDouble() * 60 + timeParts.at(1).toDouble() + millisec / 1000.;
+        }
+        else if(timeParts.count() > 1)
+            time = timeParts.at(0).toDouble() * 60 + timeParts.at(1).toDouble();
+        else if(timeParts.count() > 0)
+            time = timeParts.at(0).toDouble() * 60;
     }
     return time;
 }
@@ -486,4 +499,8 @@ void Sorting::reset(const QString &filterText, QString matchText, QStringList ch
     }
     action();
     QApplication::processEvents();
+}
+
+void Sorting::mouseReleaseEvent(QMouseEvent *) {
+    close();
 }

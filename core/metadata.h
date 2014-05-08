@@ -157,6 +157,7 @@ public:
     Thumbnails       thumbnails;
     MetadataWaveform waveform;
     QColor           baseColor;
+    void            *tempStorage;
 protected:
     bool   metadataMutex;
     QImage photo;
@@ -214,14 +215,14 @@ public:
         if(getMetadata("Rekall", "Media Function", version).toString().toLower() == "render")   metadatas[version].getFunctionCache = DocumentFunctionRender;
         else                                                                                    metadatas[version].getFunctionCache = DocumentFunctionContextual;
         QString metaType = getTypeStr(version).toLower();
-        if(     metaType == "video")     metadatas[version].getTypeCache = DocumentTypeVideo;
-        else if(metaType == "audio")     metadatas[version].getTypeCache = DocumentTypeAudio;
-        else if(metaType == "image")     metadatas[version].getTypeCache = DocumentTypeImage;
-        else if(metaType == "document")  metadatas[version].getTypeCache = DocumentTypeDoc;
-        else if(metaType == "cue")       metadatas[version].getTypeCache = DocumentTypeMarker;
-        else if(metaType == "people")    metadatas[version].getTypeCache = DocumentTypePeople;
-        else if(metaType == "web")       metadatas[version].getTypeCache = DocumentTypeWeb;
-        else                             metadatas[version].getTypeCache = DocumentTypeFile;
+        if(     metaType.startsWith("video"))     metadatas[version].getTypeCache = DocumentTypeVideo;
+        else if(metaType.startsWith("audio"))     metadatas[version].getTypeCache = DocumentTypeAudio;
+        else if(metaType.startsWith("image"))     metadatas[version].getTypeCache = DocumentTypeImage;
+        else if(metaType.startsWith("document"))  metadatas[version].getTypeCache = DocumentTypeDoc;
+        else if(metaType.startsWith("cue"))       metadatas[version].getTypeCache = DocumentTypeMarker;
+        else if(metaType.startsWith("people"))    metadatas[version].getTypeCache = DocumentTypePeople;
+        else if(metaType.startsWith("web"))       metadatas[version].getTypeCache = DocumentTypeWeb;
+        else                                      metadatas[version].getTypeCache = DocumentTypeFile;
     }
 
     inline void setFunction(DocumentFunction function, qint16 version = -1) {
@@ -229,14 +230,19 @@ public:
         else                                    setMetadata("Rekall", "Media Function", "Contextual", version);
     }
     inline void setType(DocumentType type, qint16 version = -1) {
-        if(     type == DocumentTypeVideo)  setMetadata("Rekall", "Type", "Video",    version);
-        else if(type == DocumentTypeAudio)  setMetadata("Rekall", "Type", "Audio",    version);
-        else if(type == DocumentTypeImage)  setMetadata("Rekall", "Type", "Image",    version);
+        if(     type == DocumentTypeVideo)  setMetadata("Rekall", "Type", "Video", version);
+        else if(type == DocumentTypeAudio)  setMetadata("Rekall", "Type", "Audio", version);
+        else if(type == DocumentTypeImage)  setMetadata("Rekall", "Type", "Image", version);
         else if(type == DocumentTypeDoc)    setMetadata("Rekall", "Type", "Document", version);
-        else if(type == DocumentTypeMarker) setMetadata("Rekall", "Type", "Cue",      version);
-        else if(type == DocumentTypePeople) setMetadata("Rekall", "Type", "People",    version);
-        else if(type == DocumentTypeWeb)    setMetadata("Rekall", "Type", "Web",      version);
-        else                                setMetadata("Rekall", "Type", "Other",    version);
+        else if(type == DocumentTypeMarker) setMetadata("Rekall", "Type", "Cue", version);
+        else if(type == DocumentTypePeople) setMetadata("Rekall", "Type", "People", version);
+        else if(type == DocumentTypeWeb)    setMetadata("Rekall", "Type", "Web", version);
+        else {
+            QString extension = getMetadata("Rekall", "Extension", version).toString();
+            if(!extension.isEmpty())
+                extension = " (" + extension + ")";
+            setMetadata("Rekall", "Type", "Other" + extension, version);
+        }
     }
 
 public:

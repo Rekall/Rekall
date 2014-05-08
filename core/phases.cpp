@@ -25,7 +25,7 @@
 #include "ui_phases.h"
 
 Phase::Phase(QTreeWidget *parent, const QDateTime &date, const QString &name)
-    : QTreeWidgetItem(parent, Qt::FramelessWindowHint) {
+    : QTreeWidgetItem(parent) {
     setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
     setCheckState(0, Qt::Checked);
     setValues(date, name);
@@ -37,7 +37,7 @@ void Phase::setValues(const QDateTime &date, const QString &name) {
 }
 
 Phases::Phases(QWidget *parent) :
-    QWidget(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
+    QWidget(parent, Qt::Tool | Qt::FramelessWindowHint),
     ui(new Ui::Phases) {
     ui->setupUi(this);
     needCalulation = false;
@@ -227,4 +227,8 @@ void Phases::reset(const QString &filterText, QStringList checksOnly) {
             }
         }
     }
+}
+
+void Phases::mouseReleaseEvent(QMouseEvent *) {
+    close();
 }

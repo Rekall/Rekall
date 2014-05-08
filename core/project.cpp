@@ -30,10 +30,10 @@ Project::Project(QWidget *parent) :
     timelineFilesMenu = new QMenu(Global::mainWindow);
 }
 
-void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
+void Project::open(const QFileInfoList &files, UiTreeView *view) {
     QDomDocument xmlDoc("rekall");
 
-    if(!debug) {
+    if(!Global::falseProject) {
         foreach(const QFileInfo &file, files) {
             QFile projectFile(file.absoluteFilePath() + "/rekall_cache/project.xml");
             if((file.isDir()) && (projectFile.exists()) && (projectFile.open(QFile::ReadOnly))) {
@@ -60,7 +60,8 @@ void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
     }
 
     //Web
-    if(debug) {
+    if(Global::falseProject) {
+        /*
         Document *document = new Document(this);
         if(document->updateWeb("http://www.youtube.com/watch?v=cufauMezz_Q"))
             document->createTag();
@@ -70,6 +71,7 @@ void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
         if(document->updateWeb("https://twitter.com/arielunaa/status/393195155748315136"))
             document->createTag();
         document->updateFeed();
+        */
     }
 
     foreach(const QFileInfo &file, files) {
@@ -77,7 +79,7 @@ void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
         if(file.isFile())
             dir.cdUp();
         UiFileItem::syncWith(QFileInfoList() << dir.absolutePath(), view->getTree());
-        open(dir, dir, debug);
+        open(dir, dir);
     }
 
     foreach(Person *person, persons)
@@ -85,7 +87,7 @@ void Project::open(const QFileInfoList &files, UiTreeView *view, bool debug) {
 
     Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
 }
-void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
+void Project::open(const QDir &dir, const QDir &dirBase) {
     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
     foreach(const QFileInfo &file, files) {
         if((file.isFile()) && (UiFileItem::conformFile(file))) {
@@ -112,11 +114,14 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
                     tag->init();
             }
             else if(document->updateFile(file, dirBase)) {
-                document->createTag(TagTypeGlobal);
+                if(Global::falseProject)
+                    document->createTag();
+                else
+                    document->createTag(TagTypeGlobal);
                 document->updateFeed();
             }
 
-            if(debug) {
+            if(Global::falseProject) {
                 if(file.baseName() == "NxSimoneMorphing") {
                     for(quint16 i = 1 ; i < 10 ; i++) {
                         if(document->updateFile(file, dirBase, -1, i))
@@ -127,11 +132,11 @@ void Project::open(const QDir &dir, const QDir &dirBase, bool debug) {
             }
         }
         else if((file.isDir()) && (UiFileItem::conformFile(file)))
-            open(QDir(file.absoluteFilePath() + "/"), dirBase, debug);
+            open(QDir(file.absoluteFilePath() + "/"), dirBase);
     }
 
 
-    if(debug) {
+    if(Global::falseProject) {
         //Marker
         for(quint16 i = 1 ; i < 2 ; i++) {
             Document *document = new Document(this);
@@ -161,6 +166,19 @@ void Project::save() {
     xmlFile.write(xmlDoc.toByteArray());
     xmlFile.close();
 }
+void Project::close() {
+    timelineSortTags.clear();
+    viewerTags.clear();
+    eventsTags.clear();
+    timelineClusters.clear();
+    Global::taskList->clearTasks();
+    Global::selectedTags.clear();
+    Global::selectedTagsInAction.clear();
+    Global::selectedTagHover = Global::timeMarkerAdded = 0;
+    documents.clear();
+    Global::mainWindow->displayMetadataAndSelect();
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+}
 
 
 
@@ -170,18 +188,7 @@ Document* Project::getDocument(const QString &name) const {
             return document;
     return 0;
 }
-Document* Project::getDocumentAndSelect(const QString &name) const {
-    Document *documentRetour = 0;
-    foreach(Document *document, documents) {
-        if(document->file.absoluteFilePath() == name) {
-            documentRetour = document;
-            Global::selectedTags.clear();
-            foreach(Tag *tag, document->tags)
-                Global::selectedTags.append(tag);
-        }
-    }
-    return documentRetour;
-}
+
 
 qreal Project::totalTime() const {
     qreal total = 0;
@@ -243,8 +250,14 @@ void Project::fireEvents() {
         Global::tagTextCriteria->addCheckEnd();
         foreach(Document *document, documents)
             foreach(Tag *tag, document->tags) {
-                if(tag->isAcceptableWithTextFilters(true))  tag->displayText = Tag::getCriteriaTextFormated(tag);
-                else                                        tag->displayText.clear();
+                tag->displayText.clear();
+                if(tag->isAcceptableWithTextFilters(true)) {
+                    if(tag->getDocument()->getType(tag->getDocumentVersion()) == DocumentTypeMarker)
+                        tag->displayText = tag->getDocument()->getName(tag->getDocumentVersion()) + " - ";
+                    tag->displayText += Tag::getCriteriaTextFormated(tag);
+                    if(tag->displayText.endsWith(" - "))
+                        tag->displayText.chop(3);
+                }
             }
 
 
@@ -287,7 +300,7 @@ void Project::fireEvents() {
     }
 
     if(Global::metaChanged) {
-        emit(refreshMetadata());
+        emit(displayMetadata());
         Global::metaChanged = false;
     }
 
@@ -359,7 +372,7 @@ const QRectF Project::paintTimeline(bool before) {
 
                     //Add to timeline if displayable
                     if(tag->isAcceptableWithSortFilters(false)) {
-                        QString sorting    = Tag::getCriteriaSort(tag).toLower();
+                        QString sorting = Tag::getCriteriaSort(tag).toLower();
                         if(tag->isAcceptableWithSortFilters(true)) {
                             QString phase          = Global::phases->getPhaseFor(Tag::getCriteriaPhase(tag)).toLower();
                             QString cluster        = Tag::getCriteriaCluster(tag).toLower();
@@ -701,11 +714,17 @@ const QRectF Project::paintTimeline(bool before) {
 
 
     //Selection lasso
-    if(lassoPoints.count()) {
+    if(lassoPointsDest.count()) {
         glBegin(GL_LINE_STRIP);
         Global::timelineGL->qglColor(Global::colorCluster);
-        foreach(const QPointF &lassoPoint, lassoPoints)
-            glVertex2f(lassoPoint.x(), lassoPoint.y());
+        for(quint16 i = 0 ; i < lassoPointsDest.count() ; i++) {
+            while(i >= lassoPoints.count()) {
+                if(lassoPoints.count()) lassoPoints.append(lassoPoints.last());
+                else                    lassoPoints.append(lassoPointsDest.at(i));
+            }
+            lassoPoints[i] = lassoPoints[i] + (lassoPointsDest[i] - lassoPoints[i]) / Global::inertie;
+            glVertex2f(lassoPoints[i].x(), lassoPoints[i].y());
+        }
         glEnd();
     }
 
@@ -813,7 +832,7 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
                 tagsInClusterIterator.next();
                 foreach(Tag *tag, tagsInClusterIterator.value()) {
                     mouseOnTag |= tag->mouseTimeline(pos, e, dbl, stay, action, press, release);
-                    if(lassoPoints.containsPoint(tag->getTimelineBoundingRect().translated(tag->timelinePos).translated(0, Global::timelineHeaderSize.height()).center(), Qt::WindingFill)) {
+                    if(lassoPointsDest.containsPoint(tag->getTimelineBoundingRect().translated(tag->timelinePos).translated(0, Global::timelineHeaderSize.height()).center(), Qt::WindingFill)) {
                         tagsInLasso << tag;
                     }
                 }
@@ -821,15 +840,30 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
         }
     }
 
-    if((e) && (!mouseOnTag) && (release || ((e->buttons() & Qt::LeftButton) == Qt::LeftButton))) {
-        if(press)
+    if(!mouseOnTag)
+        mouseOnTag |= Global::timeline->mouseTimeline(pos, e, dbl, stay, action, press, release);
+    if((e) && (((!mouseOnTag) && (release || ((e->buttons() & Qt::LeftButton) == Qt::LeftButton)) && (e->pos().y() > (Global::timelineHeaderSize.height()*1.1))) || lassoPointsDest.count())) {
+        if(press) {
             lassoPoints.clear();
+            lassoPointsDest.clear();
+        }
         else if(release) {
             lassoPoints.clear();
-            Global::selectedTags = tagsInLasso;
+            lassoPointsDest.clear();
+
+            if(!((e) && (((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier) || ((e->modifiers() & Qt::ControlModifier) == Qt::ControlModifier))))
+                Global::selectedTags.clear();
+            Global::selectedTags.append(tagsInLasso);
+
+            if(Global::selectedTags.count() == 1)
+                Global::mainWindow->displayMetadataAndSelect(Global::selectedTags.first());
+            else if(Global::selectedTags.count())
+                Global::mainWindow->displayMetadata();
+            else
+                Global::mainWindow->displayMetadataAndSelect();
         }
         else
-            lassoPoints << pos;
+            lassoPointsDest << pos;
     }
 
 
@@ -901,6 +935,7 @@ bool Project::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool sta
     if(!mouseOnTag) {
         Global::selectedTagsInAction.clear();
         Global::selectedTags.clear();
+        Global::mainWindow->displayMetadataAndSelect();
     }
     return mouseOnTag;
 }

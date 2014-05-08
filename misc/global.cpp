@@ -23,10 +23,12 @@
 
 #include "global.h"
 
+bool         Global::falseProject                 = false;
 QImage       Global::temporaryScreenshot;
 QFileInfo    Global::pathApplication;
 QFileInfo    Global::pathDocuments;
 QFileInfo    Global::pathCurrent;
+QFileInfo    Global::pathCurrentDefault;
 GlWidget*    Global::timelineGL                   = 0;
 GlWidget*    Global::viewerGL                     = 0;
 GlDrawable*  Global::timeline                     = 0;
@@ -505,8 +507,11 @@ QWidget *HtmlDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
     return editor;
 }
 
+QString HtmlDelegate::removeHtml(QString html) {
+    return html.remove(QRegExp("<[^>]*>")).trimmed();
+}
 void HtmlDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-    QString data   = index.model()->data(index, Qt::EditRole).toString().remove(QRegExp("<[^>]*>")).trimmed();
+    QString data   = removeHtml(index.model()->data(index, Qt::EditRole).toString());
     QString prefix = index.model()->data(index, Qt::EditRole).toString();
     prefix = prefix.left(prefix.indexOf(data));
     (static_cast<QLineEdit*>(editor))->setWindowTitle(prefix);

@@ -131,6 +131,7 @@ void UiFileItem::populate(const QFileInfo &file) {
         openInOs    .setItemSync(this);
         setIcon(0, iconFile);
     }
+    setSelected(false);
     connect(&filename,     SIGNAL(triggered(QString)), SLOT(fileRename()));
     connect(&openInFinder, SIGNAL(triggered(bool)),    SLOT(fileShowInFinder()));
     connect(&openInOs,     SIGNAL(triggered(bool)),    SLOT(fileShowInOS()));
@@ -229,6 +230,7 @@ void UiFileItem::syncWith(const QFileInfoList &files, QTreeWidget *treeWidget) {
                 treeWidget->sortItems(0, Qt::AscendingOrder);
                 baseItem->syncWith(5);
                 baseItem->highlight();
+                treeWidget->clearSelection();
             }
         }
     }
@@ -372,7 +374,7 @@ void UiFileItem::configure(UiTreeView *tree, bool _showDateTime) {
     showDateTime = _showDateTime;
 
     //tree->getTree()->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
-    tree->getTree()->setIndentation(10);
+    tree->getTree()->setIndentation(15);
     tree->getTree()->setHeaderHidden(true);
 
     quint16 columnIndex = 0;

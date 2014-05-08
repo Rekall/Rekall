@@ -55,14 +55,14 @@ public:
     ~Rekall();
 
 private:
-    bool          metaIsChanging, openProject, chutierIsUpdating;
+    bool          chutierIsUpdating;
     Splash       *splash;
     Project      *currentProject;
-    Document     *currentDocument;
-    Metadata     *currentMetadata;
+    QList<Metadata*> currentMetadatas;
     QSettings    *settings;
     QWebView     *gps;
     QPair<QString, QPixmap> picture;
+    QList<QAction*> openRecentAction;
 private:
     HttpListener         *http;
     FileUploadController *httpUpload;
@@ -73,7 +73,6 @@ private:
     void displayPixmap(DocumentType documentType, const QString &filename, const QPixmap &picture);
     void displayGps(const QList<QPair<QString, QString> > &gps);
 public:
-    void refreshMetadata(void *_tag, bool inChutier);
     void setVisbility(bool visibility);
     void showPreviewTab();
 
@@ -83,18 +82,19 @@ protected:
     bool parseMimeData(const QMimeData *mime, const QString &source, bool test = false);
 
 private slots:
+    void refreshMenus(const QFileInfo &path = QFileInfo(), bool clear = false);
     void fileUploaded(const QString &, const QString &, const QString &);
     void action();
     void actionForceGL();
     void actionMetadata();
-    void actionMetadata(QTreeWidgetItem *item, int col);
     void closeSplash();
-    void refreshAndLastMetadata();
-    void refreshMetadata();
-    void chutierItemChanged(QTreeWidgetItem*,QTreeWidgetItem*,Tag* = 0);
-    void personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*);
-    void displayMetadata(Metadata *metadata, Tag *tag, QTreeWidget*, QTreeWidgetItem*, QTreeWidgetItem*);
+    void chutierItemChanged(QTreeWidgetItem* = 0, QTreeWidgetItem* = 0);
+    void personItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
+    void displayMetadataAndSelect(void *tag = 0);
+    void displayMetadata(QTreeWidgetItem * = 0, QTreeWidgetItem * = 0);
     void showHelp(bool);
+private:
+    qint16 findDocumentVersionWithMetadata(Metadata* metadata);
 
 protected:
     void timerEvent(QTimerEvent *);

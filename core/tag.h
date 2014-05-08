@@ -76,7 +76,7 @@ public:
     QList<Tag*> historyTags, hashTags;
 
 public:
-    void init(TagType _type, qreal _timeStart, qreal _duration = 0, bool debug = false);
+    void init(TagType _type, qreal _timeStart, qreal _duration = 0);
     void init();
     const QString getTitle() const { return document->getName(version); }
     inline qint16 getDocumentVersion() const    {  return document->getMetadataIndexVersion(version); }

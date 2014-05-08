@@ -26,13 +26,15 @@
 TaskProcess::TaskProcess(const TaskProcessData &_data, QTreeWidgetItem *parentItem, QObject *parent) :
     QThread(parent), QTreeWidgetItem(parentItem) {
     document = _data;
-    if(document.metadata->file.exists())
-        file = document.metadata->file;
-    name = document.metadata->getName(document.version);
+    if(document.metadata) {
+        if(document.metadata->file.exists())
+            file = document.metadata->file;
+        name = document.metadata->getName(document.version);
+    }
 }
 void TaskProcess::init() {
     started = false;
-    if(document.type == TaskProcessTypeMetadata) {
+    if((document.metadata) && (document.type == TaskProcessTypeMetadata)) {
         document.metadata->status = DocumentStatusWaiting;
         emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Waiting for analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
     }
@@ -40,14 +42,14 @@ void TaskProcess::init() {
 
 void TaskProcess::run() {
     started = true;
-    if(document.type == TaskProcessTypeMetadata) {
+    if((document.metadata) && (document.type == TaskProcessTypeMetadata)) {
         document.metadata->status = DocumentStatusProcessing;
         emit(updateList(this, FeedItemBaseTypeProcessingStart));
         emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Starting analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
         QDir().mkpath(Global::pathCurrent.absoluteFilePath() + "/rekall_cache");
         bool shouldSendFinishedSignal = true;
 
-        if((document.needCompleteScan) && (document.metadata->getType(document.version) == DocumentTypeWeb)) {
+        if((document.metadata) && (document.needCompleteScan) && (document.metadata->getType(document.version) == DocumentTypeWeb)) {
             thumbFilepath = Global::cacheFile("thumb", QCryptographicHash::hash(qPrintable(document.metadata->getMetadata("Rekall", "URL", document.version).toString()), QCryptographicHash::Sha1).toHex().toUpper());
             thumbFilename = thumbFilepath + ".jpg";
             if(!QFile(thumbFilename).exists()) {
@@ -57,7 +59,7 @@ void TaskProcess::run() {
             }
         }
         else {
-            if((document.needCompleteScan) && (document.metadata->getType(document.version) == DocumentTypePeople)) {
+            if((document.metadata) && (document.needCompleteScan) && (document.metadata->getType(document.version) == DocumentTypePeople)) {
                 //People
                 QList<Person*> persons = Person::fromFile(file.absoluteFilePath());
                 foreach(Person *person, persons)
@@ -71,9 +73,9 @@ void TaskProcess::run() {
             if(file.exists()) {
                 emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Calculating hash of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
                 QString documentHash = Global::getFileHash(file);
-                if(documentHash != document.metadata->getMetadata("File", "Hash", document.version).toString()) {
-                    document.needCompleteScan = true;
+                if((document.metadata) && (documentHash != document.metadata->getMetadata("File", "Hash", document.version).toString())) {
                     document.metadata->setMetadata("File", "Hash", documentHash, document.version);
+                    document.needCompleteScan = true;
                 }
             }
 
@@ -84,32 +86,34 @@ void TaskProcess::run() {
                 foreach(const QString &exifData, exifDatas) {
                     QPair<QString, QPair<QString,QString> > meta = Global::seperateMetadataAndGroup(exifData);
                     if((!meta.first.isEmpty()) && (!meta.second.first.isEmpty()) && (!meta.second.second.isEmpty())) {
-                        if(meta.second.first == "File Type")
-                            document.metadata->setMetadata(meta.first, meta.second.first, meta.second.second.toUpper(), document.version);
-                        else if((meta.second.first == "File Inode Change Date/Time") || (meta.second.first == "File Modification Date/Time") || (meta.second.first == "File Creation Date/Time") || (meta.second.first == "File Access Date/Time")) {}
-                        else if((meta.first != "ExifTool") && (!meta.second.second.contains("use -b option to extract"))) {
-                            QString metaTitle = meta.second.first;
-                            if(metaTitle == "GPS Position")
-                                metaTitle = "GPS Coordinates";
-                            document.metadata->setMetadata(meta.first, metaTitle, meta.second.second, document.version);
+                        if(document.metadata) {
+                            if(meta.second.first == "File Type")
+                                document.metadata->setMetadata(meta.first, meta.second.first, meta.second.second.toUpper(), document.version);
+                            else if((meta.second.first == "File Inode Change Date/Time") || (meta.second.first == "File Modification Date/Time") || (meta.second.first == "File Creation Date/Time") || (meta.second.first == "File Access Date/Time")) {}
+                            else if((meta.first != "ExifTool") && (!meta.second.second.contains("use -b option to extract"))) {
+                                QString metaTitle = meta.second.first;
+                                if(metaTitle == "GPS Position")
+                                    metaTitle = "GPS Coordinates";
+                                document.metadata->setMetadata(meta.first, metaTitle, meta.second.second, document.version);
+                            }
+                            if((meta.second.first.toLower().contains("duration")) && (!(meta.second.first.toLower().contains("value")))) {
+                                qreal duration = Global::getDurationFromString(meta.second.second);
+                                if(duration)
+                                    document.metadata->setMetadata("Rekall", "Media Duration", duration, document.version);
+                            }
+                            if(meta.second.first.toLower().contains("author"))
+                                document.metadata->setMetadata("Rekall", "Author", meta.second.second, document.version);
+                            if(meta.second.first.toLower().contains("file size"))
+                                document.metadata->setMetadata("Rekall", "Size",   meta.second.second, document.version);
+                            if(meta.second.first.toLower().contains("keywords"))
+                                document.metadata->addKeyword(meta.second.second, document.version);
                         }
-                        if((meta.second.first.toLower().contains("duration")) && (!(meta.second.first.toLower().contains("value")))) {
-                            qreal duration = Global::getDurationFromString(meta.second.second);
-                            if(duration)
-                                document.metadata->setMetadata("Rekall", "Media Duration", duration, document.version);
-                        }
-                        if(meta.second.first.toLower().contains("author"))
-                            document.metadata->setMetadata("Rekall", "Author", meta.second.second, document.version);
-                        if(meta.second.first.toLower().contains("file size"))
-                            document.metadata->setMetadata("Rekall", "Size",   meta.second.second, document.version);
-                        if(meta.second.first.toLower().contains("keywords"))
-                            document.metadata->addKeyword(meta.second.second, document.version);
                     }
                 }
             }
 
             //Image thumb
-            if(document.metadata->getType() == DocumentTypeImage) {
+            if((document.metadata) && (document.metadata->getType() == DocumentTypeImage)) {
                 emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating picture thumbnail of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
                 if(!QFileInfo(thumbFilename).exists()) {
                     QImage thumbnail(file.absoluteFilePath());
@@ -117,14 +121,14 @@ void TaskProcess::run() {
                     if((thumbnail.width() > maxCote) || (thumbnail.height() > maxCote))
                         QImage(file.absoluteFilePath()).scaled(QSize(maxCote, maxCote), Qt::KeepAspectRatio, Qt::SmoothTransformation).save(thumbFilename);
                 }
-                if(QFileInfo(thumbFilename).exists()) {
+                if((document.metadata) && (QFileInfo(thumbFilename).exists())) {
                     document.metadata->setMetadata("Rekall", "Snapshot", "File", document.version);
                     document.metadata->thumbnails.append(GlRect(thumbFilename));
                 }
             }
 
             //Waveform
-            if((document.metadata->getType() == DocumentTypeAudio) || (document.metadata->getType() == DocumentTypeVideo)) {
+            if((document.metadata) && ((document.metadata->getType() == DocumentTypeAudio) || (document.metadata->getType() == DocumentTypeVideo))) {
                 emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating audio waveform of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
                 QString thumbFilenameIntermediate = thumbFilepath + ".raw", thumbFilename = thumbFilepath + ".peak";
 
@@ -185,16 +189,18 @@ void TaskProcess::run() {
                             u.ch[1] = samples.at(sampleIndex+3);
                             valMax = (qreal)u.i / 32768.;
                             valMaxAbs = qMax(qMax(valMaxAbs, qAbs(valMax)), qAbs(valMin));
-                            document.metadata->waveform.append(qMakePair(valMin, valMax));
+                            if(document.metadata)
+                                document.metadata->waveform.append(qMakePair(valMin, valMax));
                         }
                         thumbnailFile.close();
                     }
-                    document.metadata->waveform.normalisation = 1. / valMaxAbs;
+                    if(document.metadata)
+                        document.metadata->waveform.normalisation = 1. / valMaxAbs;
                 }
             }
 
             //Video thumbnails
-            if(document.metadata->getType() == DocumentTypeVideo) {
+            if((document.metadata) && (document.metadata->getType() == DocumentTypeVideo)) {
                 qreal mediaDuration = document.metadata->getMetadata("Rekall", "Media Duration", document.version).toDouble();
 
                 emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Creating video thumbnails of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
@@ -217,10 +223,11 @@ void TaskProcess::run() {
                     }
                 }
                 //Add to meta
-                document.metadata->thumbnails.clear();
+                if(document.metadata)
+                    document.metadata->thumbnails.clear();
                 for(quint16 thumbIndex = 0 ; thumbIndex < thumbsNumber ; thumbIndex++) {
                     QString thumbFilename = QString(thumbFilepath + "_%1.jpg").arg(thumbIndex+1);
-                    if(QFileInfo(thumbFilename).exists())
+                    if((document.metadata) && (QFileInfo(thumbFilename).exists()))
                         document.metadata->thumbnails.append(GlRect(thumbFilename));
                 }
             }
@@ -231,7 +238,8 @@ void TaskProcess::run() {
     }
 }
 void TaskProcess::sendFinishedSignal() {
-    document.metadata->status = DocumentStatusReady;
+    if(document.metadata)
+        document.metadata->status = DocumentStatusReady;
     emit(updateList(this, FeedItemBaseTypeProcessingEnd));
     emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Finishing analysis of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
     emit(finished(this));

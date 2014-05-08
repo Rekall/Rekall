@@ -95,7 +95,7 @@ public slots:
     void actionSelection();
 
 public:
-    static const QString timeToString(qreal time);
+    static const QString timeToString(qreal time, bool millisec = false);
     static qreal stringToTime(const QString &timeStr);
     static qreal toDouble(const MetadataElement &elmt, bool *ok = 0);
     static qreal toDouble(const QString &str, bool *ok = 0);
@@ -106,6 +106,9 @@ public:
 
 public:
     void reset(const QString &filterText = "", QString matchText = "", QStringList checks = QStringList());
+
+protected:
+    void mouseReleaseEvent(QMouseEvent *);
 
 private:
     Ui::Sorting *ui;
