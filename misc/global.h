@@ -99,7 +99,7 @@ public:
 class GlWidget : public QGLWidget {
 public:
     explicit GlWidget(const QGLFormat &format, QWidget *parent) : QGLWidget(format, parent) {
-        showLinkedTags = showLinkedRenders = showHashedTags = tagSnap = tagSnapSlow = 0;
+        showLinkedTags = showHashedTags = tagSnap = tagSnapSlow = 0;
         showLinkedTagsDest = showLinkedRendersDest = showLegendDest = showHashedTagsDest = tagSnapDest = tagSnapSlowDest = false;
         mouseTimer.setSingleShot(true);
         mouseTimerOk = false;
@@ -109,7 +109,7 @@ public:
     QRectF  drawingBoundingRect, visibleRect;
     QPointF scroll, scrollDest;
     UiBool  showLegendDest, showLinkedRendersDest, showLinkedTagsDest, showHashedTagsDest, tagSnapDest, tagSnapSlowDest;
-    qreal   showLinkedRenders, showLinkedTags, showHashedTags, tagSnap, tagSnapSlow;
+    qreal   showLinkedTags, showHashedTags, tagSnap, tagSnapSlow;
     bool    glReady;
 protected:
     QTimer  mouseTimer;
@@ -255,7 +255,7 @@ public:
 
 
 
-enum TagSelection { TagSelectionStart, TagSelectionEnd, TagSelectionMove, TagSelectionMediaOffset, TagSelectionDuplicate };
+enum TagSelection { TagSelectionNone, TagSelectionStart, TagSelectionEnd, TagSelectionMove, TagSelectionMediaOffset, TagSelectionDuplicate, TagSelectionLink };
 enum TagType      { TagTypeContextualMilestone, TagTypeContextualTime, TagTypeGlobal };
 
 
@@ -289,7 +289,6 @@ public:
     static QList<void*> selectedTags, selectedTagsInAction;
     static QPair<qreal, qreal> selectedTagHoverSnapped;
     static QMap<QString,void*> renders;
-    static qreal selectedTagStartDrag;
     static TagSelection selectedTagMode;
     static qreal inertie;
     static Udp *udp;
@@ -318,6 +317,18 @@ public:
     static QPair<QString, QPair<QString,QString> > seperateMetadataAndGroup(const QString &metaline, const QString &separator = QString(":"));
     static QColor getColorScale(qreal val);
     static QString getFileHash(const QFileInfo &file);
+    static inline void inert(qreal *val, qreal valDest, qreal intertieFactor = 1) {
+        if(qAbs(*val - valDest) < 0.01)
+            *val = valDest;
+        else
+            *val = *val + (valDest - *val) / (inertie * intertieFactor);
+    }
+    static inline void inert(QPointF *val, QPointF valDest, qreal intertieFactor = 1) {
+        if((qAbs(val->x() - valDest.x()) < 0.01) && (qAbs(val->y() - valDest.y()) < 0.01))
+            *val = valDest;
+        else
+            *val = *val + (valDest - *val) / (inertie * intertieFactor);
+    }
 
 public:
     static void seek(qreal);

@@ -40,7 +40,7 @@ public:
 private:
     void open(const QDir &dir, const QDir &dirBase);
 public:
-    void open(const QFileInfoList &file, UiTreeView *view);
+    bool open(const QFileInfoList &file, UiTreeView *view);
 
 public:
     QList<Document*> documents;

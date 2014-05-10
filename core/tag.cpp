@@ -40,6 +40,7 @@ Tag::Tag(DocumentBase *_document, qint16 _documentVersion) :
     tagScale     = 0;
     tagDestScale = 1;
     displayText  = "";
+    linkMove = linkMoveDest = 0.66;
 
     viewerTimeText          .setStyle(QSize( 70, Global::viewerTagHeight), Qt::AlignCenter,    Global::font);
     viewerDocumentText      .setStyle(QSize(300, Global::viewerTagHeight), Qt::AlignVCenter,   Global::font);
@@ -78,12 +79,6 @@ void Tag::init(TagType _type, qreal _timeStart, qreal _duration) {
         else
             setType(_type, _timeStart);
 
-        if((Global::falseProject) && (Global::aleaF(0, 100) > 80)) {
-            qreal tirage = Global::aleaF(0, 100);
-            if(tirage > 66)       linkedRenders << "Captation 1";
-            else if(tirage > 33)  linkedRenders << "Captation 2";
-            else                  linkedRenders << "Captation 3";
-        }
         if(Global::falseProject) {
             qreal tirage = Global::aleaF(0, 100);
             if(tirage > 50)       _duration = Global::alea( 2,  5);
@@ -154,7 +149,7 @@ void Tag::addTimeMediaOffset(qreal offset) {
 void Tag::fireEvents() {
     //Progression
     progressionDest = progress(Global::time);
-    progression = progression + (progressionDest - progression) / Global::inertie;
+    Global::inert(&progression, progressionDest);
     decounter = qMin(0., Global::time - getTimeStart());
 
     //Enter / Leave
@@ -186,9 +181,8 @@ void Tag::fireEvents() {
 
 const QRectF Tag::paintTimeline(bool before) {
     if(before) {
-        tagScale = tagScale + (tagDestScale - tagScale) / Global::inertie;
-        timelinePos = timelinePos + (timelineDestPos - timelinePos) / Global::inertie;
-
+        Global::inert(&tagScale, tagDestScale);
+        Global::inert(&timelinePos, timelineDestPos);
 
         if((Global::tagHorizontalCriteria->isTimeline()) && (getType() == TagTypeGlobal))
             timelineBoundingRect = QRectF(QPointF(Global::timelineGL->scroll.x()-Global::timelineGlobalDocsWidth, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration(true) * Global::timeUnit), Global::timelineTagHeight));
@@ -362,7 +356,7 @@ const QRectF Tag::paintTimeline(bool before) {
 
                 //Color
                 if(((historyTag->getType() == TagTypeGlobal) && (getType() != TagTypeGlobal)) || ((getType() == TagTypeGlobal) && (historyTag->getType() != TagTypeGlobal)))    colorAlpha.setAlphaF(0.1);
-                else                                                                                                                                        colorAlpha.setAlphaF(0.4);
+                else                                                                                                                                                            colorAlpha.setAlphaF(0.4);
                 Global::timelineGL->qglColor(colorAlpha);
 
                 //Anchors
@@ -374,17 +368,108 @@ const QRectF Tag::paintTimeline(bool before) {
                 if(     historyChordEndCtr.y() < historyChordBegCtr.y())   { historyChordBeg = historyChordBegTop;   historyChordEnd = historyChordEndBtm;   }
                 else if(historyChordEndCtr.y() > historyChordBegCtr.y())   { historyChordBeg = historyChordBegBtm;   historyChordEnd = historyChordEndTop;   }
                 historyChordPts[0][0] = historyChordBeg.x(); historyChordPts[0][1] = historyChordBeg.y();
-                historyChordPts[1][0] = historyChordBeg.x(); historyChordPts[1][1] = historyChordBeg.y() + (historyChordEnd.y() - historyChordBeg.y()) * 0.66;
-                historyChordPts[2][0] = historyChordEnd.x(); historyChordPts[2][1] = historyChordEnd.y() + (historyChordBeg.y() - historyChordEnd.y()) * 0.66;
+                historyChordPts[1][0] = historyChordBeg.x(); historyChordPts[1][1] = historyChordBeg.y() + (historyChordEnd.y() - historyChordBeg.y()) * linkMoveDest;
+                historyChordPts[2][0] = historyChordEnd.x(); historyChordPts[2][1] = historyChordEnd.y() + (historyChordBeg.y() - historyChordEnd.y()) * linkMoveDest;
                 historyChordPts[3][0] = historyChordEnd.x(); historyChordPts[3][1] = historyChordEnd.y();
                 glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &historyChordPts[0][0]);
                 glEnable(GL_MAP1_VERTEX_3);
                 glBegin(GL_LINE_STRIP);
-                for(qreal t = 0 ; t <= 1.05; t += 0.05)
+                for(qreal t = 0 ; t <= 1.05; t += 0.05) {
+                    glColor4f(realTimeColor.redF()   * (1-t) + historyTag->realTimeColor.redF() * t,
+                              realTimeColor.greenF() * (1-t) + historyTag->realTimeColor.greenF() * t,
+                              realTimeColor.blueF()  * (1-t) + historyTag->realTimeColor.blueF() * t,
+                              colorAlpha.alphaF());
                     glEvalCoord1f(t);
+                }
                 glEnd();
                 glDisable(GL_MAP1_VERTEX_3);
             }
+            glLineWidth(1);
+        }
+
+        //Linked tags
+        Global::inert(&linkMove, linkMoveDest, 5);
+        if((Global::timelineGL->showLinkedTags > 0.01) && (linkedTags.count())) {
+            //Anchors
+            QPointF linkedChordBegCtr = timelineBoundingRect.center();
+            QPointF linkedChordBegTop(timelineBoundingRect.center().x(), timelineBoundingRect.top()    + 1);
+            QPointF linkedChordBegBtm(timelineBoundingRect.center().x(), timelineBoundingRect.bottom() - 1);
+            GLfloat linkedChordPts[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+            glLineWidth(2);
+            foreach(Tag *linkedTag, linkedTags) {
+                if((linkedTag == this) || (!linkedTag) || (!linkedTag->isAcceptableWithSortFilters(true)))
+                    continue;
+
+                //Anchors
+                QPointF linkedChordEndCtr = linkedTag->timelineBoundingRect.center() - timelinePos + linkedTag->timelinePos;
+                QPointF linkedChordEndTop = QPointF(linkedChordEndCtr.x(), linkedTag->timelineBoundingRect.top()    + 1 - timelinePos.y() + linkedTag->timelinePos.y());
+                QPointF linkedChordEndBtm = QPointF(linkedChordEndCtr.x(), linkedTag->timelineBoundingRect.bottom() - 1 - timelinePos.y() + linkedTag->timelinePos.y());
+
+                QPointF linkedChordBeg = linkedChordBegCtr, historyChordEnd = linkedChordEndCtr;
+                if(     linkedChordEndCtr.y() < linkedChordBegCtr.y())   { linkedChordBeg = linkedChordBegTop;   historyChordEnd = linkedChordEndBtm;   }
+                else if(linkedChordEndCtr.y() > linkedChordBegCtr.y())   { linkedChordBeg = linkedChordBegBtm;   historyChordEnd = linkedChordEndTop;   }
+
+                linkedChordPts[0][0] = linkedChordBegCtr.x(); linkedChordPts[0][1] = linkedChordBegCtr.y();
+                linkedChordPts[1][0] = linkedChordBegCtr.x(); linkedChordPts[1][1] = linkedChordBegCtr.y() + (linkedChordEndCtr.y() - linkedChordBegCtr.y()) * linkMove;
+                linkedChordPts[2][0] = linkedChordEndCtr.x(); linkedChordPts[2][1] = linkedChordEndCtr.y() + (linkedChordBegCtr.y() - linkedChordEndCtr.y()) * linkMove;
+                linkedChordPts[3][0] = linkedChordEndCtr.x(); linkedChordPts[3][1] = linkedChordEndCtr.y();
+                glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &linkedChordPts[0][0]);
+                glEnable(GL_MAP1_VERTEX_3);
+                glBegin(GL_LINE_STRIP);
+                for(qreal t = 0 ; t <= (1.05 * Global::timelineGL->showLinkedTags); t += 0.05) {
+                    glColor4f(realTimeColor.redF()   * (1-t) + linkedTag->realTimeColor.redF() * t,
+                              realTimeColor.greenF() * (1-t) + linkedTag->realTimeColor.greenF() * t,
+                              realTimeColor.blueF()  * (1-t) + linkedTag->realTimeColor.blueF() * t,
+                              0.4);
+                    glEvalCoord1f(t);
+                }
+                glEnd();
+                glDisable(GL_MAP1_VERTEX_3);
+            }
+            glLineWidth(1);
+        }
+
+        //Linking
+        if((Global::selectedTagsInAction.contains(this)) && (Global::selectedTagMode == TagSelectionLink)) {
+            QColor colorAlpha = realTimeColor;
+            QColor destColor  = realTimeColor;
+            Tag *hoverTag = (Tag*)Global::selectedTagHover;
+            if(hoverTag) {
+                if((linkedTags.contains(hoverTag)) || (historyTags.contains(hoverTag)) || (hoverTag->linkedTags.contains(this)) || (hoverTag->historyTags.contains(this)))
+                    colorAlpha = destColor = Qt::red;
+                else
+                    destColor = ((Tag*)hoverTag)->realTimeColor;
+            }
+            colorAlpha.setAlphaF(0.4);
+            destColor .setAlphaF(0.4);
+            Global::timelineGL->qglColor(colorAlpha);
+
+            //Anchors
+            QPointF linkedChordBegCtr = timelineBoundingRect.center();
+            GLfloat linkedChordPts[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+            glLineWidth(2);
+
+            //Anchors
+            QPointF linkedChordEndCtr = selectedTagMousePos - timelinePos;
+            linkedChordEndCtr.setY(linkedChordEndCtr.y() - Global::timelineHeaderSize.height());
+            if(hoverTag)
+                linkedChordEndCtr = hoverTag->getTimelineBoundingRect().center() + hoverTag->timelinePos - timelinePos;
+            linkedChordPts[0][0] = linkedChordBegCtr.x(); linkedChordPts[0][1] = linkedChordBegCtr.y();
+            linkedChordPts[1][0] = linkedChordBegCtr.x(); linkedChordPts[1][1] = linkedChordBegCtr.y() + (linkedChordEndCtr.y() - linkedChordBegCtr.y()) * linkMoveDest;
+            linkedChordPts[2][0] = linkedChordEndCtr.x(); linkedChordPts[2][1] = linkedChordEndCtr.y() + (linkedChordBegCtr.y() - linkedChordEndCtr.y()) * linkMoveDest;
+            linkedChordPts[3][0] = linkedChordEndCtr.x(); linkedChordPts[3][1] = linkedChordEndCtr.y();
+            glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &linkedChordPts[0][0]);
+            glEnable(GL_MAP1_VERTEX_3);
+            glBegin(GL_LINE_STRIP);
+            for(qreal t = 0 ; t <= (1.05 * 1); t += 0.05) {
+                glColor4f(colorAlpha.redF()   * (1-t) + destColor.redF() * t,
+                          colorAlpha.greenF() * (1-t) + destColor.greenF() * t,
+                          colorAlpha.blueF()  * (1-t) + destColor.blueF() * t,
+                          colorAlpha.alphaF());
+                glEvalCoord1f(t);
+            }
+            glEnd();
+            glDisable(GL_MAP1_VERTEX_3);
             glLineWidth(1);
         }
 
@@ -411,27 +496,23 @@ const QRectF Tag::paintTimeline(bool before) {
                     colorAlpha.setAlphaF(0.4);
                 Global::timelineGL->qglColor(colorAlpha);
 
-
                 //Anchors
                 QPointF hashChordEndCtr = hashTag->timelineBoundingRect.center() - timelinePos + hashTag->timelinePos;
-                //QPointF hashChordEndTop = QPointF(hashChordEndCtr.x(), hashTag->timelineBoundingRect.top()    + 1 - timelinePos.y() + hashTag->timelinePos.y());
-                //QPointF hashChordEndBtm = QPointF(hashChordEndCtr.x(), hashTag->timelineBoundingRect.bottom() - 1 - timelinePos.y() + hashTag->timelinePos.y());
-
                 QPointF hashChordBeg = hashChordBegCtr, hashChordEnd = hashChordEndCtr;
-                /*
-                if(hashChordEndCtr.y() == hashChordBegCtr.y())      { hashChordBeg = hashChordBegCtr;   hashChordEnd = hashChordEndCtr;   }
-                else if(hashChordEndCtr.y() < hashChordBegCtr.y())  { hashChordBeg = hashChordBegTop;   hashChordEnd = hashChordEndBtm;   }
-                else                                                { hashChordBeg = hashChordBegBtm;   hashChordEnd = hashChordEndTop;   }
-                */
                 hashChordPts[0][0] = hashChordBeg.x(); hashChordPts[0][1] = hashChordBeg.y();
-                hashChordPts[1][0] = hashChordBeg.x(); hashChordPts[1][1] = hashChordBeg.y() + (hashChordEnd.y() - hashChordBeg.y()) * 0.66;
-                hashChordPts[2][0] = hashChordEnd.x(); hashChordPts[2][1] = hashChordEnd.y() + (hashChordBeg.y() - hashChordEnd.y()) * 0.66;
+                hashChordPts[1][0] = hashChordBeg.x(); hashChordPts[1][1] = hashChordBeg.y() + (hashChordEnd.y() - hashChordBeg.y()) * linkMoveDest;
+                hashChordPts[2][0] = hashChordEnd.x(); hashChordPts[2][1] = hashChordEnd.y() + (hashChordBeg.y() - hashChordEnd.y()) * linkMoveDest;
                 hashChordPts[3][0] = hashChordEnd.x(); hashChordPts[3][1] = hashChordEnd.y();
                 glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &hashChordPts[0][0]);
                 glEnable(GL_MAP1_VERTEX_3);
                 glBegin(GL_LINE_STRIP);
-                for(qreal t = 0 ; t <= (1.05 * Global::timelineGL->showHashedTags); t += 0.05)
+                for(qreal t = 0 ; t <= (1.05 * Global::timelineGL->showHashedTags); t += 0.05) {
+                    glColor4f(realTimeColor.redF()   * (1-t) + hashTag->realTimeColor.redF() * t,
+                              realTimeColor.greenF() * (1-t) + hashTag->realTimeColor.greenF() * t,
+                              realTimeColor.blueF()  * (1-t) + hashTag->realTimeColor.blueF() * t,
+                              colorAlpha.alphaF());
                     glEvalCoord1f(t);
+                }
                 glEnd();
                 glDisable(GL_MAP1_VERTEX_3);
             }
@@ -440,78 +521,6 @@ const QRectF Tag::paintTimeline(bool before) {
         }
 
 
-        //Linked tags
-        if((Global::timelineGL->showLinkedTags > 0.01) && (linkedTags.count())) {
-            QColor colorAlpha = realTimeColor;
-            colorAlpha.setAlphaF(0.4);
-            Global::timelineGL->qglColor(colorAlpha);
-            //Anchors
-            QPointF linkedChordBegLeft (timelineBoundingRect.left(), timelineBoundingRect.center().y());
-            GLfloat linkedChordPts[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-            glLineWidth(2);
-            foreach(Tag *linkedTag, linkedTags) {
-                if((linkedTag == this) || (!linkedTag))
-                    continue;
-
-                //Anchors
-                QPointF linkedChordEndCtr = linkedTag->timelineBoundingRect.center() - timelinePos + linkedTag->timelinePos;
-                QPointF linkedChordEndRight = QPointF(linkedTag->timelineBoundingRect.right() - timelinePos.x() + linkedTag->timelinePos.x(), linkedChordEndCtr.y());
-
-                linkedChordPts[0][0] = linkedChordBegLeft .x(); linkedChordPts[0][1] = linkedChordBegLeft .y();
-                linkedChordPts[1][0] = linkedChordBegLeft .x(); linkedChordPts[1][1] = linkedChordBegLeft .y() + (linkedChordEndRight.y() - linkedChordBegLeft.y()) * 0.66;
-                linkedChordPts[2][0] = linkedChordEndRight.x(); linkedChordPts[2][1] = linkedChordEndRight.y() + (linkedChordBegLeft.y() - linkedChordEndRight.y()) * 0.66;
-                linkedChordPts[3][0] = linkedChordEndRight.x(); linkedChordPts[3][1] = linkedChordEndRight.y();
-                glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &linkedChordPts[0][0]);
-                glEnable(GL_MAP1_VERTEX_3);
-                glBegin(GL_LINE_STRIP);
-                for(qreal t = 0 ; t <= (1.05 * Global::timelineGL->showLinkedTags); t += 0.05)
-                    glEvalCoord1f(t);
-                glEnd();
-                glDisable(GL_MAP1_VERTEX_3);
-            }
-            glLineWidth(1);
-        }
-
-
-        //Linked renders
-        if((Global::timelineGL->showLinkedRenders > 0.01) && (linkedRenders.count())) {
-            QColor colorSourceAlpha = realTimeColor;
-            colorSourceAlpha.setAlphaF(0.4);
-
-            Global::timelineGL->qglColor(colorSourceAlpha);
-            glLineWidth(2);
-            glBegin(GL_LINES);
-            foreach(const QString &linkedRender, linkedRenders) {
-                if(Global::renders.contains(linkedRender)) {
-                    Tag *linkedRenderTag = (Tag*)Global::renders.value(linkedRender);
-                    QRectF linkedRenderRect = linkedRenderTag->timelineBoundingRect.translated(-timelinePos + linkedRenderTag->timelinePos);
-                    QPointF linkedRenderPoint;
-                    qreal linkedRenderAnchor = 0;
-                    if(linkedRenderRect.center().y() > timelineBoundingRect.center().y()) {
-                        linkedRenderPoint  = QPointF(timelineBoundingRect.center().x(), Global::timelineGL->showLinkedRenders * linkedRenderRect.top());
-                        linkedRenderAnchor = -Global::timelineTagHeight/2;
-                    }
-                    else {
-                        linkedRenderPoint  = QPointF(timelineBoundingRect.center().x(), Global::timelineGL->showLinkedRenders * linkedRenderRect.bottom());
-                        linkedRenderAnchor = Global::timelineTagHeight/2;
-                    }
-                    QColor colorDestAlpha = linkedRenderTag->realTimeColor;
-                    colorDestAlpha.setAlphaF(0.4 * Global::timelineGL->showLinkedRenders);
-
-
-                    Global::timelineGL->qglColor(colorSourceAlpha);
-                    glVertex2f(timelineBoundingRect.center().x(), timelineBoundingRect.center().y());
-                    Global::timelineGL->qglColor(colorDestAlpha);
-                    glVertex2f(linkedRenderPoint.x(), linkedRenderPoint.y() + linkedRenderAnchor);
-                    glVertex2f(linkedRenderPoint.x(), linkedRenderPoint.y() + linkedRenderAnchor);
-                    glVertex2f(linkedRenderPoint.x() + Global::timelineTagHeight/2, linkedRenderPoint.y());
-                    glVertex2f(linkedRenderPoint.x(), linkedRenderPoint.y() + linkedRenderAnchor);
-                    glVertex2f(linkedRenderPoint.x() - Global::timelineTagHeight/2, linkedRenderPoint.y());
-                }
-            }
-            glEnd();
-            glLineWidth(1);
-        }
 
         //Snapping
         if((Global::selectedTagsInAction.count()) && (Global::selectedTagHover == this) && ((Global::selectedTagHoverSnapped.first >= 0) || (Global::selectedTagHoverSnapped.second >= 0))) {
@@ -558,8 +567,8 @@ const QRectF Tag::paintTimeline(bool before) {
                     hashChordBeg = (pointsToDraw.at(i).first  * (Global::timelineGL->tagSnapSlow)) + (pointsToDraw.at(qMin(pointsToDraw.count()-1, i+1)).first  * (1-Global::timelineGL->tagSnapSlow));
                     hashChordEnd = (pointsToDraw.at(i).second * (Global::timelineGL->tagSnapSlow)) + (pointsToDraw.at(qMin(pointsToDraw.count()-1, i+1)).second * (1-Global::timelineGL->tagSnapSlow));
                     hashChordPts[0][0] = hashChordBeg.x(); hashChordPts[0][1] = hashChordBeg.y();
-                    hashChordPts[1][0] = hashChordBeg.x(); hashChordPts[1][1] = hashChordBeg.y() + (hashChordEnd.y() - hashChordBeg.y()) * 0.66;
-                    hashChordPts[2][0] = hashChordEnd.x(); hashChordPts[2][1] = hashChordEnd.y() + (hashChordBeg.y() - hashChordEnd.y()) * 0.66;
+                    hashChordPts[1][0] = hashChordBeg.x(); hashChordPts[1][1] = hashChordBeg.y() + (hashChordEnd.y() - hashChordBeg.y()) * linkMoveDest;
+                    hashChordPts[2][0] = hashChordEnd.x(); hashChordPts[2][1] = hashChordEnd.y() + (hashChordBeg.y() - hashChordEnd.y()) * linkMoveDest;
                     hashChordPts[3][0] = hashChordEnd.x(); hashChordPts[3][1] = hashChordEnd.y();
                     glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &hashChordPts[0][0]);
                     glEnable(GL_MAP1_VERTEX_3);
@@ -575,6 +584,7 @@ const QRectF Tag::paintTimeline(bool before) {
         }
         glPopMatrix();
     }
+    linkMoveDest = 0.66;
 
     if(timelineFirstPosVisible) {
         timelineFirstPosVisible = false;
@@ -584,7 +594,7 @@ const QRectF Tag::paintTimeline(bool before) {
 }
 
 const QRectF Tag::paintViewer(quint16 tagIndex) {
-    viewerPos = viewerPos + (viewerDestPos - viewerPos) / Global::inertie;
+    Global::inert(&viewerPos, viewerDestPos);
     viewerBoundingRect = QRectF(QPointF(0, 0), QSizeF(Global::viewerGL->width(), Global::viewerTagHeight));
     QRectF thumbnailRect;
     bool hasThumbnail = false;
@@ -717,24 +727,39 @@ bool Tag::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool
             if(!Global::selectedTags.contains(this)) {
                 if(!((e) && (((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier) || ((e->modifiers() & Qt::ControlModifier) == Qt::ControlModifier))))
                     Global::selectedTags.clear();
-                Global::selectedTags.append(this);
+                if(Global::selectedTags.contains(this)) Global::selectedTags.removeOne(this);
+                else                                    Global::selectedTags.append(this);
                 Global::selectedTagHover = this;
                 Global::mainWindow->displayMetadataAndSelect(this);
             }
-            else if((!Global::selectedTagsInAction.contains(this)) && (Global::tagHorizontalCriteria->isTimeline())) {
+            else if(!Global::selectedTagsInAction.contains(this)) {
                 Global::selectedTagsInAction.clear();
-                Global::selectedTagsInAction.append(this);
-                Global::selectedTagStartDrag = timelineProgress(pos) * getDuration();
-                if((e->button() & Qt::LeftButton) == Qt::LeftButton) {
-                    qreal pixelPos      = qMax(getDuration(), Global::timelineTagHeight / Global::timeUnit) * Global::timeUnit * timelineProgress(pos);
-                    qreal pixelDuration = qMax(getDuration(), Global::timelineTagHeight / Global::timeUnit) * Global::timeUnit;
-                    if(     (pixelPos < 10)                 && (getType() == TagTypeContextualTime))   Global::selectedTagMode = TagSelectionStart;
-                    else if((pixelPos > (pixelDuration-10)) && (getType() == TagTypeContextualTime))   Global::selectedTagMode = TagSelectionEnd;
-                    else if((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier)               Global::selectedTagMode = TagSelectionMediaOffset;
-                    else if((e->modifiers() & Qt::AltModifier)   == Qt::AltModifier)                 Global::selectedTagMode = TagSelectionDuplicate;
-                    else                                                                             Global::selectedTagMode = TagSelectionMove;
+                Global::selectedTagsInAction = Global::selectedTags;
+                if(Global::tagHorizontalCriteria->isTimeline()) {
+                    foreach(void* _tag, Global::selectedTagsInAction) {
+                        Tag *tag = (Tag*)_tag;
+                        tag->selectedTagStartDrag = tag->timelineProgressRaw(pos) * tag->getDuration();
+                        tag->selectedTagMousePos = pos;
+                    }
+                    if((e->button() & Qt::LeftButton) == Qt::LeftButton) {
+                        qreal pixelPos      = qMax(getDuration(), Global::timelineTagHeight / Global::timeUnit) * Global::timeUnit * timelineProgressRaw(pos);
+                        qreal pixelDuration = qMax(getDuration(), Global::timelineTagHeight / Global::timeUnit) * Global::timeUnit;
+                        if(     (pixelPos < 10)                 && (getType() == TagTypeContextualTime))   Global::selectedTagMode = TagSelectionStart;
+                        else if((pixelPos > (pixelDuration-10)) && (getType() == TagTypeContextualTime))   Global::selectedTagMode = TagSelectionEnd;
+                        else if((e->modifiers() & Qt::ControlModifier) == Qt::ControlModifier)             Global::selectedTagMode = TagSelectionMediaOffset;
+                        else if((e->modifiers() & Qt::AltModifier)   == Qt::AltModifier)                   Global::selectedTagMode = TagSelectionDuplicate;
+                        else if((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier)                 Global::selectedTagMode = TagSelectionLink;
+                        else                                                                               Global::selectedTagMode = TagSelectionMove;
+                    }
                 }
+                else {
+                    if((e->button() & Qt::LeftButton) == Qt::LeftButton) {
+                        if((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier)                      Global::selectedTagMode = TagSelectionLink;
+                    }
+                }
+
             }
+
 
             //Menu
             if(((e->buttons() & Qt::RightButton) == Qt::RightButton) && (Global::tagHorizontalCriteria->isTimeline())) {
@@ -786,7 +811,8 @@ bool Tag::mouseViewer(const QPointF &pos, QMouseEvent *e, bool dbl, bool, bool, 
             Global::timeline->seek(getTimeStart(), true, false);
             if(!((e) && (((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier) || ((e->modifiers() & Qt::ControlModifier) == Qt::ControlModifier))))
                 Global::selectedTags.clear();
-            Global::selectedTags.append(this);
+            if(Global::selectedTags.contains(this)) Global::selectedTags.removeOne(this);
+            else                                    Global::selectedTags.append(this);
             Global::selectedTagsInAction.clear();
             if(document->chutierItem)
                 Global::chutier->setCurrentItem(document->chutierItem);
@@ -819,6 +845,11 @@ bool Tag::snapTime(qreal *time) const {
         return true;
     }
     else if(Global::selectedTagMode == TagSelectionMove) {
+        Global::selectedTagHoverSnapped.first  = getTimeStart();
+        Global::selectedTagHoverSnapped.second = getTimeEnd();
+        return true;
+    }
+    else if(Global::selectedTagMode == TagSelectionLink) {
         Global::selectedTagHoverSnapped.first  = getTimeStart();
         Global::selectedTagHoverSnapped.second = getTimeEnd();
         return true;

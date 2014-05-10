@@ -34,9 +34,7 @@ TimelineControl::TimelineControl(QWidget *parent) :
     ui->hZoom->setValue(13);
     ui->vZoom->setValue(8);
 
-
-    //Global::timelineGL->showLinkedRendersDest.setAction(ui->linkedRenders);
-    //Global::timelineGL->showLinkedTagsDest   .setAction(ui->linkedTags);
+    Global::timelineGL->showLinkedTagsDest   .setAction(ui->linkedTags);
     Global::timelineGL->showHashedTagsDest   .setAction(ui->hash);
     Global::showHistory.setAction(ui->history);
     connect(&Global::showHistory, SIGNAL(triggered(bool)), SLOT(action()));

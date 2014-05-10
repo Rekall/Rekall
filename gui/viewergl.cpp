@@ -75,7 +75,7 @@ void ViewerGL::paintGL() {
     qglClearColor(Global::colorTextBlack);
 
     QRectF _drawingBoundingRect;
-    scroll = scroll + (scrollDest - scroll) / Global::inertie;
+    Global::inert(&scroll, scrollDest);
     visibleRect = QRectF(scroll, size());
     glPushMatrix();
     glTranslatef(qRound(-scroll.x()), qRound(-scroll.y()), 0);

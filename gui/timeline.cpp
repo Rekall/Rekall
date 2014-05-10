@@ -61,8 +61,8 @@ void Timeline::timerEvent(QTimerEvent *) {
     if(Global::timeMarkerAdded)
         ((Tag*)Global::timeMarkerAdded)->setTimeEnd(Global::time);
     Global::currentProject->fireEvents();
-    Global::timeUnit          = Global::timeUnit          + (Global::timeUnitDest          - Global::timeUnit)          / Global::inertie;
-    Global::timelineTagHeight = Global::timelineTagHeight + (Global::timelineTagHeightDest - Global::timelineTagHeight) / Global::inertie;
+    Global::inert(&Global::timeUnit, Global::timeUnitDest);
+    Global::inert(&Global::timelineTagHeight, Global::timelineTagHeightDest);
 
 
     if((tagHorizontalCriteriaWasTimeline) && (!Global::tagHorizontalCriteria->isTimeline())) {
@@ -140,7 +140,7 @@ const QRectF Timeline::paintTimeline(bool before) {
 
         //Timeline
         timelinePosDest = Global::currentProject->getTimelineCursorPos(Global::time);
-        timelinePos = timelinePos + (timelinePosDest - timelinePos) / Global::inertie;
+        Global::inert(&timelinePos, timelinePosDest);
         QRectF timelineBoundingRect(QPointF(timelinePos.x() + 1, Global::timelineGL->scroll.y()), QSizeF(-50, Global::timelineGL->height()));
 
         if(Global::tagHorizontalCriteria->isTimeline()) {
@@ -180,7 +180,7 @@ const QRectF Timeline::paintTimeline(bool before) {
 }
 const QRectF Timeline::paintViewer() {
     viewerPosDest = Global::currentProject->getViewerCursorPos(Global::time);
-    viewerPos = viewerPos + (viewerPosDest - viewerPos) / Global::inertie;
+    Global::inert(&viewerPos, viewerPosDest);
     QRectF viewerBoundingRect(QPointF(0, viewerPos.y()), QSizeF(Global::viewerGL->width(), -50));
 
     if(Global::timerPlay)
@@ -238,6 +238,10 @@ void Timeline::setDuplicates(quint16 nbDuplicates) {
 }
 void Timeline::setHistories(quint16 nbHistories) {
     timelineControl->setHistories(nbHistories);
+}
+
+void Timeline::setWorkspace(quint16 workspaceIndex) {
+    ui->workspace->setCurrentIndex(workspaceIndex);
 }
 
 void Timeline::action() {
@@ -302,42 +306,35 @@ void Timeline::action() {
         ui->filter->addItem("Rekall->Size");
         */
 
-        if(workspace == "global_work") {
-            Global::tagFilterCriteria    ->reset("author");
+        if((workspace == "global_work") || (workspace == "your_work")) {
+            Global::phases               ->reset("document date", 30, 0, false);
+            Global::tagFilterCriteria    ->reset("author", (workspace == "your_work")?(Global::userInfos->getInfo("User Name")):(""));
             Global::tagSortCriteria      ->reset("date (month)");
             Global::tagHorizontalCriteria->reset("time");
         }
-        else if(workspace == "your_work") {
-            Global::tagFilterCriteria    ->reset("author", Global::userInfos->getInfo("User Name"));
-            Global::tagSortCriteria      ->reset("date (month)");
+
+        else if((workspace == "your_cues") || (workspace == "global_cues")) {
+            Global::phases               ->reset("document date", 30, 0, false);
+            Global::tagFilterCriteria    ->reset("type", "cue");
+            Global::tagSortCriteria      ->reset("author", (workspace == "your_cues")?(Global::userInfos->getInfo("User Name")):(""));
             Global::tagHorizontalCriteria->reset("time");
         }
-        else if(workspace == "your_cues") {
-            Global::tagFilterCriteria    ->reset("type", "cue");
-            Global::tagSortCriteria      ->reset("author", Global::userInfos->getInfo("User Name"));
-            Global::tagHorizontalCriteria->reset("time");
-        }
-        else if(workspace == "global_cues") {
-            Global::tagFilterCriteria    ->reset("type", "cue");
+
+        else if((workspace == "your_last_imports") || (workspace == "global_last_imports")) {
+            Global::phases               ->reset("import date", 0, 0, true);
+            Global::tagFilterCriteria    ->reset("import author", (workspace == "your_last_imports")?(Global::userInfos->getInfo("User Name")):(""));
             Global::tagSortCriteria      ->reset("author");
-            Global::tagHorizontalCriteria->reset("time");
+            Global::tagHorizontalCriteria->reset("type");
         }
-        else if(workspace == "your_last_imports") {
-            Global::tagFilterCriteria    ->reset("import author", Global::userInfos->getInfo("User Name"));
-            Global::tagSortCriteria      ->reset("import date");
-            Global::tagHorizontalCriteria->reset("time");
-        }
-        else if(workspace == "global_last_imports") {
-            Global::tagFilterCriteria    ->reset("import author");
-            Global::tagSortCriteria      ->reset("import date");
-            Global::tagHorizontalCriteria->reset("time");
-        }
+
         else if(workspace == "global_punchcard_type") {
+            Global::phases               ->reset("document date", 30, 0, false);
             Global::tagFilterCriteria    ->reset("type");
             Global::tagSortCriteria      ->reset("author");
             Global::tagHorizontalCriteria->reset("type");
         }
         else if(workspace == "global_punchcard_activity") {
+            Global::phases               ->reset("document date", 30, 0, false);
             Global::tagFilterCriteria    ->reset("type");
             Global::tagSortCriteria      ->reset("author");
             Global::tagHorizontalCriteria->reset("date (month)");

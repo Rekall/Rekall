@@ -66,7 +66,6 @@ void*        Global::timeMarkerAdded              = 0;
 QPair<qreal,qreal>  Global::selectedTagHoverSnapped = qMakePair(-1., -1.);
 QMap<QString,void*> Global::renders;
 TagSelection Global::selectedTagMode              = TagSelectionMove;
-qreal        Global::selectedTagStartDrag         = 0;
 qreal        Global::inertie                      = 5;
 Udp*         Global::udp                          = 0;
 QFont        Global::font;

@@ -271,8 +271,12 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
                 retour = true;
         }
         else {
-            if(droppedFiles.count())
-                currentProject->open(droppedFiles, ui->chutier);
+            if(droppedFiles.count()) {
+                chutierIsUpdating = metadataIsUpdating = true;
+                if(!currentProject->open(droppedFiles, ui->chutier))
+                    ui->timeline->setWorkspace(3);
+                chutierIsUpdating = metadataIsUpdating = false;
+            }
 
             foreach(const QFileInfo &droppedFile, droppedFiles) {
                 Document *document = currentProject->getDocument(droppedFile.absoluteFilePath());
@@ -324,12 +328,15 @@ void Rekall::action() {
         }
 
         if((!dirToOpen.isEmpty()) && (QFileInfo(dirToOpen).exists())) {
+            chutierIsUpdating = metadataIsUpdating = true;
             Global::pathCurrent = QFileInfo(dirToOpen);
             refreshMenus(Global::pathCurrent);
-            currentProject->open(QFileInfoList() << Global::pathCurrent, ui->chutier);
+            if(!currentProject->open(QFileInfoList() << Global::pathCurrent, ui->chutier))
+                ui->timeline->setWorkspace(3);
             ui->chutier->getTree()->collapseAll();
             for(quint16 i = 0 ; i < ui->chutier->getTree()->topLevelItemCount() ; i++)
                 ui->chutier->getTree()->expandItem(ui->chutier->getTree()->topLevelItem(i));
+            chutierIsUpdating = metadataIsUpdating = false;
         }
         refreshMenus();
     }

@@ -41,10 +41,12 @@ Phases::Phases(QWidget *parent) :
     ui(new Ui::Phases) {
     ui->setupUi(this);
     needCalulation = false;
-    ui->filter->addItem("Default Date/Time",  "Rekall->Date/Time");
+    ui->filter->addItem("document date",  "Rekall->Date/Time");
+    ui->filter->addItem("import date",    "Rekall->Import Date/Time");
     ui->filter->setCurrentIndex(0);
 
     phasesByDaysTo.setAction(ui->daysTo);
+    phasesByMinsTo.setAction(ui->minsTo);
 }
 
 Phases::~Phases() {
@@ -82,9 +84,9 @@ void Phases::addCheckEnd() {
             if(firstElement)
                 oldDate = startingDate = currentDate;
 
-            if(oldDate.daysTo(currentDate) > phasesByDaysTo) {
+            if((oldDate.daysTo(currentDate) >= phasesByDaysTo) && ((oldDate.msecsTo(currentDate) / 1000. / 60.) >= phasesByMinsTo)) {
                 if(index < ui->checks->topLevelItemCount())  ((Phase*)(ui->checks->topLevelItem(index)))->setValues(currentDate, "");
-                else                                         new Phase(ui->checks, currentDate, QString("#%1").arg(index+1));
+                else                                         new Phase(ui->checks, currentDate, QString("%2-%1").arg(index+1).arg(tagName));
                 index++;
                 startingDate = currentDate;
             }
@@ -93,7 +95,7 @@ void Phases::addCheckEnd() {
         }
         currentDate = currentDate.addSecs(1);
         if(index < ui->checks->topLevelItemCount())  ((Phase*)(ui->checks->topLevelItem(index)))->setValues(currentDate, "");
-        else                                         new Phase(ui->checks, currentDate, QString("#%1").arg(index+1));
+        else                                         new Phase(ui->checks, currentDate, QString("%2-%1").arg(index+1).arg(tagName));
 
         QString text2;
         for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++)
@@ -115,7 +117,7 @@ bool Phases::isAcceptable(bool, const MetadataElement &value) const {
     if(value.isDate()) {
         for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
             Phase *phase = (Phase*)ui->checks->topLevelItem(i);
-            if(value.toDateTime() < phase->getDate())
+            if(phase->getDate() > value.toDateTime())
                 return phase->checkState(0) == Qt::Checked;
         }
     }
@@ -210,7 +212,8 @@ void Phases::deserialize(const QDomElement &xmlElement) {
 }
 
 
-void Phases::reset(const QString &filterText, QStringList checksOnly) {
+void Phases::reset(const QString &filterText, qint16 daysTo, qint16 minsTo, bool checked, QStringList checksOnly) {
+    ui->allow->setChecked(checked);
     for(quint16 i = 0 ; i < ui->filter->count() ; i++)
         if(ui->filter->itemText(i) == filterText) {
             ui->filter->setCurrentIndex(i);
@@ -227,6 +230,10 @@ void Phases::reset(const QString &filterText, QStringList checksOnly) {
             }
         }
     }
+    if(daysTo >= 0)
+        ui->daysTo->setValue(daysTo);
+    if(minsTo >= 0)
+        ui->minsTo->setValue(minsTo);
 }
 
 void Phases::mouseReleaseEvent(QMouseEvent *) {

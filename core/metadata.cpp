@@ -83,7 +83,7 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
     }
 
     setFunction(DocumentFunctionContextual, version);
-    if(name.toLower().contains("captation"))
+    if((Global::falseProject) && (name.toLower().contains("captation")))
         setFunction(DocumentFunctionRender, version);
 
     return anEmptyMetaWasCreated;

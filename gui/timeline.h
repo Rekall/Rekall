@@ -72,6 +72,7 @@ public slots:
     void actionPlay();
     void setDuplicates(quint16 nbDuplicates);
     void setHistories (quint16 nbHistories);
+    void setWorkspace(quint16 workspaceIndex);
 
     
 private:

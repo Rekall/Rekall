@@ -48,9 +48,11 @@ private:
     TagType type;
     qint16  version;
 public:
+    qreal   linkMove, linkMoveDest;
     QString        displayText;
-    QList<QString> linkedRenders;
     QList<Tag*>    linkedTags;
+    qreal          selectedTagStartDrag;
+    QPointF        selectedTagMousePos;
 public:
     inline qreal   getTimeStart()       const { return timeStart; }
     inline qreal   getTimeEnd()         const { return timeEnd;   }
@@ -108,9 +110,12 @@ public:
     inline DocumentBase* getDocument()     const { return document; }
     inline bool timelineContains (const QPointF &pos) const {    return (timelineBoundingRect.translated(timelinePos).translated(0, Global::timelineHeaderSize.height()).contains(pos)); }
     inline bool viewerContains   (const QPointF &pos) const {    return (viewerBoundingRect.translated(viewerPos).contains(pos));    }
-    inline qreal timelineProgress(const QPointF &pos) const {
+    inline qreal timelineProgressRaw(const QPointF &pos) const {
         QRectF rect = timelineBoundingRect.translated(timelinePos);
-        return qBound(0., (pos.x() - rect.x()) / rect.width(), 1.);
+        return (pos.x() - rect.x()) / rect.width();
+    }
+    inline qreal timelineProgress(const QPointF &pos) const {
+        return qBound(0., timelineProgressRaw(pos), 1.);
     }
     inline qreal viewerProgress  (const QPointF &pos) const {
         QRectF rect = viewerBoundingRect.translated(viewerPos);

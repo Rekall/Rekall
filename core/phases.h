@@ -60,6 +60,7 @@ public:
 
 private:
     UiReal phasesByDaysTo;
+    UiReal phasesByMinsTo;
     QMap<QString, MetadataElement> elementsToProcess;
 public:
     bool needCalulation;
@@ -108,7 +109,7 @@ public:
     void setStyleSheet2(const QString &str);
 
 public:
-    void reset(const QString &filterText = "", QStringList checks = QStringList());
+    void reset(const QString &filterText = "", qint16 daysTo = -1, qint16 minsTo = -1, bool checked = false, QStringList checks = QStringList());
 
 protected:
     void mouseReleaseEvent(QMouseEvent *);

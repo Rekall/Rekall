@@ -41,7 +41,7 @@ void Cluster::clear() {
 }
 void Cluster::paintTimeline() {
     if(tags.count()) {
-        animation = animation + (animationDest - animation) / Global::inertie;
+        Global::inert(&animation, animationDest);
 
         timelineBoundingRect = QRectF(QPointF(-1, -1), QSizeF(0, 0));
         foreach(Tag *tag, tags) {

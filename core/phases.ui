@@ -49,6 +49,9 @@
         <property name="spacing">
          <number>0</number>
         </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
           <property name="spacing">
@@ -71,7 +74,7 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
           <property name="spacing">
            <number>10</number>
           </property>
@@ -84,14 +87,23 @@
              </size>
             </property>
             <property name="text">
-             <string>when they are spaced of more than</string>
+             <string>when spaced of more than</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QSpinBox" name="daysTo">
+            <property name="maximumSize">
+             <size>
+              <width>65</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="suffix">
              <string> days</string>
+            </property>
+            <property name="minimum">
+             <number>0</number>
             </property>
             <property name="maximum">
              <number>999999</number>
@@ -101,6 +113,35 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QSpinBox" name="minsTo">
+            <property name="maximumSize">
+             <size>
+              <width>65</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="suffix">
+             <string> mn</string>
+            </property>
+            <property name="minimum">
+             <number>0</number>
+            </property>
+            <property name="maximum">
+             <number>999999</number>
+            </property>
+            <property name="value">
+             <number>0</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="spacing">
+           <number>10</number>
+          </property>
          </layout>
         </item>
        </layout>
@@ -186,8 +227,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>75</y>
+     <x>230</x>
+     <y>65</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -218,8 +259,8 @@
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>62</x>
-     <y>48</y>
+     <x>76</x>
+     <y>36</y>
     </hint>
     <hint type="destinationlabel">
      <x>515</x>
@@ -304,6 +345,22 @@
     <hint type="destinationlabel">
      <x>515</x>
      <y>22</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>minsTo</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>Phases</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>289</x>
+     <y>57</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>552</x>
+     <y>11</y>
     </hint>
    </hints>
   </connection>

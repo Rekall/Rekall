@@ -30,7 +30,8 @@ Project::Project(QWidget *parent) :
     timelineFilesMenu = new QMenu(Global::mainWindow);
 }
 
-void Project::open(const QFileInfoList &files, UiTreeView *view) {
+bool Project::open(const QFileInfoList &files, UiTreeView *view) {
+    bool retour = false;
     QDomDocument xmlDoc("rekall");
 
     if(!Global::falseProject) {
@@ -54,6 +55,7 @@ void Project::open(const QFileInfoList &files, UiTreeView *view) {
                     }
                     documentNode = documentNode.nextSibling();
                 }
+                retour = true;
                 break;
             }
         }
@@ -86,6 +88,7 @@ void Project::open(const QFileInfoList &files, UiTreeView *view) {
         person->updateGUI();
 
     Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+    return retour;
 }
 void Project::open(const QDir &dir, const QDir &dirBase) {
     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
@@ -116,6 +119,8 @@ void Project::open(const QDir &dir, const QDir &dirBase) {
             else if(document->updateFile(file, dirBase)) {
                 if(Global::falseProject)
                     document->createTag();
+                else if(document->getFunction() == DocumentFunctionRender)
+                    document->createTag(TagTypeContextualTime);
                 else
                     document->createTag(TagTypeGlobal);
                 document->updateFeed();
@@ -149,7 +154,7 @@ void Project::open(const QDir &dir, const QDir &dirBase) {
         Tag *previousTag = 0;
         foreach(Document *document, documents) {
             foreach(Tag *tag, document->tags) {
-                if((Global::alea(0, 100) > 80) && (previousTag))
+                if((Global::alea(0, 100) > 98.5) && (previousTag))
                     tag->linkedTags.append(previousTag);
                 previousTag = tag;
             }
@@ -307,7 +312,7 @@ void Project::fireEvents() {
     //Opacity
     if((Global::selectedTags.count()) && (Global::timelineGL->showLegendDest))  categoryColorOpacityDest = 0.3;
     else                                                                        categoryColorOpacityDest = 1;
-    categoryColorOpacity = categoryColorOpacity + (categoryColorOpacityDest - categoryColorOpacity) / Global::inertie;
+    Global::inert(&categoryColorOpacity, categoryColorOpacityDest);
     QMutableMapIterator<QString, QPair<QColor, qreal> > colorForMetaIterator(Global::colorForMeta);
     while(colorForMetaIterator.hasNext()) {
         colorForMetaIterator.next();
@@ -501,7 +506,7 @@ const QRectF Project::paintTimeline(bool before) {
             QString phase        = categoriesInPhasesIterator.key();
             QString phaseVerbose = Global::phases->getVerbosePhaseFor(phase);
             if(debug)
-                qDebug("\t > [Phase] |%s| (%s)", qPrintable(phaseVerbose), qPrintable(phase));
+                qDebug("\t > [Phase] |%s| (%s) (nb = %d)", qPrintable(phaseVerbose), qPrintable(phase), categoriesInPhasesIterator.value().count());
 
             QMapIterator<QString, QMap<QString, QList<Tag*> > > clustersInCategoriesIterator(categoriesInPhasesIterator.value());
             while(clustersInCategoriesIterator.hasNext()) {
@@ -666,12 +671,12 @@ const QRectF Project::paintTimeline(bool before) {
                 glScissor(0, 0, Global::timelineGL->width(), Global::timelineGL->height() - Global::timelineHeaderSize.height());
                 Global::timelineGL->qglColor(Global::colorAlternateMore);
                 GlRect::drawRect(phaseRect);
-
+                /*
                 Global::timelineGL->qglColor(Qt::white);
                 glPushMatrix();
-                QSize tagPhaseTextSize(phaseRect.size().height(), phaseRect.size().width());
                 glTranslatef(phaseRect.bottomLeft().x(), phaseRect.bottomLeft().y(), 0);
                 glRotatef(-90, 0, 0, 1);
+                QSize tagPhaseTextSize(phaseRect.size().height(), phaseRect.size().width());
                 bool textFound = false;
                 if(timelinePhases.count() > 1000)
                     timelinePhases.clear();
@@ -688,6 +693,7 @@ const QRectF Project::paintTimeline(bool before) {
                     timelinePhases << tagPhaseText;
                 }
                 glPopMatrix();
+                */
                 glScissor(Global::timelineHeaderSize.width(), 0, Global::timelineGL->width() - Global::timelineHeaderSize.width(), Global::timelineGL->height() - Global::timelineHeaderSize.height());
             }
             phaseStart.setY(categoryStart.y());
@@ -715,6 +721,8 @@ const QRectF Project::paintTimeline(bool before) {
 
     //Selection lasso
     if(lassoPointsDest.count()) {
+        glLineStipple(4, 0xAAAA);
+        glEnable(GL_LINE_STIPPLE);
         glBegin(GL_LINE_STRIP);
         Global::timelineGL->qglColor(Global::colorCluster);
         for(quint16 i = 0 ; i < lassoPointsDest.count() ; i++) {
@@ -722,10 +730,11 @@ const QRectF Project::paintTimeline(bool before) {
                 if(lassoPoints.count()) lassoPoints.append(lassoPoints.last());
                 else                    lassoPoints.append(lassoPointsDest.at(i));
             }
-            lassoPoints[i] = lassoPoints[i] + (lassoPointsDest[i] - lassoPoints[i]) / Global::inertie;
+            Global::inert(&lassoPoints[i], lassoPointsDest[i]);
             glVertex2f(lassoPoints[i].x(), lassoPoints[i].y());
         }
         glEnd();
+        glDisable(GL_LINE_STIPPLE);
     }
 
     return retour;
@@ -853,7 +862,10 @@ bool Project::mouseTimeline(const QPointF &pos, QMouseEvent *e, bool dbl, bool s
 
             if(!((e) && (((e->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier) || ((e->modifiers() & Qt::ControlModifier) == Qt::ControlModifier))))
                 Global::selectedTags.clear();
-            Global::selectedTags.append(tagsInLasso);
+            foreach(void *tagInLasso, tagsInLasso) {
+                if(Global::selectedTags.contains(tagInLasso))   Global::selectedTags.removeOne(tagInLasso);
+                else                                            Global::selectedTags.append(tagInLasso);
+            }
 
             if(Global::selectedTags.count() == 1)
                 Global::mainWindow->displayMetadataAndSelect(Global::selectedTags.first());
