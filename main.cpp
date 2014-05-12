@@ -60,10 +60,10 @@ int main(int argc, char *argv[]) {
     //qDebug("Command line syntax : ./Rekall <file path>");
 #endif
 
-    QCoreApplication::setApplicationName   (appName);
+    QCoreApplication::setApplicationName   (appName.trimmed());
     QCoreApplication::setApplicationVersion(appVersion);
     QCoreApplication::setOrganizationName  ("Rekall");
-    QCoreApplication::setOrganizationDomain("org.rekall");
+    QCoreApplication::setOrganizationDomain("org.rekall.desktop");
 
 
     QDir pathApplicationDir = QDir(QCoreApplication::applicationDirPath()).absolutePath();
