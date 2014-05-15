@@ -101,7 +101,7 @@ void TaskProcess::run() {
                                 if(duration)
                                     document.metadata->setMetadata("Rekall", "Media Duration", duration, document.version);
                             }
-                            if(meta.second.first.toLower().contains("author"))
+                            if((meta.second.first.toLower().contains("author")) || (meta.second.first.toLower().contains("creator")))
                                 document.metadata->setMetadata("Rekall", "Author", meta.second.second, document.version);
                             if(meta.second.first.toLower().contains("file size"))
                                 document.metadata->setMetadata("Rekall", "Size",   meta.second.second, document.version);
@@ -252,7 +252,7 @@ QProcessOutput TaskProcess::launchCommand(const TaskProcessData &processData) {
     foreach(const QString &argument, processData.arguments)
         fullCommand += " " + argument;
 
-    //qDebug("[PROCESS] %s in %s", qPrintable(fullCommand), qPrintable(processData.workingDirectory));
+    qDebug("[PROCESS] %s in %s", qPrintable(fullCommand), qPrintable(processData.workingDirectory));
     QProcess process;
     process.setWorkingDirectory(processData.workingDirectory);
     process.start(processData.command, processData.arguments);
@@ -261,7 +261,7 @@ QProcessOutput TaskProcess::launchCommand(const TaskProcessData &processData) {
     retour.second += process.readAllStandardOutput().trimmed();
     retour.second += process.readAllStandardError().trimmed();
     retour.first = fullCommand;
-    //qDebug("[PROCESS] => %s", qPrintable(retour.second));
+    qDebug("[PROCESS] => %s", qPrintable(retour.second));
     return retour;
 }
 

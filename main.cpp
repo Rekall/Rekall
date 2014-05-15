@@ -26,6 +26,7 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QProcessEnvironment>
+#include <QFontDatabase>
 #include "rekall.h"
 #include "misc/global.h"
 

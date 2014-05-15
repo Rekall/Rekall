@@ -46,10 +46,10 @@ void ViewerGL::initializeGL() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT,  GL_NICEST);
+    //glHint(GL_PERSPECTIVE_CORRECTION_HINT,  GL_NICEST);
+    //glHint(GL_POLYGON_SMOOTH_HINT,          GL_NICEST);
     glHint(GL_POINT_SMOOTH_HINT,            GL_NICEST);
     glHint(GL_LINE_SMOOTH_HINT,             GL_NICEST);
-    glHint(GL_POLYGON_SMOOTH_HINT,          GL_NICEST);
 }
 
 void ViewerGL::resizeGL(int, int) {
