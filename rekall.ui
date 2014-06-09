@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>801</width>
-    <height>514</height>
+    <width>759</width>
+    <height>622</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Rekall</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QTabWidget, QLabel, QCheckBox, QLineEdit, QPlainTextEdit, QPushButton, QSpinBox, QDoubleSpinBox, QTreeView, QHeaderView, QTabBar, QComboBox, QFrame#globalFrame, QTabBar::tab, QTreeView, QHeaderView, QDockWidget, QStatusBar, QRadioButton, QToolBox, QToolBox::tab, QMenuBar, QMenu {
+   <string notr="true">QTabWidget, QLabel, QCheckBox, QLineEdit, QPlainTextEdit, QTextEdit, QPushButton, QSpinBox, QDoubleSpinBox, QTreeView, QHeaderView, QTabBar, QComboBox, QFrame#globalFrame, QTabBar::tab, QTreeView, QHeaderView, QDockWidget, QStatusBar, QRadioButton, QToolBox, QToolBox::tab, QMenuBar, QMenu {
 	font: 						12px &quot;Calibri&quot;, &quot;Arial&quot;;
 	padding:					0px;
 	margin:					0px;
@@ -22,12 +22,12 @@
 	color: 						rgb(245, 248, 250);
 	border: 					0px solid black;
 }
-QPushButton, QSpinBox, QDoubleSpinBox, QLineEdit, QPlainTextEdit, QCheckBox::indicator, QRadioButton::indicator, QTreeView::indicator, QComboBox, QTreeView, QHeaderView {
+QPushButton, QSpinBox, QDoubleSpinBox, QTextEdit, QLineEdit, QPlainTextEdit, QCheckBox::indicator, QRadioButton::indicator, QTreeView::indicator, QComboBox, QTreeView, QHeaderView {
 	border: 					1px solid rgb(55, 55, 55);
 	border-radius: 		2px;
 	background-color: 	rgb(71, 77, 79);
 }
-QSpinBox, QDoubleSpinBox, QLineEdit, QPlainTextEdit, QCheckBox {
+QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit, QPlainTextEdit, QCheckBox {
 	margin-top: 			4px;
 	margin-bottom: 		4px;
 }
@@ -37,6 +37,10 @@ QPushButton {
 
 QFrame#globalFrame, QDialog, QWidget#chutier, QWidget#centralwidget {
 	background-color: 	rgb(56, 61, 63);
+	border: 					0px solid black;
+}
+QFrame#annotationFrame, QTextEdit#annotation {
+	background-color: 	black;
 	border: 					0px solid black;
 }
 
@@ -271,6 +275,8 @@ QSplitter#fileSplitter::handle 						{		background: 	rgba(255,147,102, 30);	}
 QSplitter#fileSplitter::handle:pressed 			{		background: 	rgb(255,147,102);			}
 QSplitter#timelineSplitter::handle 				{		background: 	rgb(71, 77, 79);				}
 QSplitter#timelineSplitter::handle:pressed 	{		background: 	rgb(226,226,226);			}
+QSplitter#annotationSplitter::handle 				{		background: 	rgb(31, 37, 39);				}
+QSplitter#annotationSplitter::handle:pressed 	{		background: 	rgb(76,76,76);			}
 QSplitter#previewSplitter::handle 				{		background: 	rgb(91, 97, 99);				}
 QSplitter#previewSplitter::handle:pressed 	{		background: 	rgb(226,226,226);			}
 QSplitter::handle:horizontal	 						{		width: 	4px; 											}
@@ -418,6 +424,9 @@ QMenu::item:enabled:selected {
          <enum>Qt::Horizontal</enum>
         </property>
         <widget class="QToolBox" name="toolBoxLeft">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
          <property name="currentIndex">
           <number>0</number>
          </property>
@@ -429,8 +438,8 @@ QMenu::item:enabled:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>201</width>
-            <height>271</height>
+            <width>190</width>
+            <height>352</height>
            </rect>
           </property>
           <attribute name="label">
@@ -655,13 +664,66 @@ QMenu::item:enabled:selected {
           </layout>
          </widget>
         </widget>
-        <widget class="Player" name="player" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>100</height>
-          </size>
+        <widget class="QSplitter" name="annotationSplitter">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
+         <widget class="Player" name="player" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::ClickFocus</enum>
+          </property>
+         </widget>
+         <widget class="QFrame" name="annotationFrame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QTextEditPlus" name="annotation">
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="html">
+              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Calibri,Arial'; font-size:12px; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </widget>
        <widget class="Timeline" name="timeline" native="true">
@@ -671,15 +733,21 @@ QMenu::item:enabled:selected {
           <height>100</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
        </widget>
       </widget>
       <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="conduiteLayout" stretch="1,0">
+       <layout class="QVBoxLayout" name="conduiteLayout" stretch="0,0">
         <property name="spacing">
          <number>0</number>
         </property>
         <item>
          <widget class="QTabWidget" name="toolBoxRight">
+          <property name="focusPolicy">
+           <enum>Qt::ClickFocus</enum>
+          </property>
           <property name="currentIndex">
            <number>1</number>
           </property>
@@ -733,9 +801,6 @@ QMenu::item:enabled:selected {
             <string>INFOS</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_7">
-            <property name="spacing">
-             <number>6</number>
-            </property>
             <property name="leftMargin">
              <number>6</number>
             </property>
@@ -965,7 +1030,7 @@ QMenu::item:enabled:selected {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>801</width>
+     <width>759</width>
      <height>23</height>
     </rect>
    </property>
@@ -1167,6 +1232,14 @@ QMenu::item:enabled:selected {
    <header>gui/previewer.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QTextEditPlus</class>
+   <extends>QTextEdit</extends>
+   <header>gui/qtexteditplus.h</header>
+   <slots>
+    <signal>focusChanged(bool)</signal>
+   </slots>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="icons/Rekall.qrc"/>
@@ -1179,8 +1252,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>793</x>
-     <y>496</y>
+     <x>751</x>
+     <y>604</y>
     </hint>
     <hint type="destinationlabel">
      <x>1145</x>
@@ -1211,8 +1284,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>481</x>
-     <y>496</y>
+     <x>571</x>
+     <y>604</y>
     </hint>
     <hint type="destinationlabel">
      <x>981</x>
@@ -1227,8 +1300,8 @@ QMenu::item:enabled:selected {
    <slot>action()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>637</x>
-     <y>496</y>
+     <x>604</x>
+     <y>604</y>
     </hint>
     <hint type="destinationlabel">
      <x>945</x>
@@ -1243,12 +1316,44 @@ QMenu::item:enabled:selected {
    <slot>displayMetadata()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>386</x>
-     <y>441</y>
+     <x>718</x>
+     <y>563</y>
     </hint>
     <hint type="destinationlabel">
      <x>235</x>
      <y>558</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>annotation</sender>
+   <signal>textChanged()</signal>
+   <receiver>Rekall</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>421</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>929</x>
+     <y>301</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>annotation</sender>
+   <signal>focusChanged(bool)</signal>
+   <receiver>Rekall</receiver>
+   <slot>annotationFocusChanged(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>317</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>964</x>
+     <y>63</y>
     </hint>
    </hints>
   </connection>
@@ -1259,5 +1364,6 @@ QMenu::item:enabled:selected {
   <slot>displayMetadata()</slot>
   <slot>personItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
   <slot>actionForceGL()</slot>
+  <slot>annotationFocusChanged(bool)</slot>
  </slots>
 </ui>

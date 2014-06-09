@@ -146,7 +146,7 @@ void Tag::addTimeMediaOffset(qreal offset) {
 
 
 
-void Tag::fireEvents() {
+bool Tag::fireEvents() {
     //Progression
     progressionDest = progress(Global::time);
     Global::inert(&progression, progressionDest);
@@ -177,6 +177,12 @@ void Tag::fireEvents() {
     }
     if(oscValue >= 0)
         Global::udp->send("127.0.0.1", 57120, "/rekall", QList<QVariant>() << document->getTypeStr(version) << document->getAuthor(version) << document->getName(version) << getTimeStart() << getTimeEnd() << oscValue << document->baseColor.redF() << document->baseColor.greenF() << document->baseColor.blueF() << document->baseColor.alphaF());
+
+    if((oscValue == 1) && (document->getType() == DocumentTypeMarker)) {
+        Global::mainWindow->changeAnnotation(this);
+        return true;
+    }
+    return ((0. <= progressionAbs) && (progressionAbs <= 1.)) && (document->getType() == DocumentTypeMarker);
 }
 
 const QRectF Tag::paintTimeline(bool before) {
@@ -201,14 +207,14 @@ const QRectF Tag::paintTimeline(bool before) {
             timelineBoundingRect.adjust(-(timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0, (timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0);
 
         //QColor colorDestTmp = (Global::selectedTags.contains(this) == true)?(Global::colorTimeline):(document->baseColor);
-        QColor colorDestTmp = (Global::selectedTags.contains(this) == true)?(document->baseColor):(document->baseColor);
+        QColor colorDestTmp = document->baseColor;
         if(document->status == DocumentStatusWaiting)
             colorDestTmp.setAlphaF(0.1);
         if((document->status == DocumentStatusProcessing) || (Global::selectedTags.contains(this) == true))
             colorDestTmp.setAlphaF(Global::breathingFast);
         if(!Global::tagHorizontalCriteria->isTimeline()) {
             if((Global::timerPlay) && !((0.001 < progression) && (progression < 0.999))) colorDestTmp.setAlphaF(0.2);
-            else                                                                         colorDestTmp.setAlphaF(1.0);
+            //else                                                                         colorDestTmp.setAlphaF(1.0);
         }
 
         if(!((colorDestTmp.red() == 0) && (colorDestTmp.green() == 0) && (colorDestTmp.blue() == 0)))
@@ -615,7 +621,7 @@ const QRectF Tag::paintViewer(quint16 tagIndex) {
 
         //Selection
         if(Global::selectedTags.contains(this)) {
-            QColor color = Global::colorTimeline;
+            QColor color = document->baseColor;
             if((document->status == DocumentStatusProcessing) || (Global::selectedTags.contains(this)))
                 color.setAlphaF(Global::breathingFast);
             Global::viewerGL->qglColor(color);

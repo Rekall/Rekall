@@ -122,7 +122,7 @@ public:
         return qBound(0., (pos.y() - rect.y()) / rect.height(), 1.);
     }
     bool snapTime(qreal *time) const;
-    void fireEvents();
+    bool fireEvents();
 
 private:
     GlText  viewerTimeText, viewerDocumentText, timelineTimeStartText, timelineTimeEndText, timelineTimeDurationText, timelineDocumentText;

@@ -66,6 +66,9 @@ private:
 private:
     HttpListener         *http;
     FileUploadController *httpUpload;
+private:
+    bool annotationStateBeforeFocus, annotationIsUpdating;
+    Tag *annotationTag;
 
 private:
     void displayDocumentName(const QString &documentName = "");
@@ -85,6 +88,7 @@ private slots:
     void refreshMenus(const QFileInfo &path = QFileInfo(), bool clear = false);
     void fileUploaded(const QString &, const QString &, const QString &);
     void action();
+    void annotationFocusChanged(bool);
     void actionForceGL();
     void actionMetadata();
     void closeSplash();
@@ -92,6 +96,7 @@ private slots:
     void personItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
     void displayMetadataAndSelect(void *tag = 0);
     void displayMetadata(QTreeWidgetItem * = 0, QTreeWidgetItem * = 0);
+    void changeAnnotation(void *);
     void showHelp(bool);
 private:
     qint16 findDocumentVersionWithMetadata(Metadata* metadata);

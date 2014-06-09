@@ -248,6 +248,7 @@ public:
     virtual void displayMetadataAndSelect(void *tag = 0)  = 0;
     virtual void displayMetadata(QTreeWidgetItem * = 0, QTreeWidgetItem * = 0)  = 0;
     virtual void showPreviewTab()   = 0;
+    virtual void changeAnnotation(void *) = 0;
 public:
     virtual bool parseMimeData(const QMimeData *, const QString &, bool = false) = 0;
 };

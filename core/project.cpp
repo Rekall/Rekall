@@ -328,8 +328,11 @@ void Project::fireEvents() {
     }
 
     //Fire events
+    bool annotationChanged = false;
     foreach(Tag *tag, eventsTags)
-        tag->fireEvents();
+        annotationChanged |= tag->fireEvents();
+    if(!annotationChanged)
+        Global::mainWindow->changeAnnotation(0);
 
     //Progress = viewer reorder
     Global::viewerSortChanged = Global::timerPlay;

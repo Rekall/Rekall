@@ -29,9 +29,10 @@ Rekall::Rekall(QWidget *parent) :
     ui(new Ui::Rekall) {
     ui->setupUi(this);
     setAcceptDrops(true);
-    currentProject  = 0;
+    currentProject = 0;
+    annotationTag  = 0;
 
-    chutierIsUpdating = metadataIsUpdating = false;
+    annotationIsUpdating = chutierIsUpdating = metadataIsUpdating = false;
 
     Global::userInfos = new UserInfos();
 
@@ -369,6 +370,12 @@ void Rekall::action() {
     else if(sender() == ui->actionMarkerLong) {
         Global::timeline->actionMarkerAddStart();
     }
+    else if(sender() == ui->annotation) {
+        if((!annotationIsUpdating) && (annotationTag)) {
+            annotationTag->getDocument()->setMetadata("Rekall", "Name", ui->annotation->toPlainText(), annotationTag->getDocumentVersion());
+            Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+        }
+    }
     else if(sender() == ui->actionRemove) {
         foreach(void* selectedTag, Global::selectedTags) {
             Tag *tag = (Tag*)selectedTag;
@@ -381,6 +388,30 @@ void Rekall::action() {
         Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
     }
 }
+void Rekall::annotationFocusChanged(bool val) {
+    if(val) {
+        annotationStateBeforeFocus = Global::timerPlay;
+        Global::play(false);
+    }
+    else {
+        Global::play(annotationStateBeforeFocus);
+    }
+}
+void Rekall::changeAnnotation(void *_tag) {
+    annotationIsUpdating = true;
+    annotationTag = (Tag*)_tag;
+    if(annotationTag) {
+        ui->annotation->setHtml("<center>" + annotationTag->getDocument()->getName(annotationTag->getDocumentVersion()) + "</center>");
+        ui->annotation->setStyleSheet(QString("color: %1;").arg(annotationTag->getRealTimeColor().name()));
+        ui->annotation->setEnabled(true);
+    }
+    else {
+        ui->annotation->setPlainText("");
+        ui->annotation->setEnabled(false);
+    }
+    annotationIsUpdating = false;
+}
+
 void Rekall::actionForceGL() {
     ui->toolBoxRight->resize(ui->toolBoxRight->width()+1, ui->toolBoxRight->height());
 }
@@ -409,13 +440,13 @@ void Rekall::closeSplash() {
     splash->close();
     showMaximized();
     updateGeometry();
-    ui->timelineSplitter->setSizes(QList<int>() << ui->timelineSplitter->height() * 0.50 << ui->timelineSplitter->height() * 0.50);
-    ui->fileSplitter    ->setSizes(QList<int>() << 200                                   << ui->fileSplitter->width()      - 200);
-    ui->conduiteSplitter->setSizes(QList<int>() << ui->conduiteSplitter->width()  - 300  << 300);
-    ui->previewSplitter ->setSizes(QList<int>() << ui->previewSplitter->height() * 0.30  << ui->previewSplitter->height() * 0.70);
+    ui->timelineSplitter  ->setSizes(QList<int>() << ui->timelineSplitter->height() * 0.50 << ui->timelineSplitter->height() * 0.50);
+    ui->fileSplitter      ->setSizes(QList<int>() << 200                                   << ui->fileSplitter->width()      - 200);
+    ui->conduiteSplitter  ->setSizes(QList<int>() << ui->conduiteSplitter->width()  - 300  << 300);
+    ui->previewSplitter   ->setSizes(QList<int>() << ui->previewSplitter->height()    * 0.30  << ui->previewSplitter->height() * 0.70);
+    ui->annotationSplitter->setSizes(QList<int>() << ui->annotationSplitter->height() - 35 << 35);
     //trayMenu->showMessage("Rekall", "Ready!", QSystemTrayIcon::NoIcon);
 }
-
 
 
 

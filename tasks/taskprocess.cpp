@@ -81,6 +81,7 @@ void TaskProcess::run() {
 
             //Extract meta with ExifTool
             if(document.needCompleteScan) {
+                qreal durationInSamples = 0;
                 emit(updateList(this, tr("<span style='font-family: Calibri, Arial; font-size: 11px; color: #A1A5A7'>Extracting metadatas of <span style='color: #F5F8FA'>%1</span></span>").arg(name)));
                 QStringList exifDatas = launchCommand(TaskProcessData(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", Global::pathApplication.absoluteFilePath() + "/tools", QStringList() << "−c" << "%+.6f" << "-d" << "%Y:%m:%d %H:%M:%S" << "-G" << file.absoluteFilePath())).second.split("\n");
                 foreach(const QString &exifData, exifDatas) {
@@ -101,7 +102,11 @@ void TaskProcess::run() {
                                 if(duration)
                                     document.metadata->setMetadata("Rekall", "Media Duration", duration, document.version);
                             }
-                            if((meta.second.first.toLower().contains("author")) || (meta.second.first.toLower().contains("creator")))
+                            if(meta.second.first.toLower().contains("num sample frames"))
+                                durationInSamples = meta.second.second.toDouble();
+                            if((meta.second.first.toLower().contains("sample rate")) && (durationInSamples > 0))
+                                document.metadata->setMetadata("Rekall", "Media Duration", durationInSamples / meta.second.second.toDouble(), document.version);
+                            if(meta.second.first.toLower().contains("author"))
                                 document.metadata->setMetadata("Rekall", "Author", meta.second.second, document.version);
                             if(meta.second.first.toLower().contains("file size"))
                                 document.metadata->setMetadata("Rekall", "Size",   meta.second.second, document.version);
