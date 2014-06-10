@@ -178,7 +178,8 @@ void WatcherFeeling::action() {
             }
             document->updateFeed();
         }
-        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+        //Global::groupes->needCalulation = true;
         close();
 
 #ifdef Q_OS_MAC

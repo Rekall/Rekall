@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1372</width>
-    <height>183</height>
+    <height>267</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -316,9 +316,8 @@ QStatusBar {
 
 
 QFrame#frameGlobalTimeline QPushButton {
-	border:						2px solid black;
-	border-color:			rgb(64, 175, 140);
-	background-color:	rgb(64, 175, 140);
+	border:						0px solid black;
+	background-color:	rgb(255, 255, 255, 0);
 	padding:					0px;
 	padding-left: 			4px;
 	padding-right: 		4px;
@@ -352,9 +351,9 @@ QFrame#frameGlobalTimeline QPushButton#ffButton, QFrame#frameGlobalTimeline QPus
 	border-radius:			17px;
 }
 QFrame#frameGlobalTimeline QComboBox {
-	background:			rgb(82, 227, 181);
+	background:			rgb(255, 255, 255, 0);
 	border:					0px solid black;
-	color: 					black;
+	color: 					rgb(64, 175, 140);
 	margin-left: 		3px;
 	margin-right: 		3px;
 	border-radius: 	3px;
@@ -368,17 +367,17 @@ QFrame#frameGlobalTimeline QComboBox::drop-down {
 	width: 						10px;
 	padding: 					2px;
 	border: 					0px solid black;
-	background-color: 	rgb(82, 227, 181);
+	background-color: 	rgb(255, 255, 255, 0);
     image: 						url(:/icons/res_icon_down2.png);
 }
-QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineFilters, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineZoom, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineMisc, QFrame#frameGlobalTimelineOptions {
+QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineFilters, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineZoom, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineMisc, QFrame#frameGlobalTimelineOptions, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineCombo {
 	background: 			transparent;
 	border:						0px solid black;
 }
 QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineZoom, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineMisc, QFrame#frameGlobalTimelineOptions {
 	border-left:				5px solid rgb(45, 50, 53);
 }
-QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineMisc {
+QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineTransport, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineMisc, QFrame#frameGlobalTimeline QFrame#frameGlobalTimelineCombo {
 	background:				rgb(45, 50, 53);
 }
 QFrame#frameGlobalTimeline QLabel {
@@ -446,7 +445,7 @@ QMenu::item:enabled:selected {
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -463,44 +462,37 @@ QMenu::item:enabled:selected {
        <number>0</number>
       </property>
       <item>
-       <widget class="TimelineGL" name="gl" native="true"/>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="spacing">
          <number>0</number>
         </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
         <item>
-         <widget class="QFrame" name="frameGlobalTimelineFilters">
+         <widget class="QFrame" name="frameGlobalTimelineCombo">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
            <property name="spacing">
-            <number>20</number>
+            <number>30</number>
            </property>
            <property name="leftMargin">
-            <number>10</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>8</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>20</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>12</number>
+            <number>0</number>
            </property>
-           <item>
-            <widget class="QLabel" name="filterLabel">
-             <property name="text">
-              <string>FILTERS</string>
-             </property>
-            </widget>
-           </item>
            <item>
             <widget class="QComboBox" name="workspace">
              <property name="minimumSize">
@@ -511,18 +503,45 @@ QMenu::item:enabled:selected {
              </property>
             </widget>
            </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="frameGlobalTimelineFilters">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="spacing">
+            <number>30</number>
+           </property>
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>20</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QPushButton" name="phaseBy">
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="text">
@@ -542,13 +561,13 @@ QMenu::item:enabled:selected {
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="text">
@@ -564,43 +583,17 @@ QMenu::item:enabled:selected {
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="filterBy">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>FILTER</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../icons/Rekall.qrc">
-               <normaloff>:/icons/res_icon_filter_filter.png</normaloff>:/icons/res_icon_filter_filter.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QPushButton" name="horizontalBy">
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="text">
@@ -609,6 +602,32 @@ QMenu::item:enabled:selected {
              <property name="icon">
               <iconset resource="../icons/Rekall.qrc">
                <normaloff>:/icons/res_icon_filter_horizontal.png</normaloff>:/icons/res_icon_filter_horizontal.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="filterBy">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>FILTER</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_filter.png</normaloff>:/icons/res_icon_filter_filter.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -628,39 +647,32 @@ QMenu::item:enabled:selected {
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
-            <number>20</number>
+            <number>30</number>
            </property>
            <property name="leftMargin">
             <number>10</number>
            </property>
            <property name="topMargin">
-            <number>8</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
             <number>20</number>
            </property>
            <property name="bottomMargin">
-            <number>12</number>
+            <number>0</number>
            </property>
-           <item>
-            <widget class="QLabel" name="appearanceLabel">
-             <property name="text">
-              <string>APPEARANCE</string>
-             </property>
-            </widget>
-           </item>
            <item>
             <widget class="QPushButton" name="colorBy">
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="text">
@@ -680,13 +692,13 @@ QMenu::item:enabled:selected {
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="text">
@@ -706,13 +718,13 @@ QMenu::item:enabled:selected {
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="text">
@@ -728,17 +740,43 @@ QMenu::item:enabled:selected {
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="ffButton">
+            <widget class="QPushButton" name="legend">
              <property name="minimumSize">
               <size>
-               <width>34</width>
-               <height>34</height>
+               <width>0</width>
+               <height>20</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>34</width>
-               <height>34</height>
+               <width>16777215</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_legend.png</normaloff>:/icons/res_icon_filter_legend.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="ffButton">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
               </size>
              </property>
              <property name="icon">
@@ -751,14 +789,14 @@ QMenu::item:enabled:selected {
             <widget class="QPushButton" name="playButton">
              <property name="minimumSize">
               <size>
-               <width>34</width>
-               <height>34</height>
+               <width>30</width>
+               <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>34</width>
-               <height>34</height>
+               <width>30</width>
+               <height>30</height>
               </size>
              </property>
              <property name="icon">
@@ -797,58 +835,32 @@ QMenu::item:enabled:selected {
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_9">
            <property name="spacing">
-            <number>20</number>
+            <number>30</number>
            </property>
            <property name="leftMargin">
             <number>20</number>
            </property>
            <property name="topMargin">
-            <number>8</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
             <number>20</number>
            </property>
            <property name="bottomMargin">
-            <number>12</number>
+            <number>0</number>
            </property>
-           <item>
-            <widget class="QPushButton" name="legend">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="../icons/Rekall.qrc">
-               <normaloff>:/icons/res_icon_filter_legend.png</normaloff>:/icons/res_icon_filter_legend.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
            <item>
             <widget class="QPushButton" name="viewOption">
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="text">
@@ -876,32 +888,32 @@ QMenu::item:enabled:selected {
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <property name="spacing">
-            <number>20</number>
+            <number>30</number>
            </property>
            <property name="leftMargin">
             <number>20</number>
            </property>
            <property name="topMargin">
-            <number>8</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
             <number>20</number>
            </property>
            <property name="bottomMargin">
-            <number>12</number>
+            <number>0</number>
            </property>
            <item>
             <widget class="PreviewerPushButton" name="marker">
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="text">
@@ -918,13 +930,13 @@ QMenu::item:enabled:selected {
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>24</height>
+               <height>20</height>
               </size>
              </property>
              <property name="text">
@@ -936,6 +948,9 @@ QMenu::item:enabled:selected {
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="TimelineGL" name="gl" native="true"/>
       </item>
      </layout>
     </widget>
@@ -997,22 +1012,6 @@ QMenu::item:enabled:selected {
    </hints>
   </connection>
   <connection>
-   <sender>sortBy</sender>
-   <signal>released()</signal>
-   <receiver>Timeline</receiver>
-   <slot>action()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>375</x>
-     <y>169</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>100</x>
-     <y>448</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>colorBy</sender>
    <signal>released()</signal>
    <receiver>Timeline</receiver>
@@ -1025,22 +1024,6 @@ QMenu::item:enabled:selected {
     <hint type="destinationlabel">
      <x>121</x>
      <y>271</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>filterBy</sender>
-   <signal>released()</signal>
-   <receiver>Timeline</receiver>
-   <slot>action()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>447</x>
-     <y>169</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>233</x>
-     <y>309</y>
     </hint>
    </hints>
   </connection>
@@ -1077,22 +1060,6 @@ QMenu::item:enabled:selected {
    </hints>
   </connection>
   <connection>
-   <sender>horizontalBy</sender>
-   <signal>released()</signal>
-   <receiver>Timeline</receiver>
-   <slot>action()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>512</x>
-     <y>169</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>540</x>
-     <y>266</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>legend</sender>
    <signal>released()</signal>
    <receiver>Timeline</receiver>
@@ -1121,38 +1088,6 @@ QMenu::item:enabled:selected {
     <hint type="destinationlabel">
      <x>268</x>
      <y>273</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>phaseBy</sender>
-   <signal>released()</signal>
-   <receiver>Timeline</receiver>
-   <slot>action()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>309</x>
-     <y>169</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>156</x>
-     <y>312</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>workspace</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>Timeline</receiver>
-   <slot>action()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>129</x>
-     <y>158</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>132</x>
-     <y>294</y>
     </hint>
    </hints>
   </connection>
@@ -1201,6 +1136,86 @@ QMenu::item:enabled:selected {
     <hint type="destinationlabel">
      <x>290</x>
      <y>406</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sortBy</sender>
+   <signal>released()</signal>
+   <receiver>Timeline</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>375</x>
+     <y>169</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>100</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>filterBy</sender>
+   <signal>released()</signal>
+   <receiver>Timeline</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>447</x>
+     <y>169</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>233</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalBy</sender>
+   <signal>released()</signal>
+   <receiver>Timeline</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>512</x>
+     <y>169</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>540</x>
+     <y>266</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>phaseBy</sender>
+   <signal>released()</signal>
+   <receiver>Timeline</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>309</x>
+     <y>169</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>156</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>workspace</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>Timeline</receiver>
+   <slot>action()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>129</x>
+     <y>158</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>132</x>
+     <y>294</y>
     </hint>
    </hints>
   </connection>

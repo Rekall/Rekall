@@ -89,6 +89,7 @@ private slots:
     void fileUploaded(const QString &, const QString &, const QString &);
     void action();
     void annotationFocusChanged(bool);
+    void annotationFinished();
     void actionForceGL();
     void actionMetadata();
     void closeSplash();
@@ -96,7 +97,7 @@ private slots:
     void personItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
     void displayMetadataAndSelect(void *tag = 0);
     void displayMetadata(QTreeWidgetItem * = 0, QTreeWidgetItem * = 0);
-    void changeAnnotation(void *);
+    void changeAnnotation(void *, bool giveFocus = false);
     void showHelp(bool);
 private:
     qint16 findDocumentVersionWithMetadata(Metadata* metadata);

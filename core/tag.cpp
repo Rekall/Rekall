@@ -192,10 +192,12 @@ const QRectF Tag::paintTimeline(bool before) {
 
         if((Global::tagHorizontalCriteria->isTimeline()) && (getType() == TagTypeGlobal))
             timelineBoundingRect = QRectF(QPointF(Global::timelineGL->scroll.x()-Global::timelineGlobalDocsWidth, 0), QSizeF(qMax(Global::timelineTagHeight, getDuration(true) * Global::timeUnit), Global::timelineTagHeight));
+            //timelineBoundingRect = QRectF(QPointF(Global::timelineGL->scroll.x()-Global::timelineGlobalDocsWidth, 0), QSizeF(getDuration(true) * Global::timeUnit, Global::timelineTagHeight));
         else {
             qreal pos   = Global::tagHorizontalCriteria->getCriteriaFormatedReal(getCriteriaHorizontal(this), getTimeStart());
             qreal width = Global::tagHorizontalCriteria->getCriteriaFormatedRealDuration(getDuration(true));
             timelineBoundingRect = QRectF(QPointF(pos * Global::timeUnit, 0), QSizeF(qMax(Global::timelineTagHeight, width * Global::timeUnit), Global::timelineTagHeight));
+            //timelineBoundingRect = QRectF(QPointF(pos * Global::timeUnit, 0), QSizeF(width * Global::timeUnit, Global::timelineTagHeight));
             if(getType() == TagTypeContextualMilestone)
                 timelineBoundingRect.translate(-timelineBoundingRect.width() / 2, 0);
         }
@@ -203,8 +205,8 @@ const QRectF Tag::paintTimeline(bool before) {
         bool isLargeTag = (document->getFunction() == DocumentFunctionRender) && (Global::tagHorizontalCriteria->isTimeline());
         if(isLargeTag)
             timelineBoundingRect.setHeight(Global::timelineTagThumbHeight);
-        if(timelineBoundingRect.width() < timelineBoundingRect.height())
-            timelineBoundingRect.adjust(-(timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0, (timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0);
+        //if(timelineBoundingRect.width() < timelineBoundingRect.height())
+        //  timelineBoundingRect.adjust(-(timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0, (timelineBoundingRect.height() - timelineBoundingRect.width())/2, 0);
 
         //QColor colorDestTmp = (Global::selectedTags.contains(this) == true)?(Global::colorTimeline):(document->baseColor);
         QColor colorDestTmp = document->baseColor;
@@ -287,8 +289,8 @@ const QRectF Tag::paintTimeline(bool before) {
                     GlRect::drawRect(timelineBoundingRect);
                 }
                 else {
-                    GlRect::drawRect(QRectF(timelineBoundingRect.topLeft(),  QSizeF( 3, timelineBoundingRect.height())));
-                    GlRect::drawRect(QRectF(timelineBoundingRect.topRight(), QSizeF(-3, timelineBoundingRect.height())));
+                    GlRect::drawRect(QRectF(timelineBoundingRect.topLeft(),  QSizeF( 1, timelineBoundingRect.height())));
+                    GlRect::drawRect(QRectF(timelineBoundingRect.topRight(), QSizeF(-1, timelineBoundingRect.height())));
                     GlRect::drawRect(QRectF(timelineBoundingRect.topLeft() + QPointF(0, timelineBoundingRect.height() / 2 - 1), QSizeF(timelineBoundingRect.width(), 2)));
                 }
             }
@@ -329,7 +331,7 @@ const QRectF Tag::paintTimeline(bool before) {
                 }
                 if((!displayText.isEmpty()) && (document->getFunction(version) == DocumentFunctionContextual)) {
                     textPos = QPoint(timelineBoundingRect.center().x() - timelineDocumentText.size.width()/2, timelineBoundingRect.top() - timelineDocumentText.size.height() - 1);
-                    timelineDocumentText.drawText(displayText, textPos);
+                    timelineDocumentText.drawText(displayText, textPos, qMax(20., timelineBoundingRect.width()));
                 }
             }
 
@@ -883,6 +885,9 @@ bool Tag::isAcceptableWithClusterFilters(bool strongCheck) const {
 bool Tag::isAcceptableWithFilterFilters(bool strongCheck) const {
     return (tagHistoryFilters()) && (document->isAcceptableWithFilterFilters(strongCheck, version));
 }
+bool Tag::isAcceptableWithGroupeFilters(bool strongCheck) const {
+    return (tagHistoryFilters()) && (document->isAcceptableWithGroupeFilters(strongCheck, version));
+}
 bool Tag::isAcceptableWithHorizontalFilters(bool strongCheck) const {
     return (tagHistoryFilters()) && (document->isAcceptableWithHorizontalFilters(strongCheck, version));
 }
@@ -942,9 +947,11 @@ const QString Tag::getCriteriaCluster(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaCluster(tag->version);
 }
+/*
 const MetadataElement Tag::getCriteriaPhase(const Tag *tag) {
     return tag->document->getCriteriaPhase(tag->version);
 }
+*/
 const QString Tag::getCriteriaFilter(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaFilter(tag->version);
@@ -960,6 +967,15 @@ const QString Tag::getCriteriaHorizontal(const Tag *tag) {
 const QString Tag::getCriteriaHorizontalFormated(const Tag *tag) {
     if(!tag)    return "";
     return tag->document->getCriteriaHorizontalFormated(tag->version);
+}
+
+const QString Tag::getCriteriaGroupe(const Tag *tag) {
+    if(!tag)    return "";
+    return tag->document->getCriteriaGroupe(tag->version);
+}
+const QString Tag::getCriteriaGroupeFormated(const Tag *tag) {
+    if(!tag)    return "";
+    return tag->document->getCriteriaGroupeFormated(tag->version);
 }
 
 

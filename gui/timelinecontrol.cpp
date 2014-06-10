@@ -33,12 +33,24 @@ TimelineControl::TimelineControl(QWidget *parent) :
     Global::timelineTagHeightDest     .setAction(ui->vZoom);
     ui->hZoom->setValue(13);
     ui->vZoom->setValue(8);
-
-    Global::timelineGL->showLinkedTagsDest   .setAction(ui->linkedTags);
-    Global::timelineGL->showHashedTagsDest   .setAction(ui->hash);
-    Global::showHistory.setAction(ui->history);
+}
+void TimelineControl::init() {
+    Global::timelineGL->showLinkedTagsDest   .setAction(Global::tagClusterCriteria->getLinkedTags());
+    Global::timelineGL->showHashedTagsDest   .setAction(Global::tagClusterCriteria->getHash());
+    Global::showHistory.setAction(Global::tagClusterCriteria->getHistory());
     connect(&Global::showHistory, SIGNAL(triggered(bool)), SLOT(action()));
-    connect(ui->hash, SIGNAL(toggled(bool)), SLOT(action()));
+    connect(Global::tagClusterCriteria->getHistory(), SIGNAL(toggled(bool)), SLOT(action()));
+}
+
+void TimelineControl::setDuplicates(quint16 nbDuplicates) {
+    if(     nbDuplicates == 0)  Global::tagClusterCriteria->getHash()->setText(tr("Reveal duplicate documents") + tr(" (no document concerned)"));
+    else if(nbDuplicates == 1)  Global::tagClusterCriteria->getHash()->setText(tr("Reveal duplicate documents") + tr(" (1 document concerned)"));
+    else                        Global::tagClusterCriteria->getHash()->setText(tr("Reveal duplicate documents") + tr(" (%1 documents concerned)").arg(nbDuplicates));
+}
+void TimelineControl::setHistories(quint16 nbHistories) {
+    if(     nbHistories == 0)   Global::tagClusterCriteria->getHistory()->setText(tr("Show document modifications history") + tr(" (no document concerned)"));
+    else if(nbHistories == 1)   Global::tagClusterCriteria->getHistory()->setText(tr("Show document modifications history") + tr(" (1 document concerned)"));
+    else                        Global::tagClusterCriteria->getHistory()->setText(tr("Show document modifications history") + tr(" (%1 documents concerned)").arg(nbHistories));
 }
 
 void TimelineControl::showEvent(QShowEvent *) {
@@ -57,20 +69,9 @@ void TimelineControl::setStyleSheet2(const QString &str) {
     ui->globalFrameRed->setStyleSheet(str);
 }
 
-void TimelineControl::setDuplicates(quint16 nbDuplicates) {
-    if(     nbDuplicates == 0)  ui->hash->setText(tr("Reveal duplicate documents") + tr(" (no document concerned)"));
-    else if(nbDuplicates == 1)  ui->hash->setText(tr("Reveal duplicate documents") + tr(" (1 document concerned)"));
-    else                        ui->hash->setText(tr("Reveal duplicate documents") + tr(" (%1 documents concerned)").arg(nbDuplicates));
-}
-void TimelineControl::setHistories(quint16 nbHistories) {
-    if(     nbHistories == 0)   ui->history->setText(tr("Show document modifications history") + tr(" (no document concerned)"));
-    else if(nbHistories == 1)   ui->history->setText(tr("Show document modifications history") + tr(" (1 document concerned)"));
-    else                        ui->history->setText(tr("Show document modifications history") + tr(" (%1 documents concerned)").arg(nbHistories));
-}
-
-
 void TimelineControl::action() {
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    //Global::groupes->needCalulation = true;
 }
 
 TimelineControl::~TimelineControl() {

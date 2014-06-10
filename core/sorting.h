@@ -39,6 +39,9 @@ public:
     explicit Sorting(const QString &title, quint16 index = 0, bool _needWord = false, bool _isHorizontal = false, QWidget *parent = 0);
     ~Sorting();
 
+public:
+    void init();
+    bool allowEmptyCriterias;
 private:
     bool sortAscending, isUpdating, needWord, isHorizontal;
     bool asNumber, asDate, asTimeline;
@@ -53,6 +56,11 @@ public:
     inline       bool    isTimeline()         const { return asTimeline;      }
     inline       bool    isNumber()           const { return asNumber;        }
     inline       bool    isDate()             const { return asDate;          }
+
+public:
+    QCheckBox *getLinkedTags() const;
+    QCheckBox *getHash() const;
+    QCheckBox *getHistory() const;
 
 protected:
     void showEvent(QShowEvent *);

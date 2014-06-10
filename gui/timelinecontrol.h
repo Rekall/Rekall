@@ -36,6 +36,7 @@ class TimelineControl : public QWidget {
 
 public:
     explicit TimelineControl(QWidget *parent = 0);
+    void init();
     ~TimelineControl();
 
 private:

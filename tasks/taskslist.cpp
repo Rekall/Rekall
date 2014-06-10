@@ -100,7 +100,8 @@ void TasksList::nextTask() {
             if(toolbox->currentIndex() == 2)
                 toolbox->setCurrentIndex(oldToolboxIndex);
             toolbox->setItemEnabled(2, false);
-            Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+            Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+            //Global::groupes->needCalulation = true;
         }
     }
 }

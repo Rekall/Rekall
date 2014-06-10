@@ -87,7 +87,8 @@ bool Project::open(const QFileInfoList &files, UiTreeView *view) {
     foreach(Person *person, persons)
         person->updateGUI();
 
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    //Global::groupes->needCalulation = true;
     return retour;
 }
 void Project::open(const QDir &dir, const QDir &dirBase) {
@@ -112,6 +113,7 @@ void Project::open(const QDir &dir, const QDir &dirBase) {
 
             if(documentExisted) {
                 document->status = DocumentStatusWaiting;
+                document->updateForCompatibility();
                 Global::taskList->addTask(document, TaskProcessTypeMetadata, -1, false);
                 foreach(Tag *tag, document->tags)
                     tag->init();
@@ -161,7 +163,8 @@ void Project::open(const QDir &dir, const QDir &dirBase) {
         }
     }
 
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    //Global::groupes->needCalulation = true;
 }
 void Project::save() {
     QDomDocument xmlDoc("rekall");
@@ -182,7 +185,8 @@ void Project::close() {
     Global::selectedTagHover = Global::timeMarkerAdded = 0;
     documents.clear();
     Global::mainWindow->displayMetadataAndSelect();
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    //Global::groupes->needCalulation = true;
 }
 
 
@@ -275,6 +279,14 @@ void Project::fireEvents() {
         //Sorting events
         qSort(eventsTags.begin(), eventsTags.end(), Tag::sortEvents);
 
+        //Groupes
+        Global::groupes->addCheckStart();
+        foreach(Document *document, documents)
+            foreach(Tag *tag, document->tags)
+                if(tag->isAcceptableWithGroupeFilters(false))
+                    Global::groupes->addCheck(tag->getCriteriaGroupe(tag), tag->getCriteriaGroupeFormated(tag), "");
+        Global::groupes->addCheckEnd();
+
         //Filters
         Global::tagFilterCriteria->addCheckStart();
         foreach(Document *document, documents)
@@ -354,13 +366,15 @@ const QRectF Project::paintTimeline(bool before) {
             }
 
             //Find phases
-            if(Global::phases->needCalulation) {
-                Global::phases->addCheckStart();
+            /* TODOTODO
+            if(Global::groupes->needCalulation) {
+                Global::groupes->addCheckStart();
                 foreach(Document *document, documents)
                     foreach(Tag *tag, document->tags)
-                        Global::phases->addCheck(Tag::getCriteriaPhase(tag));
-                Global::phases->addCheckEnd();
+                        Global::groupes->addCheck(Tag::getCriteriaPhase(tag));
+                Global::groupes->addCheckEnd();
             }
+            */
 
             //Browse documents
             Global::tagSortCriteria->addCheckStart();
@@ -382,7 +396,8 @@ const QRectF Project::paintTimeline(bool before) {
                     if(tag->isAcceptableWithSortFilters(false)) {
                         QString sorting = Tag::getCriteriaSort(tag).toLower();
                         if(tag->isAcceptableWithSortFilters(true)) {
-                            QString phase          = Global::phases->getPhaseFor(Tag::getCriteriaPhase(tag)).toLower();
+                            //QString phase          = Global::groupes->getCriteria(Tag::getCriteriaPhase(tag)).toLower();
+                            QString phase          = Tag::getCriteriaGroupe(tag).toLower();
                             QString cluster        = Tag::getCriteriaCluster(tag).toLower();
                             if((!cluster.isEmpty()) && (tag->isAcceptableWithClusterFilters(true)) && (!Global::tagClusterCriteria->getMatchName().isEmpty())) {
                                 cluster = tag->getAcceptableWithClusterFilters();
@@ -507,9 +522,9 @@ const QRectF Project::paintTimeline(bool before) {
             categoriesInPhasesIterator.next();
 
             QString phase        = categoriesInPhasesIterator.key();
-            QString phaseVerbose = Global::phases->getVerbosePhaseFor(phase);
+            //QString phaseVerbose = Global::groupes->getVerbosePhaseFor(phase);
             if(debug)
-                qDebug("\t > [Phase] |%s| (%s) (nb = %d)", qPrintable(phaseVerbose), qPrintable(phase), categoriesInPhasesIterator.value().count());
+                qDebug("\t > [Phase] |%s| (nb = %d)", qPrintable(phase), categoriesInPhasesIterator.value().count());
 
             QMapIterator<QString, QMap<QString, QList<Tag*> > > clustersInCategoriesIterator(categoriesInPhasesIterator.value());
             while(clustersInCategoriesIterator.hasNext()) {

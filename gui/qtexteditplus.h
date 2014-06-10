@@ -1,9 +1,9 @@
 #ifndef QTEXTEDITPLUS_H
 #define QTEXTEDITPLUS_H
 
-#include <QTextEdit>
+#include <QLineEdit>
 
-class QTextEditPlus : public QTextEdit {
+class QTextEditPlus : public QLineEdit {
     Q_OBJECT
 public:
     explicit QTextEditPlus(QWidget *parent = 0);

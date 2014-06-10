@@ -1,14 +1,14 @@
 #include "qtexteditplus.h"
 
 QTextEditPlus::QTextEditPlus(QWidget *parent) :
-    QTextEdit(parent) {
+    QLineEdit(parent) {
 }
 
 void QTextEditPlus::focusInEvent(QFocusEvent *e) {
     emit(focusChanged(true));
-    QTextEdit::focusInEvent(e);
+    QLineEdit::focusInEvent(e);
 }
 void QTextEditPlus::focusOutEvent(QFocusEvent *e) {
     emit(focusChanged(false));
-    QTextEdit::focusOutEvent(e);
+    QLineEdit::focusOutEvent(e);
 }

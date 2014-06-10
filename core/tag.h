@@ -26,6 +26,7 @@
 
 #include <QObject>
 #include <QMenu>
+#include <QFontMetrics>
 #include "misc/global.h"
 #include "metadata.h"
 
@@ -166,6 +167,7 @@ public:
     bool isAcceptableWithTextFilters      (bool strongCheck) const;
     bool isAcceptableWithClusterFilters   (bool strongCheck) const;
     bool isAcceptableWithFilterFilters    (bool strongCheck) const;
+    bool isAcceptableWithGroupeFilters    (bool strongCheck) const;
     bool isAcceptableWithHorizontalFilters(bool strongCheck) const;
     const QString getAcceptableWithClusterFilters() const;
     static bool sortColor (const Tag *first, const Tag *second);
@@ -178,7 +180,9 @@ public:
     static const QString getCriteriaCluster           (const Tag *tag);
     static const QString getCriteriaFilter            (const Tag *tag);
     static const QString getCriteriaHorizontal        (const Tag *tag);
-    static const MetadataElement getCriteriaPhase     (const Tag *tag);
+    static const QString getCriteriaGroupe            (const Tag *tag);
+    //static const MetadataElement getCriteriaPhase     (const Tag *tag);
+    static const QString getCriteriaGroupeFormated    (const Tag *tag);
     static const QString getCriteriaSortFormated      (const Tag *tag);
     static const QString getCriteriaColorFormated     (const Tag *tag);
     static const QString getCriteriaTextFormated      (const Tag *tag);

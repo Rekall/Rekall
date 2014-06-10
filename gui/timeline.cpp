@@ -28,6 +28,7 @@ Timeline::Timeline(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Timeline) {
     ui->setupUi(this);
+    ui->writeNote->setVisible(false);
     tagHorizontalCriteriaWasTimeline = false;
     Global::timeline = this;
     startTimer(40);
@@ -35,15 +36,15 @@ Timeline::Timeline(QWidget *parent) :
     timelineControl = new TimelineControl();
     Global::timelineGL->showLegendDest.setAction(ui->legend);
 
-    ui->ffButton->setVisible(false);
+    ui->ffButton  ->setVisible(false);
     ui->playButton->setVisible(false);
 
-    ui->workspace->addItem("HISTORIC VIEW",        "global_work");
-    ui->workspace->addItem("YOUR WORK",            "your_work");
-    ui->workspace->addItem("YOUR CUES",            "your_cues");
-    ui->workspace->addItem("YOUR LAST IMPORTS",    "your_last_imports");
-    ui->workspace->addItem("ALL THE CUES",         "global_cues");
-    ui->workspace->addItem("ALL THE LAST IMPORTS", "global_last_imports");
+    ui->workspace->addItem("HISTORIC VIEW",               "global_work");
+    ui->workspace->addItem("YOUR WORK",                   "your_work");
+    ui->workspace->addItem("YOUR CUES",                   "your_cues");
+    ui->workspace->addItem("YOUR LAST IMPORTS",           "your_last_imports");
+    ui->workspace->addItem("ALL THE CUES",                "global_cues");
+    ui->workspace->addItem("ALL THE LAST IMPORTS",        "global_last_imports");
     ui->workspace->addItem("TYPE OF DOCUMENTS PUNCHCARD", "global_punchcard_type");
     ui->workspace->addItem("PEOPLE ACTIVITY PUNCHCARD",   "global_punchcard_activity");
 }
@@ -249,9 +250,9 @@ void Timeline::action() {
     else if(sender() == ui->ffButton)    seek(0);
     else if(sender() == ui->writeNote)   Global::watcher->writeNote();
     else if(sender() == ui->phaseBy) {
-        Global::phases->move(ui->phaseBy->parentWidget()->mapToGlobal(ui->phaseBy->pos())                       - QPoint(12, 3 + Global::phases->height()));
-        if(ui->phaseBy->isChecked())  Global::phases->show();
-        else                          Global::phases->hide();
+        Global::groupes->move(ui->phaseBy->parentWidget()->mapToGlobal(ui->phaseBy->pos())                       - QPoint(12, 3 + Global::groupes->height()));
+        if(ui->phaseBy->isChecked())  Global::groupes->show();
+        else                          Global::groupes->hide();
     }
     else if(sender() == ui->filterBy) {
         Global::tagFilterCriteria->move(ui->filterBy->parentWidget()->mapToGlobal(ui->filterBy->pos())          - QPoint(23, 3 + Global::tagFilterCriteria->height()));
@@ -307,34 +308,29 @@ void Timeline::action() {
         */
 
         if((workspace == "global_work") || (workspace == "your_work")) {
-            Global::phases               ->reset("document date", 30, 0, false);
             Global::tagFilterCriteria    ->reset("author", (workspace == "your_work")?(Global::userInfos->getInfo("User Name")):(""));
             Global::tagSortCriteria      ->reset("date (month)");
             Global::tagHorizontalCriteria->reset("time");
         }
 
         else if((workspace == "your_cues") || (workspace == "global_cues")) {
-            Global::phases               ->reset("document date", 30, 0, false);
             Global::tagFilterCriteria    ->reset("type", "cue");
             Global::tagSortCriteria      ->reset("author", (workspace == "your_cues")?(Global::userInfos->getInfo("User Name")):(""));
             Global::tagHorizontalCriteria->reset("time");
         }
 
         else if((workspace == "your_last_imports") || (workspace == "global_last_imports")) {
-            Global::phases               ->reset("import date", 0, 0, true);
             Global::tagFilterCriteria    ->reset("import author", (workspace == "your_last_imports")?(Global::userInfos->getInfo("User Name")):(""));
             Global::tagSortCriteria      ->reset("author");
             Global::tagHorizontalCriteria->reset("type");
         }
 
         else if(workspace == "global_punchcard_type") {
-            Global::phases               ->reset("document date", 30, 0, false);
             Global::tagFilterCriteria    ->reset("type");
             Global::tagSortCriteria      ->reset("author");
             Global::tagHorizontalCriteria->reset("type");
         }
         else if(workspace == "global_punchcard_activity") {
-            Global::phases               ->reset("document date", 30, 0, false);
             Global::tagFilterCriteria    ->reset("type");
             Global::tagSortCriteria      ->reset("author");
             Global::tagHorizontalCriteria->reset("date (month)");
@@ -362,6 +358,7 @@ void Timeline::actionMarkerAddEnd() {
         Tag *tag = (Tag*)Global::timeMarkerAdded;
         if(actionMarkerAddStarted.elapsed() < 1000)
             tag->setType(TagTypeContextualMilestone, tag->getTimeStart());
+        Global::mainWindow->changeAnnotation(tag, true);
         Global::timeMarkerAdded = 0;
         ui->marker->setText("+");
         ui->marker->setStyleSheet("");
@@ -382,7 +379,7 @@ void Timeline::actionDisplayed(bool val) {
         ui->clusterBy->setChecked(val);
     else if(sender() == Global::tagHorizontalCriteria)
         ui->horizontalBy->setChecked(val);
-    else if(sender() == Global::phases)
+    else if(sender() == Global::groupes)
         ui->phaseBy->setChecked(val);
     else if(sender() == timelineControl)
         ui->viewOption->setChecked(val);
@@ -392,7 +389,7 @@ void Timeline::actionChanged(QString text, QString text2) {
     QString buttonOrange = "QPushButton { background-color: rgb(255,147,102); border-color: rgb(255,147,102); } QPushButton:hover { border-color: rgb(255,255,255); } QPushButton:disabled { background-color: rgb(41, 44, 45);  border-color: rgb(41, 44, 45); }";
 
     if(text != "nothing") {
-        if(sender() == Global::phases) {
+        if(sender() == Global::groupes) {
             if(text2.isEmpty()) {
                 ui->phaseBy->setText(text);
                 ui->phaseBy->setStyleSheet("");
@@ -463,7 +460,8 @@ void Timeline::actionChanged(QString text, QString text2) {
             }
         }
     }
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+    //Global::groupes->needCalulation = true;
     Global::timelineGL->scrollTo();
     Global::viewerGL  ->scrollTo();
 }
@@ -475,6 +473,6 @@ void Timeline::closePopups() {
     Global::tagFilterCriteria->close();
     Global::tagClusterCriteria->close();
     Global::tagHorizontalCriteria->close();
-    Global::phases->close();
+    Global::groupes->close();
     timelineControl->close();
 }

@@ -27,8 +27,10 @@
 Sorting::Sorting(const QString &title, quint16 index, bool _needWord, bool _isHorizontal, QWidget *parent) :
     QWidget(parent, Qt::Tool | Qt::FramelessWindowHint),
     ui(new Ui::Sorting) {
-
     ui->setupUi(this);
+    ui->frameOptions->setVisible(false);
+
+    allowEmptyCriterias = false;
     ui->title->setText(title);
     setWindowTitle(title);
     needWord     = _needWord;
@@ -47,6 +49,7 @@ Sorting::Sorting(const QString &title, quint16 index, bool _needWord, bool _isHo
     ui->filter->addItem("name",         "Rekall->Name");
     ui->filter->addItem("import date",  "Rekall->Import Date/Time | 0,16");
     ui->filter->addItem("import author","Rekall->Import Author");
+    ui->filter->addItem("group",        "Rekall->Group");
     ui->filter->addItem("first letter (name)", "Rekall->Name | 0,1");
     ui->filter->addItem("Composite->Light Value");
     ui->filter->addItem("Rekall->Size");
@@ -55,6 +58,20 @@ Sorting::Sorting(const QString &title, quint16 index, bool _needWord, bool _isHo
     isUpdating = false;
     actionSelection();
 }
+void Sorting::init() {
+    ui->frameOptions->setVisible(true);
+}
+
+QCheckBox* Sorting::getLinkedTags() const {
+    return ui->linkedTags;
+}
+QCheckBox* Sorting::getHash() const {
+    return ui->hash;
+}
+QCheckBox* Sorting::getHistory() const {
+    return ui->history;
+}
+
 
 void Sorting::showEvent(QShowEvent *) {
     emit(displayed(true));
@@ -258,7 +275,10 @@ bool Sorting::isAcceptable(bool strongCheck, const QString &_criteria) const {
     if(asTimeline)
         return true;
 
-    if((_criteria.isEmpty()) && (!asDate))
+    if((asDate) || (allowEmptyCriterias)) {
+
+    }
+    else if(_criteria.isEmpty())
         return false;
 
     /*

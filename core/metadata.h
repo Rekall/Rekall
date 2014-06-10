@@ -164,6 +164,7 @@ protected:
 
 public:
     bool updateFile(const QFileInfo &file, const QDir &dirBase = QDir(), qint16 version = -1, quint16 falseInfoForTest = 0);
+    bool updateForCompatibility(qint16 version = -1);
     bool updateImport(const QString &name, qint16 version = -1);
     bool updateCard(const PersonCard &card, qint16 version = -1);
     bool updateWeb(const QString &url, qint16 version = -1);
@@ -246,7 +247,9 @@ public:
     }
 
 public:
-    const MetadataElement getCriteriaPhase       (qint16 version = -1) const;
+    //const MetadataElement getCriteriaPhase       (qint16 version = -1) const;
+    const QString getCriteriaGroupe                (qint16 version = -1) const;
+    const QString getCriteriaGroupeFormated        (qint16 version = -1) const;
     const QString getCriteriaSort                (qint16 version = -1) const;
     const QString getCriteriaSortFormated        (qint16 version = -1) const;
     const QString getCriteriaCluster             (qint16 version = -1) const;
@@ -266,6 +269,7 @@ public:
     bool isAcceptableWithClusterFilters          (bool strongCheck, qint16 version = -1) const;
     bool isAcceptableWithFilterFilters           (bool strongCheck, qint16 version = -1) const;
     bool isAcceptableWithHorizontalFilters       (bool strongCheck, qint16 version = -1) const;
+    bool isAcceptableWithGroupeFilters           (bool strongCheck, qint16 version = -1) const;
 
 public:
     void debug();

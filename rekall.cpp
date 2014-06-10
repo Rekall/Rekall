@@ -66,13 +66,17 @@ Rekall::Rekall(QWidget *parent) :
     Global::currentProject = currentProject;
     connect(currentProject, SIGNAL(displayMetadata()), SLOT(displayMetadata()));
 
-    Global::phases                = new Phases(0);
-    Global::tagFilterCriteria     = new Sorting(tr("Filter by documents"),     6);
-    Global::tagSortCriteria       = new Sorting(tr("Sort by documents"),    2);
-    Global::tagColorCriteria      = new Sorting(tr("Color depends on documents"),      5);
-    Global::tagTextCriteria       = new Sorting(tr("Text on timeline is documents"),       0);
-    Global::tagClusterCriteria    = new Sorting(tr("Hightlight on documents"), 7, true);
+    Global::groupes               = new Sorting(tr("Group by documents"),           11);
+    Global::groupes->allowEmptyCriterias = true;
+    Global::tagFilterCriteria     = new Sorting(tr("Filter by documents"),           6);
+    Global::tagSortCriteria       = new Sorting(tr("Sort by documents"),             2);
+    Global::tagColorCriteria      = new Sorting(tr("Color depends on documents"),    5);
+    Global::tagTextCriteria       = new Sorting(tr("Text on timeline is documents"), 0);
+    Global::tagClusterCriteria    = new Sorting(tr("Hightlight on documents"),       7, true);
     Global::tagHorizontalCriteria = new Sorting(tr("Horizontal scale is documents"), 1, false, true);
+    Global::tagClusterCriteria->init();
+    ui->timeline->timelineControl->init();
+
 
     QString styleAdditionnal = "QWidget#Sorting, QWidget#Phases, QWidget#TimelineControl { background-color: transparent;}";
     Global::tagFilterCriteria    ->setStyleSheet(styleSheet() + styleAdditionnal);
@@ -81,12 +85,12 @@ Rekall::Rekall(QWidget *parent) :
     Global::tagTextCriteria      ->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::tagClusterCriteria   ->setStyleSheet(styleSheet() + styleAdditionnal);
     Global::tagHorizontalCriteria->setStyleSheet(styleSheet() + styleAdditionnal);
-    Global::phases               ->setStyleSheet(styleSheet() + styleAdditionnal);
-    Global::phases               ->setStyleSheet2(Global::tagFilterCriteria->styleSheet2());
+    Global::groupes               ->setStyleSheet(styleSheet() + styleAdditionnal);
+    Global::groupes               ->setStyleSheet2(Global::tagFilterCriteria->styleSheet2());
     ui->timeline->timelineControl->setStyleSheet(styleSheet() + styleAdditionnal);
     ui->timeline->timelineControl->setStyleSheet2(Global::tagFilterCriteria->styleSheet2());
 
-    connect(Global::phases,                SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
+    connect(Global::groupes,                SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(Global::tagFilterCriteria,     SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(Global::tagSortCriteria,       SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(Global::tagColorCriteria,      SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
@@ -95,14 +99,14 @@ Rekall::Rekall(QWidget *parent) :
     connect(Global::tagHorizontalCriteria, SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
     connect(ui->timeline->timelineControl, SIGNAL(displayed(bool)), (Timeline*)Global::timeline, SLOT(actionDisplayed(bool)));
 
-    connect(Global::phases,                SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
+    connect(Global::groupes,                SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagFilterCriteria,     SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagSortCriteria,       SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagColorCriteria,      SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagTextCriteria,       SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagClusterCriteria,    SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
     connect(Global::tagHorizontalCriteria, SIGNAL(actionned(QString,QString)), (Timeline*)Global::timeline, SLOT(actionChanged(QString,QString)));
-    Global::phases               ->action();
+    Global::groupes               ->action();
     Global::tagFilterCriteria    ->action();
     Global::tagSortCriteria      ->action();
     Global::tagColorCriteria     ->action();
@@ -121,6 +125,7 @@ Rekall::Rekall(QWidget *parent) :
     connect(ui->actionRemove, SIGNAL(triggered()), SLOT(action()));
     connect(ui->actionMarker, SIGNAL(triggered(bool)), SLOT(action()));
     connect(ui->actionMarkerLong, SIGNAL(triggered(bool)), SLOT(action()));
+    connect(ui->actionSRT, SIGNAL(triggered(bool)), SLOT(action()));
     connect(&Global::showHelp, SIGNAL(triggered(bool)), SLOT(showHelp(bool)));
 
     ui->metadata->setColumnWidth(0, 135);
@@ -290,7 +295,8 @@ bool Rekall::parseMimeData(const QMimeData *mime, const QString &source, bool te
                     Global::chutier->setCurrentItem(droppedDocument->chutierItem);
                 retour = true;
             }
-            Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+            Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+            //Global::groupes->needCalulation = true;
         }
     }
     return retour;
@@ -370,9 +376,52 @@ void Rekall::action() {
     else if(sender() == ui->actionMarkerLong) {
         Global::timeline->actionMarkerAddStart();
     }
+    else if(sender() == ui->actionSRT) {
+        QString fileToOpen = QFileDialog::getOpenFileName(0, tr("Select a SRT file"), Global::pathCurrentDefault.absoluteFilePath(), tr("Subtitles files (*.srt)"));
+        QFile file(fileToOpen);
+        if((!fileToOpen.isEmpty()) && (file.exists()) && (file.open(QFile::ReadOnly))) {
+            QTextStream in(&file);
+            int state = 0;
+            quint16 srtIndex = 0;
+            qreal srtStart = -1, srtEnd = -1;
+            QString srtText;
+            while(!in.atEnd()) {
+                QString line = in.readLine().trimmed();
+                if(state == 0) {
+                    srtIndex = line.toInt();
+                    srtText  = "";
+                    srtStart = -1;
+                    srtEnd   = -1;
+                    state = 1;
+                }
+                else if(state == 1) {
+                    QStringList times = line.split(" --> ", QString::SkipEmptyParts);
+                    if(times.count() >= 2) {
+                        srtStart = Global::getDurationFromString(times.at(0));
+                        srtEnd   = Global::getDurationFromString(times.at(1));
+                    }
+                    state = 2;
+                }
+                else if(state == 2) {
+                    if(line.isEmpty()) {
+                        srtText.chop(3);
+                        state = 0;
+                        Document *marker = new Document(Global::currentProject);
+                        marker->updateImport(QString("%1 : %2").arg(srtIndex).arg(srtText));
+                        marker->createTag(TagTypeContextualTime, srtStart, srtEnd - srtStart);
+                        marker->updateFeed();
+                    }
+                    else
+                        srtText += line + " | ";
+                }
+            }
+            file.close();
+            Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+        }
+    }
     else if(sender() == ui->annotation) {
         if((!annotationIsUpdating) && (annotationTag)) {
-            annotationTag->getDocument()->setMetadata("Rekall", "Name", ui->annotation->toPlainText(), annotationTag->getDocumentVersion());
+            annotationTag->getDocument()->setMetadata("Rekall", "Name", ui->annotation->text(), annotationTag->getDocumentVersion());
             Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
         }
     }
@@ -385,7 +434,8 @@ void Rekall::action() {
         Global::selectedTags.clear();
         Global::selectedTagsInAction.clear();
         Global::mainWindow->displayMetadataAndSelect();
-        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::phases->needCalulation = true;
+        Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = true;
+        //Global::groupes->needCalulation = true;
     }
 }
 void Rekall::annotationFocusChanged(bool val) {
@@ -397,16 +447,23 @@ void Rekall::annotationFocusChanged(bool val) {
         Global::play(annotationStateBeforeFocus);
     }
 }
-void Rekall::changeAnnotation(void *_tag) {
+void Rekall::annotationFinished() {
+    ui->timeline->setFocus();
+}
+void Rekall::changeAnnotation(void *_tag, bool giveFocus) {
     annotationIsUpdating = true;
     annotationTag = (Tag*)_tag;
     if(annotationTag) {
-        ui->annotation->setHtml("<center>" + annotationTag->getDocument()->getName(annotationTag->getDocumentVersion()) + "</center>");
-        ui->annotation->setStyleSheet(QString("color: %1;").arg(annotationTag->getRealTimeColor().name()));
+        ui->annotation->setText(annotationTag->getDocument()->getName(annotationTag->getDocumentVersion()));
+        //ui->annotation->setStyleSheet(QString("color: %1;").arg(annotationTag->getRealTimeColor().name()));
         ui->annotation->setEnabled(true);
+        if(giveFocus) {
+            ui->annotation->setFocus();
+            ui->annotation->selectAll();
+        }
     }
     else {
-        ui->annotation->setPlainText("");
+        ui->annotation->setText("");
         ui->annotation->setEnabled(false);
     }
     annotationIsUpdating = false;
@@ -433,7 +490,8 @@ void Rekall::actionMetadata() {
         ui->metadata->currentItem()->setText(0, ui->metadata->currentItem()->text(0).remove("<i>").remove("</i>"));
         ui->metadata->currentItem()->setText(1, ui->metadata->currentItem()->text(1).remove("<i>").remove("</i>"));
     }
-    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = Global::phases->needCalulation = true;
+    Global::timelineSortChanged = Global::viewerSortChanged = Global::eventsSortChanged = Global::metaChanged = true;
+    //Global::groupes->needCalulation = true;
 }
 
 void Rekall::closeSplash() {

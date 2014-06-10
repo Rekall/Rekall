@@ -59,15 +59,16 @@ void FeedList::setToolbox(QToolBox *_toolbox) {
 }
 
 void FeedList::addFeed(FeedItemBase *feedItem) {
+    return;
     agoNow->insertChild(0, feedItem);
     feeds << feedItem;
     if(feedItem->author != Global::userInfos->getInfo("User Name"))
         notifCounter++;
-    timerEvent();
+    //timerEvent();
 }
 
 void FeedList::timerEvent() {
-    timerEvent(0);
+    //timerEvent(0);
 }
 
 void FeedList::timerEvent(QTimerEvent *) {

@@ -87,7 +87,7 @@ Sorting*     Global::tagTextCriteria       = 0;
 Sorting*     Global::tagClusterCriteria    = 0;
 Sorting*     Global::tagFilterCriteria     = 0;
 Sorting*     Global::tagHorizontalCriteria = 0;
-Phases*      Global::phases             = 0;
+Sorting*     Global::groupes               = 0;
 WatcherBase* Global::watcher            = 0;
 RekallBase*  Global::mainWindow         = 0;
 TaskListBase*  Global::taskList         = 0;
@@ -191,13 +191,33 @@ qreal Global::getDurationFromString(QString timeStr) {
         if(parts.count() == 3) {
             duration += parts.at(0).toDouble()*3600;
             duration += parts.at(1).toDouble()*60;
-            duration += parts.at(2).split(".").first().toDouble();
+            QStringList decimals = Global::splits(parts.at(2), QStringList() << "." << ",");
+            if(decimals.count())
+                duration += decimals.at(0).toDouble();
+            if(decimals.count() > 1)
+                duration += decimals.at(1).toDouble() / 1000.;
         }
-        else
-            duration += parts.last().split(".").first().toDouble();
+        else {
+            QStringList decimals = Global::splits(parts.last(), QStringList() << "." << ",");
+            if(decimals.count())
+                duration += decimals.at(0).toDouble();
+            if(decimals.count() > 1)
+                duration += decimals.at(1).toDouble() / 1000.;
+        }
     }
     return duration;
 }
+QStringList Global::splits(const QString &str, QStringList separators, QString::SplitBehavior behavior) {
+    QStringList retour = QStringList() << str;
+    foreach(const QString &separator, separators) {
+        QStringList retourTmp;
+        foreach(const QString &strToSplit, retour)
+            retourTmp << strToSplit.split(separator, behavior);
+        retour = retourTmp;
+    }
+    return retour;
+}
+
 QPair<QString,QString> Global::seperateMetadata(const QString &metaline, const QString &separator) {
     QPair<QString,QString> retour;
     qint16 index = metaline.indexOf(separator);
@@ -289,13 +309,18 @@ void GlText::setStyle(const QSize &_size, int _alignement, const QFont &_font) {
     text       = "...";
 }
 
-void GlText::drawText(const QString &newtext, const QPoint &pos) {
-    setText(newtext);
+void GlText::drawText(const QString &newtext, const QPoint &pos, qreal maxWidth) {
+    setText(newtext, maxWidth);
     drawText(pos);
 }
-void GlText::setText(const QString &newText) {
+void GlText::setText(const QString &newText, qreal maxWidth) {
     if(newText != text) {
-        text = newText;
+        if(maxWidth > 0) {
+            QFontMetrics fm(font);
+            text = fm.elidedText(newText, Qt::ElideRight, maxWidth, alignement);
+        }
+        else
+            text = newText;
         init = false;
         image.fill(Qt::transparent);
         QPainter painter(&image);

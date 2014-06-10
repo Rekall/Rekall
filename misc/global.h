@@ -141,8 +141,8 @@ public:
     explicit GlText() { init = false; texture = 0; }
 public:
     void setStyle(const QSize &_size, int _alignement, const QFont &_font);
-    void setText(const QString &text);
-    void drawText(const QString &text,const QPoint &pos = QPoint(0, 0));
+    void setText(const QString &text, qreal maxWidth = -1);
+    void drawText(const QString &text, const QPoint &pos = QPoint(0, 0), qreal maxWidth = -1);
     void drawText(const QPoint &pos = QPoint(0, 0));
 };
 
@@ -248,7 +248,7 @@ public:
     virtual void displayMetadataAndSelect(void *tag = 0)  = 0;
     virtual void displayMetadata(QTreeWidgetItem * = 0, QTreeWidgetItem * = 0)  = 0;
     virtual void showPreviewTab()   = 0;
-    virtual void changeAnnotation(void *) = 0;
+    virtual void changeAnnotation(void *, bool giveFocus = false) = 0;
 public:
     virtual bool parseMimeData(const QMimeData *, const QString &, bool = false) = 0;
 };
@@ -285,7 +285,7 @@ public:
     static qreal breathing, breathingDest, breathingFast, breathingFastDest, breathingPics, breathingPicsDest;
     static QTime timer;
     static Sorting *tagSortCriteria, *tagColorCriteria, *tagTextCriteria, *tagClusterCriteria, *tagFilterCriteria, *tagHorizontalCriteria;
-    static Phases *phases;
+    static Sorting *groupes;
     static void *selectedTagHover, *timeMarkerAdded;
     static QList<void*> selectedTags, selectedTagsInAction;
     static QPair<qreal, qreal> selectedTagHoverSnapped;
@@ -314,6 +314,7 @@ public:
     }
     static QString getBetween(const QString &data, const QString &start, const QString &end, bool trim = true);
     static qreal getDurationFromString(QString timeStr);
+    static QStringList splits(const QString &str, QStringList separators, QString::SplitBehavior behavior = QString::SkipEmptyParts);
     static QPair<QString,QString> seperateMetadata(const QString &metaline, const QString &separator = QString(":"));
     static QPair<QString, QPair<QString,QString> > seperateMetadataAndGroup(const QString &metaline, const QString &separator = QString(":"));
     static QColor getColorScale(qreal val);

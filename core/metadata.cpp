@@ -56,6 +56,12 @@ Metadata::Metadata(QObject *parent, bool createEmpty) :
 Metadata::~Metadata() {
 }
 
+
+bool Metadata::updateForCompatibility(qint16 version) {
+    setMetadata("Rekall", "Keywords", getMetadata("Rekall", "Keywords", version), version);
+    setMetadata("Rekall", "Group",    getMetadata("Rekall", "Group",    version), version);
+    return true;
+}
 bool Metadata::updateImport(const QString &name, qint16 version) {
     bool anEmptyMetaWasCreated = false;
     if(version < 0) {
@@ -65,13 +71,14 @@ bool Metadata::updateImport(const QString &name, qint16 version) {
 
     if(!file.exists())
         setType(DocumentTypeMarker);
-    setMetadata("Rekall", "Name",               name, version);
-    setMetadata("Rekall", "Comments",           "",   version);
-    //setMetadata("Rekall", "Comments (details)", "",   version);
-    setMetadata("Rekall", "Author",        Global::userInfos->getInfo("User Name"), version);
-    setMetadata("Rekall", "Import Author", Global::userInfos->getInfo("User Name"), version);
-    setMetadata("Rekall", "Date/Time",          QDateTime::currentDateTime(), version);
-    setMetadata("Rekall", "Import Date/Time",   QDateTime::currentDateTime(), version);
+    setMetadata("Rekall", "Name",             name, version);
+    setMetadata("Rekall", "Comments",         "",   version);
+    setMetadata("Rekall", "Author",           Global::userInfos->getInfo("User Name"), version);
+    setMetadata("Rekall", "Import Author",    Global::userInfos->getInfo("User Name"), version);
+    setMetadata("Rekall", "Date/Time",        QDateTime::currentDateTime(), version);
+    setMetadata("Rekall", "Import Date/Time", QDateTime::currentDateTime(), version);
+    setMetadata("Rekall", "Keywords",         "", version);
+    setMetadata("Rekall", "Group",            "", version);
     setMetadata(Global::userInfos->getInfos());
 
     if(Global::falseProject) {
@@ -343,14 +350,14 @@ void Metadata::setMetadata(const QMetaDictionnay &metaDictionnay) {
 
 bool Metadata::isAcceptableWithSortFilters(bool strongCheck, qint16 version) const {
     return (getFunction() == DocumentFunctionRender) ||
-            (   (Global::phases                  ->isAcceptable(true,        getCriteriaPhase(version)))
+            (   (Global::groupes                 ->isAcceptable(true,        getCriteriaGroupe(version)))
                 && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
                 && (Global::tagSortCriteria      ->isAcceptable(strongCheck, getCriteriaSort(version).toLower()))
                 && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version))));
 }
 bool Metadata::isAcceptableWithColorFilters(bool strongCheck, qint16 version) const {
     return (getFunction() == DocumentFunctionContextual)
-            && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+            && (Global::groupes              ->isAcceptable(true,        getCriteriaGroupe(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
             && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
             && (Global::tagColorCriteria     ->isAcceptable(strongCheck, getCriteriaColor(version)))
@@ -358,7 +365,7 @@ bool Metadata::isAcceptableWithColorFilters(bool strongCheck, qint16 version) co
 }
 bool Metadata::isAcceptableWithTextFilters(bool strongCheck, qint16 version) const {
     return (getType() == DocumentTypeMarker) || ((getFunction() == DocumentFunctionContextual)
-                                                 && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+                                                 && (Global::groupes              ->isAcceptable(true,        getCriteriaGroupe(version)))
                                                  && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
                                                  && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
                                                  && (Global::tagTextCriteria      ->isAcceptable(strongCheck, getCriteriaText(version)))
@@ -366,23 +373,29 @@ bool Metadata::isAcceptableWithTextFilters(bool strongCheck, qint16 version) con
 }
 bool Metadata::isAcceptableWithClusterFilters(bool strongCheck, qint16 version) const {
     return (getFunction() == DocumentFunctionContextual)
-            && (Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+            && (Global::groupes              ->isAcceptable(true,        getCriteriaGroupe(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
             && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
             && (Global::tagClusterCriteria   ->isAcceptable(strongCheck, getCriteriaCluster(version)))
             && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
 bool Metadata::isAcceptableWithFilterFilters(bool strongCheck, qint16 version) const {
-    return (    Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+    return (    Global::groupes              ->isAcceptable(true,        getCriteriaGroupe(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(strongCheck, getCriteriaFilter(version)))
             && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
             && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
 bool Metadata::isAcceptableWithHorizontalFilters(bool strongCheck, qint16 version) const {
-    return (    Global::phases               ->isAcceptable(true,        getCriteriaPhase(version)))
+    return (    Global::groupes              ->isAcceptable(true,        getCriteriaGroupe(version)))
             && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
             && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
             && (Global::tagHorizontalCriteria->isAcceptable(strongCheck, getCriteriaHorizontal(version)));
+}
+bool Metadata::isAcceptableWithGroupeFilters(bool strongCheck, qint16 version) const {
+    return (    Global::groupes              ->isAcceptable(strongCheck, getCriteriaGroupe(version)))
+            && (Global::tagFilterCriteria    ->isAcceptable(true,        getCriteriaFilter(version)))
+            && (Global::tagSortCriteria      ->isAcceptable(true,        getCriteriaSort(version).toLower()))
+            && (Global::tagHorizontalCriteria->isAcceptable(true,        getCriteriaHorizontal(version)));
 }
 
 
@@ -391,7 +404,17 @@ const QString Metadata::getAcceptableWithClusterFilters(qint16 version) const {
     return Global::tagClusterCriteria->getAcceptableWithFilters(getCriteriaCluster(version));
 }
 
-
+/*
+const MetadataElement Metadata::getCriteriaPhase(qint16 version) const {
+    return getMetadata(Global::groupes->getTagNameCategory(), Global::groupes->getTagName(), version);
+}
+*/
+const QString Metadata::getCriteriaGroupe(qint16 version) const {
+    return Global::groupes->getCriteria(getMetadata(Global::groupes->getTagNameCategory(), Global::groupes->getTagName(), version).toString(Global::groupes->getTrunctionLeft(), Global::groupes->getTrunctionLength()));
+}
+const QString Metadata::getCriteriaGroupeFormated(qint16 version) const {
+    return Global::groupes->getCriteriaFormated(getCriteriaGroupe(version));
+}
 
 const QString Metadata::getCriteriaColor(qint16 version) const {
     if(getFunction() == DocumentFunctionRender) return QString();
@@ -447,9 +470,6 @@ const QString Metadata::getCriteriaSortFormated(qint16 version) const {
     if((Global::tagSortCriteria->isDate()) && (retour.isEmpty()))
         retour = tr("Undated");
     return retour;
-}
-const MetadataElement Metadata::getCriteriaPhase(qint16 version) const {
-    return getMetadata(Global::phases->getTagNameCategory(), Global::phases->getTagName(), version);
 }
 
 const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) const {
