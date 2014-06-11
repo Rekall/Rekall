@@ -327,8 +327,8 @@ QFrame#frameGlobalTimeline QPushButton {
 	max-height:				20px;
 }
 QFrame#frameGlobalTimeline QPushButton:enabled:checked, QFrame#frameGlobalTimeline QPushButton:enabled:pressed {
-	border-color:			rgb(255,84,79);
-	background-color:	rgb(255,84,79);
+	border-color:			rgb(0, 0, 0, 50);
+	background-color:	rgb(0, 0, 0, 50);
 }
 QFrame#frameGlobalTimeline QPushButton:disabled, QFrame#frameGlobalTimeline QPushButton:checked:disabled {
 	border:						2px solid black;
@@ -351,15 +351,14 @@ QFrame#frameGlobalTimeline QPushButton#ffButton, QFrame#frameGlobalTimeline QPus
 	border-radius:			17px;
 }
 QFrame#frameGlobalTimeline QComboBox {
-	background:			rgb(255, 255, 255, 0);
+	background:			rgb(64, 175, 140);
 	border:					0px solid black;
-	color: 					rgb(64, 175, 140);
+	color: 					black;
 	margin-left: 		3px;
 	margin-right: 		3px;
-	border-radius: 	3px;
+	border-radius: 	0px;
 	selection-color: 	black;
 	padding-left: 		5px;
-	margin-top:			2px;
 	min-height:			24px;
 	max-height:			24px;
 }
@@ -498,7 +497,7 @@ QMenu::item:enabled:selected {
              <property name="minimumSize">
               <size>
                <width>150</width>
-               <height>26</height>
+               <height>24</height>
               </size>
              </property>
             </widget>
@@ -530,32 +529,6 @@ QMenu::item:enabled:selected {
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item>
-            <widget class="QPushButton" name="phaseBy">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>PHASES</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../icons/Rekall.qrc">
-               <normaloff>:/icons/res_icon_filter_date.png</normaloff>:/icons/res_icon_filter_date.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
            <item>
             <widget class="QPushButton" name="sortBy">
              <property name="minimumSize">
@@ -609,7 +582,7 @@ QMenu::item:enabled:selected {
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="filterBy">
+            <widget class="QPushButton" name="phaseBy">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -623,11 +596,11 @@ QMenu::item:enabled:selected {
               </size>
              </property>
              <property name="text">
-              <string>FILTER</string>
+              <string>GROUPES</string>
              </property>
              <property name="icon">
               <iconset resource="../icons/Rekall.qrc">
-               <normaloff>:/icons/res_icon_filter_filter.png</normaloff>:/icons/res_icon_filter_filter.png</iconset>
+               <normaloff>:/icons/res_icon_filter_date.png</normaloff>:/icons/res_icon_filter_date.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -662,33 +635,20 @@ QMenu::item:enabled:selected {
             <number>0</number>
            </property>
            <item>
-            <widget class="QPushButton" name="colorBy">
-             <property name="minimumSize">
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
               <size>
-               <width>0</width>
+               <width>40</width>
                <height>20</height>
               </size>
              </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>COLOR</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../icons/Rekall.qrc">
-               <normaloff>:/icons/res_icon_filter_color.png</normaloff>:/icons/res_icon_filter_color.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
+            </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="textBy">
+            <widget class="QPushButton" name="filterBy">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -702,11 +662,11 @@ QMenu::item:enabled:selected {
               </size>
              </property>
              <property name="text">
-              <string>TEXT</string>
+              <string>FILTER</string>
              </property>
              <property name="icon">
               <iconset resource="../icons/Rekall.qrc">
-               <normaloff>:/icons/res_icon_filter_text.png</normaloff>:/icons/res_icon_filter_text.png</iconset>
+               <normaloff>:/icons/res_icon_filter_filter.png</normaloff>:/icons/res_icon_filter_filter.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -733,32 +693,6 @@ QMenu::item:enabled:selected {
              <property name="icon">
               <iconset resource="../icons/Rekall.qrc">
                <normaloff>:/icons/res_icon_filter_search.png</normaloff>:/icons/res_icon_filter_search.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="legend">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="../icons/Rekall.qrc">
-               <normaloff>:/icons/res_icon_filter_legend.png</normaloff>:/icons/res_icon_filter_legend.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -849,6 +783,84 @@ QMenu::item:enabled:selected {
            <property name="bottomMargin">
             <number>0</number>
            </property>
+           <item>
+            <widget class="QPushButton" name="textBy">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>TEXT</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_text.png</normaloff>:/icons/res_icon_filter_text.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="colorBy">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>COLOR</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_color.png</normaloff>:/icons/res_icon_filter_color.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="legend">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons/Rekall.qrc">
+               <normaloff>:/icons/res_icon_filter_legend.png</normaloff>:/icons/res_icon_filter_legend.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QPushButton" name="viewOption">
              <property name="minimumSize">

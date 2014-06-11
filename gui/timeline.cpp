@@ -386,7 +386,7 @@ void Timeline::actionDisplayed(bool val) {
 }
 
 void Timeline::actionChanged(QString text, QString text2) {
-    QString buttonOrange = "QPushButton { background-color: rgb(255,147,102); border-color: rgb(255,147,102); } QPushButton:hover { border-color: rgb(255,255,255); } QPushButton:disabled { background-color: rgb(41, 44, 45);  border-color: rgb(41, 44, 45); }";
+    QString buttonOrange = "QPushButton { color: rgb(255,147,102); border-color: rgb(255,147,102); } QPushButton:hover { /*border-color: rgb(255,255,255);*/ } QPushButton:disabled { /*background-color: rgb(41, 44, 45);  border-color: rgb(41, 44, 45);*/ }";
 
     if(text != "nothing") {
         if(sender() == Global::groupes) {
