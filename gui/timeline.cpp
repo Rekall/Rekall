@@ -35,18 +35,20 @@ Timeline::Timeline(QWidget *parent) :
     ticksWidth = 50;
     timelineControl = new TimelineControl();
     Global::timelineGL->showLegendDest.setAction(ui->legend);
+    workspaceIsChanging = false;
 
     ui->ffButton  ->setVisible(false);
     ui->playButton->setVisible(false);
 
     ui->workspace->addItem("HISTORIC VIEW",               "global_work");
     ui->workspace->addItem("YOUR WORK",                   "your_work");
-    ui->workspace->addItem("YOUR CUES",                   "your_cues");
+    ui->workspace->addItem("YOUR MARKERS",                "your_cues");
     ui->workspace->addItem("YOUR LAST IMPORTS",           "your_last_imports");
-    ui->workspace->addItem("ALL THE CUES",                "global_cues");
+    ui->workspace->addItem("ALL THE MARKERS",             "global_cues");
     ui->workspace->addItem("ALL THE LAST IMPORTS",        "global_last_imports");
     ui->workspace->addItem("TYPE OF DOCUMENTS PUNCHCARD", "global_punchcard_type");
     ui->workspace->addItem("PEOPLE ACTIVITY PUNCHCARD",   "global_punchcard_activity");
+    ui->workspace->addItem("CUSTOM",                      "custom");
 }
 
 Timeline::~Timeline() {
@@ -249,6 +251,8 @@ void Timeline::action() {
     if(sender() == ui->playButton)       Global::play(ui->playButton->isChecked());
     else if(sender() == ui->ffButton)    seek(0);
     else if(sender() == ui->writeNote)   Global::watcher->writeNote();
+    else if(sender() == ui->reset)
+        ui->workspace->setCurrentIndex(0);
     else if(sender() == ui->phaseBy) {
         Global::groupes->move(ui->phaseBy->parentWidget()->mapToGlobal(ui->phaseBy->pos())                       - QPoint(12, 3 + Global::groupes->height()));
         if(ui->phaseBy->isChecked())  Global::groupes->show();
@@ -290,6 +294,7 @@ void Timeline::action() {
         else                            timelineControl->hide();
     }
     else if((sender() == ui->workspace) && ((Global::tagFilterCriteria) && (Global::tagSortCriteria) && (Global::tagColorCriteria) && (Global::tagTextCriteria) && (Global::tagClusterCriteria) && (Global::tagHorizontalCriteria))) {
+        workspaceIsChanging = true;
         QString workspace = ui->workspace->itemData(ui->workspace->currentIndex()).toString();
         /*
         ui->filter->addItem(1"date (year)",  "Rekall->Date/Time | 0,4");
@@ -307,6 +312,7 @@ void Timeline::action() {
         ui->filter->addItem("Rekall->Size");
         */
 
+        ui->reset->setVisible(false);
         if((workspace == "global_work") || (workspace == "your_work")) {
             Global::tagFilterCriteria    ->reset("author", (workspace == "your_work")?(Global::userInfos->getInfo("User Name")):(""));
             Global::tagSortCriteria      ->reset("date (month)");
@@ -335,6 +341,10 @@ void Timeline::action() {
             Global::tagSortCriteria      ->reset("author");
             Global::tagHorizontalCriteria->reset("date (month)");
         }
+        else if(workspace == "custom") {
+            ui->reset->setVisible(true);
+        }
+        workspaceIsChanging = false;
     }
 }
 
@@ -386,6 +396,8 @@ void Timeline::actionDisplayed(bool val) {
 }
 
 void Timeline::actionChanged(QString text, QString text2) {
+    if(!workspaceIsChanging)
+        ui->workspace->setCurrentIndex(ui->workspace->count()-1);
     QString buttonOrange = "QPushButton { color: rgb(255,147,102); border-color: rgb(255,147,102); } QPushButton:hover { /*border-color: rgb(255,255,255);*/ } QPushButton:disabled { /*background-color: rgb(41, 44, 45);  border-color: rgb(41, 44, 45);*/ }";
 
     if(text != "nothing") {

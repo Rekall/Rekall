@@ -185,6 +185,7 @@ public slots:
     virtual void fileWatcherDirChanged (QString) = 0;
     virtual void fileWatcherFileChanged(QString) = 0;
     virtual void writeNote() = 0;
+    virtual void takeTemporarySnapshot() = 0;
 };
 
 enum TaskProcessType { TaskProcessTypeProcess, TaskProcessTypeMetadata };

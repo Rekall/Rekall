@@ -42,7 +42,7 @@ Sorting::Sorting(const QString &title, quint16 index, bool _needWord, bool _isHo
     ui->filter->addItem("date (year)",  "Rekall->Date/Time | 0,4");
     ui->filter->addItem("date (month)", "Rekall->Date/Time | 0,7");
     ui->filter->addItem("date (day)",   "Rekall->Date/Time | 0,10");  // 1234:67:90 23:56:89
-    ui->filter->addItem("time (hours)", "Rekall->Date/Time | 11,2");  // 0123:56:89012:45:67
+    ui->filter->addItem("time (hour)",  "Rekall->Date/Time | 11,2");  // 0123:56:89012:45:67
     ui->filter->addItem("type",         "Rekall->Type");
     ui->filter->addItem("author",       "Rekall->Author");
     ui->filter->addItem("keywords",     "Rekall->All");
@@ -511,11 +511,15 @@ void Sorting::reset(const QString &filterText, QString matchText, QStringList ch
         for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++) {
             if(!ui->checks->topLevelItem(i)->isHidden()) {
                 if(checksOnly.contains(ui->checks->topLevelItem(i)->text(0)))
-                    ui->checks->topLevelItem(i)->setCheckState(0, Qt::Checked);
+                    ui->checks->topLevelItem(i)->setCheckState(1, Qt::Checked);
                 else
-                    ui->checks->topLevelItem(i)->setCheckState(0, Qt::Unchecked);
+                    ui->checks->topLevelItem(i)->setCheckState(1, Qt::Unchecked);
             }
         }
+    }
+    else {
+        for(quint16 i = 0 ; i < ui->checks->topLevelItemCount() ; i++)
+            ui->checks->topLevelItem(i)->setCheckState(1, Qt::Checked);
     }
     action();
     QApplication::processEvents();

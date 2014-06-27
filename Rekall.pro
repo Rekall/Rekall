@@ -36,11 +36,14 @@ TARGET    = Rekall
 TEMPLATE  = app
 
 SOURCES  += main.cpp \
-    gui/qtexteditplus.cpp
+    gui/qtexteditplus.cpp \
+    core/watchersnapshot.cpp
 HEADERS  += tasks/taskslist.h   tasks/feedlist.h   tasks/taskprocess.h \
-    gui/qtexteditplus.h
+    gui/qtexteditplus.h \
+    core/watchersnapshot.h
 SOURCES  += tasks/taskslist.cpp tasks/feedlist.cpp tasks/taskprocess.cpp
-FORMS    += tasks/taskslist.ui  tasks/feedlist.ui
+FORMS    += tasks/taskslist.ui  tasks/feedlist.ui \
+    core/watchersnapshot.ui
 
 HEADERS  += core/watcherfeeling.h   core/watcher.h
 SOURCES  += core/watcherfeeling.cpp core/watcher.cpp

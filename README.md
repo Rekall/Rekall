@@ -2,7 +2,7 @@ About Rekall
 ============
 
 
-Build IanniX
+Build Rekall
 ============
 
 All platforms

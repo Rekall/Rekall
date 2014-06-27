@@ -43,7 +43,7 @@ public:
 public:
     TimelineControl *timelineControl;
 private:
-    bool tagHorizontalCriteriaWasTimeline;
+    bool tagHorizontalCriteriaWasTimeline, workspaceIsChanging;
     QPointF timelinePos, timelinePosDest;
     QPointF viewerPos,   viewerPosDest;
     QTime   actionMarkerAddStarted;

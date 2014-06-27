@@ -475,12 +475,12 @@ const QString Metadata::getCriteriaSortFormated(qint16 version) const {
 const QPair<QString, QPixmap> Metadata::getThumbnail(qint16 version) const {
     if(!photo.isNull())
         return qMakePair(QString(), QPixmap::fromImage(photo));
-    else if((getType(version) == DocumentTypeWeb) && (thumbnails.count()))
-        return qMakePair(getMetadata("Rekall", "URL", version).toString(), QPixmap::fromImage(thumbnails.first().image));
     else if(getSnapshot(version) == "comment")
         return qMakePair(QString("%1_%2.jpg").arg(Global::cacheFile("comment", file)).arg(version), QPixmap(QString("%1_%2.jpg").arg(Global::cacheFile("comment", file)).arg(version)));
     else if(getSnapshot(version) == "note")
         return qMakePair(QString("%1_%2.jpg").arg(Global::cacheFile("note", getMetadata("Rekall", "Note ID").toString())).arg(version), QPixmap(QString("%1_%2.jpg").arg(Global::cacheFile("note", getMetadata("Rekall", "Note ID").toString())).arg(version)));
+    else if((getType(version) == DocumentTypeWeb) && (thumbnails.count()))
+        return qMakePair(getMetadata("Rekall", "URL", version).toString(), QPixmap::fromImage(thumbnails.first().image));
     else if(getSnapshot(version) == "file")
         return qMakePair(file.absoluteFilePath(), QPixmap(file.absoluteFilePath()));
     else if((thumbnails.count()) && (file.exists()))

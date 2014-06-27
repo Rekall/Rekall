@@ -32,7 +32,9 @@
 #include <QWebPage>
 #include <QDesktopServices>
 #include <QInputDialog>
+#include <QMessageBox>
 #include "core/watcher.h"
+#include "core/watchersnapshot.h"
 #include "interfaces/userinfos.h"
 #include "interfaces/http/httplistener.h"
 #include "interfaces/fileuploadcontroller.h"
@@ -101,6 +103,16 @@ private slots:
     void showHelp(bool);
 private:
     qint16 findDocumentVersionWithMetadata(Metadata* metadata);
+
+private:
+    QSettings *globalSettings;
+    bool forceUpdate;
+    QString updateAnonymousId;
+    QNetworkAccessManager *updateManager;
+private slots:
+    void checkForUpdatesFinished(QNetworkReply*);
+public:
+    void checkForUpdates();
 
 protected:
     void timerEvent(QTimerEvent *);

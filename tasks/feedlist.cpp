@@ -103,11 +103,11 @@ void FeedList::timerEvent(QTimerEvent *) {
             notifCounter = 0;
 
         if(notifCounter) {
-            toolbox->setItemText(1, tr("EVENTS (%1)").arg(notifCounter));
+            //toolbox->setItemText(1, tr("EVENTS (%1)").arg(notifCounter));
             toolbox->setItemIcon(1, QIcon(":/icons/res_tray_icon_color.png"));
         }
         else {
-            toolbox->setItemText(1, tr("EVENTS"));
+            //toolbox->setItemText(1, tr("EVENTS"));
             toolbox->setItemIcon(1, QIcon());
         }
     }

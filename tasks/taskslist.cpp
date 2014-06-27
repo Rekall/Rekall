@@ -97,6 +97,7 @@ void TasksList::nextTask() {
         }
         else {
             hide();
+            Global::falseProject = false;
             if(toolbox->currentIndex() == 2)
                 toolbox->setCurrentIndex(oldToolboxIndex);
             toolbox->setItemEnabled(2, false);

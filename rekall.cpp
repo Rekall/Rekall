@@ -28,11 +28,18 @@ Rekall::Rekall(QWidget *parent) :
     RekallBase(parent),
     ui(new Ui::Rekall) {
     ui->setupUi(this);
+
     setAcceptDrops(true);
     currentProject = 0;
     annotationTag  = 0;
 
+    //ui->actionOpenRandom->setVisible(false);
+    addAction(ui->actionOpenRandom);
+
     annotationIsUpdating = chutierIsUpdating = metadataIsUpdating = false;
+
+    forceUpdate   = false;
+    updateManager = 0;
 
     Global::userInfos = new UserInfos();
 
@@ -159,6 +166,7 @@ Rekall::Rekall(QWidget *parent) :
     ui->metadataOpenGps->setVisible(false);
     ui->metadataOpenFinder->setVisible(false);
     ui->metadataOpen->setVisible(false);
+    ui->metadataSnap->setVisible(false);
     gps = new QWebView(0);
     gps->setWindowFlags(Qt::Tool);
     gps->load(QUrl::fromLocalFile(Global::pathApplication.absoluteFilePath() + "/tools/maps.html"));
@@ -169,6 +177,33 @@ Rekall::Rekall(QWidget *parent) :
     splash->show();
     QTimer::singleShot(1500, this, SLOT(closeSplash()));
     QCoreApplication::processEvents();
+
+
+    //Global settings creation if needed
+    globalSettings = new QSettings();
+    if((globalSettings) && (!globalSettings->childKeys().contains("id"))) {
+        qsrand(QDateTime::currentDateTime().toTime_t());
+        updateAnonymousId = QString::number(qrand());
+        globalSettings->setValue("id", updateAnonymousId);
+        globalSettings->setValue("updatePeriod", 1);
+        globalSettings->setValue("lastUpdate",   QDateTime(QDate(2000, 01, 01)));
+    }
+
+    //Update management
+    if((globalSettings) && (globalSettings->childKeys().contains("id"))) {
+        QDateTime updateLastDate  = globalSettings->value("lastUpdate")  .toDateTime();
+        quint16   updatePeriod    = globalSettings->value("updatePeriod").toUInt();
+        updateAnonymousId         = globalSettings->value("id")          .toString();
+        qDebug("Last update : %s (should update each %d day(s))", qPrintable(updateLastDate.toString("dd/MM/yyyy hh:mm:ss")), updatePeriod);
+        if((updateLastDate.daysTo(QDateTime::currentDateTime()) >= updatePeriod) || (forceUpdate))
+            checkForUpdates();
+    }
+
+
+    ui->toolBoxLeft->setItemText(1, ui->toolBoxLeft->itemText(1) + " (future version)");
+    ui->toolBoxLeft->setItemEnabled(1, false);
+    ui->toolBoxLeft->setItemText(3, ui->toolBoxLeft->itemText(3) + " (future version)");
+    ui->toolBoxLeft->setItemEnabled(3, false);
 
     refreshMenus();
 
@@ -332,6 +367,7 @@ void Rekall::action() {
             Global::pathCurrent = QFileInfo();
             displayMetadata();
             ui->player->unload();
+            ui->centralwidgetStack->setCurrentIndex(1);
         }
 
         if((!dirToOpen.isEmpty()) && (QFileInfo(dirToOpen).exists())) {
@@ -344,6 +380,7 @@ void Rekall::action() {
             for(quint16 i = 0 ; i < ui->chutier->getTree()->topLevelItemCount() ; i++)
                 ui->chutier->getTree()->expandItem(ui->chutier->getTree()->topLevelItem(i));
             chutierIsUpdating = metadataIsUpdating = false;
+            ui->centralwidgetStack->setCurrentIndex(0);
         }
         refreshMenus();
     }
@@ -368,6 +405,9 @@ void Rekall::action() {
             else if(currentMetadata->thumbnails.count())
                 UiFileItem::fileShowInFinder(currentMetadata->thumbnails.first().currentFilename);
         }
+    }
+    else if((sender() == ui->metadataSnap) && (currentMetadatas.count() == 1)) {
+        new WatcherSnapshot(currentMetadatas.first(), ui->metadataSlider->value());
     }
     else if(sender() == ui->actionMarker) {
         Global::timeline->actionMarkerAddStart();
@@ -498,11 +538,13 @@ void Rekall::closeSplash() {
     splash->close();
     showMaximized();
     updateGeometry();
+    ui->timeline->setWorkspace(0);
     ui->timelineSplitter  ->setSizes(QList<int>() << ui->timelineSplitter->height() * 0.50 << ui->timelineSplitter->height() * 0.50);
     ui->fileSplitter      ->setSizes(QList<int>() << 200                                   << ui->fileSplitter->width()      - 200);
     ui->conduiteSplitter  ->setSizes(QList<int>() << ui->conduiteSplitter->width()  - 300  << 300);
     ui->previewSplitter   ->setSizes(QList<int>() << ui->previewSplitter->height()    * 0.30  << ui->previewSplitter->height() * 0.70);
     ui->annotationSplitter->setSizes(QList<int>() << ui->annotationSplitter->height() - 35 << 35);
+    ui->centralwidgetStack->setCurrentIndex(1);
     //trayMenu->showMessage("Rekall", "Ready!", QSystemTrayIcon::NoIcon);
 }
 
@@ -568,7 +610,7 @@ void Rekall::displayMetadata(QTreeWidgetItem *, QTreeWidgetItem *) {
     if((!currentMetadatas.count()) && (Global::selectedTagHover)) {
         Metadata *metadata = ((Tag*)Global::selectedTagHover)->getDocument();
         if((metadata) && (!currentMetadatas.contains(metadata))) {
-            metadata->tempStorage = 0;
+            metadata->tempStorage = Global::selectedTagHover;
             currentMetadatas << metadata;
         }
     }
@@ -736,6 +778,8 @@ void Rekall::displayMetadata(QTreeWidgetItem *, QTreeWidgetItem *) {
                     ui->metadataOpen      ->setVisible(false);
                 }
 
+                ui->metadataSnap->setVisible(currentMetadatas.count() == 1);
+
                 if(currentMetadatas.last() == currentMetadata) {
                     displayDocumentName(QString("%1 (%2)").arg(currentMetadata->getName()).arg(currentMetadata->getMetadata("Rekall", "Folder").toString()));
                     displayPixmap(currentMetadata->getType(), currentMetadata->getThumbnail(findDocumentVersionWithMetadata(currentMetadata)));
@@ -788,7 +832,6 @@ void Rekall::displayGps(const QList< QPair<QString,QString> > &gpsCoords) {
 
 void Rekall::showHelp(bool visible) {
     ui->chutierLabel->setVisible(visible);
-    ui->chutierLabel2->setVisible(visible);
     ui->tasksLabel->setVisible(visible);
     ui->feedsLabel->setVisible(visible);
     ui->peopleLabel->setVisible(visible);
@@ -881,3 +924,30 @@ void Rekall::refreshMenus(const QFileInfo &path, bool clear) {
     ui->actionSave ->setEnabled(Global::pathCurrent.exists());
     ui->actionClose->setEnabled(Global::pathCurrent.exists());
 }
+
+
+
+
+
+void Rekall::checkForUpdates() {
+    updateManager = new QNetworkAccessManager(this);
+    connect(updateManager, SIGNAL(finished(QNetworkReply*)), SLOT(checkForUpdatesFinished(QNetworkReply*)));
+    QString url = "http://www.rekall.fr/download/updates.php?id=" + updateAnonymousId + "&package=" + (QCoreApplication::applicationName() + "__" + QCoreApplication::applicationVersion()).toLower().replace(" ", "_").replace(".", "_");
+    qDebug("Checking for updates %s", qPrintable(url));
+    updateManager->get(QNetworkRequest(QUrl(url, QUrl::TolerantMode)));
+}
+void Rekall::checkForUpdatesFinished(QNetworkReply *reply) {
+    if(reply->error() != QNetworkReply::NoError)
+        qDebug("Network error. %s", qPrintable(reply->errorString()));
+    else {
+        if(globalSettings)
+            globalSettings->setValue("lastUpdate", QDateTime::currentDateTime());
+        QString info = reply->readAll().trimmed();
+        if((info.length() > 0) || (forceUpdate)) {
+            int rep = QMessageBox::information(0, tr("Rekall Update Center"), tr("A new version of Rekall is available. Would you like to update Rekall with the new version ?"), QMessageBox::Yes, QMessageBox::No);
+            if(rep)
+                QDesktopServices::openUrl(QUrl("http://www.rekall.fr/", QUrl::TolerantMode));
+        }
+    }
+}
+

@@ -213,6 +213,13 @@ void Project::fireEvents() {
 
     //Gather and set color information
     if(Global::eventsSortChanged) {
+        //Contextual for renders
+        foreach(Document *document, documents)
+            foreach(Tag *tag, document->tags)
+                if((document->getFunction(tag->getDocumentVersion()) == DocumentFunctionRender) && (tag->getType() != TagTypeContextualTime))
+                    tag->setType(TagTypeContextualTime);
+
+
         //Color
         Global::tagColorCriteria->addCheckStart();
         Global::colorForMeta.clear();

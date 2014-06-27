@@ -92,7 +92,7 @@ void Watcher::unsync(const QString &file, bool inTracker) {
 
 void Watcher::takeTemporarySnapshot() {
     QRect screenSize = QApplication::desktop()->screenGeometry();
-    if(lastScreenshotTimestamp.secsTo(QDateTime::currentDateTime()) > 3) {
+    if(lastScreenshotTimestamp.secsTo(QDateTime::currentDateTime()) > 2) {
         lastScreenshot = QPixmap();
 #ifdef Q_OS_MAC
         CGRect screenRect;
