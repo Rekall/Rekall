@@ -215,7 +215,7 @@ my %ttCharset = (
     NOTES => q{
         The following tags are extracted from the TrueType font "name" table found
         in OTF, TTF, TTC and DFONT files.  These tags support localized languages by
-        adding a hyphen followed by a language code to the end of the tag name (ie.
+        adding a hyphen followed by a language code to the end of the tag name (eg.
         "Copyright-fr" or "License-en-US").  Tags with no language code use the
         default language of "en".
     },

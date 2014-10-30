@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::es;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 %Image::ExifTool::Lang::es::Translate = (
    'AEAperture' => 'Aperture AE',
@@ -874,6 +874,7 @@ $VERSION = '1.12';
    'Country' => 'País',
    'Country-PrimaryLocationCode' => 'Código País ISO',
    'Country-PrimaryLocationName' => 'País',
+   'CountryCode' => 'Código País',
    'CreateDate' => 'Fecha y Hora de Datos Digital',
    'CreationDate' => 'Fecha Creación',
    'CreativeStyle' => {
@@ -903,6 +904,7 @@ $VERSION = '1.12';
    'Creator' => 'Creador',
    'CreatorAddress' => 'Creador - Dirección',
    'CreatorCity' => 'Creador - Ciudad',
+   'CreatorContactInfo' => 'Contacto Creador',
    'CreatorCountry' => 'Creador - País',
    'CreatorPostalCode' => 'Creador - Código Postal',
    'CreatorRegion' => 'Creador - Estado/Provincia',
@@ -2215,6 +2217,7 @@ $VERSION = '1.12';
    'JPEGRestartInterval' => 'Intervalo Reinicio JPEG',
    'JPEGTables' => 'Tablas JPEG',
    'JobID' => 'ID del Trabajo',
+   'JobTitle' => 'Cargo',
    'Keyword' => 'Palabras Clave',
    'Keywords' => 'Clave',
    'LCDIllumination' => {
@@ -3492,7 +3495,6 @@ $VERSION = '1.12';
    'SubSecTimeOriginal' => 'Subsegundos DateTimeOriginal',
    'SubTileBlockSize' => 'Tamaño Bloque Submosaico',
    'SubTitle' => 'Subtitulo',
-   'Subtitle' => 'Subtitulo',
    'SubTitleDescription' => 'Descripción Subtitulo',
    'SubfileType' => 'Nuevo Tipo Subarchivo',
    'SubimageColor' => {
@@ -3524,6 +3526,7 @@ $VERSION = '1.12';
         'Unknown' => 'Desconocido',
       },
     },
+   'Subtitle' => 'Subtitulo',
    'SuperimposedDisplay' => {
       PrintConv => {
         'Off' => 'Desactivado',

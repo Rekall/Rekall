@@ -84,7 +84,7 @@ my $mwgLoaded;  # flag set if we alreaded Load()ed the MWG tags
         DelCheck   => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteCheck => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteAlso  => {
-            # only write Keywords if IPTC exists (ie. set EditGroup option)
+            # only write Keywords if IPTC exists (eg. set EditGroup option)
             'IPTC:Keywords'  => '$opts{EditGroup} = 1; $val',
             'XMP-dc:Subject' => '$val',
         },
@@ -391,7 +391,7 @@ my %sExtensions = (
     NOTES => q{
         This structure may contain any top-level XMP tags, but none have been
         pre-defined in ExifTool.  Since no flattened tags have been pre-defined,
-        RegionExtensions is writable only as a structure (ie.
+        RegionExtensions is writable only as a structure (eg.
         C<{xmp-dc:creator=me,rating=5}>).  Fields for this structure are identified
         using the standard ExifTool tag name (with optional leading group name,
         and/or trailing language code, and/or trailing C<#> symbol to disable print
@@ -717,7 +717,7 @@ By default, loading the MWG Composite tags enables "strict MWG conformance"
 unless previously enabled or disabled by the user.  In this mode, ExifTool
 will generate a Warning instead of extracting EXIF, IPTC and XMP from
 non-standard locations.  The strict mode may be disabled or enabled at any
-time by setting the MWG "strict" flag to 0 or 1.  ie)
+time by setting the MWG "strict" flag to 0 or 1.  eg)
 
     $Image::ExifTool::MWG::strict = 0;
 

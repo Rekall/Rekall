@@ -79,7 +79,7 @@ my %faceCategories = (
             this number is unique, and contains the date of manufacture, but doesn't
             necessarily correspond to the camera body number -- this needs to be checked
         },
-        # ie)  "FPX20017035 592D31313034060427796060110384"
+        # eg)  "FPX20017035 592D31313034060427796060110384"
         # "FPX 20495643     592D313335310701318AD010110047" (F40fd)
         #                               yymmdd
         PrintConv => q{
@@ -396,7 +396,7 @@ my %faceCategories = (
     0x1304 => { #PH
         Name => 'GEImageSize',
         Condition => '$$self{Make} =~ /^GENERAL IMAGING/',
-        Format => 'string',
+        Writable => 'string',
         Notes => 'GE models only',
     },
     0x1400 => { #2
@@ -484,7 +484,7 @@ my %faceCategories = (
     },
     0x1436 => { #8
         Name => 'ImageGeneration',
-        Format => 'int16u',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Original Image',
             1 => 'Re-developed from RAW',
@@ -635,6 +635,52 @@ my %faceCategories = (
             return $val;
         },
     },
+    0x2000 => { #9
+        Name => 'WB_GRGBLevelsAuto',
+        Format => 'int16u',
+        Count => 4, # (ignore the duplicate values)
+    },
+    0x2100 => { #9
+        Name => 'WB_GRGBLevelsDaylight',
+        Format => 'int16u',
+        Count => 4,
+    },
+    0x2200 => { #9
+        Name => 'WB_GRGBLevelsCloudy',
+        Format => 'int16u',
+        Count => 4,
+    },
+    0x2300 => { #9
+        Name => 'WB_GRGBLevelsDaylightFluor',
+        Format => 'int16u',
+        Count => 4,
+    },
+    0x2301 => { #9
+        Name => 'WB_GRGBLevelsDayWhiteFluor',
+        Format => 'int16u',
+        Count => 4,
+    },
+    0x2302 => { #9
+        Name => 'WB_GRGBLevelsWhiteFluorescent',
+        Format => 'int16u',
+        Count => 4,
+    },
+    0x2310 => { #9
+        Name => 'WB_GRGBLevelsWarmWhiteFluor',
+        Format => 'int16u',
+        Count => 4,
+    },
+    0x2311 => { #9
+        Name => 'WB_GRGBLevelsLivingRoomWarmWhiteFluor',
+        Format => 'int16u',
+        Count => 4,
+    },
+    0x2400 => { #9
+        Name => 'WB_GRGBLevelsTungsten',
+        Format => 'int16u',
+        Count => 4,
+    },
+    # 0x2f00 => WB_GRGBLevelsCustom: int32u count, then count * (int16u GRGBGRGB), ref 9
     0x2ff0 => {
         Name => 'WB_GRGBLevels',
         Format => 'int16u',

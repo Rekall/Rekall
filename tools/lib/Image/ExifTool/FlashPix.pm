@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.22';
+$VERSION = '1.24';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -298,7 +298,7 @@ my %fpxFileType = (
         "file allocation table" (FAT).  No wonder this image format never became
         popular.  However, some of the structures used in FlashPix streams are part
         of the EXIF specification, and are still being used in the APP2 FPXR segment
-        of JPEG images by some Kodak and Hewlett-Packard digital cameras.
+        of JPEG images by some digital cameras from various manufacturers.
 
         ExifTool extracts FlashPix information from both FPX images and the APP2
         FPXR segment of JPEG images.  As well, FlashPix information is extracted
@@ -370,20 +370,20 @@ my %fpxFileType = (
         },
     },
 #   'Subimage 0000 Data'
-    "\x05Data Object" => {  # plus instance number (ie. " 000000")
+    "\x05Data Object" => {  # plus instance number (eg. " 000000")
         Name => 'DataObject',
         SubDirectory => {
             TagTable => 'Image::ExifTool::FlashPix::DataObject',
         },
     },
-#   "\x05Data Object Store" => { # plus instance number (ie. " 000000")
-    "\x05Transform" => {    # plus instance number (ie. " 000000")
+#   "\x05Data Object Store" => { # plus instance number (eg. " 000000")
+    "\x05Transform" => {    # plus instance number (eg. " 000000")
         Name => 'Transform',
         SubDirectory => {
             TagTable => 'Image::ExifTool::FlashPix::Transform',
         },
     },
-    "\x05Operation" => {    # plus instance number (ie. " 000000")
+    "\x05Operation" => {    # plus instance number (eg. " 000000")
         Name => 'Operation',
         SubDirectory => {
             TagTable => 'Image::ExifTool::FlashPix::Operation',
@@ -395,7 +395,7 @@ my %fpxFileType = (
             TagTable => 'Image::ExifTool::FlashPix::GlobalInfo',
         },
     },
-    "\x05Screen Nail" => { # plus class ID (ie. "_bd0100609719a180")
+    "\x05Screen Nail" => { # plus class ID (eg. "_bd0100609719a180")
         Name => 'ScreenNail',
         Groups => { 2 => 'Other' },
         # strip off stream header
@@ -407,7 +407,7 @@ my %fpxFileType = (
             TagTable => 'Image::ExifTool::FlashPix::AudioInfo',
         },
     },
-    'Audio Stream' => { # plus instance number (ie. " 000000")
+    'Audio Stream' => { # plus instance number (eg. " 000000")
         Name => 'AudioStream',
         Groups => { 2 => 'Audio' },
         # strip off stream header
@@ -422,6 +422,24 @@ my %fpxFileType = (
             my $len = $size - $pos - 4;
             return undef if $len < 0 or length $val < $size + 8;
             return substr($val, 8 + $pos, $len);
+        },
+    },
+    Preview => {
+        Name => 'PreviewImage',
+        Binary => 1,
+        Notes => 'written by some FujiFilm models',
+        # skip 47-byte Fuji header
+        RawConv => q{
+            return undef unless length $val > 47;
+            $val = substr($val, 47);
+            return $val =~ /^\xff\xd8\xff/ ? $val : undef;
+        },
+    },
+    Property => {
+        Name => 'PreviewInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::FlashPix::PreviewInfo',
+            ByteOrder => 'BigEndian',
         },
     },
 );
@@ -984,6 +1002,26 @@ my %fpxFileType = (
     },
 );
 
+# FujiFilm "Property" information (ref PH)
+%Image::ExifTool::FlashPix::PreviewInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
+    NOTES => 'Preview information written by some FujiFilm models.',
+    FIRST_ENTRY => 0,
+    # values are all constant for for my samples except the two decoded tags
+    # 0x0000: 01 01 00 00 02 01 00 00 00 00 00 00 00 xx xx 01
+    # 0x0010: 01 00 00 00 00 00 00 xx xx 00 00 00 00 00 00 00
+    # 0x0020: 00 00 00 00 00
+    0x0d => {
+        Name => 'PreviewImageWidth',
+        Format => 'int16u',
+    },
+    0x17 => {
+        Name => 'PreviewImageHeight',
+        Format => 'int16u',
+    },
+);
+
 # composite FlashPix tags
 %Image::ExifTool::FlashPix::Composite = (
     GROUPS => { 2 => 'Image' },
@@ -1085,9 +1123,24 @@ sub ReadFPXValue($$$$$;$$)
                 # convert from time in 100 ns increments to time in seconds
                 $val = 1e-7 * Image::ExifTool::Get64u($dataPt, $valPos);
                 # print as date/time if value is greater than one year (PH hack)
-                if ($val > 365 * 24 * 3600) {
+                my $secDay = 24 * 3600;
+                if ($val > 365 * $secDay) {
                     # shift from Jan 1, 1601 to Jan 1, 1970
-                    $val -= 134774 * 24 * 3600;
+                    my $unixTimeZero = 134774 * $secDay;
+                    $val -= $unixTimeZero;
+                    # there are a lot of bad programmers out there...
+                    my $sec100yr = 100 * 365 * $secDay;
+                    if ($val < 0 || $val > $sec100yr) {
+                        # some software writes the wrong byte order (but the proper word order)
+                        my @w = unpack("x${valPos}NN", $$dataPt);
+                        my $v2 = ($w[0] + $w[1] * 4294967296) * 1e-7 - $unixTimeZero;
+                        if ($v2 > 0 && $v2 < $sec100yr) {
+                            $val = $v2;
+                        # also check for wrong time base
+                        } elsif ($val < 0 && $val + $unixTimeZero > 0) {
+                            $val += $unixTimeZero;
+                        }
+                    }
                     $val = Image::ExifTool::ConvertUnixTime($val);
                 }
             } elsif ($format eq 'VT_DATE') {
@@ -1361,7 +1414,7 @@ sub ProcessFPXR($$$)
     my $verbose = $et->Options('Verbose');
 
     if ($dirLen < 13) {
-        $et->Warn('FPXR segment to small');
+        $et->Warn('FPXR segment too small');
         return 0;
     }
 
@@ -1412,6 +1465,14 @@ sub ProcessFPXR($$$)
                 # unpack class ID in case we want to use it sometime
                 $classID = Image::ExifTool::ASF::GetGUID($1);
             }
+            # find the tagInfo if available
+            my $tagInfo;
+            unless ($$tagTablePtr{$name}) {
+                # remove instance number or class ID from tag if necessary
+                $tagInfo = $et->GetTagInfo($tagTablePtr, $1) if
+                    ($name =~ /(.*) \d{6}$/s and $$tagTablePtr{$1}) or
+                    ($name =~ /(.*)_[0-9a-f]{16}$/s and $$tagTablePtr{$1});
+            }
             # update position in list
             $pos = pos($$dataPt);
             # add to our contents list
@@ -1420,6 +1481,7 @@ sub ProcessFPXR($$$)
                 Size => $size,
                 Default => $default,
                 ClassID => $classID,
+                TagInfo => $tagInfo,
             };
         }
         # save contents list as $et member variable
@@ -1439,47 +1501,31 @@ sub ProcessFPXR($$$)
                 # (in my sample images, this isn't always zero as one would expect)
                 $$obj{Stream} = substr($$dataPt, $dirStart+13);
             } else {
-                # add data to the stream at the proper offset
-                my $pad = $offset - length($$obj{Stream});
-                if ($pad >= 0) {
-                    if ($pad) {
-                        if ($pad > 0x10000) {
-                            $et->Warn("Bad FPXR stream offset ($offset)");
-                        } else {
-                            # pad with default value to specified offset
-                            $et->Warn("Padding FPXR stream with $pad default bytes",1);
-                            $$obj{Stream} .= ($$obj{Default} x $pad);
-                        }
-                    }
-                    # concatenate data with this stream
-                    $$obj{Stream} .= substr($$dataPt, $dirStart+13);
+                # add data at the proper offset to the stream
+                my $overlap = length($$obj{Stream}) - $offset;
+                my $start = $dirStart + 13;
+                if ($overlap < 0 or $dirLen - $overlap < 13) {
+                    $et->WarnOnce("Bad FPXR stream $index offset",1);
                 } else {
-                    $et->Warn("Duplicate FPXR stream data at offset $offset");
-                    substr($$obj{Stream}, $offset, -$pad) = substr($$dataPt, $dirStart+13);
+                    # ignore any overlapping data in this segment
+                    # (this seems to be the convention)
+                    $start += $overlap;
                 }
+                # concatenate data with this stream
+                $$obj{Stream} .= substr($$dataPt, $start);
             }
             # save value for this tag if stream is complete
             my $len = length $$obj{Stream};
             if ($len >= $$obj{Size}) {
-                if ($verbose) {
-                    $et->VPrint(0, "  + [FPXR stream, Contents index $index, $len bytes]\n");
-                }
+                $et->VPrint(0, "  + [FPXR stream $index, $len bytes]\n") if $verbose;
                 if ($len > $$obj{Size}) {
                     $et->Warn('Extra data in FPXR segment (truncated)');
                     $$obj{Stream} = substr($$obj{Stream}, 0, $$obj{Size});
                 }
-                my $tag = $$obj{Name};
-                my $tagInfo;
-                unless ($$tagTablePtr{$tag}) {
-                    # remove instance number or class ID from tag if necessary
-                    $tagInfo = $et->GetTagInfo($tagTablePtr, $1) if
-                        ($tag =~ /(.*) \d{6}$/s and $$tagTablePtr{$1}) or
-                        ($tag =~ /(.*)_[0-9a-f]{16}$/s and $$tagTablePtr{$1});
-                }
-                # save the data for this tag
-                $et->HandleTag($tagTablePtr, $tag, $$obj{Stream},
+                # handle this tag
+                $et->HandleTag($tagTablePtr, $$obj{Name}, $$obj{Stream},
                     DataPt => \$$obj{Stream},
-                    TagInfo => $tagInfo,
+                    TagInfo => $$obj{TagInfo},
                 );
                 delete $$obj{Stream}; # done with this stream
             }
@@ -1487,12 +1533,9 @@ sub ProcessFPXR($$$)
         } elsif ($index == 512 and $dirLen > 60 and ($$et{FujiPreview} or
             ($dirLen > 64 and substr($$dataPt, $dirStart+60, 4) eq "\xff\xd8\xff\xdb")))
         {
-            # recombine PreviewImage, skipping unknown 60 byte header
-            if ($$et{FujiPreview}) {
-                $$et{FujiPreview} .= substr($$dataPt, $dirStart+60);
-            } else {
-                $$et{FujiPreview} = substr($$dataPt, $dirStart+60);
-            }
+            $$et{FujiPreview} = '' unless defined $$et{FujiPreview};
+            # recombine PreviewImage, skipping 13-byte FPXR header + 47-byte Fuji header
+            $$et{FujiPreview} .= substr($$dataPt, $dirStart+60);
         } else {
             # (Kodak uses index 255 for a free segment in images from some cameras)
             $et->Warn("Unlisted FPXR segment (index $index)") if $index != 255;
@@ -1508,10 +1551,13 @@ sub ProcessFPXR($$$)
     if ($$dirInfo{LastFPXR}) {
         if ($$et{FPXR}) {
             my $obj;
-            my $i = 0;
             foreach $obj (@{$$et{FPXR}}) {
-                $et->Warn("Missing stream for FPXR object $i") if defined $$obj{Stream};
-                ++$i;
+                next unless defined $$obj{Stream} and length $$obj{Stream};
+                # parse it even though it isn't the proper length
+                $et->HandleTag($tagTablePtr, $$obj{Name}, $$obj{Stream},
+                    DataPt => \$$obj{Stream},
+                    TagInfo => $$obj{TagInfo},
+                );
             }
             delete $$et{FPXR};    # delete our temporary variables
         }

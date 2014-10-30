@@ -23,7 +23,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.33';
+$VERSION = '1.35';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -750,7 +750,7 @@ sub WriteKodakIFD($$$);
         Notes => 'Kodak only',
     },
     0xa8 => {
-        Name => 'UnknownNumber', # (was SerialNumber, but not unique for all cameras. ie C1013)
+        Name => 'UnknownNumber', # (was SerialNumber, but not unique for all cameras. eg. C1013)
         Condition => '$$self{Make} =~ /Kodak/i and $$valPt =~ /^([A-Z0-9]{1,11}\0|[A-Z0-9]{12})/i',
         Format => 'string[12]',
         Notes => 'Kodak only',
@@ -845,6 +845,31 @@ sub WriteKodakIFD($$$);
     # 0x3fe undef[2540]
 );
 
+# Kodak PixPro S-1 maker notes (ref PH)
+# (similar to Ricoh::Type2 and GE::Main)
+%Image::ExifTool::Kodak::Type11 = (
+    # (can't currently write these)
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES =>q{
+        These tags are found in models such as the PixPro S-1.  They are not
+        writable because the inconsistency of Kodak maker notes is beginning to get
+        on my nerves.
+    },
+    0x0203 => {
+        Name => 'PictureEffect',
+        PrintConv => {
+            0 => 'None',
+            3 => 'Monochrome',
+            9 => 'Kodachrome',
+        },
+    },
+    # 0x0204 - ExposureComp or FlashExposureComp maybe?
+    0x0207 => 'KodakModel',
+    0x0300 => 'KodakMake',
+    0x0308 => 'LensSerialNumber',
+    0x0309 => 'LensModel',
+);
+
 # Kodak SubIFD0 tags (ref PH)
 %Image::ExifTool::Kodak::SubIFD0 = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -854,7 +879,7 @@ sub WriteKodakIFD($$$);
     0xfa02 => {
         Name => 'SceneMode',
         Writable => 'int16u',
-        Notes => 'may not be valid for some models', # ie. M580?
+        Notes => 'may not be valid for some models', # eg. M580?
         PrintConvColumns => 2,
         PrintConv => {
             1 => 'Sport',
@@ -876,8 +901,8 @@ sub WriteKodakIFD($$$);
             25 => 'Back Light',
             28 => 'Candlelight',
             29 => 'Sunset',
-            31 => 'Panorama Left-Right',
-            32 => 'Panorama Right-Left',
+            31 => 'Panorama Left-right',
+            32 => 'Panorama Right-left',
             33 => 'Smart Scene',
             34 => 'High ISO',
         },

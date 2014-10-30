@@ -68,13 +68,11 @@ my %dateTimeConv = (
 %Image::ExifTool::ID3::Main = (
     VARS => { NO_ID => 1 },
     NOTES => q{
-        ExifTool extracts ID3 information from MP3, MPEG, AIFF, OGG, FLAC, APE and
-        RealAudio files.  ID3v2 tags which support multiple languages (ie. Comment
-        and Lyrics) are extracted by specifying the tag name, followed by a dash
-        ('-'), then a 3-character
-        ISO 639-2
-        language code (ie. "Comment-spa"). See L<http://www.id3.org/> for the
-        official ID3 specification and
+        ExifTool extracts ID3 information from MP3, MPEG, AIFF, OGG, FLAC, APE, MPC
+        and RealAudio files.  ID3v2 tags which support multiple languages (eg.
+        Comment and Lyrics) are extracted by specifying the tag name, followed by a
+        dash ('-'), then a 3-character ISO 639-2 language code (eg. "Comment-spa").
+        See L<http://www.id3.org/> for the official ID3 specification and
         L<http://www.loc.gov/standards/iso639-2/php/code_list.php> for a list of ISO
         639-2 language codes.
     },
@@ -806,8 +804,8 @@ sub ConvertID3v1Text($$)
 
 #------------------------------------------------------------------------------
 # Re-format time stamp in synchronized lyrics
-# Inputs: 0) synchronized lyrics entry (ie. "[84.030]Da do do do")
-# Returns: entry with formatted timestamp (ie. "[01:24.03]Da do do do")
+# Inputs: 0) synchronized lyrics entry (eg. "[84.030]Da do do do")
+# Returns: entry with formatted timestamp (eg. "[01:24.03]Da do do do")
 sub ConvertTimeStamp($)
 {
     my $val = shift;

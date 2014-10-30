@@ -143,13 +143,13 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         written by adding a language/country code to the tag name in the form
         C<TAG-xx_YY>, where C<TAG> is the tag name, C<xx> is a 2-character lower
         case ISO 639-1 language code, and C<YY> is a 2-character upper case ISO
-        3166-1 alpha 2 country code (ie. C<Title-en_US>).  But as usual, the user
+        3166-1 alpha 2 country code (eg. C<Title-en_US>).  But as usual, the user
         interface is case-insensitive, and ExifTool will write the correct case to
         the file.
 
         3) Some numerical MIE tags allow units of measurement to be specified.  For
         these tags, units may be added in brackets immediately following the value
-        (ie. C<55(mi/h)>).  If no units are specified, the default units are
+        (eg. C<55(mi/h)>).  If no units are specified, the default units are
         written.
 
         See L<http://owl.phy.queensu.ca/~phil/exiftool/MIE1.1-20070121.pdf> for the
@@ -784,7 +784,7 @@ sub UpdateMieMap()
 
 #------------------------------------------------------------------------------
 # Get localized version of tagInfo hash
-# Inputs: 0) tagInfo hash ref, 1) locale code (ie. "en_CA")
+# Inputs: 0) tagInfo hash ref, 1) locale code (eg. "en_CA")
 # Returns: new tagInfo hash ref, or undef if invalid
 sub GetLangInfo($$)
 {
@@ -930,14 +930,14 @@ sub WriteMIEGroup($$$)
     } else {
         ($grp1 = $grp) =~ s/MIE-/MIE$n-/;
         my $m = $$cnt{$grp1} = ($$cnt{$grp1} || 0) + 1;
-        $isWriting{"$grp$m"} = 1;   # ie. 'MIE-Doc2'
-        $isWriting{$grp1} = 1;      # ie. 'MIE1-Doc'
+        $isWriting{"$grp$m"} = 1;   # eg. 'MIE-Doc2'
+        $isWriting{$grp1} = 1;      # eg. 'MIE1-Doc'
         $grp1 .= $m;
     }
     # build lookup for all valid group names for this MIE group
-    $isWriting{$grp} = 1;           # ie. 'MIE-Doc'
-    $isWriting{$grp1} = 1;          # ie. 'MIE1-Doc2'
-    $isWriting{"MIE$n"} = 1;        # ie. 'MIE1'
+    $isWriting{$grp} = 1;           # eg. 'MIE-Doc'
+    $isWriting{$grp1} = 1;          # eg. 'MIE1-Doc2'
+    $isWriting{"MIE$n"} = 1;        # eg. 'MIE1'
 
     # determine if we are deleting this group
     if (%{$$et{DEL_GROUP}}) {
@@ -1442,8 +1442,8 @@ sub ProcessMIEGroup($$$)
     my ($msg, $buff, $ok, $oldIndent, $mime);
     my $lastTag = '';
 
-    # get group 1 names: $grp doesn't have numbers (ie. 'MIE-Doc'),
-    # and $grp1 does (ie. 'MIE1-Doc1')
+    # get group 1 names: $grp doesn't have numbers (eg. 'MIE-Doc'),
+    # and $grp1 does (eg. 'MIE1-Doc1')
     my $cnt = $$et{MIE_COUNT};
     my $grp1 = $tagTablePtr->{GROUPS}->{1};
     my $n = $$cnt{'MIE-Main'} || 0;
@@ -2070,7 +2070,7 @@ FormatSize 0x01).
 =item 2.
 
 The TagName of a string element may have an 6-character suffix to indicate a
-specific locale. (ie. "Title-en_US", or "Keywords-de_DE").
+specific locale. (eg. "Title-en_US", or "Keywords-de_DE").
 
 =item 3.
 
@@ -2099,7 +2099,7 @@ null character is 2 or 4 zero bytes respectively.
 both 32-bit words and bytes within these words.  For instance, the high
 order byte is always the first byte if big-endian, and the eighth byte if
 little-endian.  This means that some swapping is always necessary for these
-values on systems where the byte order differs from the word order (ie. some
+values on systems where the byte order differs from the word order (eg. some
 ARM systems), regardless of the endian-ness of the stored values.
 
 =item 7.
@@ -2107,13 +2107,13 @@ ARM systems), regardless of the endian-ness of the stored values.
 Rational values are treated as two separate integers.  The numerator always
 comes first regardless of the byte ordering.  In a signed rational value,
 only the numerator is signed.  The denominator of all rational values is
-unsigned (ie. a signed 64-bit rational of 0x80000000/0x80000000 evaluates to
+unsigned (eg. a signed 64-bit rational of 0x80000000/0x80000000 evaluates to
 -1, not +1).
 
 =item 8.
 
 32-bit fixed point values are converted to floating point by treating them
-as an integer and dividing by an appropriate value.  ie)
+as an integer and dividing by an appropriate value.  eg)
 
     16-bit fixed value = 16-bit integer value / 256.0
     32-bit fixed value = 32-bit integer value / 65536.0
@@ -2162,7 +2162,7 @@ TagNames should be meaningful.  Case is significant.  Words should be
 lowercase with an uppercase first character, and acronyms should be all
 upper case.  The underline ("_") is provided to allow separation of two
 acronyms or two numbers, but it shouldn't be used unless necessary.  No
-separation is necessary between an acronym and a word (ie. "ISOSetting").
+separation is necessary between an acronym and a word (eg. "ISOSetting").
 
 All TagNames should start with an uppercase letter.  An exception to this
 rule allows tags to begin with a digit (0-9) if they must come before other
@@ -2174,7 +2174,7 @@ meta information tags in the main "0MIE" group.
 Tag names for localized text strings have an 6-character suffix with the
 following format:  The first character is a dash ('-'), followed by a
 2-character lower case ISO 639-1 language code, then an underline ('_'), and
-ending with a 2-character upper case ISO 3166-1 alpha 2 country code.  (ie.
+ending with a 2-character upper case ISO 3166-1 alpha 2 country code.  (eg.
 "-en_US", "-en_GB", "-de_DE" or "-fr_FR".  Note that "GB", and not "UK" is
 the code for Great Britain, although "UK" should be recognized for
 compatibility reasons.)  The suffix is included when sorting the tags
@@ -2185,7 +2185,7 @@ should be used.
 Tags with numerical values may allow units of measurement to be specified.
 The units string is stored in brackets at the end of the tag name, and is
 composed of zero or more ASCII characters in the range 0x21 to 0x7d,
-excluding the bracket characters 0x28 and 0x29.  (ie. "Resolution(/cm)" or
+excluding the bracket characters 0x28 and 0x29.  (eg. "Resolution(/cm)" or
 "SpecificHeat(J/kg.K)".)  See L<Image::ExifTool::MIEUnits> for details. Unit
 strings are not localized, and may not be used in combination with localized
 text strings.
@@ -2378,10 +2378,10 @@ allows a more reasonable interpretation of unrecognized values.
 
 Integer and floating point numbers may be represented in binary or string
 form.  In string form, integers are a series of digits with an optional
-leading sign (ie. "[+|-]DDDDDD"), and multiple values are separated by a
-single space character (ie. "23 128 -32").  Floating point numbers are
+leading sign (eg. "[+|-]DDDDDD"), and multiple values are separated by a
+single space character (eg. "23 128 -32").  Floating point numbers are
 similar but may also contain a decimal point and/or a signed exponent with a
-leading 'e' character (ie. "[+|-]DD[.DDDDDD][e(+|-)EEE]").  The string "inf"
+leading 'e' character (eg. "[+|-]DD[.DDDDDD][e(+|-)EEE]").  The string "inf"
 is used to represent infinity.  One advantage of numerical strings is that
 they can have an arbitrarily high precision because the possible number of
 significant digits is virtually unlimited.
@@ -2429,7 +2429,7 @@ groups, but should be able to process the remaining information.
 Some software may limit the maximum size of a MIE group or element.
 Historically, a limit of 2GB may be imposed by some systems.  However,
 8-byte data lengths should be supported by all applications provided the
-value doesn't exceed the system limit.  (ie. For systems with a 2GB limit,
+value doesn't exceed the system limit.  (eg. For systems with a 2GB limit,
 8-byte data lengths should be supported if the upper 17 bits are all zero.)
 If a data length above the system limit is encountered, it may be necessary
 for the application to stop processing if it can not seek to the next

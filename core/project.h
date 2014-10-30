@@ -25,75 +25,41 @@
 #define PROJECT_H
 
 #include <QObject>
-#include <QMenu>
-#include <QImage>
-#include "document.h"
-#include "cluster.h"
-#include "person.h"
+#include <QDesktopServices>
+#include <QUrl>
+#include <QTimer>
+#include <QAction>
+#include "http/filecontroller.h"
+#include "global.h"
+#include "watcherlocal.h"
 
-class Project : public ProjectBase {
+
+class Project : public ProjectInterface {
     Q_OBJECT
 
 public:
-    explicit Project(QWidget *parent = 0);
+    explicit Project(const QString &_name, const QString &_friendlyName, bool _isPublic, const QFileInfo &_path, QObject *parent = 0);
 
 private:
-    void open(const QDir &dir, const QDir &dirBase);
+    QDomElement xmlProject;
+    bool hasChanged;
+    QTimer saveTimer;
 public:
-    bool open(const QFileInfoList &file, UiTreeView *view);
-
-public:
-    QList<Document*> documents;
-    QList<Person*>   persons;
-public:
-    void addDocument(void *_document) {
-        Document *document = (Document*)_document;
-        documents.append(document);
-    }
-    void addPerson(void* _person) {
-        Person *person = (Person*)_person;
-        Global::mainWindow->personsTreeWidget->addTopLevelItem(person);
-        persons.append(person);
-    }
+    static bool sortEventFunction(SyncEntryEvent *a, SyncEntryEvent *b);
 
 private:
-    QList<Tag*> viewerTags, eventsTags;
-    QMap<QString, QMap<QString, QMap<QString, QList<Tag*> > > > timelineSortTags;
-    QMap< QPair<QString, QString>, Cluster*> timelineClusters;
-    QPolygonF lassoPoints, lassoPointsDest;
-public:
-    Document* getDocument(const QString &name) const;
+    QAction* addEvent(SyncEntryEvent *event);
+    void addItemToMenu(QAction *action);
 
-public:
-    void fireEvents();
-    qreal totalTime() const;
-
-private:
-    QList< QPair<QRectF, QPair<QString, QString> > > guiCategories;
-    QList<GlText> timelineCategories, timelinePhases;
-    qreal categoryColorOpacity, categoryColorOpacityDest;
-    QMenu *timelineFilesMenu;
-    GlRect textureStrips;
-public:
-    const QRectF paintTimeline(bool before = false);
-    const QRectF paintViewer();
-    bool mouseTimeline(const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool);
-    bool mouseViewer  (const QPointF &, QMouseEvent *, bool, bool, bool, bool, bool);
-
-public:
-    const QPointF getTimelineCursorPos(qreal) const;
-    const QPointF getViewerCursorPos  (qreal) const;
-    qreal         getTimelineCursorTime(const QPointF &) const;
-    qreal         getViewerCursorTime  (const QPointF &) const;
-
-public:
-    QDomElement serialize(QDomDocument &xmlDoc) const;
-    void deserialize(const QDomElement &xmlElement);
+public slots:
+    void load();
     void save();
-    void close();
+    void openWebPage();
+    void openFolder();
+    void updateGUI();
+    void fileChanged(SyncEntry *file);
+    void projectChanged(SyncEntry *file, bool firstChange);
 
-signals:
-    void displayMetadata();
 };
 
 #endif // PROJECT_H

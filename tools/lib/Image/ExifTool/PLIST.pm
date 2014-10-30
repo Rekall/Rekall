@@ -20,7 +20,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ExtractObject($$;$);
 sub Get24u($$);
@@ -64,7 +64,7 @@ my %readProc = (
         Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
         # Sony uses a "real" here -- number of days since Dec 31, 1899
-        ValueConv => 'IsFloat($val) ? ConvertUnixTime(($val - 25569) * 24 * 3600 + 0.5) : $val',
+        ValueConv => 'IsFloat($val) ? ConvertUnixTime(($val - 25569) * 24 * 3600) : $val',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     'MetaDataList//Duration' => {

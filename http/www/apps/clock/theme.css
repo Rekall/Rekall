@@ -1,0 +1,63 @@
+@import url("/css/font/stylesheet.css");
+
+html, body {
+	width:  	 100%;
+  	height: 	 100%;
+  	margin: 	 0px;
+	color: 		 #C0C0C0;
+	font-family: "open_sansregular";
+	font-size:	 10px;
+	background-color: #2C3032;
+	overflow: 	 hidden;
+}
+u {
+	cursor:		pointer;
+}
+
+#ruban {
+	font-family: "open_sanssemibold";
+	width: 				100%;
+	background-color: 	white;
+	color: 				black;
+	line-height:		30px;
+	text-align:			center;
+	text-transform: 	uppercase;
+}
+
+#clock_sync {
+	font-family: 	"open_sanslight";
+	color:		white;
+	text-align: center;
+	width: 		100vw; 
+    height: 	18vw;
+    max-height: 100vh;
+    max-width: 	555vh;
+    margin: 	auto;
+    position: 	absolute;
+    top:0; bottom:0;
+    left:0;right:0;
+	cursor: 	pointer;
+}
+#clock_sync span {
+	font-size:	50%;
+}
+
+#clock_menu {
+	width: 			100%;
+	text-align:		center;
+}
+#clock_menu li {
+	color:			#4E5455;
+	text-transform: uppercase;
+	display:		inline-block;
+	margin:			10px;
+	min-width:		10%;
+	cursor:			pointer;
+	line-height:	50px;
+}
+#clock_menu li.selected {
+	color:			white;
+}
+
+
+

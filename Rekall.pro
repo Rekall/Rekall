@@ -19,79 +19,39 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 QT_VERSION = $$[QT_VERSION]
 message($$[QT_VERSION])
 contains(QT_VERSION, "^4.*") {
     message("Rekall For QT4")
     DEFINES += QT4
-    QT      += core gui opengl network script xml phonon webkit
+    QT      += core gui network xml webkit
 } else {
-    message("Rekall For QT5 (very experimental)")
+    message("Rekall For QT5")
     DEFINES += QT5
-    QT      += widgets core gui opengl network script xml phonon webkit
+    QT      += widgets core gui network xml webkitwidgets
 }
 
-TARGET    = Rekall
-TEMPLATE  = app
+TARGET   = Rekall
+TEMPLATE = app
 
-SOURCES  += main.cpp \
-    gui/qtexteditplus.cpp \
-    core/watchersnapshot.cpp
-HEADERS  += tasks/taskslist.h   tasks/feedlist.h   tasks/taskprocess.h \
-    gui/qtexteditplus.h \
-    core/watchersnapshot.h
-SOURCES  += tasks/taskslist.cpp tasks/feedlist.cpp tasks/taskprocess.cpp
-FORMS    += tasks/taskslist.ui  tasks/feedlist.ui \
-    core/watchersnapshot.ui
 
-HEADERS  += core/watcherfeeling.h   core/watcher.h
-SOURCES  += core/watcherfeeling.cpp core/watcher.cpp
-FORMS    += core/watcherfeeling.ui
+SOURCES  += rekall.cpp global.cpp core/project.cpp  core/analyse.cpp
+HEADERS  += rekall.h   global.h   core/project.h    core/analyse.h
 
-HEADERS  += rekall.h   gui/splash.h   misc/global.h   misc/options.h
-SOURCES  += rekall.cpp gui/splash.cpp misc/global.cpp misc/options.cpp
-FORMS    += rekall.ui  gui/splash.ui
+SOURCES  += main.cpp
 
-HEADERS  += core/sorting.h   core/phases.h   core/metadata.h   core/project.h   core/document.h   core/tag.h   core/cluster.h
-SOURCES  += core/sorting.cpp core/phases.cpp core/metadata.cpp core/project.cpp core/document.cpp core/tag.cpp core/cluster.cpp
-FORMS    += core/sorting.ui  core/phases.ui
-
-HEADERS  += gui/timeline.h   gui/previewer.h   gui/playervideo.h   gui/timelinecontrol.h   gui/timelinegl.h   gui/previewerlabel.h
-SOURCES  += gui/timeline.cpp gui/previewer.cpp gui/playervideo.cpp gui/timelinecontrol.cpp gui/timelinegl.cpp gui/previewerlabel.cpp
-FORMS    += gui/timeline.ui  gui/previewer.ui  gui/playervideo.ui  gui/timelinecontrol.ui
-
-HEADERS  += gui/player.h   gui/viewer.h   gui/viewergl.h
-SOURCES  += gui/player.cpp gui/viewer.cpp gui/viewergl.cpp
-FORMS    += gui/player.ui  gui/viewer.ui
-
-HEADERS  += items/uitreeview.h   items/uitreeviewwidget.h   items/uitreedelegate.h   items/uifileitem.h
-SOURCES  += items/uitreeview.cpp items/uitreeviewwidget.cpp items/uitreedelegate.cpp items/uifileitem.cpp
-FORMS    += items/uitreeview.ui
-
-HEADERS  += interfaces/udp.h   interfaces/fileuploadcontroller.h
-SOURCES  += interfaces/udp.cpp interfaces/fileuploadcontroller.cpp
-FORMS    += interfaces/udp.ui
-HEADERS  += interfaces/http/httplistener.h interfaces/http/httpconnectionhandler.h interfaces/http/httpconnectionhandlerpool.h interfaces/http/httprequest.h interfaces/http/httpresponse.h interfaces/http/httpcookie.h interfaces/http/httprequesthandler.h
-HEADERS  += interfaces/http/httpsession.h interfaces/http/httpsessionstore.h
-HEADERS  += interfaces/http/staticfilecontroller.h
-SOURCES  += interfaces/http/httplistener.cpp interfaces/http/httpconnectionhandler.cpp interfaces/http/httpconnectionhandlerpool.cpp interfaces/http/httprequest.cpp interfaces/http/httpresponse.cpp interfaces/http/httpcookie.cpp interfaces/http/httprequesthandler.cpp
-SOURCES  += interfaces/http/httpsession.cpp interfaces/http/httpsessionstore.cpp
-SOURCES  += interfaces/http/staticfilecontroller.cpp
-
-HEADERS  += core/person.h
-SOURCES  += core/person.cpp
 
 #Location
-HEADERS += interfaces/userinfos.h
-SOURCES += interfaces/userinfos.cpp
+HEADERS  += core/userinfos.h
+SOURCES  += core/userinfos.cpp
 macx {
     DEFINES           += LOCATION_INSTALLED
-    OBJECTIVE_SOURCES += interfaces/userinfos_mac.mm
+    OBJECTIVE_SOURCES += core/userinfos_mac.mm
     LIBS              += -framework Cocoa -framework CoreLocation
 }
 
-#TRANSLATIONS          = Tools/Translation_fr_FR.ts
+
+#Bundle Mac OS X
 RESOURCES             += icons/Rekall.qrc
 macx {
     LIBS              += -framework Carbon
@@ -107,4 +67,33 @@ win32 {
     #LIBS             += -lwinmm -lsetupapi
     RC_FILE            = icon.rc
     DEFINES           += WINVER=0x0501 # needed for mingw to pull in appropriate dbt business...probably a better way to do this
+}
+
+
+HEADERS += core/watcherlocal.h   watcher/folderwatcher.h
+SOURCES += core/watcherlocal.cpp watcher/folderwatcher.cpp
+
+linux {
+    HEADERS += watcher/folderwatcher_linux.h
+    SOURCES += watcher/folderwatcher_linux.cpp
+}
+win {
+    HEADERS += watcher/folderwatcher_win.h
+    SOURCES += watcher/folderwatcher_win.cpp
+}
+macx {
+    HEADERS += watcher/folderwatcher_mac.h
+    SOURCES += watcher/folderwatcher_mac.cpp
+}
+
+#WebApp
+HEADERS += http/http.h   http/requestmapper.h   http/static.h   http/filecontroller.h   http/udp.h
+SOURCES += http/http.cpp http/requestmapper.cpp http/static.cpp http/filecontroller.cpp http/udp.cpp
+true {
+    HEADERS += http/lib/dumpcontroller.h    http/lib/templatecontroller.h    http/lib/formcontroller.h    http/lib/fileuploadcontroller.h    http/lib/sessioncontroller.h
+    SOURCES += http/lib/dumpcontroller.cpp  http/lib/templatecontroller.cpp  http/lib/formcontroller.cpp  http/lib/fileuploadcontroller.cpp  http/lib/sessioncontroller.cpp
+    include(http/lib/qtservice/src/qtservice.pri)
+    include(http/lib/bfLogging/src/bfLogging.pri)
+    include(http/lib/bfHttpServer/src/bfHttpServer.pri)
+    include(http/lib/bfTemplateEngine/src/bfTemplateEngine.pri)
 }

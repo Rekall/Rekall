@@ -343,17 +343,18 @@ my %writeTable = (
     0x8298 => {             # Copyright
         Writable => 'string',
         WriteGroup => 'IFD0',
-        RawConvInv => sub {
+        RawConvInv => '$val . "\0"',
+        PrintConvInv => sub {
             my ($val, $self) = @_;
             # encode if necessary
             my $enc = $self->Options('CharsetEXIF');
             $val = $self->Encode($val,$enc) if $enc and $val !~ /\0/;
             if ($val =~ /(.*?)\s*[\n\r]+\s*(.*)/s) {
-                return $1 . "\0" unless length $2;
+                return $1 unless length $2;
                 # photographer copyright set to ' ' if it doesn't exist, according to spec.
-                return((length($1) ? $1 : ' ') . "\0" . $2 . "\0");
+                return((length($1) ? $1 : ' ') . "\0" . $2);
             }
-            return $val . "\0";
+            return $val;
         },
     },
 #
@@ -1317,7 +1318,7 @@ sub ConvertLensInfo($)
 
 #------------------------------------------------------------------------------
 # Get binary CFA Pattern from a text string
-# Inputs: Print-converted CFA pattern (ie. '[Blue,Green][Green,Red]')
+# Inputs: Print-converted CFA pattern (eg. '[Blue,Green][Green,Red]')
 # Returns: CFA pattern as a string of numbers
 sub GetCFAPattern($)
 {
@@ -1484,9 +1485,9 @@ sub RebuildMakerNotes($$$)
                     # (Note: this expression also appears in Exif.pm)
                     if ($$et{Model} =~ /\b(K(-[57mrx]|(10|20|100|110|200)D|2000)|GX(10|20))\b/) {
                         $hdr =~ s/^(PENTAX |SAMSUNG)\0/AOC\0/;
+                        # save fixup because AOC maker notes have absolute offsets
+                        $$et{MAKER_NOTE_FIXUP} = $makerFixup;
                     }
-                    # save fixup so we will adjust to absolute offsets when writing
-                    $$et{MAKER_NOTE_FIXUP} = $makerFixup;
                 }
                 $rtnValue = $hdr . $rtnValue;
                 # adjust fixup for shift in start position
@@ -1515,19 +1516,19 @@ sub RebuildMakerNotes($$$)
 
 #------------------------------------------------------------------------------
 # Sort IFD directory entries
-# Inputs: 0) data reference, 1) directory start, 2) number of entries
-sub SortIFD($$$)
+# Inputs: 0) data reference, 1) directory start, 2) number of entries,
+#         3) flag to treat 0 as a valid tag ID (as opposed to an empty IFD entry)
+sub SortIFD($$$;$)
 {
-    my ($dataPt, $dirStart, $numEntries) = @_;
+    my ($dataPt, $dirStart, $numEntries, $allowZero) = @_;
     my ($index, %entries);
     # split the directory into separate entries
-    my $newDir = '';
     for ($index=0; $index<$numEntries; ++$index) {
         my $entry = $dirStart + 2 + 12 * $index;
         my $tagID = Get16u($dataPt, $entry);
         my $entryData = substr($$dataPt, $entry, 12);
         # silly software can pad directories with zero entries -- put these at the end
-        $tagID = 0x10000 unless $tagID or $index == 0;
+        $tagID = 0x10000 unless $tagID or $index == 0 or $allowZero;
         # add new entry (allow for duplicate tag ID's, which shouldn't normally happen)
         if ($entries{$tagID}) {
             $entries{$tagID} .= $entryData;
@@ -1537,6 +1538,8 @@ sub SortIFD($$$)
     }
     # sort the directory entries
     my @sortedTags = sort { $a <=> $b } keys %entries;
+    # generate the sorted IFD
+    my $newDir = '';
     foreach (@sortedTags) {
         $newDir .= $entries{$_};
     }
@@ -1807,8 +1810,8 @@ sub WriteExif($$$)
                 for ($index=0; $index<$numEntries; ++$index) {
                     my $tagID = Get16u($dataPt, $dirStart + 2 + 12 * $index);
                     # check for proper sequence (but ignore null entries at end)
-                    if ($tagID < $lastID and $tagID) {
-                        SortIFD($dataPt, $dirStart, $numEntries);
+                    if ($tagID < $lastID and ($tagID or $$tagTablePtr{0})) {
+                        SortIFD($dataPt, $dirStart, $numEntries, $$tagTablePtr{0});
                         $et->Warn("Entries in $name were out of sequence. Fixed.",1);
                         last;
                     }
@@ -1879,7 +1882,7 @@ sub WriteExif($$$)
                 next unless $et->IsOverwriting($nvHash);
                 # don't cross delete if specifically deleting from the other directory
                 # (Note: don't call GetValue() here because it shouldn't be called
-                #  if IsOverwriting returns < 0 -- ie. when shifting)
+                #  if IsOverwriting returns < 0 -- eg. when shifting)
                 next if not defined $$nvHash{Value} and $$nvHash{WantGroup} and
                         lc($$nvHash{WantGroup}) eq lc($wrongDir);
                 # remove this tag if found in this IFD
@@ -2434,7 +2437,7 @@ NoOverwrite:            next if $isNew > 0;
 # create new subdirectory
 #
                     # newInfo may not be defined if we try to add a mandatory tag
-                    # to a directory that doesn't support it (ie. IFD1 in RW2 images)
+                    # to a directory that doesn't support it (eg. IFD1 in RW2 images)
                     $newInfo = $$addDirs{$newID} or next;
                     # make sure we don't try to generate a new MakerNotes directory
                     # or a SubIFD
@@ -2485,7 +2488,7 @@ NoOverwrite:            next if $isNew > 0;
                     $newFormat = $formatNumber{$newFormName};
                 } elsif ($$addDirs{$newID} and $newInfo ne $$addDirs{$newID}) {
                     # this can happen if we are trying to add a directory that doesn't exist
-                    # in this type of file (ie. try adding a SubIFD tag to an A100 image)
+                    # in this type of file (eg. try adding a SubIFD tag to an A100 image)
                     $isNew = -1;
                 }
             }
@@ -2800,7 +2803,7 @@ NoOverwrite:            next if $isNew > 0;
                                 $et->Error("Error writing $subdirName") unless $$et{VALUE}{Error};
                                 return undef;
                             }
-                            # add back original header if necessary (ie. Ricoh GR)
+                            # add back original header if necessary (eg. Ricoh GR)
                             if ($hdrLen and $hdrLen > 0 and $subdirStart <= $dataLen) {
                                 $subdirData = substr($$dataPt, $subdirStart - $hdrLen, $hdrLen) . $subdirData;
                                 $subdirInfo{Fixup}{Start} += $hdrLen;

@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Sigma;
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -32,6 +32,9 @@ sub ProcessX3FProperties($$$);
     },
     Header => {
         SubDirectory => { TagTable => 'Image::ExifTool::SigmaRaw::Header' },
+    },
+    Header4 => {
+        SubDirectory => { TagTable => 'Image::ExifTool::SigmaRaw::Header4' },
     },
     HeaderExt => {
         SubDirectory => { TagTable => 'Image::ExifTool::SigmaRaw::HeaderExt' },
@@ -61,6 +64,7 @@ sub ProcessX3FProperties($$$);
 %Image::ExifTool::SigmaRaw::Header = (
     PROCESS_PROC => \&ProcessX3FHeader,
     FORMAT => 'int32u',
+    NOTES => 'Information extracted from the header of an X3F file.',
     1 => {
         Name => 'FileVersion',
         ValueConv => '($val >> 16) . "." . ($val & 0xffff)',
@@ -89,9 +93,27 @@ sub ProcessX3FProperties($$$);
     },
 );
 
+# X3F version 4 header structure (ref PH)
+%Image::ExifTool::SigmaRaw::Header4 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int32u',
+    NOTES => 'Header information for version 4.0 or greater X3F.',
+    1 => {
+        Name => 'FileVersion',
+        ValueConv => '($val >> 16) . "." . ($val & 0xffff)',
+    },
+    # 8 - undef[4]: 4 random ASCII characters
+    10 => 'ImageWidth',
+    11 => 'ImageHeight',
+    12 => 'Rotation',
+    # don't know what the rest of the header contains, but none of
+    # these values change in any of my samples...
+);
+
 # extended header tags
 %Image::ExifTool::SigmaRaw::HeaderExt = (
     GROUPS => { 2 => 'Camera' },
+    FORMAT => 'float',
     NOTES => 'Extended header data found in version 2.1 and 2.2 files',
     0 => 'Unused',
     1 => { Name => 'ExposureAdjust',PrintConv => 'sprintf("%.1f",$val)' },
@@ -242,7 +264,7 @@ sub ProcessX3FProperties($$$);
 
 #------------------------------------------------------------------------------
 # Extract null-terminated unicode string from list of characters
-# Inputs: 0) ExifTool object ref, 1) list ref, 2) position in list
+# Inputs: 0) ExifTool ref, 1) list ref, 2) position in list
 # Returns: Converted string
 sub ExtractUnicodeString($$$)
 {
@@ -257,48 +279,36 @@ sub ExtractUnicodeString($$$)
 
 #------------------------------------------------------------------------------
 # Process an X3F header
-# Inputs: 0) ExifTool object reference, 1) DirInfo reference, 2) tag table ref
+# Inputs: 0) ExifTool ref, 1) DirInfo ref, 2) tag table ref
 # Returns: 1 on success
 sub ProcessX3FHeader($$$)
 {
     my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $hdrLen = $$dirInfo{DirLen};
-    my $verbose = $et->Options('Verbose');
 
     # process the static header structure first
     $et->ProcessBinaryData($dirInfo, $tagTablePtr);
 
     # process extended data if available
-    if (length $$dataPt >= 232) {
+    if (length($$dataPt) - $hdrLen >= 160) {
+        my $verbose = $et->Options('Verbose');
         if ($verbose) {
             $et->VerboseDir('X3F HeaderExt', 32);
             Image::ExifTool::HexDump($dataPt, undef,
                 MaxLen => $verbose > 3 ? 1024 : 96,
                 Out    => $et->Options('TextOut'),
                 Prefix => $$et{INDENT},
-                Start  => $$dirInfo{DirLen},
+                Start  => $hdrLen,
             ) if $verbose > 2;
         }
         $tagTablePtr = GetTagTable('Image::ExifTool::SigmaRaw::HeaderExt');
-        my @vals = unpack("x${hdrLen}C32V32", $$dataPt);
+        my @tags = unpack("x${hdrLen}C32", $$dataPt);
         my $i;
         my $unused = 0;
         for ($i=0; $i<32; ++$i) {
-            $vals[$i] or ++$unused, next;
-            my $val = $vals[$i+32];
-            # convert value 0x40000000 => 2 ** 1, 0x3f800000 => 2 ** 0, 0x3f000000 => 2 ** -1
-            if ($val) {
-                my $sign;
-                if ($val & 0x80000000) {
-                    $sign = -1;
-                    $val &= 0x7fffffff;
-                } else {
-                    $sign = 1;
-                }
-                $val = $sign * 2 ** (($val - 0x3f800000) / 0x800000);
-            }
-            $et->HandleTag($tagTablePtr, $vals[$i], $val,
+            $tags[$i] or ++$unused, next;
+            $et->HandleTag($tagTablePtr, $tags[$i], undef,
                 Index  => $i,
                 DataPt => $dataPt,
                 Start  => $hdrLen + 32 + $i * 4,
@@ -312,7 +322,7 @@ sub ProcessX3FHeader($$$)
 
 #------------------------------------------------------------------------------
 # Process an X3F properties
-# Inputs: 0) ExifTool object reference, 1) DirInfo reference, 2) tag table ref
+# Inputs: 0) ExifTool ref, 1) DirInfo ref, 2) tag table ref
 # Returns: 1 on success
 sub ProcessX3FProperties($$$)
 {
@@ -367,7 +377,7 @@ sub ProcessX3FProperties($$$)
 
 #------------------------------------------------------------------------------
 # Write an X3F file
-# Inputs: 0) ExifTool object reference, 1) DirInfo reference (DirStart = directory offset)
+# Inputs: 0) ExifTool ref, 1) DirInfo ref (DirStart = directory offset)
 # Returns: error string, undef on success, or -1 on write error
 # Notes: Writes metadata to embedded JpgFromRaw image
 sub WriteX3F($$)
@@ -470,7 +480,7 @@ sub WriteX3F($$)
 
 #------------------------------------------------------------------------------
 # Process an X3F directory
-# Inputs: 0) ExifTool object reference, 1) DirInfo reference, 2) tag table ref
+# Inputs: 0) ExifTool ref, 1) DirInfo ref, 2) tag table ref
 # Returns: error string or undef on success
 sub ProcessX3FDirectory($$$)
 {
@@ -541,7 +551,7 @@ sub ProcessX3FDirectory($$$)
 
 #------------------------------------------------------------------------------
 # Read/write information from a Sigma raw (X3F) image
-# Inputs: 0) ExifTool object reference, 1) DirInfo reference
+# Inputs: 0) ExifTool ref, 1) DirInfo ref
 # Returns: 1 on success, 0 if this wasn't a valid X3F image, or -1 on write error
 sub ProcessX3F($$)
 {
@@ -549,7 +559,7 @@ sub ProcessX3F($$)
     my $outfile = $$dirInfo{OutFile};
     my $raf = $$dirInfo{RAF};
     my $warn = $outfile ? \&Image::ExifTool::Error : \&Image::ExifTool::Warn;
-    my ($buff, $err);
+    my ($buff, $err, $hdrLen);
 
     return 0 unless $raf->Read($buff, 40) == 40;
     return 0 unless $buff =~ /^FOVb/;
@@ -560,27 +570,33 @@ sub ProcessX3F($$)
     # check version number
     my $ver = unpack('x4V',$buff);
     $ver = ($ver >> 16) . '.' . ($ver & 0xffff);
-    if ($ver > 3) {
+    if ($ver > 4) {
         &$warn($et, "Untested X3F version ($ver). Please submit sample for testing", 1);
     }
-    my $hdrLen = length $buff;
     # read version 2.1/2.2/2.3 extended header
     if ($ver > 2) {
-        $hdrLen += $ver > 2.2 ? 64 : 32;            # SceneCaptureType string added in 2.3
-        my $more = $hdrLen - length($buff) + 160;   # (extended header is 160 bytes)
-        my $buf2;
+        my ($extra, $buf2);
+        if ($ver >= 4) {
+            $hdrLen = 0x300;
+            $extra = 0;
+        } else {
+            $hdrLen = $ver > 2.2 ? 104 : 72;    # SceneCaptureType string added in 2.3
+            $extra = 160;                       # (extended header is 160 bytes)
+        }
+        my $more = $hdrLen - length($buff) + $extra;
         unless ($raf->Read($buf2, $more) == $more) {
-            &$warn($et, 'Error reading extended header');
+            &$warn($et, 'Error reading X3F header');
             return 1;
         }
         $buff .= $buf2;
     }
+    my ($widPos, $hdrType) = $ver < 4 ? (28, 'Header') : (40, 'Header4');
     # extract ImageWidth for later
-    $$et{ImageWidth} = Get32u(\$buff, 28);
+    $$et{ImageWidth} = Get32u(\$buff, $widPos);
     # process header information
     my $tagTablePtr = GetTagTable('Image::ExifTool::SigmaRaw::Main');
     unless ($outfile) {
-        $et->HandleTag($tagTablePtr, 'Header', $buff,
+        $et->HandleTag($tagTablePtr, $hdrType, $buff,
             DataPt => \$buff,
             Size   => $hdrLen,
         );

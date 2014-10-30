@@ -55,7 +55,7 @@ use vars qw($VERSION %pentaxLensTypes);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.73';
+$VERSION = '2.79';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -78,7 +78,7 @@ sub PrintFilter($$$);
         return undef if $inv;
         # *istD may report a series number of 4 for series 7 lenses
         $val =~ s/^4 /7 / and $$conv{$val} and return $$conv{$val} . " ($_[0])";
-        # cameras that don't recognize SDM lenses (ie. older K10 firmware)
+        # cameras that don't recognize SDM lenses (eg. older K10 firmware)
         # may report series 7 instead of 8
         $val =~ s/^7 /8 / and $$conv{$val} and return $$conv{$val} . " ? ($_[0])";
         return undef;
@@ -101,12 +101,14 @@ sub PrintFilter($$$);
     '3 23' => 'smc PENTAX-F 100-300mm F4.5-5.6 or Sigma Lens',
     '3 23.1' => 'Sigma AF 28-300mm F3.5-5.6 DL IF', #JD
     '3 23.2' => 'Sigma AF 28-300mm F3.5-6.3 DG IF Macro', #JD
+    '3 23.3' => 'Tokina 80-200mm F2.8 ATX-Pro', #Exiv2
     '3 24' => 'smc PENTAX-F 35-135mm F3.5-4.5',
     '3 25' => 'smc PENTAX-F 35-105mm F4-5.6 or Sigma or Tokina Lens',
     '3 25.1' => 'Sigma AF 28-300mm F3.5-5.6 DL IF', #11
     '3 25.2' => 'Sigma 55-200mm F4-5.6 DC', #JD
-    '3 25.3' => 'Sigma AF 28-300mm F3.5-6.3 DG IF Macro', #JD
-    '3 25.4' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
+    '3 25.3' => 'Sigma AF 28-300mm F3.5-6.3 DL IF', #Exiv2
+    '3 25.4' => 'Sigma AF 28-300mm F3.5-6.3 DG IF Macro', #JD
+    '3 25.5' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
     '3 26' => 'smc PENTAX-F* 250-600mm F5.6 ED[IF]',
     '3 27' => 'smc PENTAX-F 28-80mm F3.5-4.5 or Tokina Lens',
     '3 27.1' => 'Tokina AT-X Pro AF 28-70mm F2.6-2.8', #JD
@@ -254,6 +256,7 @@ sub PrintFilter($$$);
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
     '7 58' => 'smc PENTAX-D FA Macro 100mm F2.8 WR', #PH - this bit of information cost me $600 ;)
     '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #(Anton Bondar)
+    '7 201' => 'smc Pentax-DA L 50-200mm F4-5.6 ED WR', #(Bruce Rusk)
     '7 202' => 'smc PENTAX-DA L 18-55mm F3.5-5.6 AL WR', #29
     '7 203' => 'HD PENTAX-DA 55-300mm F4-5.8 ED WR', #29
     '7 204' => 'HD PENTAX-DA 15mm F4 ED AL Limited', #forum5318
@@ -288,17 +291,19 @@ sub PrintFilter($$$);
     '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #19
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
+    '8 0' => 'Sigma 50-150mm F2.8 II APO EX DC HSM', #forum2997
     '8 3' => 'Sigma AF 18-125mm F3.5-5.6 DC', #29
     '8 4' => 'Sigma 50mm F1.4 EX DG HSM', #Artur private communication
+    '8 7' => 'Sigma 24-70mm F2.8 IF EX DG HSM', #Exiv2
     '8 8' => 'Sigma 18-250mm F3.5-6.3 DC OS HSM', #27
     '8 11' => 'Sigma 10-20mm F3.5 EX DC HSM', #27
-    '8 12' => 'Sigma 70-300mm F4-5.6 DG OS', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3382.0.html
+    '8 12' => 'Sigma 70-300mm F4-5.6 DG OS', #forum3382
     '8 13' => 'Sigma 120-400mm F4.5-5.6 APO DG OS HSM', #26
     '8 14' => 'Sigma 17-70mm F2.8-4.0 DC Macro OS HSM', #(Hubert Meier)
     '8 15' => 'Sigma 150-500mm F5-6.3 APO DG OS HSM', #26
     '8 16' => 'Sigma 70-200mm F2.8 EX DG Macro HSM II', #26
     '8 17' => 'Sigma 50-500mm F4.5-6.3 DG OS HSM', #(Heike Herrmann) (also APO, ref 26)
-    '8 18' => 'Sigma 8-16mm F4.5-5.6 DC HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2998.0.html
+    '8 18' => 'Sigma 8-16mm F4.5-5.6 DC HSM', #forum2998
     '8 21' => 'Sigma 17-50mm F2.8 EX DC OS HSM', #26
     '8 22' => 'Sigma 85mm F1.4 EX DG HSM', #26
     '8 23' => 'Sigma 70-200mm F2.8 APO EX DG OS HSM', #27
@@ -307,6 +312,8 @@ sub PrintFilter($$$);
     '8 28' => 'Sigma 18-250mm F3.5-6.3 DC Macro HSM', #27
     '8 29' => 'Sigma 35mm F1.4 DG HSM', #27
     '8 30' => 'Sigma 17-70mm F2.8-4 DC Macro HSM Contemporary', #27
+    '8 31' => 'Sigma 18-35mm F1.8 DC HSM', #27
+    '8 32' => 'Sigma 30mm F1.4 DC HSM | A', #27
     '8 209' => 'HD PENTAX-DA 20-40mm F2.8-4 ED Limited DC WR', #29
     '8 210' => 'smc PENTAX-DA 18-270mm F3.5-6.3 ED SDM', #Helmut Schutz
     '8 211' => 'HD PENTAX-DA 560mm F5.6 ED AW', #PH
@@ -321,7 +328,7 @@ sub PrintFilter($$$);
     '8 255' => 'Sigma Lens (8 255)',
     '8 255.1' => 'Sigma 70-200mm F2.8 EX DG Macro HSM II', #JD
     '8 255.2' => 'Sigma 150-500mm F5-6.3 DG APO [OS] HSM', #JD (non-OS version has same type, ref 29)
-    '8 255.3' => 'Sigma 50-150mm F2.8 II APO EX DC HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2997.0.html
+    '8 255.3' => 'Sigma 50-150mm F2.8 II APO EX DC HSM', #forum2997
     '8 255.4' => 'Sigma 4.5mm F2.8 EX DC HSM Circular Fisheye', #PH
     '8 255.5' => 'Sigma 50-200mm F4-5.6 DC OS', #26
     '8 255.6' => 'Sigma 24-70mm F2.8 EX DG HSM', #29
@@ -478,7 +485,7 @@ my %pentaxModelID = (
     0x12f5c => 'X-5',
     0x12f66 => 'Q10',
     0x12f70 => 'K-5 II',
-    0x12f71 => 'K-5 II s', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4515.0.html
+    0x12f71 => 'K-5 II s', #forum4515
     0x12f7a => 'Q7',
     0x12f84 => 'MX-1',
     0x12f8e => 'WG-3 GPS',
@@ -487,6 +494,10 @@ my %pentaxModelID = (
     0x12fb6 => 'K-50',
     0x12fc0 => 'K-3', #29
     0x12fca => 'K-500',
+    0x12fe8 => 'WG-4', # (Ricoh)
+    0x12fde => 'WG-4 GPS', # (Ricoh)
+    0x13006 => 'WG-20', # (Ricoh)
+    0x13010 => '645Z',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -980,6 +991,7 @@ my %binaryDataAttrs = (
             63 => 'Panorama 2', #PH (X-5)
             65 => 'Half-length Portrait', #JD
             66 => 'Portrait 2', #PH (LS645)
+            74 => 'Digital Microscope', #PH (WG-4)
             75 => 'Blue Sky', #PH (LS465)
             80 => 'Miniature', #PH (VS20)
             81 => 'HDR', #PH (LS465)
@@ -1064,6 +1076,7 @@ my %binaryDataAttrs = (
         Name => 'AFPointSelected',
         Condition => '$$self{Model} !~ /K-3\b/',
         Writable => 'int16u',
+        Notes => 'all models but the K-3',
         PrintConvColumns => 2,
         PrintConv => [{
             # 0 - Contrast-detect AF? - PH (K-5)
@@ -1091,6 +1104,7 @@ my %binaryDataAttrs = (
     },{
         Name => 'AFPointSelected',
         Writable => 'int16u',
+        Notes => 'K-3',
         PrintConvColumns => 2,
         PrintConv => [{
             # 0 - Contrast-detect AF? - PH (K-5)
@@ -1099,7 +1113,7 @@ my %binaryDataAttrs = (
             0xfffd => 'Automatic Tracking AF', #JD
             0xfffc => 'Face Detect AF', #JD
             0xfffb => 'AF Select', #PH (Q select from 25-areas)
-            # AF pattern: (ref http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5422.0.html)
+            # AF pattern: (ref forum5422)
             #    01 02 03 04 05
             #    06 07 08 09 10
             # 11 12 13 14 15 16 17
@@ -1113,7 +1127,7 @@ my %binaryDataAttrs = (
             5 => 'Top-right',
             6 => 'Upper-left',
             7 => 'Upper Near-left',
-            8 => 'Upper-midle',
+            8 => 'Upper-middle',
             9 => 'Upper Near-right',
             10 => 'Upper-right',
             11 => 'Far Left',
@@ -1133,6 +1147,39 @@ my %binaryDataAttrs = (
             25 => 'Bottom',
             26 => 'Bottom Near-right',
             27 => 'Bottom-right',
+            #forum5892
+            257 => 'Zone Select Top-left',
+            258 => 'Zone Select Top Near-left',
+            259 => 'Zone Select Top',
+            260 => 'Zone Select Top Near-right',
+            261 => 'Zone Select Top-right',
+            262 => 'Zone Select Upper-left',
+            263 => 'Zone Select Upper Near-left',
+            264 => 'Zone Select Upper-middle',
+            265 => 'Zone Select Upper Near-right',
+            266 => 'Zone Select Upper-right',
+            267 => 'Zone Select Far Left',
+            268 => 'Zone Select Left',
+            269 => 'Zone Select Near-left',
+            270 => 'Zone Select Center',
+            271 => 'Zone Select Near-right',
+            272 => 'Zone Select Right',
+            273 => 'Zone Select Far Right',
+            274 => 'Zone Select Lower-left',
+            275 => 'Zone Select Lower Near-left',
+            276 => 'Zone Select Lower-middle',
+            277 => 'Zone Select Lower Near-right',
+            278 => 'Zone Select Lower-right',
+            279 => 'Zone Select Bottom-left',
+            280 => 'Zone Select Bottom Near-left',
+            281 => 'Zone Select Bottom',
+            282 => 'Zone Select Bottom Near-right',
+            283 => 'Zone Select Bottom-right',
+        },{ #forum5892
+            0 => 'Single Point',
+            1 => 'Expanded Area 9-point (S)',
+            3 => 'Expanded Area 25-point (M)',
+            5 => 'Expanded Area 27-point (L)',
         }],
     }],
     0x000f => [{ #PH
@@ -1157,35 +1204,38 @@ my %binaryDataAttrs = (
         Name => 'AFPointsInFocus',
         Writable => 'int32u',
         PrintHex => 1,
-        PrintConv => { BITMASK => {
-            0 => 'Top-left',
-            1 => 'Top Near-left',
-            2 => 'Top',
-            3 => 'Top Near-right',
-            4 => 'Top-right',
-            5 => 'Upper-left',
-            6 => 'Upper Near-left',
-            7 => 'Upper-midle',
-            8 => 'Upper Near-right',
-            9 => 'Upper-right',
-            10 => 'Far Left',
-            11 => 'Left',
-            12 => 'Near-left',
-            13 => 'Center',
-            14 => 'Near-right',
-            15 => 'Right',
-            16 => 'Far Right',
-            17 => 'Lower-left',
-            18 => 'Lower Near-left',
-            19 => 'Lower-middle',
-            20 => 'Lower Near-right',
-            21 => 'Lower-right',
-            22 => 'Bottom-left',
-            23 => 'Bottom Near-left',
-            24 => 'Bottom',
-            25 => 'Bottom Near-right',
-            26 => 'Bottom-right',
-        }},
+        PrintConv => {
+            0 => '(none)',
+            BITMASK => {
+                0 => 'Top-left',
+                1 => 'Top Near-left',
+                2 => 'Top',
+                3 => 'Top Near-right',
+                4 => 'Top-right',
+                5 => 'Upper-left',
+                6 => 'Upper Near-left',
+                7 => 'Upper-middle',
+                8 => 'Upper Near-right',
+                9 => 'Upper-right',
+                10 => 'Far Left',
+                11 => 'Left',
+                12 => 'Near-left',
+                13 => 'Center',
+                14 => 'Near-right',
+                15 => 'Right',
+                16 => 'Far Right',
+                17 => 'Lower-left',
+                18 => 'Lower Near-left',
+                19 => 'Lower-middle',
+                20 => 'Lower Near-right',
+                21 => 'Lower-right',
+                22 => 'Bottom-left',
+                23 => 'Bottom Near-left',
+                24 => 'Bottom',
+                25 => 'Bottom Near-right',
+                26 => 'Bottom-right',
+            },
+        },
     }],
     0x0010 => { #PH
         Name => 'FocusPosition',
@@ -1291,7 +1341,7 @@ my %binaryDataAttrs = (
         # ranges from 0-12 for my Optio WP - PH
         Notes => q{
             calibrated differently for different models.  For the Optio WP, add 6 to get
-            approximate Light Value.  May not be valid for some models, ie. Optio S
+            approximate Light Value.  May not be valid for some models, eg. Optio S
         },
     },
     0x0016 => { #PH
@@ -1589,6 +1639,7 @@ my %binaryDataAttrs = (
             # note: doesn't apply to digital filters applied when picture is taken
             '4 0 0 0' => 'Digital Filter 4', #PH (K10D)
             '6 0 0 0' => 'Digital Filter 6', #PH (K-5)
+            '8 0 0 0' => 'Red-eye Correction', #PH (WG-10)
             '16 0 0 0' => 'Frame Synthesis?',
         },
     },
@@ -1751,19 +1802,22 @@ my %binaryDataAttrs = (
         Notes => '*istD only',
         ValueConv => '$val & 0x7ff', # ignore other bits for now
         PrintConvColumns => 2,
-        PrintConv => { BITMASK => {
-            0 => 'Upper-left',
-            1 => 'Top',
-            2 => 'Upper-right',
-            3 => 'Left',
-            4 => 'Mid-left',
-            5 => 'Center',
-            6 => 'Mid-right',
-            7 => 'Right',
-            8 => 'Lower-left',
-            9 => 'Bottom',
-            10 => 'Lower-right',
-        } },
+        PrintConv => {
+            0 => '(none)',
+            BITMASK => {
+                0 => 'Upper-left',
+                1 => 'Top',
+                2 => 'Upper-right',
+                3 => 'Left',
+                4 => 'Mid-left',
+                5 => 'Center',
+                6 => 'Mid-right',
+                7 => 'Right',
+                8 => 'Lower-left',
+                9 => 'Bottom',
+                10 => 'Lower-right',
+            },
+        },
     },
     # 0x003d - int16u: 8192 for most images, but occasionally 11571 for K100D/K110D,
     #              and 8289 or 8456 for the K-x - PH
@@ -1878,7 +1932,7 @@ my %binaryDataAttrs = (
         # 246 [7], and 209 [18 (one of the first 20 shots)], so there must be a number
         # of test images shot in the factory. (But my new K-5 started at 1 - PH)
         # This count includes shutter actuations even if they don't result in a
-        # recorded image (ie. manual white balance frame or digital preview), but
+        # recorded image (eg. manual white balance frame or digital preview), but
         # does not include actuations due to Live View or video recording - PH
         Name => 'ShutterCount',
         Writable => 'undef',
@@ -1901,7 +1955,7 @@ my %binaryDataAttrs = (
         Format => 'undef', # (written as int8u)
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::FaceInfo' },
     },
-    0x0062 => { # (http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4803.0.html)
+    0x0062 => { #forum4803
         Name => 'RawDevelopmentProcess',
         Condition => '$$self{Make} =~ /^(PENTAX|RICOH)/', # rules out Kodak, which also use this tag
         Writable => 'int16u',
@@ -1918,6 +1972,7 @@ my %binaryDataAttrs = (
             11 => '11 (Q10)',
             12 => '12 (MX-1)',
             13 => '13 (K-3)',
+            14 => '14 (645Z)',
         },
     },
     0x0067 => { #PH (K-5)
@@ -1952,16 +2007,14 @@ my %binaryDataAttrs = (
         Writable => 'undef',
         Format => 'int8u',
         Count => 4,
-        PrintConv => {
-            '0 0 0 0' => 'Off',
-            '0 1 0 0' => 'Off (enabled)', # (not yet observed)
-            '0 2 0 0' => 'Off (auto)', # (K-01)
-            '1 0 0 0' => 'On',
-            '1 1 0 0' => 'On (enabled)', # (K-01)
-            '1 2 0 0' => 'On (auto)', # (K-01)
-            '0 2' => 'Off 2 (auto)', # (NC, WG-3)
-            '1 2' => 'On 2 (auto)', # (NC, WG-3)
-        },
+        PrintConv => [{
+            0 => 'Off',
+            1 => 'On',
+        },{
+            0 => 0,
+            1 => 'Enabled', # (K-01)
+            2 => 'Auto', # (K-01)
+        }],
     },
     0x006b => { #PH (K-5)
         Name => 'TimeInfo',
@@ -2369,12 +2422,12 @@ my %binaryDataAttrs = (
     ],
     0x0209 => { #PH
         Name => 'AEMeteringSegments',
-        Condition => '$count <= 77', # (doesn't work for K-3)
         Format => 'int8u',
         Count => -1,
         Notes => q{
             measurements from each of the 16 AE metering segments for models such as the
-            K10D, and 77 metering segments for models such as the K-5, converted to LV
+            K10D, 77 metering segments for models such as the K-5, and 4050 metering
+            segments for the K-3, converted to LV
         },
         %convertMeteringSegments,
         #  16 metering segment              77 metering segment
@@ -2393,14 +2446,12 @@ my %binaryDataAttrs = (
     },
     0x020a => { #PH/JD/19
         Name => 'FlashMeteringSegments',
-        Condition => '$count <= 77', # (likely doesn't work for K-3)
         Format => 'int8u',
         Count => -1,
         %convertMeteringSegments,
     },
     0x020b => { #PH/JD/19
         Name => 'SlaveFlashMeteringSegments',
-        Condition => '$count <= 77', # (likely doesn't work for K-3)
         Format => 'int8u',
         Count => -1,
         Notes => 'used in wireless control mode',
@@ -2707,8 +2758,7 @@ my %binaryDataAttrs = (
     },
     1 => {
         Name => 'ShakeReduction',
-        # (ref http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5425.0.html)
-        PrintConv => {
+        PrintConv => { #forum5425
             0 => 'Off', # (NC for K-3)
             1 => 'On', # (NC for K-3)
             4 => 'Off (AA simulation off)',
@@ -2909,7 +2959,7 @@ my %binaryDataAttrs = (
     2.1 => {
         Name => 'MeteringMode2',
         Mask => 0x0f,
-        Notes => 'may not be valid for some models, ie. *ist D',
+        Notes => 'may not be valid for some models, eg. *ist D',
         PrintConv => {
             0 => 'Multi-segment',
             BITMASK => {
@@ -3513,7 +3563,7 @@ my %binaryDataAttrs = (
         Name => 'AEError',
         Format => 'int8s',
         # this is usually zero except in M exposure mode, but it can be non-zero
-        # in other modes (ie. if you hit an aperture limit in Tv mode)
+        # in other modes (eg. if you hit an aperture limit in Tv mode)
         ValueConv => '-($val-64)/8', # (negate to make overexposed positive)
         ValueConvInv => '-$val * 8 + 64',
     },
@@ -4361,6 +4411,7 @@ my %binaryDataAttrs = (
         ValueConvInv => '$val',
         PrintConvColumns => 2,
         PrintConv => {
+            0 => '(none)',
             0x07ff => 'All',
             0x0777 => 'Central 9 points',
             BITMASK => {
@@ -5489,6 +5540,7 @@ my %binaryDataAttrs = (
         Groups => { 1 => 'GPS', 2 => 'Time' },
         Format => 'rational64u[3]',
         ValueConv => 'Image::ExifTool::GPS::ConvertTimeStamp($val)',
+        PrintConv => 'Image::ExifTool::GPS::PrintTimeStamp($val)',
     },
     0x134 => {
         Name => 'GPSSatellites',
@@ -5661,7 +5713,7 @@ sub PrintFilter($$$)
 #------------------------------------------------------------------------------
 # Convert Pentax hex-based EV (modulo 8) to real number
 # Inputs: 0) value to convert
-# ie) 0x00 -> 0
+# eg) 0x00 -> 0
 #     0x03 -> 0.33333
 #     0x04 -> 0.5
 #     0x05 -> 0.66666

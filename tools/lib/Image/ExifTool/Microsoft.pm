@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.10';
+$VERSION = '1.13';
 
 sub ProcessXtra($$$);
 
@@ -88,8 +88,8 @@ sub ProcessXtra($$$);
     Rating => {
         Name => 'RatingPercent',
         Notes => q{
-            normal Rating values of 1,2,3,4 and 5 stars correspond to RatingPercent
-            values of 1,25,50,75 and 99 respectively
+            called Rating by the spec.  XMP-xmp:Rating values of 1,2,3,4 and 5 stars
+            correspond to RatingPercent values of 1,25,50,75 and 99 respectively
         },
     },
 );
@@ -132,6 +132,11 @@ sub ProcessXtra($$$);
 my %sRegions = (
     STRUCT_NAME => 'Microsoft Regions',
     NAMESPACE   => 'MPReg',
+    NOTES => q{
+        Note that PersonLiveIdCID element is called PersonLiveCID according to the
+        Microsoft specification, but in practice their software actually writes
+        PersonLiveIdCID, so ExifTool uses this too.
+    },
     Rectangle         => { },
     PersonDisplayName => { },
     PersonEmailDigest => { },
@@ -440,7 +445,7 @@ my %sRegions = (
     '{F29F85E0-4FF9-1068-AB91-08002B27B3D9} 6'     => 'Comments',
     '{64440492-4C8B-11D1-8B70-080036B11A03} 11'    => {
         Name => 'Copyright',
-        Groups => { 2 => 'Copyright' },
+        Groups => { 2 => 'Author' },
     },
     '{56A3372E-CE9C-11D2-9F0E-006097C686F6} 2'     => 'Artist',
     '{56A3372E-CE9C-11D2-9F0E-006097C686F6} 4'     => 'AlbumTitle',

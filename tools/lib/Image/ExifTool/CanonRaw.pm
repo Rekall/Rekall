@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.56';
+$VERSION = '1.57';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -74,9 +74,7 @@ sub BuildMakerNotes($$$$$$);
     0x080a => {
         Name => 'CanonRawMakeModel',
         Writable => 0,
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::CanonRaw::MakeModel',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::CanonRaw::MakeModel' },
     },
     0x080b => { Name => 'CanonFirmwareVersion', Writable => 'string[32]' },
     0x080c => { Name => 'ComponentVersion',     Writable => 'string'     }, #3
@@ -120,16 +118,12 @@ sub BuildMakerNotes($$$$$$);
     0x1029 => {
         Name => 'CanonFocalLength',
         Writable => 0,
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Canon::FocalLength',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Canon::FocalLength' },
     },
     0x102a => {
         Name => 'CanonShotInfo',
         Writable => 0,
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Canon::ShotInfo',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Canon::ShotInfo' },
     },
     0x102c => {
         Name => 'CanonColorInfo2',
@@ -142,9 +136,7 @@ sub BuildMakerNotes($$$$$$);
     0x102d => {
         Name => 'CanonCameraSettings',
         Writable => 0,
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Canon::CameraSettings',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Canon::CameraSettings' },
     },
     0x1030 => { #4
         Name => 'WhiteSample',
@@ -157,9 +149,7 @@ sub BuildMakerNotes($$$$$$);
     0x1031 => {
         Name => 'SensorInfo',
         Writable => 0,
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Canon::SensorInfo',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Canon::SensorInfo' },
     },
     # this tag has only be verified for the 10D in CRW files, but the D30 and D60
     # also produce CRW images and have CustomFunction information in their JPEG's
@@ -201,9 +191,7 @@ sub BuildMakerNotes($$$$$$);
     0x1038 => {
         Name => 'CanonAFInfo',
         Writable => 0,
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Canon::AFInfo',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Canon::AFInfo' },
     },
     0x1093 => {
         Name => 'CanonFileInfo',
@@ -215,12 +203,7 @@ sub BuildMakerNotes($$$$$$);
     0x10a9 => {
         Name => 'ColorBalance',
         Writable => 0,
-        SubDirectory => {
-            # this offset is necessary because the table contains short rationals
-            # (4 bytes long) but the first entry is 2 bytes into the table.
-            Start => '2',
-            TagTable => 'Image::ExifTool::Canon::ColorBalance',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Canon::ColorBalance' },
     },
     0x10b5 => { #PH
         Name => 'RawJpgInfo',
@@ -245,9 +228,7 @@ sub BuildMakerNotes($$$$$$);
     0x1803 => { #3
         Name => 'ImageFormat',
         Writable => 0,
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::CanonRaw::ImageFormat',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::CanonRaw::ImageFormat' },
     },
     0x1804 => { Name => 'RecordID', Writable => 'int32u' }, #3
     0x1806 => { #3
@@ -330,9 +311,7 @@ sub BuildMakerNotes($$$$$$);
         Name => 'ExposureInfo',
         Groups => { 1 => 'CIFF' }, # (only so CIFF shows up in group lists)
         Writable => 0,
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::CanonRaw::ExposureInfo',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::CanonRaw::ExposureInfo' },
     },
     0x1834 => { #PH
         Name => 'CanonModelID',
@@ -348,9 +327,7 @@ sub BuildMakerNotes($$$$$$);
     0x1835 => {
         Name => 'DecoderTable',
         Writable => 0,
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::CanonRaw::DecoderTable',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::CanonRaw::DecoderTable' },
     },
     0x183b => { #PH
         # display format for serial number
@@ -837,7 +814,7 @@ sub ProcessCRW($$)
     # initialize maker note data if building maker notes
     $buildMakerNotes and InitMakerNotes($et);
 
-    # set the FileType tag unless already done (ie. APP0 CIFF record in JPEG image)
+    # set the FileType tag unless already done (eg. APP0 CIFF record in JPEG image)
     $et->SetFileType();
 
     # build directory information for main raw directory

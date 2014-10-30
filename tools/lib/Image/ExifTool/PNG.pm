@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.31';
+$VERSION = '1.33';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -63,6 +63,7 @@ my %pngMap = (
     XMP          => 'PNG',
     ICC_Profile  => 'PNG',
     Photoshop    => 'PNG',
+   'PNG-pHYs'    => 'PNG',
     IPTC         => 'Photoshop',
     MakerNotes   => 'ExifIFD',
 );
@@ -98,6 +99,10 @@ $Image::ExifTool::PNG::colorType = -1;
     },
     gAMA => {
         Name => 'Gamma',
+        Notes => q{
+            ExifTool reports the gamma for decoding the image, which is consistent with
+            the EXIF convention, but is the inverse of the stored encoding gamma
+        },
         ValueConv => 'my $a=unpack("N",$val);$a ? int(1e9/$a+0.5)/1e4 : $val',
     },
     gIFg => {
@@ -155,7 +160,10 @@ $Image::ExifTool::PNG::colorType = -1;
     },
     pHYs => {
         Name => 'PhysicalPixel',
-        SubDirectory => { TagTable => 'Image::ExifTool::PNG::PhysicalPixel' },
+        SubDirectory => { 
+            TagTable => 'Image::ExifTool::PNG::PhysicalPixel',
+            DirName => 'PNG-pHYs', # (needed for writing)
+        },
     },
     PLTE => {
         Name => 'Palette',
@@ -288,7 +296,15 @@ $Image::ExifTool::PNG::colorType = -1;
 # PNG pHYs chunk
 %Image::ExifTool::PNG::PhysicalPixel = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 2 => 'Image' },
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    WRITABLE => 1,
+    GROUPS => { 1 => 'PNG-pHYs', 2 => 'Image' },
+    WRITE_GROUP => 'PNG-pHYs',
+    NOTES => q{
+        These tags are found in the PNG pHYs chunk and belong to the PNG-pHYs family
+        1 group.  They are all created together with default values if necessary
+        when any of these tags is written, and may only be deleted as a group.
+    },
     0 => {
         Name => 'PixelsPerUnitX',
         Format => 'int32u',
@@ -299,7 +315,7 @@ $Image::ExifTool::PNG::colorType = -1;
     },
     8 => {
         Name => 'PixelUnits',
-        PrintConv => { 0 => 'Unknown', 1 => 'Meters' },
+        PrintConv => { 0 => 'Unknown', 1 => 'meters' },
     },
 );
 
@@ -309,7 +325,7 @@ $Image::ExifTool::PNG::colorType = -1;
     GROUPS => { 2 => 'Image' },
     0 => {
         Name => 'SubjectUnits',
-        PrintConv => { 1 => 'Meters', 2 => 'Radians' },
+        PrintConv => { 1 => 'meters', 2 => 'radians' },
     },
     1 => {
         Name => 'SubjectPixelWidth',
@@ -375,7 +391,7 @@ my %unreg = ( Notes => 'unregistered' );
         available, or tEXt otherwise.  Standard XMP is written as uncompressed iTXt.
 
         Alternate languages are accessed by suffixing the tag name with a '-',
-        followed by an RFC 3066 language code (ie. "PNG:Comment-fr", or
+        followed by an RFC 3066 language code (eg. "PNG:Comment-fr", or
         "Title-en-US").  See L<http://www.ietf.org/rfc/rfc3066.txt> for the RFC 3066
         specification.
 
@@ -536,7 +552,7 @@ sub StandardLangCase($)
 
 #------------------------------------------------------------------------------
 # Get localized version of tagInfo hash
-# Inputs: 0) tagInfo hash ref, 1) language code (ie. "x-default")
+# Inputs: 0) tagInfo hash ref, 1) language code (eg. "x-default")
 # Returns: new tagInfo hash ref, or undef if invalid
 sub GetLangInfo($$)
 {
@@ -640,12 +656,13 @@ sub FoundPNG($$$$;$$$$)
             # nothing more to do if writing and subdirectory is not writable
             my $subTable = GetTagTable($$subdir{TagTable});
             return 1 if $outBuff and not $$subTable{WRITE_PROC};
+            my $dirName = $$subdir{DirName} || $tagName;
             my %subdirInfo = (
                 DataPt   => \$val,
                 DirStart => 0,
                 DataLen  => $len,
                 DirLen   => $len,
-                DirName  => $tagName,
+                DirName  => $dirName,
                 TagInfo  => $tagInfo,
                 ReadOnly => 1, # (only used by WriteXMP)
                 OutBuff  => $outBuff,
@@ -654,7 +671,7 @@ sub FoundPNG($$$$;$$$$)
             undef $processProc if $wasCompressed and $processProc eq \&ProcessPNG_Compressed;
             # rewrite this directory if necessary (but always process TextualData normally)
             if ($outBuff and not $processProc and $subTable ne \%Image::ExifTool::PNG::TextualData) {
-                return 1 unless $$et{EDIT_DIRS}{$tagName};
+                return 1 unless $$et{EDIT_DIRS}{$dirName};
                 $$outBuff = $et->WriteDirectory(\%subdirInfo, $subTable);
                 if ($tagName eq 'XMP' and $$outBuff) {
                     if ($$et{FoundIDAT} and $$et{DEL_GROUP}{XMP}) {
@@ -665,7 +682,7 @@ sub FoundPNG($$$$;$$$$)
                         Image::ExifTool::XMP::ValidateXMP($outBuff,'r');
                     }
                 }
-                DoneDir($et, $tagName, $outBuff, $$tagInfo{NonStandard});
+                DoneDir($et, $dirName, $outBuff, $$tagInfo{NonStandard});
             } else {
                 # issue warning for standard XMP after IDAT (PNGEarlyXMP option)
                 if ($tagName eq 'XMP' and not $$tagInfo{NonStandard} and
@@ -1034,9 +1051,11 @@ sub ProcessPNG($$)
                 # add any new chunks immediately before the IEND chunk
                 AddChunks($et, $outfile) or $err = 1;
             } elsif ($chunk eq 'PLTE' or $chunk eq 'IDAT') {
-                # add XMP before IDAT if specified
-                if ($earlyXMP and $chunk eq 'IDAT') {
-                    AddChunks($et, $outfile, 'XMP') or $err = 1;
+                if ($chunk eq 'IDAT') {
+                    # add XMP before IDAT if specified
+                    AddChunks($et, $outfile, 'XMP') or $err = 1 if $earlyXMP;
+                    # pHYs comes before IDAT
+                    AddChunks($et, $outfile, 'PNG-pHYs') or $err = 1;
                 }
                 # iCCP chunk must come before PLTE and IDAT
                 # (ignore errors -- will add later as text profile if this fails)

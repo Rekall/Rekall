@@ -8,6 +8,7 @@
 #               16/04/2011 - P. Harvey Decode NikonCaptureEditVersions
 #
 # References:   1) http://www.cybercom.net/~dcoffin/dcraw/
+#               2) Iliah Borg private communication (LibRaw)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::NikonCapture;
@@ -17,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.10';
+$VERSION = '1.13';
 
 sub ProcessNikonCapture($$$);
 
@@ -93,6 +94,11 @@ my %unsharpColor = (
         Writable => 'string', # (null terminated)
     },
     # 0x3e726567 added when I rotated by 90 degrees
+    0x416391c6 => {
+        Name => 'QuickFix',
+        Writable => 'int8u',
+        PrintConv => \%offOn,
+    },
     0x56a54260 => {
         Name => 'Exposure',
         SubDirectory => {
@@ -165,6 +171,7 @@ my %unsharpColor = (
             TagTable => 'Image::ExifTool::NikonCapture::Brightness',
         },
     },
+  # 0x88f55e48 - related to QuickFix
     0x890ff591 => {
         Name => 'D-LightingHQData',
         SubDirectory => {
@@ -183,7 +190,7 @@ my %unsharpColor = (
             TagTable => 'Image::ExifTool::IPTC::Main',
         },
     },
-  # 0xa7264a72, 0x88f55e48 and 0x416391c6 all change from 0 to 1 when QuickFix is turned on
+  # 0xa7264a72 - related to QuickFix
     0xab5eca5e => {
         Name => 'PhotoEffects',
         Writable => 'int8u',
@@ -346,23 +353,40 @@ my %unsharpColor = (
             1 => 'Use Gray Point',
             2 => 'Recorded Value',
             3 => 'Use Temperature',
-            4 => 'Calculate Automatically'
+            4 => 'Calculate Automatically',
+            5 => 'Auto2', #2
+            6 => 'Underwater', #2
+            7 => 'Auto1',
         },
     },
-    0x14 => {
-        Name => 'WBAdjLightingSubtype',
-        # this varies for different lighting types
-        # (ie. for Daylight, this is 0 => 'Direct', 1 => 'Shade', 2 => 'Cloudy')
-    },
-    0x15 => {
+    0x14 => { #2
         Name => 'WBAdjLighting',
+        Format => 'int16u',
+        PrintHex => 1,
         PrintConv => {
-            0 => 'None',
-            1 => 'Incandescent',
-            2 => 'Daylight',
-            3 => 'Standard Fluorescent',
-            4 => 'High Color Rendering Fluorescent',
-            5 => 'Flash',
+            0x000 => 'None',
+            0x100 => 'Incandescent',
+            0x200 => 'Daylight (direct sunlight)',
+            0x201 => 'Daylight (shade)',
+            0x202 => 'Daylight (cloudy)',
+            0x300 => 'Standard Fluorescent (warm white)',
+            0x301 => 'Standard Fluorescent (3700K)',
+            0x302 => 'Standard Fluorescent (cool white)',
+            0x303 => 'Standard Fluorescent (5000K)',
+            0x304 => 'Standard Fluorescent (daylight)',
+            0x305 => 'Standard Fluorescent (high temperature mercury vapor)',
+            0x400 => 'High Color Rendering Fluorescent (warm white)',
+            0x401 => 'High Color Rendering Fluorescent (3700K)',
+            0x402 => 'High Color Rendering Fluorescent (cool white)',
+            0x403 => 'High Color Rendering Fluorescent (5000K)',
+            0x404 => 'High Color Rendering Fluorescent (daylight)',
+            0x500 => 'Flash',
+            0x501 => 'Flash (FL-G1 filter)',
+            0x502 => 'Flash (FL-G2 filter)',
+            0x503 => 'Flash (TN-A1 filter)',
+            0x504 => 'Flash (TN-A2 filter)',
+            0x600 => 'Sodium Vapor Lamps',
+            # 0x1002 => seen for WBAdjMode modes of Underwater and Calculate Automatically
         },
     },
     0x18 => {
@@ -461,6 +485,7 @@ my %unsharpColor = (
         PrintConv => {
             0 => 'Faster',
             1 => 'Better Quality',
+            2 => 'Better Quality 2013',
         },
     },
     0x15 => {
@@ -654,6 +679,8 @@ my %unsharpColor = (
             3 => 'Normal',
             4 => 'High',
             6 => 'Extra High',
+            7 => 'Extra High 1',
+            8 => 'Extra High 2',
         },
     },
 );
@@ -695,7 +722,7 @@ sub WriteNikonCapture($$$)
     # make sure the capture data is properly contained
     SetByteOrder('II');
     my $tagID = Get32u($dataPt, $dirStart);
-    # sometimes size includes 18 header bytes, and other times it doesn't (ie. ViewNX 2.1.1)
+    # sometimes size includes 18 header bytes, and other times it doesn't (eg. ViewNX 2.1.1)
     my $size = Get32u($dataPt, $dirStart + 18);
     my $pad = $dirLen - $size - 18; 
     unless ($tagID == 0x7a86a940 and ($pad >= 0 or $pad == -18)) {
@@ -860,9 +887,11 @@ sub ProcessNikonCapture($$$)
                 $value = substr($$dataPt, $pos, $size);
             }
             $et->HandleTag($tagTablePtr, $tagID, $value,
-                DataPt => $dataPt,
-                Start  => $pos,
-                Size   => $size,
+                DataPt  => $dataPt,
+                DataPos => $$dirInfo{DataPos},
+                Base    => $$dirInfo{Base},
+                Start   => $pos,
+                Size    => $size,
             ) and $success = 1;
         }
         $pos += $size;

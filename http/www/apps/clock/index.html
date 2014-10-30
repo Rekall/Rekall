@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+		<meta http-equiv="Content-Language" content="fr">
+		<meta name="language" content="fr">
+		<meta name="designer" content="buzzing light">  
+		<meta name="copyright" content="buzzing light">
+		<meta name="HandheldFriendly" content="true" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">    
+	
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+		<link rel="stylesheet" type="text/css" href="apps/clock/theme.css" />
+		
+		<title>Rekall</title>
+	                                                                 
+	    <script language="javascript" type='text/javascript' src='js/libs/jquery.min.js'></script>                  
+		<script language="javascript" type='text/javascript' src='js/libs/moment.min.js'></script>
+	    <script language="javascript" type='text/javascript' src='js/libs/jquery-ui.min.js'></script>                  
+		<script language="javascript" type='text/javascript' src='js/libs/url.min.js'></script>
+
+		<script language="javascript" type='text/javascript' src='js/iannix.js'></script>
+		<script language="javascript" type='text/javascript' src='js/rekall/Utils.js'></script>
+		
+		<script language="javascript" type='text/javascript' src='/apps/clock/script.js'></script>
+		
+		<script language="javascript" type='text/javascript'>
+			window.onresize = function(event) {
+		    	documentReady();
+			};
+			$(document).ready(function() { 
+				documentReady();
+			});	
+		</script>		
+	</head> 
+
+	<body class='unselectable'>
+		<div id='ruban'></div>
+		<ul id='clock_menu'>
+			<li clockMenuId="clk">clock</li>
+			<li clockMenuId="elp">elapsed</li>
+			<li clockMenuId="rst">restart</li>
+			<li clockMenuId="txt">custom</li>
+		</ul>
+		<div id='clock_sync'>
+			00:00.000
+		</div>
+	</body>
+</html>                              

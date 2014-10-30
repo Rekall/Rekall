@@ -23,7 +23,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
 sub ProcessFLIR($$;$);
 sub ProcessFLIRText($$$);
@@ -45,6 +45,7 @@ my %floatKelvin = (
 # commonly used tag information elements
 my %float1f = ( Format => 'float', PrintConv => 'sprintf("%.1f",$val)' );
 my %float2f = ( Format => 'float', PrintConv => 'sprintf("%.2f",$val)' );
+my %float6f = ( Format => 'float', PrintConv => 'sprintf("%.6f",$val)' );
 my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
 
 # FLIR makernotes tags (ref PH)
@@ -93,10 +94,15 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
 %Image::ExifTool::FLIR::FFF = (
     GROUPS => { 0 => 'APP1', 2 => 'Image' },
     PROCESS_PROC => \&ProcessFLIR,
+    VARS => { ALPHA_FIRST => 1 },
     NOTES => q{
         Information extracted from FLIR FFF images and the FLIR APP1 segment of JPEG
         images.  These tags may also be extracted from the first frame of an FLIR
-        SEQ file, even though SEQ is not listed as a supported file type.
+        SEQ file.
+    },
+    "_header" => {
+        Name => 'FFFHeader',
+        SubDirectory => { TagTable => 'Image::ExifTool::FLIR::Header' },
     },
     # 0 = free (ref 3)
     0x01 => {
@@ -171,6 +177,15 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
         Name => 'ParameterInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::FLIR::ParamInfo' },
     },
+);
+
+# FFF file header (ref PH)
+%Image::ExifTool::FLIR::Header = (
+    GROUPS => { 0 => 'APP1', 2 => 'Image' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FIRST_ENTRY => 0,
+    NOTES => 'Tags extracted from the FLIR FFF/AFF header.',
+    4 => { Name => 'CreatorSoftware', Format => 'string[16]' },
 );
 
 # FLIR raw data record (ref PH)
@@ -393,11 +408,11 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     0x5c => { Name => 'PlanckB',  %float8g }, #1
     0x60 => { Name => 'PlanckF',  %float8g }, #1
     # 0x64,0x68,0x6c: 0
-    # 0x70 - float: 0.006568
-    # 0x74 - float: 0.012620
-    # 0x78 - float: -0.00227
-    # 0x7c - float: -0.00667
-    # 0x80 - float: 1.89999
+    0x070 => { Name => 'AtmosphericTransAlpha1', %float6f }, #1 (value: 0.006569)
+    0x074 => { Name => 'AtmosphericTransAlpha2', %float6f }, #1 (value: 0.012620)
+    0x078 => { Name => 'AtmosphericTransBeta1',  %float6f }, #1 (value: -0.002276)
+    0x07C => { Name => 'AtmosphericTransBeta2',  %float6f }, #1 (value: -0.006670)
+    0x080 => { Name => 'AtmosphericTransX',      %float6f }, #1 (value: 1.900000)
     # 0x84,0x88: 0
     # 0x8c - float: 0,4,6
     0x90 => { Name => 'CameraTemperatureRangeMax', %floatKelvin },
@@ -414,7 +429,7 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     0x114 => { Name => 'CameraSoftware',    Format => 'string[16]' }, #1/PH (NC)
     0x170 => { Name => 'LensModel',         Format => 'string[32]' },
     # note: it seems that FLIR updated their lenses at some point, so lenses with the same
-    # name may have different part numbers (ie. the FOL38 is either 1196456 or T197089)
+    # name may have different part numbers (eg. the FOL38 is either 1196456 or T197089)
     0x190 => { Name => 'LensPartNumber',    Format => 'string[16]' },
     0x1a0 => { Name => 'LensSerialNumber',  Format => 'string[16]' },
     0x1b4 => { Name => 'FieldOfView',       Format => 'float', PrintConv => 'sprintf("%.1f deg", $val)' }, #1
@@ -1119,6 +1134,59 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     15 => { Name => 'UnknownTemperature2', %floatKelvin, Unknown => 1 }, # (60.0 C)
 );
 
+# FLIR AFF tag table (ref PH)
+%Image::ExifTool::FLIR::AFF = (
+    GROUPS => { 0 => 'FLIR', 1 => 'FLIR', 2 => 'Image' },
+    NOTES => 'Tags extracted from FLIR "AFF" SEQ images.',
+    VARS => { ALPHA_FIRST => 1 },
+    "_header" => {
+        Name => 'AFFHeader',
+        SubDirectory => { TagTable => 'Image::ExifTool::FLIR::Header' },
+    },
+    0x01 => {
+        Name => 'AFF1',
+        SubDirectory => { TagTable => 'Image::ExifTool::FLIR::AFF1' },
+    },
+    0x05 => {
+        Name => 'AFF5',
+        SubDirectory => { TagTable => 'Image::ExifTool::FLIR::AFF5' },
+    },
+);
+
+# AFF record type 1 (ref forum?topic=4898.msg27627)
+%Image::ExifTool::FLIR::AFF1 = (
+    GROUPS => { 0 => 'FLIR', 1 => 'FLIR', 2 => 'Camera' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    0x00 => {
+        # use this tag only to determine the byte order of the raw data
+        # (the value should be 0x0002 if the byte order is correct)
+        Name => 'RawDataByteOrder',
+        Hidden => 1,
+        RawConv => 'ToggleByteOrder() if $val >= 0x0100; undef',
+    },
+    0x01 => { Name => 'SensorWidth',  Format => 'int16u' },
+    0x02 => { Name => 'SensorHeight', Format => 'int16u' },
+);
+
+# AFF record type 5 (ref forum?topic=4898.msg27628)
+%Image::ExifTool::FLIR::AFF5 = (
+    GROUPS => { 0 => 'FLIR', 1 => 'FLIR', 2 => 'Camera' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    0x12 => {
+        # use this tag only to determine the byte order of the raw data
+        # (the value should be 0x0002 if the byte order is correct)
+        Name => 'RawDataByteOrder',
+        Hidden => 1,
+        RawConv => 'ToggleByteOrder() if $val >= 0x0100; undef',
+    },
+    0x13 => { Name => 'SensorWidth',  Format => 'int16u' },
+    0x14 => { Name => 'SensorHeight', Format => 'int16u' },
+);
+
 # FLIR composite tags (ref 1)
 %Image::ExifTool::FLIR::Composite = (
     GROUPS => { 1 => 'FLIR', 2 => 'Camera' },
@@ -1170,7 +1238,7 @@ sub GetImageType($$$)
 sub UnescapeFLIR($)
 {
     my $char = shift;
-    return $char unless length $char eq 4; # escaped ASCII char (ie. '\\')
+    return $char unless length $char eq 4; # escaped ASCII char (eg. '\\')
     my $val = hex $char;
     return chr($val) if $val < 0x80;   # simple ASCII
     return pack('C0U', $val) if $] >= 5.006001;
@@ -1290,17 +1358,19 @@ sub ProcessFLIR($$;$)
     my $raf = $$dirInfo{RAF} || new File::RandomAccess($$dirInfo{DataPt});
     my $verbose = $et->Options('Verbose');
     my $out = $et->Options('TextOut');
-    my ($i, $buff, $rec);
+    my ($i, $hdr, $buff, $rec);
 
     # read and verify FFF header
-    $raf->Read($buff, 0x40) == 0x40 and $buff =~ /^FFF\0/ or return 0;
+    $raf->Read($hdr, 0x40) == 0x40 and $hdr =~ /^([AF]FF)\0/ or return 0;
 
-    # set file type if reading from FFF file ($tagTablePtr will not be defined)
-    $et->SetFileType() unless $tagTablePtr;
+    my $type = $1;
+
+    # set file type if reading from FFF or SEQ file ($tagTablePtr will not be defined)
+    $et->SetFileType($type eq 'FFF' ? 'FLIR' : 'SEQ') unless $tagTablePtr;
 
     # FLIR file header (ref 3)
     # 0x00 - string[4] file format ID = "FFF\0"
-    # 0x04 - string[16] file origin: seen "\0","MTX IR\0","CAMCTRL\0"
+    # 0x04 - string[16] file creator: seen "\0","MTX IR\0","CAMCTRL\0"
     # 0x14 - int32u file format version = 100
     # 0x18 - int32u offset to record directory
     # 0x1c - int32u number of entries in record directory
@@ -1312,24 +1382,31 @@ sub ProcessFLIR($$;$)
 
     # determine byte ordering by validating version number
     # (in my samples FLIR APP1 is big-endian, FFF files are little-endian)
-    my $ver = Get32u(\$buff, 0x14);
+    my $ver = Get32u(\$hdr, 0x14);
     if ($ver != 100) {
-        $ver == 0x64000000 or $et->Warn('Unsupported FLIR FFF version'), return 1;
+        $ver == 0x64000000 or $et->Warn("Unsupported FLIR $type version"), return 1;
         ToggleByteOrder();
     }
 
     # read the FLIR record directory
-    my $pos = Get32u(\$buff, 0x18);
-    my $num = Get32u(\$buff, 0x1c);
+    my $pos = Get32u(\$hdr, 0x18);
+    my $num = Get32u(\$hdr, 0x1c);
     unless ($raf->Seek($pos) and $raf->Read($buff, $num * 0x20) == $num * 0x20) {
         $et->Warn('Truncated FLIR FFF directory');
         return 1;
     }
 
     unless ($tagTablePtr) {
-        $tagTablePtr = GetTagTable('Image::ExifTool::FLIR::FFF');
+        $tagTablePtr = GetTagTable("Image::ExifTool::FLIR::$type");
         $$et{SET_GROUP0} = 'FLIR'; # (set group 0 to 'FLIR' for FFF files)
     }
+
+    # process the header data
+    $et->HandleTag($tagTablePtr, '_header', $hdr);
+
+    my $oldIndent = $$et{INDENT};
+    $$et{INDENT} .= '| ';
+    $et->VerboseDir($type, $num);
 
     for ($i=0; $i<$num; ++$i) {
 
@@ -1363,6 +1440,7 @@ sub ProcessFLIR($$;$)
                 DataPos => $recPos,
                 Start   => 0,
                 Size    => $recLen,
+                Index => $i,
             );
         } elsif ($verbose > 2) {
             my %parms = ( DataPos => $recPos, Prefix => $$et{INDENT} );
@@ -1371,6 +1449,7 @@ sub ProcessFLIR($$;$)
         }
     }
     delete $$et{SET_GROUP0};
+    $$et{INDENT} = $oldIndent;
     return 1;
 }
 

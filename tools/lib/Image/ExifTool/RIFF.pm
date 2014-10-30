@@ -18,6 +18,7 @@
 #              11) Andreas Winter (SCLive) private communication
 #              12) http://abcavi.kibi.ru/infotags.htm
 #              13) http://tech.ebu.ch/docs/tech/tech3285.pdf
+#              14) https://developers.google.com/speed/webp/docs/riff_container
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::RIFF;
@@ -26,7 +27,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.37';
+$VERSION = '1.38';
 
 sub ConvertTimecode($);
 
@@ -306,10 +307,9 @@ my %riffMimeType = (
         chunk.  As well as this information, some video information and proprietary
         manufacturer-specific information is also extracted.
         
-        Large AVI videos may be a concatenation of two or more RIFF chunks.
-        For these files, information is extracted from subsequent RIFF
-        chunks as sub-documents, but the Duration is calculated for the full
-        video.
+        Large AVI videos may be a concatenation of two or more RIFF chunks.  For
+        these files, information is extracted from subsequent RIFF chunks as
+        sub-documents, but the Duration is calculated for the full video.
     },
     # (not 100% sure that the concatination technique mentioned above is valid - PH)
    'fmt ' => {
@@ -327,14 +327,6 @@ my %riffMimeType = (
     LIST_exif => {
         Name => 'Exif',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Exif' },
-    },
-    EXIF => { # WEBP Exif tags
-        Name => 'EXIF',
-        Notes => 'EXIF extracted from WEBP images',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Exif::Main',
-            ProcessProc => \&Image::ExifTool::ProcessTIFF,
-        },
     },
     LIST_hdrl => { # AVI header LIST chunk
         Name => 'Hdrl',
@@ -404,6 +396,7 @@ my %riffMimeType = (
     ],
     _PMX => { #PH (Adobe CS3 Bridge)
         Name => 'XMP',
+        Notes => 'AVI and WAV files',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
     },
     JUNQ => { #PH (Adobe CS3 Bridge)
@@ -415,10 +408,52 @@ my %riffMimeType = (
         Name => 'Olym',
         SubDirectory => { TagTable => 'Image::ExifTool::Olympus::WAV' },
     },
-    'VP8 ' => { # (WEBP images)
+#
+# WebP-specific tags
+#
+    EXIF => { # (WebP)
+        Name => 'EXIF',
+        Notes => 'WebP files',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Exif::Main',
+            ProcessProc => \&Image::ExifTool::ProcessTIFF,
+        },
+    },
+   'XMP ' => { #14 (WebP)
+        Name => 'XMP',
+        Notes => 'WebP files',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
+    },
+    ICCP => { #14 (WebP)
+        Name => 'ICC_Profile',
+        Notes => 'WebP files',
+        SubDirectory => { TagTable => 'Image::ExifTool::ICC_Profile::Main' },
+    },
+   'VP8 ' => { # (WebP lossy)
         Name => 'VP8Bitstream',
         Condition => '$$valPt =~ /^...\x9d\x01\x2a/s',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::VP8' },
+    },
+    VP8L => { #14 (WebP lossless)
+        Name => 'VP8L',
+        Condition => '$$valPt =~ /^\x2f/',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::VP8L' },
+    },
+    VP8X => { #14 (WebP extended)
+        Name => 'VP8X',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::VP8X' },
+    },
+    ANIM => { #14 (WebP animation)
+        Name => 'ANIM',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::ANIM' },
+    },
+    ANMF => { #14 (WebP animation frame)
+        Name => 'ANMF',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::ANMF' },
+    },
+    ALPH => { #14 (WebP alpha)
+        Name => 'ALPH',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::ALPH' },
     },
 );
 
@@ -903,6 +938,11 @@ my %riffMimeType = (
 %Image::ExifTool::RIFF::VP8 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Image' },
+    NOTES => q{
+        This chunk is found in simple-format (lossy) WebP files. See
+        L<https://developers.google.com/speed/webp/docs/riff_container> for the WebP
+        container specification.
+    },
     0 => {
         Name => 'VP8Version',
         Mask => 0x0e,
@@ -938,6 +978,110 @@ my %riffMimeType = (
     },
 );
 
+# WebP lossless info (ref 14)
+%Image::ExifTool::RIFF::VP8L = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    NOTES => 'This chunk is found in lossless WebP files.',
+    GROUPS => { 2 => 'Image' },
+    1 => {
+        Name => 'ImageWidth',
+        Format => 'int16u',
+        ValueConv => '($val & 0x3fff) + 1',
+    },
+    2 => {
+        Name => 'ImageHeight',
+        Format => 'int32u',
+        ValueConv => '(($val >> 6) & 0x3fff) + 1',
+    },
+);
+
+# WebP extended info (ref 14)
+%Image::ExifTool::RIFF::VP8X = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
+    NOTES => 'This chunk is found in extended WebP files.',
+    # 0 - bitmask: 2=ICC, 3=alpha, 4=EXIF, 5=XMP, 6=animation
+    4 => {
+        Name => 'ImageWidth',
+        Format => 'int32u',
+        ValueConv => '($val & 0xffffff) + 1',
+    },
+    6 => {
+        Name => 'ImageHeight',
+        Format => 'int32u',
+        ValueConv => '($val >> 8) + 1',
+    },
+);
+
+# WebP animation info (ref 14)
+%Image::ExifTool::RIFF::ANIM = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
+    NOTES => 'WebP animation chunk.',
+    0 => {
+        Name => 'BackgroundColor',
+        Format => 'int8u[4]',
+    },
+    4 => {
+        Name => 'AnimationLoopCount',
+        PrintConv => '$val || "inf"',
+    },
+);
+
+# WebP animation frame info (ref 14)
+%Image::ExifTool::RIFF::ANMF = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
+    NOTES => 'WebP animation frame chunk.',
+    12 => {
+        Name => 'Duration',
+        Format => 'int32u',
+        Notes => 'extracted as the sum of durations of all animation frames',
+        RawConv => q{
+            if (defined $$self{VALUE}{Duration}) {
+                $$self{VALUE}{Duration} += $val & 0x0fff;
+                return undef;
+            }
+            return $val & 0x0fff;
+        },
+        ValueConv => '$val / 1000',
+        PrintConv => 'ConvertDuration($val)',
+    },
+);
+
+# WebP alpha info (ref 14)
+%Image::ExifTool::RIFF::ALPH = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
+    NOTES => 'WebP alpha chunk.',
+    0 => {
+        Name => 'AlphaPreprocessing',
+        Mask => 0x03,
+        PrintConv => {
+            0 => 'none',
+            1 => 'Level Reduction',
+        },
+    },
+    0.1 => {
+        Name => 'AlphaFiltering',
+        Mask => 0x03,
+        PrintConv => {
+            0 => 'none',
+            1 => 'Horizontal',
+            2 => 'Vertical',
+            3 => 'Gradient',
+        },
+    },
+    0.2 => {
+        Name => 'AlphaCompression',
+        Mask => 0x03,
+        PrintConv => {
+            0 => 'none',
+            1 => 'Lossless',
+        },
+    },
+);
+
 # RIFF composite tags
 %Image::ExifTool::RIFF::Composite = (
     Duration => {
@@ -960,7 +1104,7 @@ my %riffMimeType = (
         },
         Desire => {
             # check FrameCount because this calculation only applies
-            # to audio-only files (ie. WAV)
+            # to audio-only files (eg. WAV)
             2 => 'FrameCount',
             3 => 'VideoFrameCount',
         },
@@ -989,7 +1133,7 @@ sub ConvertRIFFDate($)
     my @part = split ' ', $val;
     my $mon;
     if (@part >= 5 and $mon = $monthNum{ucfirst(lc($part[1]))}) {
-        # the standard AVI date format (ie. "Mon Mar 10 15:04:43 2003")
+        # the standard AVI date format (eg. "Mon Mar 10 15:04:43 2003")
         $val = sprintf("%.4d:%.2d:%.2d %s", $part[4],
                        $mon, $part[2], $part[3]);
     } elsif ($val =~ m{(\d{4})/\s*(\d+)/\s*(\d+)/?\s+(\d+):\s*(\d+)\s*(P?)}) {
@@ -1027,9 +1171,9 @@ sub CalcDuration($@)
     my @keyList;
     for (;;) {
         # this is annoying.  Apparently (although I couldn't verify this), FrameCount
-        # in the RIFF header includes multiple video tracks if they exist (ie. with the
+        # in the RIFF header includes multiple video tracks if they exist (eg. with the
         # FujiFilm REAL 3D AVI's), but the video stream information isn't reliable for
-        # some cameras (ie. Olympus FE models), so use the video stream information
+        # some cameras (eg. Olympus FE models), so use the video stream information
         # only if the RIFF header duration is 2 to 3 times longer
         my $dur1 = $val[1] / $val[0] if $val[0];
         if ($val[2] and $val[3]) {
@@ -1266,7 +1410,7 @@ sub ProcessRIFF($$)
                 Base    => $pos,
             );
         } elsif ($tag eq 'RIFF') {
-            # don't read into RIFF chunk (ie. concatenated video file)
+            # don't read into RIFF chunk (eg. concatenated video file)
             $raf->Read($buff, 4) == 4 or $err=1, last;
             # extract information from remaining file as an embedded file
             $$et{DOC_NUM} = ++$$et{DOC_COUNT}
@@ -1296,7 +1440,7 @@ This module is used by Image::ExifTool
 
 This module contains routines required by Image::ExifTool to extract
 information from RIFF-based (Resource Interchange File Format) files,
-including Windows WAV audio and AVI video files.
+including AVI videos, WAV audio files and WEBP images.
 
 =head1 AUTHOR
 
@@ -1320,6 +1464,8 @@ under the same terms as Perl itself.
 =item L<http://msdn.microsoft.com/archive/en-us/directx9_c/directx/htm/avirifffilereference.asp>
 
 =item L<http://wiki.multimedia.cx/index.php?title=TwoCC>
+
+=item L<https://developers.google.com/speed/webp/docs/riff_container>
 
 =back
 

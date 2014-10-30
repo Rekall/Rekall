@@ -20,7 +20,7 @@ use Image::ExifTool::PostScript;
 use Image::ExifTool::XMP qw(EscapeXML UnescapeXML);
 require Exporter;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -344,7 +344,7 @@ sub SetHTMLCharset($$)
 #------------------------------------------------------------------------------
 # Convert single UTF-8 character to HTML character reference
 # Inputs: 0) UTF-8 character sequence
-# Returns: HTML character reference (ie. "&quot;");
+# Returns: HTML character reference (eg. "&quot;");
 # Note: Must be called via EscapeHTML to load name lookup
 sub EscapeChar($)
 {
@@ -409,8 +409,8 @@ sub ProcessHTML($$)
 
     # validate HTML or XHTML file
     $raf->Read($buff, 256) or return 0;
-    $buff =~ /^\s*<(!DOCTYPE\s+HTML|HTML|\?xml)/i or return 0;
-    $buff =~ /<(!DOCTYPE\s+)?HTML/i or return 0 if $1 eq '?xml';
+    $buff =~ /^(\xef\xbb\xbf)?\s*<(!DOCTYPE\s+HTML|HTML|\?xml)/i or return 0;
+    $buff =~ /<(!DOCTYPE\s+)?HTML/i or return 0 if $2 eq '?xml';
     $et->SetFileType();
 
     $raf->Seek(0,0) or $et->Warn('Seek error'), return 1;

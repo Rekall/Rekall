@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::it;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 %Image::ExifTool::Lang::it::Translate = (
    'A100DataOffset' => 'Offset dati A100',
@@ -7103,7 +7103,7 @@ $VERSION = '1.10';
    'SubjectReference' => 'Codice Soggetto',
    'SubjectUnits' => {
       PrintConv => {
-        'Radians' => 'Radianti',
+        'radians' => 'Radianti',
       },
     },
    'Subsystem' => {
@@ -7713,7 +7713,9 @@ $VERSION = '1.10';
     },
    'WBAdjLighting' => {
       PrintConv => {
-        'Daylight' => 'Luce del giorno',
+        'Daylight (direct sunlight)' => 'Luce del giorno (0)',
+        'Daylight (shade)' => 'Luce del giorno (1)',
+        'Daylight (cloudy)' => 'Luce del giorno (2)',
         'None' => 'Nessuno',
       },
     },

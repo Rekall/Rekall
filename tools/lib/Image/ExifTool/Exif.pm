@@ -51,7 +51,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.62';
+$VERSION = '3.65';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -1190,7 +1190,9 @@ my %sampleFormat = (
         Format => 'undef',
         Notes => q{
             may contain copyright notices for photographer and editor, separated by a
-            newline in ExifTool
+            newline.  As per the EXIF specification, the newline is replaced by a null
+            byte when writing to file, but this may be avoided by disabling the print
+            conversion
         },
         # internally the strings are separated by a null character in this format:
         # Photographer only: photographer + NULL
@@ -1554,6 +1556,7 @@ my %sampleFormat = (
         },
     },
     0x9102 => 'CompressedBitsPerPixel',
+    # 0x9103 - int16u: 1 (found in Pentax XG-1 samples)
     0x9201 => {
         Name => 'ShutterSpeedValue',
         Notes => 'displayed in seconds, but stored as an APEX value',
@@ -1859,6 +1862,8 @@ my %sampleFormat = (
         PrintConv => {
             0 => 'Normal',
             1 => 'Custom',
+            # 4 - Apple iPhone5c horizontal orientation
+            # 6 - Apple iPhone5c panorama
         },
     },
     0xa402 => {
@@ -1868,7 +1873,7 @@ my %sampleFormat = (
             0 => 'Auto',
             1 => 'Manual',
             2 => 'Auto bracket',
-            # have seen 3 from Samsung EX1 and NX200 - PH
+            # have seen 3 from Samsung EX1, NX30, NX200 - PH
         },
     },
     0xa403 => {
@@ -1901,6 +1906,7 @@ my %sampleFormat = (
             1 => 'Landscape',
             2 => 'Portrait',
             3 => 'Night',
+            # 4 - HDR (Samsung GT-I9300)
         },
     },
     0xa407 => {
@@ -3194,7 +3200,7 @@ sub CalcScaleFactor35efl
             my %lkup = ( 3=>10, 4=>1, 5=>0.001 , cm=>10, mm=>1, um=>0.001 );
             my $units = $lkup{ shift() || $res || '' } || 25.4;
             my $x_res = shift || return undef;
-            my $y_res = shift || return undef;
+            my $y_res = shift || $x_res;
             Image::ExifTool::IsFloat($x_res) and $x_res != 0 or return undef;
             Image::ExifTool::IsFloat($y_res) and $y_res != 0 or return undef;
             my ($w, $h);
@@ -3650,7 +3656,7 @@ sub PrintLensID($$@)
     return join(' or ', @best) if @best;
     return join(' or ', @matches) if @matches;
     $lens = $$printConv{$lensType};
-    return $lensModel if $lensModel and $lens =~ / or /; # (ie. Sony NEX-5N)
+    return $lensModel if $lensModel and $lens =~ / or /; # (eg. Sony NEX-5N)
     return $lens;
 }
 
@@ -3676,7 +3682,7 @@ sub ExifDate($)
 # Returns: time in format '10:30:55'
 # - bad formats recognized: '10 30 55', '103055', '103055+0500'
 # - removes null terminator if it exists
-# - leaves time zone intact if specified (ie. '10:30:55+05:00')
+# - leaves time zone intact if specified (eg. '10:30:55+05:00')
 sub ExifTime($)
 {
     my $time = shift;
@@ -3780,7 +3786,9 @@ sub ProcessExif($$$)
         if ($dirSize > $dirLen) {
             if ($verbose > 0 and not $$dirInfo{SubIFD}) {
                 my $short = $dirSize - $dirLen;
+                $$et{INDENT} =~ s/..$//; # keep indent the same
                 $et->Warn("Short directory size (missing $short bytes)");
+                $$et{INDENT} .= '| ';
             }
             undef $dirSize if $dirEnd > $dataLen; # read from file if necessary
         }
@@ -3869,7 +3877,7 @@ sub ProcessExif($$$)
 
     # loop through all entries in an EXIF directory (IFD)
     my ($index, $valEnd, $offList, $offHash);
-    my $warnCount = 0;
+    my ($warnCount, $lastID) = (0, -1);
     for ($index=0; $index<$numEntries; ++$index) {
         if ($warnCount > 10) {
             $et->Warn("Too many warnings -- $name parsing aborted", 2) and return 0;
@@ -3942,7 +3950,7 @@ sub ProcessExif($$$)
                 my $buff;
                 if ($raf) {
                     # avoid loading large binary data unless necessary
-                    # (ie. ImageSourceData -- layers in Photoshop TIFF image)
+                    # (eg. ImageSourceData -- layers in Photoshop TIFF image)
                     while ($size > BINARY_DATA_LIMIT) {
                         if ($tagInfo) {
                             # make large unknown blocks binary data
@@ -4128,8 +4136,10 @@ sub ProcessExif($$$)
             # (avoids long delays when processing some corrupted files)
             if ($count > 100000 and $formatStr !~ /^(undef|string|binary)$/) {
                 my $tagName = $tagInfo ? $$tagInfo{Name} : sprintf('tag 0x%.4x', $tagID);
-                my $minor = $count > 2000000 ? 0 : 2;
-                next if $et->Warn("Ignoring $dirName $tagName with excessive count", $minor);
+                if ($tagName ne 'TransferFunction' or $count ne 196608) {
+                    my $minor = $count > 2000000 ? 0 : 2;
+                    next if $et->Warn("Ignoring $dirName $tagName with excessive count", $minor);
+                }
             }
             # convert according to specified format
             $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$count,$readSize,\$rational);
@@ -4178,6 +4188,8 @@ sub ProcessExif($$$)
                     $colName = $tagName;
                 }
                 $colName .= ' <span class=V>(err)</span>' if $wrongFormat;
+                $colName .= ' <span class=V>(seq)</span>' if $tagID <= $lastID and not $inMakerNotes;
+                $lastID = $tagID;
                 if (not defined $tval) {
                     $tval = '<bad size/offset>';
                 } else {
@@ -4216,6 +4228,10 @@ sub ProcessExif($$$)
                     $et->HDump($exifDumpPos,$size,"$tagName value",'SAME', $flag);
                 }
             } else {
+                if ($tagID <= $lastID and not $inMakerNotes) {
+                    $et->Warn(sprintf('Tag ID 0x%.4x out of sequence in %s', $tagID, $dirName));
+                }
+                $lastID = $tagID;
                 my $fstr = $formatName[$format];
                 $fstr = "$origFormStr read as $fstr" if $origFormStr;
                 $et->VerboseInfo($tagID, $tagInfo,

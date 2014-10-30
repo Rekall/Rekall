@@ -19,7 +19,7 @@ use strict;
 use vars qw($VERSION $warnString);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.13';
+$VERSION = '1.17';
 
 sub WarnProc($) { $warnString = $_[0]; }
 
@@ -33,7 +33,8 @@ my %openDocType = (
     'application/vnd.oasis.opendocument.presentation' => 'ODP',
     'application/vnd.oasis.opendocument.spreadsheet'  => 'ODS',
     'application/vnd.oasis.opendocument.text'         => 'ODT',
-    'application/vnd.adobe.indesign-idml-package'     => 'IDML', #6
+    'application/vnd.adobe.indesign-idml-package'     => 'IDML', #6 (not open doc)
+    'application/epub+zip' => 'EPUB', #PH (not open doc)
 );
 
 # ZIP metadata blocks
@@ -45,9 +46,10 @@ my %openDocType = (
         The following tags are extracted from ZIP archives.  ExifTool also extracts
         additional meta information from compressed documents inside some ZIP-based
         files such Office Open XML (DOCX, PPTX and XLSX), Open Document (ODB, ODC,
-        ODF, ODG, ODI, ODP, ODS and ODT), iWork (KEY, PAGES, NUMBERS), and Capture
-        One Enhanced Image Package (EIP).  The ExifTool family 3 groups may be used
-        to organize the output by embedded document number (ie. the exiftool C<-g3>
+        ODF, ODG, ODI, ODP, ODS and ODT), iWork (KEY, PAGES, NUMBERS), Capture One
+        Enhanced Image Package (EIP), Adobe InDesign Markup Language (IDML), and
+        Electronic Publication (EPUB).  The ExifTool family 3 groups may be used to
+        organize ZIP tags by embedded document number (ie. the exiftool C<-g3>
         option).
     },
     2 => 'ZipRequiredVersion',
@@ -364,7 +366,7 @@ sub HandleMember($$;$)
 }
 
 #------------------------------------------------------------------------------
-# Extract information from an ZIP file
+# Extract information from a ZIP file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid ZIP file
 sub ProcessZIP($$)
@@ -432,7 +434,7 @@ sub ProcessZIP($$)
 
         # check for an Office Open file (DOCX, etc)
         # --> read '[Content_Types].xml' to determine the file type
-        my ($mime, @members);
+        my ($mime, @members, $epub);
         my $cType = $zip->memberNamed('[Content_Types].xml');
         if ($cType) {
             ($buff, $status) = $zip->contents($cType);
@@ -466,7 +468,7 @@ sub ProcessZIP($$)
             last;
         }
 
-        # check for an Open Document or IDML file
+        # check for an Open Document, IDML or EPUB file
         my $mType = $zip->memberNamed('mimetype');
         if ($mType) {
             ($mime, $status) = $zip->contents($mType);
@@ -474,7 +476,7 @@ sub ProcessZIP($$)
                 # clean up MIME type just in case (note that MIME is case insensitive)
                 $mime = lc $1;
                 $et->SetFileType($openDocType{$mime} || 'ZIP', $mime);
-                $et->Warn('Unrecognized MIMEType') unless $openDocType{$mime};
+                $et->Warn("Unrecognized MIMEType $mime") unless $openDocType{$mime};
                 # extract Open Document metadata from "meta.xml"
                 my $meta = $zip->memberNamed('meta.xml');
                 # IDML files have metadata in a different place (ref 6)
@@ -486,10 +488,43 @@ sub ProcessZIP($$)
                             DataPt => \$buff,
                             DirLen => length $buff,
                             DataLen => length $buff,
+                            NoStruct => 1,  # (avoid structure warnings when copying)
                         );
-                        my $xmpTable = GetTagTable('Image::ExifTool::XMP::Main');
-                        $et->ProcessDirectory(\%dirInfo, $xmpTable);
+                        $et->ProcessDirectory(\%dirInfo, GetTagTable('Image::ExifTool::XMP::Main'));
                     }
+                }
+                # process rootfile of EPUB container if applicable
+                for (;;) {
+                    last if $meta and $mime ne 'application/epub+zip';
+                    my $container = $zip->memberNamed('META-INF/container.xml');
+                    ($buff, $status) = $zip->contents($container);
+                    last if $status;
+                    $buff =~ /<rootfile\s+[^>]*?\bfull-path=(['"])(.*?)\1/s or last;
+                    # load the rootfile data (OPF extension; contains XML metadata)
+                    my $meta2 = $zip->memberNamed($2) or last;
+                    $meta = $meta2;
+                    ($buff, $status) = $zip->contents($meta);
+                    last if $status;
+                    # use opf:event to generate more meaningful tag names for dc:date
+                    while ($buff =~ s{<dc:date opf:event="(\w+)">([^<]+)</dc:date>}{<dc:${1}Date>$2</dc:${1}Date>}s) {
+                        my $dcTable = GetTagTable('Image::ExifTool::XMP::dc');
+                        my $tag = "${1}Date";
+                        AddTagToTable($dcTable, $tag, {
+                            Name => ucfirst $tag,
+                            Groups => { 2 => 'Time' },
+                            List => 'Seq',
+                            %Image::ExifTool::XMP::dateTimeInfo
+                        }) unless $$dcTable{$tag};
+                    }
+                    my %dirInfo = (
+                        DataPt => \$buff,
+                        DirLen => length $buff,
+                        DataLen => length $buff,
+                        NoStruct => 1,
+                        IgnoreProp => { 'package' => 1, metadata => 1 },
+                    );
+                    $et->ProcessDirectory(\%dirInfo, GetTagTable('Image::ExifTool::XMP::XML'));
+                    last;
                 }
                 if ($openDocType{$mime} or $meta) {
                     # extract preview image(s) from "Thumbnails" directory if they exist
@@ -592,7 +627,10 @@ This module is used by Image::ExifTool
 
 This module contains definitions required by Image::ExifTool to extract meta
 information from ZIP, GZIP and RAR archives.  This includes ZIP-based file
-types like DOCX, PPTX, XLSX, ODB, ODC, ODF, ODG, ODI, ODP, ODS, ODT and EIP.
+types like Office Open XML (DOCX, PPTX and XLSX), Open Document (ODB, ODC,
+ODF, ODG, ODI, ODP, ODS and ODT), iWork (KEY, PAGES, NUMBERS), Capture One
+Enhanced Image Package (EIP), Adobe InDesign Markup Language (IDML), and
+Electronic Publication (EPUB).
 
 =head1 AUTHOR
 

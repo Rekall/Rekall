@@ -620,7 +620,6 @@ $VERSION = '1.04';
         'Night View/Portrait' => 'Ночной вид/портрет',
         'Portrait' => 'Портрет',
         'Sports' => 'Спортивные сцены',
-        'Standard' => '',
         'Sunset' => 'Закат',
         'Sweep Panorama' => 'Панорамный обзор',
       },

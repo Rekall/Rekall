@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.37';
+$VERSION = '1.38';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -217,7 +217,8 @@ sub DecodeComment($$$;$)
                 @$lines = split /$altnl/, $buff, -1;
                 # handle case of DOS newline data inside file using Unix newlines
                 @$lines = ( $$lines[0] . $$lines[1] ) if @$lines == 2 and $$lines[1] eq $/;
-                @$lines[-1] .= $/ if $/ eq "\x0d\x0a";  # add back trailing newline
+                # add back trailing DOS newline if necessary
+                @$lines ? @$lines[-1] .= $/ : push @$lines, $/ if $/ eq "\x0d\x0a";
             } else {
                 push @$lines, $buff;
             }

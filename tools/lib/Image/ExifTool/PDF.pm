@@ -32,7 +32,7 @@ sub ReadPDFValue($);
 sub CheckPDF($$$);
 
 # $lastFetched - last fetched object reference (used for decryption)
-#                (undefined if fetched object was already decrypted, ie. object from stream)
+#                (undefined if fetched object was already decrypted, eg. object from stream)
 
 my $cryptInfo;      # encryption object reference (plus additional information)
 my $cryptString;    # flag that strings are encrypted
@@ -897,8 +897,8 @@ sub ExtractObject($$;$$)
 # extract dictionary
 #
     # Note: entries are not necessarily separated by whitespace (doh!)
-    # ie) "/Tag/Name", "/Tag(string)", "/Tag[array]", etc are legal!
-    # Also, they may be separated by a comment (ie. "/Tag%comment\nValue"),
+    # eg) "/Tag/Name", "/Tag(string)", "/Tag[array]", etc are legal!
+    # Also, they may be separated by a comment (eg. "/Tag%comment\nValue"),
     # but comments have already been removed
     while ($objData =~ m{(\s*)/([^/[\]()<>{}\s]+)\s*(\S[^[(/<>\s]*)}sg) {
         my $tag = $2;
@@ -1975,7 +1975,7 @@ sub ProcessDict($$$$;$$)
         }
     }
 #
-# extract information from stream object if it exists (ie. Metadata stream)
+# extract information from stream object if it exists (eg. Metadata stream)
 #
     for (;;) { # (cheap goto)
         last unless $$dict{_stream};

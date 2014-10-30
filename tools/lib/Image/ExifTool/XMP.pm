@@ -47,7 +47,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.73';
+$VERSION = '2.78';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -230,6 +230,9 @@ my %boolConv = (
 # (Note: namespaces with non-standard prefixes aren't currently ignored)
 my %ignoreNamespace = ( 'x'=>1, rdf=>1, xmlns=>1, xml=>1, svg=>1, et=>1, office=>1 );
 
+# XMP properties to ignore (set dynamically via dirInfo IgnoreProp)
+my %ignoreProp;
+
 # these are the attributes that we handle for properties that contain
 # sub-properties.  Attributes for simple properties are easy, and we
 # just copy them over.  These are harder since we don't store attributes
@@ -242,7 +245,8 @@ my %recognizedAttrs = (
     'rdf:parseType' => 1,
     'rdf:nodeID' => 1,
     'et:toolkit' => 1,
-    'rdf:xmlns' => 1, # this is presumably the default namespace, which we currently ignore
+    'rdf:xmlns'  => 1, # this is presumably the default namespace, which we currently ignore
+    'lastUpdate' => [ 'Image::ExifTool::XMP::XML', 'lastUpdate', 'LastUpdate' ], # found in XML from Sony ICLE-7S MP4
 );
 
 # special tags in structures below
@@ -707,6 +711,21 @@ my %sLocationDetails = (
     getty => {
         Name => 'getty',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::GettyImages' },
+    },
+);
+
+# hack to allow XML containing Dublin Core metadata to be handled like XMP (eg. EPUB - see ZIP.pm)
+%Image::ExifTool::XMP::XML = (
+    GROUPS => { 0 => 'XML', 1 => 'XML', 2 => 'Unknown' },
+    PROCESS_PROC => \&ProcessXMP,
+    dc => {
+        Name => 'dc',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::dc' },
+    },
+    lastUpdate => {
+        Groups => { 2 => 'Time' },
+        ValueConv => 'Image::ExifTool::XMP::ConvertXMPDate($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
     },
 );
 
@@ -1835,6 +1854,7 @@ my %sPantryItem = (
     },
     GPSTrack => { Groups => { 2 => 'Location' }, Writable => 'rational' },
     GPSImgDirectionRef => {
+        Groups => { 2 => 'Location' },
         PrintConv => {
             M => 'Magnetic North',
             T => 'True North',
@@ -2310,7 +2330,7 @@ sub FullUnescapeXML($)
 
 #------------------------------------------------------------------------------
 # Convert XML character reference to UTF-8
-# Inputs: 0) XML character reference stripped of the '&' and ';' (ie. 'quot', '#34', '#x22')
+# Inputs: 0) XML character reference stripped of the '&' and ';' (eg. 'quot', '#34', '#x22')
 #         1) hash reference for looking up character numbers by name
 # Returns: UTF-8 equivalent (or original character on conversion error)
 sub UnescapeChar($$)
@@ -2442,7 +2462,7 @@ sub GetXMPTagID($;$$)
         # split name into namespace and property name
         # (Note: namespace can be '' for property qualifiers)
         my ($ns, $nm) = ($prop =~ /(.*?):(.*)/) ? ($1, $2) : ('', $prop);
-        if ($ignoreNamespace{$ns}) {
+        if ($ignoreNamespace{$ns} or $ignoreProp{$prop}) {
             # special case: don't ignore rdf numbered items
             unless ($prop =~ /^rdf:(_\d+)$/) {
                 # save list index if necessary for structures
@@ -2632,7 +2652,7 @@ sub AddFlattenedTags($;$$)
 
 #------------------------------------------------------------------------------
 # Get localized version of tagInfo hash
-# Inputs: 0) tagInfo hash ref, 1) language code (ie. "x-default")
+# Inputs: 0) tagInfo hash ref, 1) language code (eg. "x-default")
 # Returns: new tagInfo hash ref, or undef if invalid
 sub GetLangInfo($$)
 {
@@ -2641,8 +2661,6 @@ sub GetLangInfo($$)
     return undef unless $$tagInfo{Writable} and $$tagInfo{Writable} eq 'lang-alt';
     $langCode =~ tr/_/-/;   # RFC 3066 specifies '-' as a separator
     my $langInfo = Image::ExifTool::GetLangInfo($tagInfo, $langCode);
-    # save reference to source tagInfo hash in case we need to set the PropertyPath later
-    $$langInfo{SrcTagInfo} = $tagInfo;
     return $langInfo;
 }
 
@@ -2702,8 +2720,8 @@ sub ScanForXMP($$)
         $et->SetFileType('<unknown file containing XMP>');
     }
     my %dirInfo = (
-        DataPt => \$xmp,
-        DirLen => length $xmp,
+        DataPt  => \$xmp,
+        DirLen  => length $xmp,
         DataLen => length $xmp,
     );
     ProcessXMP($et, \%dirInfo);
@@ -2748,10 +2766,13 @@ sub PrintLensID(@)
         # Nikon is a special case because Adobe doesn't store the full LensID
         if ($mk eq 'Nikon') {
             my $hex = sprintf("%.2X", $id);
-            my %newConv;
+            my (%newConv, %used);
             my $i = 0;
             foreach (grep /^$hex /, keys %$printConv) {
-                $newConv{$i ? "$id.$i" : $id} = $$printConv{$_};
+                my $lens = $$printConv{$_};
+                next if $used{$lens}; # avoid duplicates
+                $used{$lens} = 1;
+                $newConv{$i ? "$id.$i" : $id} = $lens;
                 ++$i;
             }
             $printConv = \%newConv;
@@ -3100,7 +3121,7 @@ sub ParseXMPElement($$$;$$$$)
 
     Element: for (;;) {
         # all done if there isn't enough data for another element
-        # (the smallest possible element is 4 bytes, ie. "<a/>")
+        # (the smallest possible element is 4 bytes, eg. "<a/>")
         last if pos($$dataPt) > $end - 4;
         # reset nodeID before processing each element
         my $nodeID = $$blankInfo{NodeID} = $oldNodeID;
@@ -3113,7 +3134,7 @@ sub ParseXMPElement($$$;$$$$)
         my $valStart = pos($$dataPt);
         my $valEnd;
         # only look for closing token if this is not an empty element
-        # (empty elements end with '/', ie. <a:b/>)
+        # (empty elements end with '/', eg. <a:b/>)
         if ($attrs !~ s/\/$//) {
             my $nesting = 1;
             my $tok;
@@ -3146,13 +3167,12 @@ sub ParseXMPElement($$$;$$$$)
         my $parseResource;
         if ($prop eq 'rdf:li') {
             # impose a reasonable maximum on the number of items in a list
-            if ($nItems > 999) {
-                my ($tg,$ns);
-                ($tg, $ns) = GetXMPTagID($propListPt) if $nItems == 1000;
+            if ($nItems == 1000) {
+                my ($tg,$ns) = GetXMPTagID($propListPt);
                 if ($isWriting) {
-                    $et->Warn("Excessive number of items for $ns:$tg. Processing may be slow.", 1) if $tg;
+                    $et->Warn("Excessive number of items for $ns:$tg. Processing may be slow.", 1);
                 } elsif (not $$et{OPTIONS}{IgnoreMinorErrors}) {
-                    $et->Warn("Excessive number of items for $ns:$tg. Extracted only the first 1000.", 2) if $tg;
+                    $et->Warn("Excessive number of items for $ns:$tg. Extracted only the first 1000.", 2);
                     last;
                 }
             }
@@ -3243,12 +3263,19 @@ sub ParseXMPElement($$$;$$$$)
             }
             # keep track of the namespace prefixes used
             if ($ns eq 'xmlns') {
-                unless ($attrs{$shortName}) {
-                    $et->WarnOnce("Duplicate namespace '$shortName'");
-                    next;
+                my $uri = $attrs{$shortName};
+                next unless $uri; # (shouldn't happen)
+                my $stdNS = $uri2ns{$uri};
+                unless ($stdNS) {
+                    # patch for Nikon NX2 URI bug for Microsoft PhotoInfo namespace
+                    $uri =~ s{/$}{} or $uri .= '/';
+                    $stdNS = $uri2ns{$uri};
+                    if ($stdNS) {
+                        $attrs{$shortName} = $uri;
+                        $et->WarnOnce("Fixed incorrect URI for $shortName", 1);
+                    }
                 }
                 $curNS{$name} = $attrs{$shortName};
-                my $stdNS = $uri2ns{$attrs{$shortName}};
                 # translate namespace if non-standard (except 'x' and 'iX')
                 if ($stdNS and $name ne $stdNS and $stdNS ne 'x' and $stdNS ne 'iX') {
                     # make a copy of the standard translations so we can modify it
@@ -3280,7 +3307,7 @@ sub ParseXMPElement($$$;$$$$)
                 }
             }
             my $shortVal = $attrs{$shortName};
-            if ($ignoreNamespace{$ns}) {
+            if ($ignoreNamespace{$ns} or $ignoreProp{$prop}) {
                 $ignored = $propName;
                 # handle special attributes (extract as tags only once if not empty)
                 if (ref $recognizedAttrs{$propName} and $shortVal) {
@@ -3426,7 +3453,7 @@ sub ProcessXMP($$;$)
         my $raf = $$dirInfo{RAF} or return 0;
         $raf->Read($buff, 256) or return 0;
         ($buf2 = $buff) =~ tr/\0//d;    # cheap conversion to UTF-8
-        # remove leading comments if they exist (ie. ImageIngester)
+        # remove leading comments if they exist (eg. ImageIngester)
         while ($buf2 =~ /^\s*<!--/) {
             # remove the comment if it is complete
             if ($buf2 =~ s/^\s*<!--.*?-->\s+//s) {
@@ -3668,10 +3695,17 @@ sub ProcessXMP($$;$)
     $xlatNamespace = \%stdXlatNS;
 
     # avoid scanning for XMP later in case ScanForXMP is set
-    $$et{FoundXMP} = 1;
+    $$et{FoundXMP} = 1 if $tagTablePtr eq \%Image::ExifTool::XMP::Main;
 
     # set XMP parsing options
     $$et{XMPParseOpts} = $$dirInfo{XMPParseOpts};
+
+    # ignore any specified properties (XML hack)
+    if ($$dirInfo{IgnoreProp}) {
+        %ignoreProp = %{$$dirInfo{IgnoreProp}};
+    } else {
+        undef %ignoreProp;
+    }
 
     # need to preserve list indices to be able to handle multi-dimensional lists
     my $keepFlat;
@@ -3688,7 +3722,7 @@ sub ProcessXMP($$;$)
     }
 
     # don't generate structures if this isn't real XMP
-    $$et{NO_STRUCT} = 1 if $$dirInfo{BlockInfo};
+    $$et{NO_STRUCT} = 1 if $$dirInfo{BlockInfo} or $$dirInfo{NoStruct};
 
     # parse the XMP
     if (ParseXMPElement($et, $tagTablePtr, $dataPt, $dirStart, $dirEnd)) {

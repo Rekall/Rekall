@@ -495,7 +495,6 @@ $VERSION = '1.05';
         'Night View/Portrait' => 'Nattvy/porträtt',
         'Portrait' => 'Porträtt',
         'Sports' => 'Sporthändelse',
-        'Standard' => '',
         'Sunset' => 'Solnedgång',
         'Sweep Panorama' => 'Panorering',
       },

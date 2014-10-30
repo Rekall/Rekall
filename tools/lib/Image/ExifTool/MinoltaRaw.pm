@@ -369,7 +369,7 @@ sub ConvertWBMode($)
 }
 
 #------------------------------------------------------------------------------
-# Write MRW directory (ie. in ARW images)
+# Write MRW directory (eg. in ARW images)
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) optional tag table ref
 # Returns: new MRW data or undef on error
 sub WriteMRW($$;$)

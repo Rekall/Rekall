@@ -217,7 +217,7 @@ sub FoundTag($$$$;$)
 
     # un-escape XML character entities
     $val = Image::ExifTool::XMP::UnescapeXML($val);
-    # convert OOXML-escaped characters (ie. "_x0000d_" is a newline)
+    # convert OOXML-escaped characters (eg. "_x0000d_" is a newline)
     $val =~ s/_x([0-9a-f]{4})_/Image::ExifTool::PackUTF8(hex($1))/gie;
     # convert from UTF8 to ExifTool Charset
     $val = $et->Decode($val, 'UTF8');

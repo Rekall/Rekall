@@ -636,7 +636,6 @@ $VERSION = '1.06';
         'Night View/Portrait' => '夜景/肖像',
         'Portrait' => '肖像',
         'Sports' => '運動場面',
-        'Standard' => '',
         'Sunset' => '夕陽',
         'Sweep Panorama' => '全景攝影',
       },

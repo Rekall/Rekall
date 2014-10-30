@@ -19,7 +19,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.49';
+$VERSION = '1.53';
 
 # this is a special table used to define command-line shortcuts
 # (documentation Notes may be added for these via %shortcutNotes in BuildTagLookup.pm)
@@ -143,6 +143,7 @@ $VERSION = '1.49';
         'MakerNoteKodak8c',
         'MakerNoteKodak9',
         'MakerNoteKodak10',
+        'MakerNoteKodak11',
         'MakerNoteKodakUnknown',
         'MakerNoteKyocera',
         'MakerNoteMinolta',
@@ -151,6 +152,7 @@ $VERSION = '1.49';
         'MakerNoteNikon',
         'MakerNoteNikon2',
         'MakerNoteNikon3',
+        'MakerNoteNintendo',
         'MakerNoteOlympus',
         'MakerNoteOlympus2',
         'MakerNoteLeica',
@@ -170,6 +172,7 @@ $VERSION = '1.49';
         'MakerNotePhaseOne',
         'MakerNoteReconyx',
         'MakerNoteRicoh',
+        'MakerNoteRicoh2',
         'MakerNoteRicohText',
         'MakerNoteSamsung1a',
         'MakerNoteSamsung1b',
@@ -232,6 +235,25 @@ $VERSION = '1.49';
         'IFD0:XPKeywords',
         'IFD0:XPSubject',
     ],
+    # large binary data tags which won't be loaded if excluded when extracting
+    LargeTags => [
+        'CanonVRD',
+        'DLOData',
+        'EXIF',
+        'ICC_Profile',
+        'IDCPreviewImage',
+        'ImageData',
+        'IPTC',
+        'JpgFromRaw',
+        'OriginalRawImage',
+        'OtherImage',
+        'PreviewImage',
+        'ThumbnailImage',
+        'TIFFPreview',
+        'XML',
+        'XMP',
+        'ZoomedPreviewImage',
+    ],
 );
 
 #------------------------------------------------------------------------------
@@ -292,6 +314,10 @@ An example shortcut definition in .ExifTool_config:
 In this example, MyShortcut is a shortcut for the CreateDate,
 EXIF:ExposureTime and Aperture tags, and MyAlias is a shortcut for
 FocalLengthIn35mmFormat.
+
+The target tag names may contain an optional group name prefix.  A group
+name applied to the shortcut will be ignored for any target tag with a group
+name prefix.
 
 =head1 AUTHOR
 

@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessBitStream($$$);
 
@@ -122,7 +122,7 @@ sub ProcessBitStream($$$);
             0 => 'FLAC:SampleRate',
             1 => 'FLAC:TotalSamples',
         },
-        ValueConv => '$val[0] and $val[1] ? $val[1] / $val[0] : undef',
+        ValueConv => '($val[0] and $val[1]) ? $val[1] / $val[0] : undef',
         PrintConv => 'ConvertDuration($val)',
     },
 );
@@ -136,7 +136,7 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::FLAC');
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Notes: Byte order is used to determine the ordering of bits in the stream:
 # 'MM' = bit 0 is most significant, 'II' = bit 0 is least significant
-# - can handle arbitrarily wide values (ie. 8-byte or larger integers)
+# - can handle arbitrarily wide values (eg. 8-byte or larger integers)
 sub ProcessBitStream($$$)
 {
     my ($et, $dirInfo, $tagTablePtr) = @_;

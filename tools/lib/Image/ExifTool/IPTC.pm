@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.50';
+$VERSION = '1.52';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -42,6 +42,15 @@ my %isStandardIPTC = (
     'MIE-IPTC'                  => 1,
     'EPS-Photoshop-IPTC'        => 1,
     'PS-Photoshop-IPTC'         => 1,
+    'EXV-APP13-Photoshop-IPTC'  => 1,
+    # set file types to 0 if they have a standard location
+    JPEG => 0,
+    TIFF => 0,
+    PSD  => 0,
+    MIE  => 0,
+    EPS  => 0,
+    PS   => 0,
+    EXV  => 0,
 );
 
 my %fileFormat = (
@@ -1015,11 +1024,14 @@ sub TranslateCodedString($$$$)
 #------------------------------------------------------------------------------
 # Is this IPTC in a standard location?
 # Inputs: 0) Current metadata path string
-# Returns: true if path is standard
+# Returns: true if path is standard, 0 if file type doesn't have standard IPTC,
+#          or undef if IPTC is non-standard
 sub IsStandardIPTC($)
 {
     my $path = shift;
-    return $isStandardIPTC{$path};
+    return 1 if $isStandardIPTC{$path};
+    return 0 unless $path =~ /^(\w+)/ and defined $isStandardIPTC{$1};
+    return undef;   # non-standard
 }
 
 #------------------------------------------------------------------------------
@@ -1041,30 +1053,37 @@ sub ProcessIPTC($$$)
     $verbose and $dirInfo and $et->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
 
     if ($tagTablePtr eq \%Image::ExifTool::IPTC::Main) {
-        # calculate MD5 if Digest::MD5 is available (for standard IPTC only)
         my $path = $et->MetadataPath();
-        if (IsStandardIPTC($path)) {
-            my $md5;
-            if (eval { require Digest::MD5 }) {
-                if ($pos or $dirLen != length($$dataPt)) {
-                    $md5 = Digest::MD5::md5(substr $$dataPt, $pos, $dirLen);
+        my $isStd = IsStandardIPTC($path);
+        if (defined $isStd and not $$et{DIR_COUNT}{STD_IPTC}) {
+            # set flag to ensure we only have one family 1 "IPTC" group
+            $$et{DIR_COUNT}{STD_IPTC} = 1;
+            # calculate MD5 if Digest::MD5 is available (truly standard IPTC only)
+            if ($isStd) {
+                my $md5;
+                if (eval { require Digest::MD5 }) {
+                    if ($pos or $dirLen != length($$dataPt)) {
+                        $md5 = Digest::MD5::md5(substr $$dataPt, $pos, $dirLen);
+                    } else {
+                        $md5 = Digest::MD5::md5($$dataPt);
+                    }
                 } else {
-                    $md5 = Digest::MD5::md5($$dataPt);
+                    # a zero digest indicates IPTC exists but we don't have Digest::MD5
+                    $md5 = "\0" x 16;
                 }
-            } else {
-                # a zero digest indicates IPTC exists but we don't have Digest::MD5
-                $md5 = "\0" x 16;
+                $et->FoundTag('CurrentIPTCDigest', $md5);
             }
-            $et->FoundTag('CurrentIPTCDigest', $md5);
         } elsif ($Image::ExifTool::MWG::strict and $$et{FILE_TYPE} =~ /^(JPEG|TIFF|PSD)$/) {
             # ignore non-standard IPTC while in strict MWG compatibility mode
             $et->Warn("Ignored non-standard IPTC at $path");
             return 1;
+        } else {
+            # extract non-standard IPTC
+            my $count = ($$et{DIR_COUNT}{IPTC} || 0) + 1;  # count non-standard IPTC
+            $$et{DIR_COUNT}{IPTC} = $count;
+            $$et{LOW_PRIORITY_DIR}{IPTC} = 1;       # lower priority of non-standard IPTC
+            $$et{SET_GROUP1} = '+' . ($count + 1);  # add number to family 1 group name
         }
-        # set family 1 group name if multiple IPTC directories
-        my $dirCount = ($$et{DIR_COUNT}{IPTC} || 0) + 1;
-        $$et{DIR_COUNT}{IPTC} = $dirCount;
-        $$et{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
     }
     # begin by assuming default IPTC encoding
     my $xlat = $et->Options('CharsetIPTC');
@@ -1199,6 +1218,7 @@ sub ProcessIPTC($$$)
         $pos += $len;   # increment to next field
     }
     delete $$et{SET_GROUP1};
+    delete $$et{LOW_PRIORITY_DIR}{IPTC};
     return $success;
 }
 

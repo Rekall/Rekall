@@ -1939,7 +1939,6 @@ $VERSION = '1.06';
         'Off' => '꺼짐',
         'Portrait' => '인물',
         'Sports' => '스포츠 액션',
-        'Standard' => '',
         'Sunset' => '석양촬영',
         'Sweep Panorama' => '스위프 파노라마',
       },

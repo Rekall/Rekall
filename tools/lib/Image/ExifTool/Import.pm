@@ -83,7 +83,7 @@ sub ReadCSV($$;$)
         } else {
             # the first row should be the tag names
             foreach (@vals) {
-                # terminate at first blank tag name (ie. extra comma at end of line)
+                # terminate at first blank tag name (eg. extra comma at end of line)
                 last unless length $_;
                 @tags or s/^\xef\xbb\xbf//; # remove UTF-8 BOM if it exists
                 /^[-\w]+(:[-\w+]+)?#?$/ or $err = "Invalid tag name '$_'", last;
@@ -132,7 +132,7 @@ Tok: for (;;) {
             # read another 64kB and add to unparsed data
             my $offset = length($$buffPt) - $pos;
             $$buffPt = substr($$buffPt, $pos) if $offset;
-            read $fp, $$buffPt, 65536, $offset or $$buffPt = '', last;
+            ($fp and read $fp, $$buffPt, 65536, $offset) or $$buffPt = '', last;
             unless ($didBOM) {
                 $$buffPt =~ s/^\xef\xbb\xbf//;  # remove UTF-8 BOM if it exists
                 $didBOM = 1;

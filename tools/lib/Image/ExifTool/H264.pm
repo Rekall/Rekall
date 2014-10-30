@@ -24,7 +24,7 @@ use vars qw($VERSION %convMake);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 sub ProcessSEI($$);
 
@@ -297,6 +297,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         Combine => 2,    # the next tags (0xbc/0xbd) contain the minutes/seconds
         Notes => 'combined with tags 0xbc and 0xbd',
         ValueConv => 'Image::ExifTool::GPS::ConvertTimeStamp($val)',
+        PrintConv => 'Image::ExifTool::GPS::PrintTimeStamp($val)',
     },
     0xbe => {
         Name => 'GPSStatus',

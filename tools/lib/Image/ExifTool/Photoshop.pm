@@ -19,7 +19,7 @@
 #               4) http://www.fileformat.info/format/psd/egff.htm
 #               5) http://www.telegraphics.com.au/svn/psdparse/trunk/resources.c
 #               6) http://libpsd.graphest.com/files/Photoshop%20File%20Formats.pdf
-#               7) http://www.adobe.com/devnet-apps/photoshop/fileformatashtml/PhotoshopFileFormats.htm
+#               7) http://www.adobe.com/devnet-apps/photoshop/fileformatashtml/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Photoshop;
@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD $iptcDigestInfo);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.44';
+$VERSION = '1.45';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -238,6 +238,7 @@ my %psdMap = (
     0x043d => { Unknown => 1, Name => 'WindowsDEVMODE' }, #7
     0x043e => { Unknown => 1, Name => 'AutoSaveFilePath' }, #7
     0x043f => { Unknown => 1, Name => 'AutoSaveFormat' }, #7
+    0x0440 => { Unknown => 1, Name => 'PathSelectionState' }, #7
     # 0x07d0-0x0bb6 Path information
     0x0bb7 => {
         Name => 'ClippingPathName',
@@ -248,8 +249,10 @@ my %psdMap = (
             return Image::ExifTool::Photoshop::ConvertPascalString($self,$val);
         },
     },
+    0x0bb8 => { Unknown => 1, Name => 'OriginPathInfo' }, #7
     # 0x0fa0-0x1387 - plug-in resources (ref 7)
     0x1b58 => { Unknown => 1, Name => 'ImageReadyVariables' }, #7
+    0x1b59 => { Unknown => 1, Name => 'ImageReadyDataSets' }, #7
     0x1f40 => { Unknown => 1, Name => 'LightroomWorkflow' }, #7
     0x2710 => { Unknown => 1, Name => 'PrintFlagsInfo' },
 );
@@ -616,7 +619,7 @@ under the same terms as Perl itself.
 
 =item L<http://libpsd.graphest.com/files/Photoshop%20File%20Formats.pdf>
 
-=item L<http://www.adobe.com/devnet-apps/photoshop/fileformatashtml/PhotoshopFileFormats.htm>
+=item L<http://www.adobe.com/devnet-apps/photoshop/fileformatashtml/>
 
 =back
 

@@ -18,6 +18,7 @@ $VERSION = '1.00';
 sub ProcessGE2($$$);
 
 # GE type 1 maker notes (ref PH)
+# (similar to Kodak::Type11 and Ricoh::Type2)
 %Image::ExifTool::GE::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,

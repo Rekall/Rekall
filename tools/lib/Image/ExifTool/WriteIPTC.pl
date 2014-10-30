@@ -102,7 +102,7 @@ sub PrintInvCodedCharset($)
 sub CheckIPTC($$$)
 {
     my ($et, $tagInfo, $valPtr) = @_;
-    my $format = $$tagInfo{Format} || $tagInfo->{Table}->{FORMAT} || '';
+    my $format = $$tagInfo{Format} || $$tagInfo{Table}{FORMAT} || '';
     if ($format =~ /^int(\d+)/) {
         my $bytes = int(($1 || 0) / 8);
         if ($bytes ne 1 and $bytes ne 2 and $bytes ne 4) {
@@ -311,8 +311,8 @@ sub DoWriteIPTC($$$)
     # - avoids changing current MD5 digest unnecessarily
     # - avoids adding mandatory tags unless some other IPTC is changed
     unless (exists $$et{EDIT_DIRS}{$$dirInfo{DirName}} or
-        # standard IPTC tags in other locations should be edited too (ie. AFCP_IPTC)
-        ($tagTablePtr = \%Image::ExifTool::IPTC::Main and exists $$et{EDIT_DIRS}{IPTC}))
+        # standard IPTC tags in other locations should be edited too (eg. AFCP_IPTC)
+        ($tagTablePtr eq \%Image::ExifTool::IPTC::Main and exists $$et{EDIT_DIRS}{IPTC}))
     {
         print $out "$$et{INDENT}  [nothing changed]\n" if $verbose;
         return undef;
@@ -349,9 +349,9 @@ sub DoWriteIPTC($$$)
     # generate lookup so we can find the record numbers
     my %recordNum;
     foreach $tag (Image::ExifTool::TagTableKeys($tagTablePtr)) {
-        $tagInfo = $tagTablePtr->{$tag};
+        $tagInfo = $$tagTablePtr{$tag};
         $$tagInfo{SubDirectory} or next;
-        my $table = $tagInfo->{SubDirectory}->{TagTable} or next;
+        my $table = $$tagInfo{SubDirectory}{TagTable} or next;
         my $subTablePtr = Image::ExifTool::GetTagTable($table);
         $recordNum{$subTablePtr} = $tag;
     }
@@ -465,13 +465,13 @@ sub DoWriteIPTC($$$)
                             foreach $mandTag (sort { $a <=> $b } keys %$mandatory) {
                                 next if $foundRec{$lastRec}->{$mandTag};
                                 unless ($subTablePtr) {
-                                    $tagInfo = $tagTablePtr->{$lastRec};
+                                    $tagInfo = $$tagTablePtr{$lastRec};
                                     $tagInfo and $$tagInfo{SubDirectory} or warn("WriteIPTC: Internal error 1\n"), next;
-                                    $tagInfo->{SubDirectory}->{TagTable} or next;
-                                    $subTablePtr = Image::ExifTool::GetTagTable($tagInfo->{SubDirectory}->{TagTable});
+                                    $$tagInfo{SubDirectory}{TagTable} or next;
+                                    $subTablePtr = Image::ExifTool::GetTagTable($$tagInfo{SubDirectory}{TagTable});
                                 }
-                                $tagInfo = $subTablePtr->{$mandTag} or warn("WriteIPTC: Internal error 2\n"), next;
-                                my $value = $mandatory->{$mandTag};
+                                $tagInfo = $$subTablePtr{$mandTag} or warn("WriteIPTC: Internal error 2\n"), next;
+                                my $value = $$mandatory{$mandTag};
                                 $et->VerboseValue("+ IPTC:$$tagInfo{Name}", $value, ' (mandatory)');
                                 # apply necessary format conversions
                                 FormatIPTC($et, $tagInfo, \$value, \$xlat, $lastRec);
@@ -517,11 +517,11 @@ sub DoWriteIPTC($$$)
                     # write tags for each value in list
                     my $value;
                     foreach $value (@values) {
-                        $et->VerboseValue("+ IPTC:$$tagInfo{Name}", $value);
+                        $et->VerboseValue("+ $$dirInfo{DirName}:$$tagInfo{Name}", $value);
                         # reset allMandatory flag if a non-mandatory tag is written
                         if ($allMandatory) {
                             my $mandatory = $mandatory{$newRec};
-                            $allMandatory = 0 unless $mandatory and $mandatory->{$newTag};
+                            $allMandatory = 0 unless $mandatory and $$mandatory{$newTag};
                         }
                         # apply necessary format conversions
                         FormatIPTC($et, $tagInfo, \$value, \$xlat, $newRec);
@@ -572,7 +572,7 @@ sub DoWriteIPTC($$$)
             FormatIPTC($et, $tagInfo, \$val, \$xlat, $rec, 1);
             if ($et->IsOverwriting($nvHash, $val)) {
                 $xlat = $oldXlat;   # don't change translation (not writing this value)
-                $et->VerboseValue("- IPTC:$$tagInfo{Name}", $val);
+                $et->VerboseValue("- $$dirInfo{DirName}:$$tagInfo{Name}", $val);
                 ++$$et{CHANGED};
                 # set deleted flag to indicate we found and deleted this tag
                 $foundRec{$rec}->{$tag} |= 0x02;
@@ -594,7 +594,7 @@ sub DoWriteIPTC($$$)
         # reset allMandatory flag if a non-mandatory tag is written
         if ($allMandatory) {
             my $mandatory = $mandatory{$rec};
-            unless ($mandatory and $mandatory->{$tag}) {
+            unless ($mandatory and $$mandatory{$tag}) {
                 $allMandatory = 0;
             }
         }
@@ -603,9 +603,9 @@ sub DoWriteIPTC($$$)
     }
     # make sure the rest of the data is zero
     if ($tail < $dirEnd) {
-        my $trailer = substr($$dataPt, $tail, $dirEnd-$tail);
-        if ($trailer =~ /[^\0]/) {
-            return undef if $et->Warn('Unrecognized data in IPTC trailer', 2);
+        my $pad = substr($$dataPt, $tail, $dirEnd-$tail);
+        if ($pad =~ /[^\0]/) {
+            return undef if $et->Warn('Unrecognized data in IPTC padding', 2);
         }
     }
     return $newData;

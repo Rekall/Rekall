@@ -18,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::ID3;
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 # information for time/date-based tags (time zero is Jan 1, 1904)
 my %timeInfo = (
@@ -124,6 +124,21 @@ my %timeInfo = (
         ValueConv => '$self->Decode($val, "MacRoman")',
     },
 );
+
+%Image::ExifTool::AIFF::Composite = (
+    Duration => {
+        Require => {
+            0 => 'AIFF:SampleRate',
+            1 => 'AIFF:NumSampleFrames',
+        },
+        RawConv => '($val[0] and $val[1]) ? $val[1] / $val[0] : undef',
+        PrintConv => 'ConvertDuration($val)',
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::AIFF');
+
 
 #------------------------------------------------------------------------------
 # Process AIFF Comment chunk

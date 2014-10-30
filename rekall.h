@@ -24,89 +24,31 @@
 #ifndef REKALL_H
 #define REKALL_H
 
-#include <QMainWindow>
-#include <QTimer>
-#include <QClipboard>
-#include <QWebView>
-#include <QWebFrame>
-#include <QWebPage>
-#include <QDesktopServices>
-#include <QInputDialog>
+#include <QWidget>
+#include <QDialog>
+#include <QApplication>
 #include <QMessageBox>
-#include "core/watcher.h"
-#include "core/watchersnapshot.h"
-#include "interfaces/userinfos.h"
-#include "interfaces/http/httplistener.h"
-#include "interfaces/fileuploadcontroller.h"
-#include "items/uifileitem.h"
-#include "gui/splash.h"
-#include "gui/timeline.h"
-#include "tasks/taskslist.h"
-#include "tasks/feedlist.h"
+#include <QSystemTrayIcon>
+#include <QWebView>
+#include <QFileDialog>
+#include "http/http.h"
+#include "core/analyse.h"
+#include "core/userinfos.h"
+#include "core/project.h"
 
-
-namespace Ui {
-class Rekall;
-}
-
-class Rekall : public RekallBase {
+class Rekall : public QDialog, public RekallInterface {
     Q_OBJECT
-    
-public:
-    explicit Rekall(QWidget *parent = 0);
-    ~Rekall();
 
 private:
-    bool          chutierIsUpdating, metadataIsUpdating;
-    Splash       *splash;
-    Project      *currentProject;
-    QList<Metadata*> currentMetadatas;
-    QSettings    *settings;
-    QWebView     *gps;
-    QPair<QString, QPixmap> picture;
-    QList<QAction*> openRecentAction;
-private:
-    HttpListener         *http;
-    FileUploadController *httpUpload;
-private:
-    bool annotationStateBeforeFocus, annotationIsUpdating;
-    Tag *annotationTag;
-
-private:
-    void displayDocumentName(const QString &documentName = "");
-    void displayPixmap(DocumentType documentType, const QPair<QString, QPixmap> &picture);
-    void displayPixmap(DocumentType documentType, const QString &filename, const QPixmap &picture);
-    void displayGps(const QList<QPair<QString, QString> > &gps);
-public:
-    void setVisbility(bool visibility);
-    void showPreviewTab();
-
-protected:
-    void dragEnterEvent(QDragEnterEvent *);
-    void dropEvent(QDropEvent *);
-    bool parseMimeData(const QMimeData *mime, const QString &source, bool test = false);
-
-private slots:
-    void refreshMenus(const QFileInfo &path = QFileInfo(), bool clear = false);
-    void fileUploaded(const QString &, const QString &, const QString &);
-    void action();
-    void annotationFocusChanged(bool);
-    void annotationFinished();
-    void actionForceGL();
-    void actionMetadata();
-    void closeSplash();
-    void chutierItemChanged(QTreeWidgetItem* = 0, QTreeWidgetItem* = 0);
-    void personItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
-    void displayMetadataAndSelect(void *tag = 0);
-    void displayMetadata(QTreeWidgetItem * = 0, QTreeWidgetItem * = 0);
-    void changeAnnotation(void *, bool giveFocus = false);
-    void showHelp(bool);
-private:
-    qint16 findDocumentVersionWithMetadata(Metadata* metadata);
+    QSystemTrayIcon *trayIcon;
+    QMenu *trayMenu;
+    QAction *trayMenuProjects, *trayAnalyse;
+    QList<QIcon> trayIcons;
+    quint16 trayIconIndex, trayIconIndexOld;
 
 private:
     QSettings *globalSettings;
-    bool forceUpdate;
+    bool forceUpdate, firstTimeOpened;
     QString updateAnonymousId;
     QNetworkAccessManager *updateManager;
 private slots:
@@ -114,12 +56,40 @@ private slots:
 public:
     void checkForUpdates();
 
-protected:
-    void timerEvent(QTimerEvent *);
-    void closeEvent(QCloseEvent *);
+
+public:
+    void addProject(ProjectInterface *project);
+    void removeProject(ProjectInterface *project);
 
 private:
-    Ui::Rekall *ui;
+    QTimer trayTimer, trayTimerOff;
+private slots:
+    void trayIconToOnPrivate();
+    void trayIconToOffPrivate();
+public slots:
+    void trayIconToOn(qint16 duration);
+    void trayIconToOff();
+    void analyseTrayChanged(QString,bool);
+
+public slots:
+    void openWebPage();
+    void closeRekall();
+
+public slots:
+    void showMessage(const QString &message);
+    void incomingMessage(const QString &, quint16, const QString &, const QList<QVariant> &);
+    void addProject();
+    void updateGUI();
+    void trayActivated(QSystemTrayIcon::ActivationReason);
+
+protected:
+    void timerEvent(QTimerEvent *);
+    void takeScreenshot();
+
+
+public:
+    explicit Rekall(const QStringList &arguments = QStringList(), QWidget *parent = 0);
+    ~Rekall();
 };
 
 #endif // REKALL_H

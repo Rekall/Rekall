@@ -270,7 +270,7 @@ sub ProcessRTF($$)
             $et->Warn('Unterminated information group');
             last;
         }
-        # process info commands (ie. "\author", "\*\copyright");
+        # process info commands (eg. "\author", "\*\copyright");
         while ($info =~ /\{[\n\r]*(\\\*[\n\r]*)?\\([a-zA-Z]+)([^a-zA-Z])/g) {
             pos($info) = pos($info) - 1 if $3 ne ' ';
             my $tag = $2;

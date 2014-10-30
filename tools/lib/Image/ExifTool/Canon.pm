@@ -65,7 +65,7 @@
 #              49) http://www.listware.net/201101/digikam-users/49795-digikam-users-re-lens-recognition.html
 #              50) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3833.0.html
 #              51) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4110.0.html
-#              52) Iliah Borg private communication
+#              52) Iliah Borg private communication (LibRaw)
 #              53) Niels Kristian Bech Jensen private communication
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ sub ProcessSerialData($$$);
 sub ProcessFilters($$$);
 sub SwapWords($);
 
-$VERSION = '3.26';
+$VERSION = '3.34';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -94,6 +94,7 @@ $VERSION = '3.26';
         have the same LensType, and are used by the Composite LensID tag when
         attempting to identify the specific lens model.
      },
+     -1 => 'n/a',
      1 => 'Canon EF 50mm f/1.8',
      2 => 'Canon EF 28mm f/2.8',
      # (3 removed in current Kamisaka list)
@@ -108,7 +109,7 @@ $VERSION = '3.26';
      6.4 => 'Sigma 28-80mm f/3.5-5.6 II Macro', #47
      7 => 'Canon EF 100-300mm f/5.6L', #15
      8 => 'Canon EF 100-300mm f/5.6 or Sigma or Tokina Lens', #32
-     8.1 => 'Sigma 70-300mm f/4-5.6 [APO] DG Macro', #15 (both APO and non-APO, ref http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2947.0.html)
+     8.1 => 'Sigma 70-300mm f/4-5.6 [APO] DG Macro', #15 (both APO and non-APO, ref forum2947)
      8.2 => 'Tokina AT-X 242 AF 24-200mm f/3.5-5.6', #15
      9 => 'Canon EF 70-210mm f/4', #32
      9.1 => 'Sigma 55-200mm f/4-5.6 DC', #34
@@ -144,7 +145,7 @@ $VERSION = '3.26';
     28.1 => 'Tamron SP AF 28-105mm f/2.8 LD Aspherical IF', #15
     28.2 => 'Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical [IF] Macro', #4
   # 28.3 => 'Tamron AF 70-300mm f/4.5-5.6 Di LD 1:2 Macro Zoom', #11
-    28.3 => 'Tamron AF 70-300mm f/4-5.6 Di LD 1:2 Macro', #exiv2 patch
+    28.3 => 'Tamron AF 70-300mm f/4-5.6 Di LD 1:2 Macro', #47
     28.4 => 'Tamron AF Aspherical 28-200mm f/3.8-5.6', #14
     29 => 'Canon EF 50mm f/1.8 II',
     30 => 'Canon EF 35-105mm f/4.5-5.6', #32
@@ -154,18 +155,20 @@ $VERSION = '3.26';
     32.1 => 'Sigma 15mm f/2.8 EX Fisheye', #11
     33 => 'Voigtlander or Carl Zeiss Lens',
     33.1 => 'Voigtlander Ultron 40mm f/2 SLII Aspherical', #45
-    33.2 => 'Carl Zeiss Distagon T* 15mm f/2.8 ZE', #PH
-    33.3 => 'Carl Zeiss Distagon T* 18mm f/3.5 ZE', #PH
-    33.4 => 'Carl Zeiss Distagon T* 21mm f/2.8 ZE', #PH
-    33.5 => 'Carl Zeiss Distagon T* 28mm f/2 ZE', #PH
-    33.6 => 'Carl Zeiss Distagon T* 35mm f/2 ZE', #PH
+    33.2 => 'Voigtlander Color Skopar 20mm f/3.5 SLII Aspherical', #50
+    33.3 => 'Voigtlander APO-Lanthar 90mm f/3.5 SLII Close Focus', #50
+    33.4 => 'Carl Zeiss Distagon T* 15mm f/2.8 ZE', #PH
+    33.5 => 'Carl Zeiss Distagon T* 18mm f/3.5 ZE', #PH
+    33.6 => 'Carl Zeiss Distagon T* 21mm f/2.8 ZE', #PH
+    33.7 => 'Carl Zeiss Distagon T* 28mm f/2 ZE', #PH
+    33.8 => 'Carl Zeiss Distagon T* 35mm f/2 ZE', #PH
     35 => 'Canon EF 35-80mm f/4-5.6', #32
     36 => 'Canon EF 38-76mm f/4.5-5.6', #32
     37 => 'Canon EF 35-80mm f/4-5.6 or Tamron Lens', #32
     37.1 => 'Tamron 70-200mm f/2.8 Di LD IF Macro', #PH
     37.2 => 'Tamron AF 28-300mm f/3.5-6.3 XR Di VC LD Aspherical [IF] Macro Model A20', #38
     37.3 => 'Tamron SP AF 17-50mm f/2.8 XR Di II VC LD Aspherical [IF]', #34
-    37.4 => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC LD Aspherical [IF] Macro', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2937.0.html
+    37.4 => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC LD Aspherical [IF] Macro', #forum2937
     38 => 'Canon EF 80-200mm f/4.5-5.6', #32
     39 => 'Canon EF 75-300mm f/4-5.6',
     40 => 'Canon EF 28-80mm f/3.5-5.6',
@@ -182,7 +185,7 @@ $VERSION = '3.26';
     51 => 'Canon EF-S 18-135mm f/3.5-5.6 IS', #PH
     52 => 'Canon EF-S 18-55mm f/3.5-5.6 IS II', #PH
     53 => 'Canon EF-S 18-55mm f/3.5-5.6 III', #Jon Charnas
-    54 => 'Canon EF-S 55-250mm f/4-5.6 IS II', #Exiv2
+    54 => 'Canon EF-S 55-250mm f/4-5.6 IS II', #47
     94 => 'Canon TS-E 17mm f/4L', #42
     95 => 'Canon TS-E 24.0mm f/3.5 L II', #43
     124 => 'Canon MP-E 65mm f/2.8 1-5x Macro Photo', #9
@@ -211,10 +214,10 @@ $VERSION = '3.26';
     137.3 => 'Sigma 18-250mm f/3.5-6.3 DC OS HSM', #PH (also Sigma 18-250mm f/3.5-6.3 DC Macro OS HSM)
     137.4 => 'Sigma 24-70mm f/2.8 IF EX DG HSM', #PH
     137.5 => 'Sigma 18-125mm f/3.8-5.6 DC OS HSM', #PH
-    137.6 => 'Sigma 17-70mm f/2.8-4 DC Macro OS HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2819.0.html (Contemporary version has this ID - PH)
-    137.7 => 'Sigma 17-50mm f/2.8 OS HSM', #PH (from Exiv2)
+    137.6 => 'Sigma 17-70mm f/2.8-4 DC Macro OS HSM', #forum2819 (Contemporary version has this ID - PH)
+    137.7 => 'Sigma 17-50mm f/2.8 OS HSM', #47
     137.8 => 'Sigma 18-200mm f/3.5-6.3 II DC OS HSM', #PH
-    137.9 => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC PZD', #(model B008)http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3090.0.html
+    137.9 => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC PZD', #(model B008)forum3090
    '137.10' => 'Sigma 8-16mm f/4.5-5.6 DC HSM', #50-Zwielicht
    '137.11' => 'Tamron SP 17-50mm f/2.8 XR Di II VC', #50 (model B005)
    '137.12' => 'Tamron SP 60mm f/2 Macro Di II', #50 (model G005)
@@ -256,13 +259,14 @@ $VERSION = '3.26';
     160.1 => 'Tamron AF 19-35mm f/3.5-4.5', #44
     160.2 => 'Tokina AT-X 124 AF Pro DX 12-24mm f/4', #49
     160.3 => 'Tokina AT-X 107 AF DX 10-17mm f/3.5-4.5 Fisheye', #PH (http://osdir.com/ml/digikam-devel/2011-04/msg00275.html)
-    160.4 => 'Tokina AT-X 116 AF Pro DX 11-16mm f/2.8', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3967.0.html
+    160.4 => 'Tokina AT-X 116 AF Pro DX 11-16mm f/2.8', #forum3967
     161 => 'Canon EF 28-70mm f/2.8L or Sigma or Tamron Lens',
     161.1 => 'Sigma 24-70mm f/2.8 EX',
     161.2 => 'Sigma 28-70mm f/2.8 EX', #PH (http://www.breezesys.com/forum/showthread.php?t=3718)
-    161.3 => 'Tamron AF 17-50mm f/2.8 Di-II LD Aspherical', #40
-    161.4 => 'Tamron 90mm f/2.8',
-    161.5 => 'Sigma 24-60mm f/2.8 EX DG', #PH (http://www.lensrentals.com/blog/2012/08/canon-illumination-correction-and-third-party-lenses)
+    161.3 => 'Sigma 24-60mm f/2.8 EX DG', #PH (http://www.lensrentals.com/blog/2012/08/canon-illumination-correction-and-third-party-lenses)
+    161.4 => 'Tamron AF 17-50mm f/2.8 Di-II LD Aspherical', #40
+    161.5 => 'Tamron 90mm f/2.8',
+    161.6 => 'Tamron SP AF 17-35mm f/2.8-4 Di LD Aspherical IF', #52 (A05)
     162 => 'Canon EF 200mm f/2.8L', #32
     163 => 'Canon EF 300mm f/4L', #32
     164 => 'Canon EF 400mm f/5.6L', #32
@@ -277,7 +281,7 @@ $VERSION = '3.26';
     169.4 => 'Sigma 50mm f/1.4 EX DG HSM', #PH
     169.5 => 'Sigma 85mm f/1.4 EX DG HSM', #Rolando Ruzic
     169.6 => 'Sigma 30mm f/1.4 EX DC HSM', #Rodolfo Borges
-    169.7 => 'Sigma 35mm f/1.4 DG HSM', #PH
+    169.7 => 'Sigma 35mm f/1.4 DG HSM', #PH (also "| A" version, ref forum3833)
     170 => 'Canon EF 200mm f/2.8L II', #9
     171 => 'Canon EF 300mm f/4L', #15
     172 => 'Canon EF 400mm f/5.6L', #32
@@ -286,14 +290,15 @@ $VERSION = '3.26';
     173.2 => 'Sigma APO Macro 150mm f/2.8 EX DG HSM', #14
     174 => 'Canon EF 135mm f/2L or Sigma Lens', #9
     174.1 => 'Sigma 70-200mm f/2.8 EX DG APO OS HSM', #PH (probably version II of this lens)
-    174.2 => 'Sigma 50-500mm f/4.5-6.3 APO DG OS HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4031.0.html
+    174.2 => 'Sigma 50-500mm f/4.5-6.3 APO DG OS HSM', #forum4031
     174.3 => 'Sigma 150-500mm f/5-6.3 APO DG OS HSM', #47
     175 => 'Canon EF 400mm f/2.8L', #32
     176 => 'Canon EF 24-85mm f/3.5-4.5 USM',
     177 => 'Canon EF 300mm f/4L IS', #9
     178 => 'Canon EF 28-135mm f/3.5-5.6 IS',
     179 => 'Canon EF 24mm f/1.4L', #20
-    180 => 'Canon EF 35mm f/1.4L', #9
+    180 => 'Canon EF 35mm f/1.4L or Sigma Lens', #9
+    180.1 => 'Sigma 50mm f/1.4 DG HSM | A', #50
     181 => 'Canon EF 100-400mm f/4.5-5.6L IS + 1.4x', #15
     182 => 'Canon EF 100-400mm f/4.5-5.6L IS + 2x',
     183 => 'Canon EF 100-400mm f/4.5-5.6L IS or Sigma Lens',
@@ -305,7 +310,7 @@ $VERSION = '3.26';
     187 => 'Canon EF 70-200mm f/4L + 1.4x', #26
     188 => 'Canon EF 70-200mm f/4L + 2x', #PH
     189 => 'Canon EF 70-200mm f/4L + 2.8x', #32
-    190 => 'Canon EF 100mm f/2.8 Macro',
+    190 => 'Canon EF 100mm f/2.8 Macro USM', # (+USM ref 42)
     191 => 'Canon EF 400mm f/4 DO IS', #9
     193 => 'Canon EF 35-80mm f/4-5.6 USM', #32
     194 => 'Canon EF 80-200mm f/4.5-5.6 USM', #32
@@ -324,9 +329,11 @@ $VERSION = '3.26';
     211 => 'Canon EF 28-200mm f/3.5-5.6 USM', #15
     212 => 'Canon EF 28-105mm f/4-5.6 USM', #15
     213 => 'Canon EF 90-300mm f/4.5-5.6 USM or Tamron Lens',
-    213.1 => 'Tamron SP 150-600mm F/5-6.3 Di VC USD', #topic5565 (Model A011)
+    213.1 => 'Tamron SP 150-600mm f/5-6.3 Di VC USD', #topic5565 (model A011)
+    213.2 => 'Tamron 16-300mm f/3.5-6.3 Di II VC PZD Macro', #PH (model B016)
     214 => 'Canon EF-S 18-55mm f/3.5-5.6 USM', #PH/34
     215 => 'Canon EF 55-200mm f/4.5-5.6 II USM',
+    217 => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC PZD', #47
     224 => 'Canon EF 70-200mm f/2.8L IS', #11
     225 => 'Canon EF 70-200mm f/2.8L IS + 1.4x', #11
     226 => 'Canon EF 70-200mm f/2.8L IS + 2x', #14
@@ -358,6 +365,7 @@ $VERSION = '3.26';
     252 => 'Canon EF 70-200mm f/2.8L IS II USM + 1.4x', #50 (1.4x Mk II)
     253 => 'Canon EF 70-200mm f/2.8L IS II USM + 2x', #PH (NC)
     254 => 'Canon EF 100mm f/2.8L Macro IS USM', #42
+    255 => 'Sigma 24-105mm f/4 DG OS HSM | A', #50
     # Note: LensType 488 (0x1e8) is reported as 232 (0xe8) in 7D CameraSettings
     488 => 'Canon EF-S 15-85mm f/3.5-5.6 IS USM', #PH
     489 => 'Canon EF 70-300mm f/4-5.6L IS USM', #Gerald Kapounek
@@ -373,6 +381,7 @@ $VERSION = '3.26';
     503 => 'Canon EF 24mm f/2.8 IS USM', #PH
     504 => 'Canon EF 24-70mm f/4L IS USM', #PH
     505 => 'Canon EF 35mm f/2 IS USM', #PH
+    507 => 'Canon EF 16-35mm f/4L IS USM', #42
     # (STM lenses seem to start with 0x10xx)
     4142 => 'Canon EF-S 18-135mm f/3.5-5.6 IS STM',
     4143 => 'Canon EF-M 18-55mm f/3.5-5.6 IS STM',
@@ -381,6 +390,7 @@ $VERSION = '3.26';
     4146 => 'Canon EF-S 18-55mm f/3.5-5.6 IS STM', #PH
     4147 => 'Canon EF-M 11-22mm f/4-5.6 IS STM', #42
     4148 => 'Canon EF-S 55-250mm f/4-5.6 IS STM', #42
+    4150 => 'Canon EF-S 10-18mm f/4.5-5.6 IS STM', #42
 );
 
 # Canon model ID numbers (PH)
@@ -535,7 +545,11 @@ $VERSION = '3.26';
     0x3110000 => 'PowerShot S100 (new)',
     0x3130000 => 'PowerShot SX40 HS',
     0x3120000 => 'PowerShot ELPH 310 HS / IXUS 230 HS / IXY 600F',
-    0x3140000 => 'PowerShot ELPH 500 HS / IXUS 320 HS / IXY 32S', # (duplicate PowerShot model???)
+    # the Canon page lists the IXY 32S as "Japan only", but many other
+    # sites list the ELPH 500 HS and IXUS 320 HS as being the same model.
+    # I haven't been able to find an IXUS 320 sample, and the ELPH 500 HS
+    # is already associated with other IXUS and IXY models - PH
+    0x3140000 => 'IXY 32S', # (PowerShot ELPH 500 HS / IXUS 320 HS ??)
     0x3160000 => 'PowerShot A1300',
     0x3170000 => 'PowerShot A810',
     0x3180000 => 'PowerShot ELPH 320 HS / IXUS 240 HS / IXY 420F',
@@ -555,14 +569,14 @@ $VERSION = '3.26';
     0x3360000 => 'PowerShot S110 (new)',
     0x3370000 => 'PowerShot SX500 IS',
     0x3380000 => 'PowerShot N',
-    0x3390000 => 'IXUS 245 HS / IXY 430F', # (apparently no PowerShot equivalent)
+    0x3390000 => 'IXUS 245 HS / IXY 430F', # (no PowerShot)
     0x3400000 => 'PowerShot SX280 HS',
     0x3410000 => 'PowerShot SX270 HS',
     0x3420000 => 'PowerShot A3500 IS',
     0x3430000 => 'PowerShot A2600',
     0x3450000 => 'PowerShot A1400',
     0x3460000 => 'PowerShot ELPH 130 IS / IXUS 140 / IXY 110F',
-    0x3470000 => 'PowerShot ELPH 115 IS / IXUS 132/135 / IXY 90F',
+    0x3470000 => 'PowerShot ELPH 115/120 IS / IXUS 132/135 / IXY 90F/100F',
     0x3490000 => 'PowerShot ELPH 330 HS / IXUS 255 HS / IXY 610F',
     0x3510000 => 'PowerShot A2500',
     0x3540000 => 'PowerShot G16',
@@ -570,11 +584,16 @@ $VERSION = '3.26';
     0x3560000 => 'PowerShot SX170 IS',
     0x3580000 => 'PowerShot SX510 HS',
     0x3590000 => 'PowerShot S200 (new)',
+    0x3600000 => 'IXY 620F', # (no PowerShot or IXUS?)
     0x3610000 => 'PowerShot N100',
     0x3640000 => 'PowerShot G1 X Mark II',
     0x3650000 => 'PowerShot D30',
     0x3660000 => 'PowerShot SX700 HS',
     0x3670000 => 'PowerShot SX600 HS',
+    0x3680000 => 'PowerShot ELPH 140 IS / IXUS 150', # IXY?
+    0x3690000 => 'PowerShot ELPH 135 / IXUS 145 / IXY 120',
+    0x3700000 => 'PowerShot ELPH 340 HS / IXUS 265 HS / IXY 630',
+    0x3710000 => 'PowerShot ELPH 150 IS / IXUS 155 / IXY 140',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
 
@@ -669,6 +688,7 @@ my %canonQuality = (
     130 => 'Normal Movie', #22
 );
 my %canonImageSize = (
+   -1 => 'n/a',
     0 => 'Large',
     1 => 'Medium',
     2 => 'Small',
@@ -1238,15 +1258,18 @@ my %binaryDataAttrs = (
         ValueConv => '$val =~ s/^8 //; $val',
         ValueConvInv => '"8 $val"',
         PrintConvColumns => 2,
-        PrintConv => { BITMASK => {
-            0 => 'People',
-            1 => 'Scenery',
-            2 => 'Events',
-            3 => 'User 1',
-            4 => 'User 2',
-            5 => 'User 3',
-            6 => 'To Do',
-        } },
+        PrintConv => {
+            0 => '(none)',
+            BITMASK => {
+                0 => 'People',
+                1 => 'Scenery',
+                2 => 'Events',
+                3 => 'User 1',
+                4 => 'User 2',
+                5 => 'User 3',
+                6 => 'To Do',
+            },
+        },
     },
     0x24 => { #PH
         Name => 'FaceDetect1',
@@ -1287,6 +1310,7 @@ my %binaryDataAttrs = (
         ValueConv => 'unpack("H*", $val)',
         ValueConvInv => 'pack("H*", $val)',
     },
+    # 0x29 - WBInfo (ref 52, offset 0x6 is int32u[4] WB_GRBGLevels as shot for PowerShot G9)
     # 0x2d - changes with categories (ref 31)
     0x2f => { #PH (G12)
         Name => 'FaceDetect3',
@@ -1430,10 +1454,7 @@ my %binaryDataAttrs = (
     0xa9 => {
         Name => 'ColorBalance',
         SubDirectory => {
-            # this offset is necessary because the table is interpreted as short rationals
-            # (4 bytes long) but the first entry is 2 bytes into the table.
-            Start => '$valuePtr + 2',
-            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart-2,$size+2)',
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
             TagTable => 'Image::ExifTool::Canon::ColorBalance',
         },
     },
@@ -1568,7 +1589,7 @@ my %binaryDataAttrs = (
         Unknown => 1,
     },
     # 0x4009 (BasePictStyleOfPC)
-    0x4010 => { #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2933.0.html
+    0x4010 => { #forum2933
         Name => 'CustomPictureStyleFileName', # (PictStyleCaption)
         Writable => 'string',
     },
@@ -1584,15 +1605,31 @@ my %binaryDataAttrs = (
         },
     },
     # 0x4014 (similar to 0x83?)
-    0x4015 => {
+    0x4015 => [{
         Name => 'VignettingCorr', # (LensPacket)
-        Condition => '$$valPt !~ /^\0\0\0\0/', # (data may be all zeros for 60D)
+        Condition => '$$valPt =~ /^\0/ and $$valPt !~ /^\0\0\0\0/', # (data may be all zeros for 60D)
         SubDirectory => {
             # (the size word is at byte 2 in this structure)
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart+2,$size)',
             TagTable => 'Image::ExifTool::Canon::VignettingCorr',
         },
-    },
+    },{
+        Name => 'VignettingCorrUnknown1',
+        Condition => '$$valPt =~ /^[\x01\x02]/ and $$valPt !~ /^\0\0\0\0/',
+        SubDirectory => {
+            # (the size word is at byte 2 in this structure)
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart+2,$size)',
+            TagTable => 'Image::ExifTool::Canon::VignettingCorrUnknown',
+        },
+    },{
+        Name => 'VignettingCorrUnknown2',
+        Condition => '$$valPt !~ /^\0\0\0\0/',
+        SubDirectory => {
+            # (the size word is at byte 4 for version 3 of this structure)
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart+4,$size)',
+            TagTable => 'Image::ExifTool::Canon::VignettingCorrUnknown',
+        },
+    }],
     0x4016 => {
         Name => 'VignettingCorr2', # (ImageCorrectActual)
         SubDirectory => {
@@ -1691,6 +1728,9 @@ my %binaryDataAttrs = (
             4 => 'Continuous, Low', #PH
             5 => 'Continuous, High', #PH
             6 => 'Silent Single', #PH
+            # ref A: http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5701.msg27843.html#msg27843
+            9 => 'Single, Silent', #A
+            10 => 'Continuous, Silent', #A
             # 11 - seen for SX260
             # 32-34 - Self-timer?
         },
@@ -1963,17 +2003,20 @@ my %binaryDataAttrs = (
     29 => {
         Name => 'FlashBits',
         PrintConvColumns => 2,
-        PrintConv => { BITMASK => {
-            0 => 'Manual', #PH
-            1 => 'TTL', #PH
-            2 => 'A-TTL', #PH
-            3 => 'E-TTL', #PH
-            4 => 'FP sync enabled',
-            7 => '2nd-curtain sync used',
-            11 => 'FP sync used',
-            13 => 'Built-in',
-            14 => 'External', #(may not be set in manual mode - ref 37)
-        } },
+        PrintConv => {
+            0 => '(none)',
+            BITMASK => {
+                0 => 'Manual', #PH
+                1 => 'TTL', #PH
+                2 => 'A-TTL', #PH
+                3 => 'E-TTL', #PH
+                4 => 'FP sync enabled',
+                7 => '2nd-curtain sync used',
+                11 => 'FP sync used',
+                13 => 'Built-in',
+                14 => 'External', #(may not be set in manual mode - ref 37)
+            },
+        },
     },
     32 => {
         Name => 'FocusContinuous',
@@ -2233,6 +2276,7 @@ my %binaryDataAttrs = (
     9 => {
         Name => 'SequenceNumber',
         Description => 'Shot Number In Continuous Burst',
+        Notes => 'valid only for some models', #PH (eg. not the 5DmkIII)
     },
     10 => { #PH/17
         Name => 'OpticalZoomCode',
@@ -3181,23 +3225,25 @@ my %ciMaxFocal = (
         Name => 'AFPointsInFocus5D',
         Format => 'int16uRev',
         PrintConvColumns => 2,
-        PrintConv => { BITMASK => {
-            0 => 'Center',
-            1 => 'Top',
-            2 => 'Bottom',
-            3 => 'Upper-left',
-            4 => 'Upper-right',
-            5 => 'Lower-left',
-            6 => 'Lower-right',
-            7 => 'Left',
-            8 => 'Right',
-            9 => 'AI Servo1',
-           10 => 'AI Servo2',
-           11 => 'AI Servo3',
-           12 => 'AI Servo4',
-           13 => 'AI Servo5',
-           14 => 'AI Servo6',
-        } },
+        PrintConv => { 0 => '(none)',
+            BITMASK => {
+                0 => 'Center',
+                1 => 'Top',
+                2 => 'Bottom',
+                3 => 'Upper-left',
+                4 => 'Upper-right',
+                5 => 'Lower-left',
+                6 => 'Lower-right',
+                7 => 'Left',
+                8 => 'Right',
+                9 => 'AI Servo1',
+               10 => 'AI Servo2',
+               11 => 'AI Servo3',
+               12 => 'AI Servo4',
+               13 => 'AI Servo5',
+               14 => 'AI Servo6',
+           },
+        },
     },
     0x54 => { #15
         Name => 'WhiteBalance',
@@ -4964,69 +5010,90 @@ my %ciMaxFocal = (
         PrintConv => '"$val C"',
         PrintConvInv => '$val=~s/ ?C//; $val',
     },
-    466 => { # [-3]
+    -3 => {
         Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 469',
-        Notes => '100HS, 300HS, 500HS, A1200, A2200, A3200 and A3300',
+        Condition => '$$self{CameraInfoCount} > 400',
+        Notes => '3 entries from end of record for most newer camera models',
         PrintConv => '"$val C"',
         PrintConvInv => '$val=~s/ ?C//; $val',
     },
-    503 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 506',
-        Notes => 'A800',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    506 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 509',
-        Notes => 'SX230HS',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    520 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 523',
-        Notes => '310HS, 510HS, G1X, S100 (new), SX40HS and SX150',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    524 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 527',
-        Notes => '110HS, 520HS, A2300, A2400, A3400, A4000, D20 and SX260HS',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    532 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 535',
-        Notes => 'S110 (new), G15, SX50, SX160IS and SX500IS',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    547 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 550',
-        Notes => '130IS, A1400, A2500 and A2600',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    549 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 552',
-        Notes => '115IS, 130IS, SX270, SX280, 330HS and A3500',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    552 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 555',
-        Notes => 'S200 (new)',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
+#    466 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 469',
+#        Notes => '100HS, 300HS, 500HS, A1200, A2200, A3200 and A3300',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    503 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 506',
+#        Notes => 'A800',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    506 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 509',
+#        Notes => 'SX230HS',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    520 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 523',
+#        Notes => '310HS, 510HS, G1X, S100 (new), SX40HS and SX150',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    524 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 527',
+#        Notes => '110HS, 520HS, A2300, A2400, A3400, A4000, D20 and SX260HS',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    532 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 535',
+#        Notes => 'S110 (new), G15, SX50, SX160IS and SX500IS',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    547 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 550',
+#        Notes => '130IS, A1400, A2500 and A2600',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    549 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 552',
+#        Notes => '115IS, 130IS, SX270, SX280, 330HS and A3500',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    552 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 555',
+#        Notes => 'S200 (new)',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    850 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 853',
+#        Notes => 'N',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    895 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 898',
+#        Notes => 'G1XmkII, N100, SX600HS and SX700HS',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
 );
 
 # unknown Canon camera information (MakerNotes tag 0x0d) - PH
@@ -5840,6 +5907,7 @@ my %ciMaxFocal = (
     FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    DATAMEMBER => [ 20 ],
     1 => [
         { #5
             Name => 'FileNumber',
@@ -6012,6 +6080,25 @@ my %ciMaxFocal = (
         Name => 'LiveViewShooting',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
+    20 => { #47
+        Name => 'FocusDistanceUpper',
+        DataMember => 'FocusDistanceUpper2',
+        Format => 'int16u',
+        RawConv => '($$self{FocusDistanceUpper2} = $val) || undef',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => '$val > 655.345 ? "inf" : "$val m"',
+        PrintConvInv => '$val =~ s/ ?m$//; IsFloat($val) ? $val : 655.35',
+    },
+    21 => { #47
+        Name => 'FocusDistanceLower',
+        Condition => '$$self{FocusDistanceUpper2}',
+        Format => 'int16u',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => '$val > 655.345 ? "inf" : "$val m"',
+        PrintConvInv => '$val =~ s/ ?m$//; IsFloat($val) ? $val : 655.35',
+    },
     # 22 - values: 0, 1
     # 23 - values: 0, 21, 22
     25 => { #PH
@@ -6062,7 +6149,7 @@ my %ciMaxFocal = (
     # (could use better names for these, or the Crop tags above, or both)
     1 => 'CroppedImageWidth',
     2 => 'CroppedImageHeight',
-    3 => 'CroppedImageLeft', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4138.0.html
+    3 => 'CroppedImageLeft', #forum4138
     4 => 'CroppedImageTop', #ditto
 );
 
@@ -6137,15 +6224,16 @@ my %ciMaxFocal = (
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # red,green1,green2,blue (ref 2)
-    0  => { Name => 'WB_RGGBLevelsAuto',       Format => 'int16s[4]' },
-    4  => { Name => 'WB_RGGBLevelsDaylight',   Format => 'int16s[4]' },
-    8  => { Name => 'WB_RGGBLevelsShade',      Format => 'int16s[4]' },
-    12 => { Name => 'WB_RGGBLevelsCloudy',     Format => 'int16s[4]' },
-    16 => { Name => 'WB_RGGBLevelsTungsten',   Format => 'int16s[4]' },
-    20 => { Name => 'WB_RGGBLevelsFluorescent',Format => 'int16s[4]' },
-    24 => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16s[4]' },
-    28 => { Name => 'WB_RGGBLevelsCustom',     Format => 'int16s[4]' },
-    32 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16s[4]' },
+    1  => { Name => 'WB_RGGBLevelsAuto',       Format => 'int16s[4]' },
+    5  => { Name => 'WB_RGGBLevelsDaylight',   Format => 'int16s[4]' },
+    9  => { Name => 'WB_RGGBLevelsShade',      Format => 'int16s[4]' },
+    13 => { Name => 'WB_RGGBLevelsCloudy',     Format => 'int16s[4]' },
+    17 => { Name => 'WB_RGGBLevelsTungsten',   Format => 'int16s[4]' },
+    21 => { Name => 'WB_RGGBLevelsFluorescent',Format => 'int16s[4]' },
+    25 => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16s[4]' },
+    29 => { Name => 'WB_RGGBLevelsCustom',     Format => 'int16s[4]' }, # (actually black levels for D60, ref 52)
+    33 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16s[4]' },
+    37 => { Name => 'WB_RGGBBlackLevels',      Format => 'int16s[4]' }, #52
 );
 
 # Measured color levels (MakerNotes tag 0xaa) (ref 37)
@@ -6684,7 +6772,7 @@ my %ciMaxFocal = (
     # not a green coefficient) - PH
     NOTES => q{
         Camera color calibration data.  For the 20D, 350D, 1DmkII and 1DSmkII the
-        order of the cooefficients is A, B, C, Temperature, but for newer models it
+        order of the coefficients is A, B, C, Temperature, but for newer models it
         is B, C, A, Temperature.  These tags are extracted only when the Unknown
         option is used.
     },
@@ -6983,11 +7071,12 @@ my %ciMaxFocal = (
     FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => q{
-        This information is found in images from the 1DmkIV, 5DmkII, 7D, 50D, 60D,
-        500D and 550D.
+    NOTES => 'This information is found in images from newer EOS models.',
+    0 => {
+        Name => 'VignettingCorrVersion',
+        Format => 'int8u',
+        Writable => 0,
     },
-    # 0 => 'PeripheralLightingVersion', value = 0x1000
     2 => {
         Name => 'PeripheralLighting',
         PrintConv => { 0 => 'Off', 1 => 'On' },
@@ -7007,6 +7096,19 @@ my %ciMaxFocal = (
         Notes => 'full size of original image before being rotated or scaled in camera',
     },
     12 => 'OriginalImageHeight',
+);
+
+%Image::ExifTool::Canon::VignettingCorrUnknown = (
+    %binaryDataAttrs,
+    FORMAT => 'int16s',
+    FIRST_ENTRY => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'Vignetting correction from PowerShot models.',
+    0 => {
+        Name => 'VignettingCorrVersion',
+        Format => 'int8u',
+        Writable => 0,
+    },
 );
 
 # More Vignetting correction information (MakerNotes tag 0x4016)
@@ -7049,7 +7151,7 @@ my %ciMaxFocal = (
     %binaryDataAttrs,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    0 => { # this doesn't seem to be valid for some models (ie. 550D, 7D?, 1DmkIV?)
+    0 => { # this doesn't seem to be valid for some models (eg. 550D, 7D?, 1DmkIV?)
         Name => 'LensSerialNumber',
         Notes => q{
             apparently this is an internal serial number because it doesn't correspond
@@ -7401,7 +7503,8 @@ sub CalcSensorDiag($$)
 sub PrintLensID(@)
 {
     my ($printConv, $lensType, $shortFocal, $longFocal, $maxAperture, $lensModel) = @_;
-    my $lens = $$printConv{$lensType};
+    my $lens;
+    $lens = $$printConv{$lensType} unless $lensType eq '-1';
     if ($lens) {
         # return this lens unless other lenses have the same LensType
         return LensWithTC($lens, $shortFocal) unless $$printConv{"$lensType.1"};
@@ -7814,7 +7917,7 @@ sub PrintAFPoints1D($)
 #------------------------------------------------------------------------------
 # Convert Canon hex-based EV (modulo 0x20) to real number
 # Inputs: 0) value to convert
-# ie) 0x00 -> 0
+# eg) 0x00 -> 0
 #     0x0c -> 0.33333
 #     0x10 -> 0.5
 #     0x14 -> 0.66666

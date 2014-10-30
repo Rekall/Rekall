@@ -8,6 +8,7 @@
 # References:   1) http://www.ozhiker.com/electronics/pjmt/jpeg_info/ricoh_mn.html
 #               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_ricoh.htm
 #               3) Tim Gray private communication (GR)
+#               4) https://github.com/atotto/ricoh-theta-tools/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Ricoh;
@@ -17,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.26';
+$VERSION = '1.28';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -47,7 +48,7 @@ my %ricohLensIDs = (
     0x0002 => { #PH
         Name => 'FirmwareVersion',
         Writable => 'string',
-        # ie. "Rev0113" is firmware version 1.13
+        # eg. "Rev0113" is firmware version 1.13
         PrintConv => '$val=~/^Rev(\d+)$/ ? sprintf("%.2f",$1/100) : $val',
         PrintConvInv => '$val=~/^(\d+)\.(\d+)$/ ? sprintf("Rev%.2d%.2d",$1,$2) : $val',
     },
@@ -421,6 +422,47 @@ my %ricohLensIDs = (
             },
         },
     ],
+    0x4001 => {
+        Name => 'ThetaSubdir',
+        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Ricoh::ThetaSubdir',
+            Start => '$val',
+        },
+    },
+);
+
+# Ricoh type 2 maker notes (ref PH)
+# (similar to Kodak::Type11 and GE::Main)
+%Image::ExifTool::Ricoh::Type2 = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        Tags written by models such as the Ricoh HZ15 and the Pentax XG-1.  These
+        are not writable due to numerous formatting errors as written by these
+        cameras.
+    },
+    # 0x104 - int32u: 1
+    # 0x200 - int32u[3]: 0 0 0
+    # 0x202 - int16u: 0 (GE Macro?)
+    # 0x203 - int16u: 0,3 (Kodak PictureEffect?)
+    # 0x204 - rational64u: 0/10
+    # 0x206 - float[6]: (not really float because size should be 2 bytes)
+    # 0x207 - string[4]: zeros (GE/Kodak Model?)
+    0x300 => {
+        # brutal.  There are lots of errors in the XG-1 maker notes.  For the XG-1,
+        # 0x300 has a value of "XG-1Pentax".  The "XG-1" part is likely an improperly
+        # stored 0x207 RicohModel, resulting in an erroneous 4-byte offset for this tag
+        Name => 'RicohMake',
+        Writable => 'undef',
+        ValueConv => '$val =~ s/ *$//; $val',
+    },
+    # 0x306 - int16u: 1
+    # 0x500 - int16u: 0
+    # 0x501 - int16u: 0
+    # 0x502 - int16u: 0
+    # 0x9c9c - int8u[6]: ?
+    # 0xadad - int8u[20480]: ?
 );
 
 # Ricoh image info (ref 2)
@@ -594,6 +636,31 @@ my %ricohLensIDs = (
         SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::SerialInfo' },
     }
     # 0x000E ProductionNumber? (ref 2) [no. zero for most models - PH]
+);
+
+
+# Ricoh Theta subdirectory tags - Contains orientation information (ref 4)
+%Image::ExifTool::Ricoh::ThetaSubdir = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    # 0x0001 => Unknown
+    # 0x0002 => Unknown
+    0x0003 => {
+        Name => 'Accelerometer',
+        Writable => 'rational64s',
+        Count => 2,
+    },
+    0x0004 => {
+        Name => 'Compass',
+        Writable => 'rational64u',
+    },
+    # 0x0005 => Unknown
+    # 0x0101 => Unknown - ISO Speed?
+    # 0x0102 => Unknown - F Number?
+    # 0x0103 => Unknown - Exposure?
+    # 0x0104 => Unknown - Serial Number?
+    # 0x0105 => Unknown - Serial Number?
 );
 
 # face detection information (ref PH, CX4)
@@ -826,6 +893,14 @@ my %ricohLensIDs = (
         RawConv => '$val[0] ? $val[0] : undef',
         ValueConv => '$val=~s/\s*:.*//; $val',
         PrintConv => \%ricohLensIDs,
+    },
+    RicohPitch => {
+        Require => 'Ricoh:Accelerometer',
+        ValueConv => 'my @v = split(" ",$val); $v[1]',
+    },
+    RicohRoll => {
+        Require => 'Ricoh:Accelerometer',
+        ValueConv => 'my @v = split(" ",$val); $v[0] <= 180 ? $v[0] : $v[0] - 360',
     },
 );
 

@@ -32,9 +32,9 @@ use vars qw($VERSION %leicaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.83';
+$VERSION = '1.86';
 
-sub ProcessPanasonicType2($$$);
+sub ProcessLeicaLEIC($$$);
 sub WhiteBalanceConv($;$$);
 
 # Leica lens types (ref 10)
@@ -556,8 +556,24 @@ my %shootingMode = (
                 47 => 'Dynamic Mono', #(GF5)
                 50 => 'Impressive Art', #(GF5)
                 51 => 'Cross Process', #(GF5)
+                100 => 'High Dynamic 2', #Exiv2 (G6)
+                101 => 'Retro 2', #Exiv2 (G6)
+                102 => 'High Key 2', #Exiv2 (G6)
+                103 => 'Low Key 2', #Exiv2 (G6)
+                104 => 'Toy Effect 2', #Exiv2 (G6)
                 107 => 'Expressive 2', #(GF6)
+                112 => 'Sepia', #Exiv2 (G6)
+                117 => 'Miniature', #Exiv2 (G6)
                 122 => 'Dynamic Monochrome', #(GF6)
+                127 => 'Old Days', #Exiv2 (G6)
+                132 => 'Dynamic Monochrome 2', #Exiv2 (G6)
+                135 => 'Impressive Art 2', #Exiv2 (G6)
+                136 => 'Cross Process 2', #Exiv2 (G6)
+                137 => 'Toy Pop', #Exiv2 (G6)
+                138 => 'Fantasy', #Exiv2 (G6)
+                256 => 'Normal 3', #Exiv2 (G6)
+                272 => 'Standard', #Exiv2 (G6)
+                288 => 'High', #Exiv2 (G6)
                 # more new modes for GF6:
                 # ? => 'Old Days',
                 # ? => 'Toy Pop',
@@ -731,7 +747,7 @@ my %shootingMode = (
         Name => 'FilmMode',
         Writable => 'int16u',
         PrintConv => {
-            0 => 'n/a', #PH (ie. FZ100 "Photo Frame" ShootingMode)
+            0 => 'n/a', #PH (eg. FZ100 "Photo Frame" ShootingMode)
             1 => 'Standard (color)',
             2 => 'Dynamic (color)',
             3 => 'Nature (color)',
@@ -1550,7 +1566,14 @@ my %shootingMode = (
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
     WRITABLE => 1,
-    NOTES => 'This information is written by the X1.',
+    PRIORITY => 0,
+    NOTES => 'This information is written by the X1, X2, X VARIO and T.',
+    0x0303 => {
+        Name => 'LensModel',
+        Condition => '$format eq "string"',
+        Notes => 'Leica T only',
+        Writable => 'string',
+    },
     # 0x0406 - saturation or sharpness
     0x0407 => { Name => 'OriginalFileName', Writable => 'string' },
     0x0408 => { Name => 'OriginalDirectory',Writable => 'string' },
@@ -1562,6 +1585,7 @@ my %shootingMode = (
         PrintConv => {
             '0 0 0 0' => 'Program AE',
             '1 0 0 0' => 'Aperture-priority AE',
+            '1 1 0 0' => 'Aperture-priority AE (1)', # (see for Leica T)
             '2 0 0 0' => 'Shutter speed priority AE', #(guess)
             '3 0 0 0' => 'Manual',
         },
@@ -1771,32 +1795,79 @@ my %shootingMode = (
     },
 );
 
+# PANA atom found in user data of MP4 videos (ref PH)
 %Image::ExifTool::Panasonic::PANA = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     NOTES => q{
-        Tags extracted from the PANA user data found in MP4 videos from models such
-        as the DMC-FT20.
+        Tags extracted from the PANA and LEIC user data found in MP4 videos from
+        various Panasonic and Leica models.
     },
-    0 => {
+    0x00 => {
+        Name => 'Make',
+        Condition => '$$valPt =~ /^(LEICA|Panasonic)/', # (only seen "LEICA")
+        Groups => { 2 => 'Camera' },
+        Format => 'string[22]',
+        RawConv => '$$self{LeicaLEIC} = 1;$$self{Make} = $val',
+    },
+    0x04 => {
+        Name => 'Model',
+        Condition => '$$valPt =~ /^[^\0]{6}/ and not $$self{LeicaLEIC}',
+        Description => 'Camera Model Name',
+        Groups => { 2 => 'Camera' },
+        Format => 'string[16]',
+        RawConv => '$$self{Model} = $val',
+    },
+    0x0c => { # (FZ1000)
+        Name => 'Model',
+        Condition => '$$valPt =~ /^[^\0]{6}/ and not $$self{LeicaLEIC} and not $$self{Model}',
+        Description => 'Camera Model Name',
+        Groups => { 2 => 'Camera' },
+        Format => 'string[16]',
+        RawConv => '$$self{Model} = $val',
+    },
+    0x16 => {
+        Name => 'Model',
+        Condition => '$$self{LeicaLEIC}',
+        Description => 'Camera Model Name',
+        Groups => { 2 => 'Camera' },
+        Format => 'string[30]',
+        RawConv => '$$self{Model} = $val',
+    },
+    0x40 => {
         Name => 'ThumbnailTest',
-        Format => 'undef[0x1000]',
+        Format => 'undef[0x600]',
         Hidden => 1,
         RawConv => q{
-            if (substr($val,0x5c,3) eq "\xff\xd8\xff") {
+            if (substr($val,0x1c,3) eq "\xff\xd8\xff") { # offset 0x5c
                 $$self{ThumbType} = 1;
-            } elsif (substr($val,0x546,3) eq "\xff\xd8\xff") {
+            } elsif (substr($val,0x506,3) eq "\xff\xd8\xff") { # offset 0x546
                 $$self{ThumbType} = 2;
+            } elsif (substr($val,0x51e,3) eq "\xff\xd8\xff") { # offset 0x55e (Leica T)
+                $$self{ThumbType} = 3;
             } else {
                 $$self{ThumbType} = 0;
             }
             return undef;
         },
     },
-    4 => {
-        Name => 'Model',
-        Description => 'Camera Model Name',
-        Format => 'string[16]',
+    0x34 => {
+        Name => 'Version1',
+        Condition => '$$self{LeicaLEIC}',
+        Format => 'string[14]',
+    },
+    0x3e => {
+        Name => 'Version2',
+        Condition => '$$self{LeicaLEIC}',
+        Format => 'string[14]',
+    },
+    0x50 => {
+        Name => 'MakerNoteLeica5',
+        Condition => '$$self{LeicaLEIC}',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Leica5',
+            ProcessProc => \&ProcessLeicaLEIC,
+        },
     },
     0x58 => {
         Name => 'ThumbnailWidth',
@@ -1839,7 +1910,38 @@ my %shootingMode = (
         Format => 'undef[$val{0x53e}]',
         Binary => 1,
     },
+    0x54e => { # (Leica T)
+        Name => 'ThumbnailWidth',
+        Condition => '$$self{ThumbType} == 3',
+        Notes => 'Leica X Vario',
+        Format => 'int32uRev', # (little-endian)
+    },
+    0x552 => { # (Leica T)
+        Name => 'ThumbnailHeight',
+        Condition => '$$self{ThumbType} == 3',
+        Format => 'int32uRev', # (little-endian)
+    },
+    0x556 => { # (Leica T)
+        Name => 'ThumbnailLength',
+        Condition => '$$self{ThumbType} == 3',
+        Format => 'int32uRev', # (little-endian)
+    },
+    0x55e => { # (Leica T)
+        Name => 'ThumbnailImage',
+        Condition => '$$self{ThumbType} == 3',
+        Format => 'undef[$val{0x556}]',
+        Binary => 1,
+    },
     0x4068 => {
+        Name => 'ExifData',
+        Condition => '$$valPt =~ /^\xff\xd8\xff\xe1..Exif\0\0/s',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Exif::Main',
+            ProcessProc => \&Image::ExifTool::ProcessTIFF,
+            Start => 12,
+        },
+    },
+    0x4080 => { # (FZ1000)
         Name => 'ExifData',
         Condition => '$$valPt =~ /^\xff\xd8\xff\xe1..Exif\0\0/s',
         SubDirectory => {
@@ -1978,6 +2080,35 @@ sub WhiteBalanceConv($;$$)
         return ($val - 0x8000) . ' Kelvin' if $val > 0x8000;
     }
     return undef;
+}
+
+#------------------------------------------------------------------------------
+# Process Leica makernotes in LEIC atom of MP4 videos (Leica T and X Vario)
+# Inputs: 0) ExifTool ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessLeicaLEIC($$$)
+{
+    my ($et, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $dirLen = $$dirInfo{DirLen} || (length($$dataPt) - $dirStart);
+    return 0 if $dirLen < 6;
+    SetByteOrder('II');
+    my $numEntries = Get16u($dataPt, $dirStart);
+    return 0 if $numEntries < 1 or $numEntries > 255;
+    my $size = Get32u($dataPt, $dirStart + 2);
+    return 0 if $size < $numEntries * 12 or $size + 6 > $dirLen;
+    # the Leica programmers want to make things difficult, so they store
+    # the entry count before the directory size, making it impossible to
+    # process as a standard TIFF IFD without a bit of reorganization...
+    Set16u($numEntries, $dataPt, $dirStart + 4);
+    my %dirInfo = %$dirInfo;
+    $dirInfo{DirStart} = $dirStart + 4;
+    $dirInfo{DirLen} = $size - 4;
+    $dirInfo{DataPos} -= $dirStart;
+    $dirInfo{Base} += $dirStart;
+    return Image::ExifTool::Exif::ProcessExif($et, \%dirInfo, $tagTablePtr);
+    return 1;
 }
 
 #------------------------------------------------------------------------------

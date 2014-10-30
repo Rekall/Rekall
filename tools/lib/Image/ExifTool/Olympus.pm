@@ -27,6 +27,7 @@
 #              19) Brad Grier private communication
 #              20) Niels Kristian Bech Jensen private communication
 #              21) Iliah Borg private communication (LibRaw)
+#              22) Herbert Kauer private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -36,7 +37,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '2.16';
+$VERSION = '2.23';
 
 sub PrintLensInfo($$$);
 
@@ -148,8 +149,11 @@ my %olympusLensTypes = (
     '2 19 10' => 'Lumix G Vario 14-140mm F3.5-5.6 Asph. Power OIS', #20
     '2 20 10' => 'Lumix G Vario 12-32mm F3.5-5.6 Asph. Mega OIS', #20
     '2 21 10' => 'Leica DG Nocticron 42.5mm F1.2 Asph. Power OIS', #20
+    '2 22 10' => 'Leica DG Summilux 15mm F1.7 Asph.', #20
     '3 01 00' => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
     '3 02 00' => 'Leica D Summilux 25mm F1.4 Asph.',
+    # Tamron lenses
+    '5 01 10' => 'Tamron 14-150mm F3.5-5.8 Di III', #20 (model C001)
 );
 
 # lookup for Olympus camera types (ref PH)
@@ -318,8 +322,10 @@ my %olympusCameraTypes = (
     D4535 => 'SP-620UZ',
     D4536 => 'TG-320',
     D4537 => 'VR340,D750',
+    D4538 => 'VG160,X990,D745',
     D4541 => 'SZ-12',
     D4545 => 'VH410',
+    D4546 => 'XZ-10', #21
     D4547 => 'TG-2',
     D4548 => 'TG-830',
     D4549 => 'TG-630',
@@ -328,6 +334,12 @@ my %olympusCameraTypes = (
     D4562 => 'SP-820UZ',
     D4566 => 'SZ-15',
     D4572 => 'STYLUS1',
+    D4574 => 'TG-3',
+    D4575 => 'TG-850',
+    D4579 => 'SP-100EE',
+    D4580 => 'SH-60',
+    D4581 => 'SH-1',
+    D4582 => 'TG-835',
     D4809 => 'C2500L',
     D4842 => 'E-10',
     D4856 => 'C-1',
@@ -562,8 +574,8 @@ my %indexInfo = (
         Name => 'SpecialMode',
         Notes => q{
             3 numbers: 1. Shooting mode: 0=Normal, 2=Fast, 3=Panorama;
-            2. Sequence Number; 3. Panorama Direction: 1=Left-Right,
-            2=Right-Left, 3=Bottom-Top, 4=Top-Bottom
+            2. Sequence Number; 3. Panorama Direction: 1=Left-right,
+            2=Right-left, 3=Bottom-Top, 4=Top-Bottom
         },
         Writable => 'int32u',
         Count => 3,
@@ -599,7 +611,7 @@ my %indexInfo = (
                 2 => 'SHQ (Fine)',
                 6 => 'RAW', #PH - C5050WZ
             );
-            my %t2 = ( # all other types
+            my %t2 = ( # all other types (except D4322, ref 22)
                 1 => 'SQ (Low)',
                 2 => 'HQ (Normal)',
                 3 => 'SHQ (Fine)',
@@ -608,7 +620,7 @@ my %indexInfo = (
                 6 => 'Small-Fine', #PH
                 33 => 'Uncompressed', #PH - C2100Z
             );
-            my $conv = $self->{CameraType} =~ /^SX(?!151\b)/ ? \%t1 : \%t2;
+            my $conv = $self->{CameraType} =~ /^(SX(?!151\b)|D4322)/ ? \%t1 : \%t2;
             return $$conv{$val} ? $$conv{$val} : "Unknown ($val)";
         },
         # (no PrintConvInv because we don't know CameraType at write time)
@@ -626,7 +638,11 @@ my %indexInfo = (
         Name => 'BWMode',
         Description => 'Black And White Mode',
         Writable => 'int16u',
-        PrintConv => \%offOn,
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            6 => '(none)', #22
+        },
     },
     0x0204 => {
         Name => 'DigitalZoom',
@@ -1509,7 +1525,7 @@ my %indexInfo = (
         # 5: 0, 16(new Lumix lenses)
         ValueConv => 'my @a=split(" ",$val); sprintf("%x %.2x %.2x",@a[0,2,3])',
         # set unknown values to zero when writing
-        ValueConvInv => 'my @a=split(" ",$val); hex($a[0])." 0 ".hex($a[1]).hex($a[2])." 0 0"',
+        ValueConvInv => 'my @a=split(" ",$val); hex($a[0])." 0 ".hex($a[1])." ".hex($a[2])." 0 0"',
         PrintConv => \%olympusLensTypes,
     },
     # apparently the first 3 digits of the lens s/n give the type (ref 4):
@@ -1690,7 +1706,7 @@ my %indexInfo = (
             1027 => 'Spot+Shadow control', #6
         },
     },
-    0x203 => { Name => 'ExposureShift', Writable => 'rational64s' }, #11 (some E-models only)
+    0x203 => { Name => 'ExposureShift', Writable => 'rational64s' }, #11 (some models only)
     0x204 => { #11 (XZ-1)
         Name => 'NDFilter',
         PrintConv => \%offOn,
@@ -1714,17 +1730,20 @@ my %indexInfo = (
             1 => 'Sequential shooting AF',
             2 => 'Continuous AF',
             3 => 'Multi AF',
-            5 => 'Face detect', #11
+            4 => 'Face detect', #11
             10 => 'MF',
-        }, { BITMASK => { #11
-            0 => 'S-AF',
-            2 => 'C-AF',
-            4 => 'MF',
-            5 => 'Face detect',
-            6 => 'Imager AF',
-            7 => 'Live View Magnification Frame',
-            8 => 'AF sensor',
-        }}],
+        }, {
+            0 => '(none)',
+            BITMASK => { #11
+                0 => 'S-AF',
+                2 => 'C-AF',
+                4 => 'MF',
+                5 => 'Face detect',
+                6 => 'Imager AF',
+                7 => 'Live View Magnification Frame',
+                8 => 'AF sensor',
+            },
+        }],
     },
     0x302 => { #6
         Name => 'FocusProcess',
@@ -1763,9 +1782,15 @@ my %indexInfo = (
         ValueConv => '$val =~ s/\S* //; $val', # ignore first undefined value
         ValueConvInv => '"undef $val"',
         PrintConv => q{
-            return $val if $val =~ /undef/;
+            return 'n/a' if $val =~ /undef/;
             sprintf("(%d%%,%d%%) (%d%%,%d%%)", map {$_ * 100} split(" ",$val));
-        }
+        },
+        PrintConvInv => q{
+            return 'undef undef undef undef' if $val eq 'n/a';
+            my @nums = $val =~ /\d+(?:\.\d+)?/g;
+            return undef unless @nums == 4;
+            join ' ', map {$_ / 100} @nums;
+        },
     },
     0x306 => { #11
         Name => 'AFFineTune',
@@ -1818,7 +1843,8 @@ my %indexInfo = (
     0x404 => { #11
         Name => 'FlashControlMode',
         Writable => 'int16u',
-        Count => 3,
+        Count => -1,
+        Notes => '3 or 4 values',
         PrintConv => [{
             0 => 'Off',
             3 => 'TTL',
@@ -1829,16 +1855,24 @@ my %indexInfo = (
     0x405 => { #11
         Name => 'FlashIntensity',
         Writable => 'rational64s',
-        Count => 3,
-        PrintConv => '$val eq "undef undef undef" ? "n/a" : $val',
-        PrintConvInv => '$val eq "n/a" ? "undef undef undef" : $val',
+        Count => -1,
+        Notes => '3 or 4 values',
+        PrintConv => {
+            OTHER => sub { shift },
+            'undef undef undef' => 'n/a',
+            'undef undef undef undef' => 'n/a (x4)',
+        },
     },
     0x406 => { #11
         Name => 'ManualFlashStrength',
         Writable => 'rational64s',
-        Count => 3,
-        PrintConv => '$val eq "undef undef undef" ? "n/a" : $val',
-        PrintConvInv => '$val eq "n/a" ? "undef undef undef" : $val',
+        Count => -1,
+        Notes => '3 or 4 values',
+        PrintConv => {
+            OTHER => sub { shift },
+            'undef undef undef' => 'n/a',
+            'undef undef undef undef' => 'n/a (x4)',
+        },
     },
     0x500 => { #6
         Name => 'WhiteBalance2',
@@ -1992,6 +2026,7 @@ my %indexInfo = (
         Name => 'NoiseReduction',
         Writable => 'int16u',
         PrintConv => {
+            0 => '(none)',
             BITMASK => {
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',
@@ -2323,6 +2358,7 @@ my %indexInfo = (
         Name => 'RawDevNoiseReduction',
         Writable => 'int16u',
         PrintConv => { #11
+            0 => '(none)',
             BITMASK => {
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',
@@ -2344,6 +2380,7 @@ my %indexInfo = (
         Name => 'RawDevSettings',
         Writable => 'int16u',
         PrintConv => { #11
+            0 => '(none)',
             BITMASK => {
                 0 => 'WB Color Temp',
                 1 => 'WB Gray Point',
@@ -2399,6 +2436,7 @@ my %indexInfo = (
         Name => 'RawDevNoiseReduction',
         Writable => 'int16u',
         PrintConv => {
+            0 => '(none)',
             BITMASK => {
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',
@@ -2558,6 +2596,7 @@ my %indexInfo = (
         Name => 'NoiseReduction2',
         Writable => 'int16u',
         PrintConv => {
+            0 => '(none)',
             BITMASK => {
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',
@@ -2915,7 +2954,7 @@ my %indexInfo = (
 %Image::ExifTool::Olympus::RawInfo = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    NOTES => 'These tags are found only in ORF images of some models (ie. C8080WZ).',
+    NOTES => 'These tags are found only in ORF images of some models (eg. C8080WZ).',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x000 => {
         Name => 'RawInfoVersion',
@@ -3042,7 +3081,7 @@ my %indexInfo = (
         Name => 'ExposureUnknown',
         Unknown => 1,
         Format => 'int32u',
-        # this conversion doesn't work for all models (ie. gives "1/100000")
+        # this conversion doesn't work for all models (eg. gives "1/100000")
         ValueConv => '$val ? 10 / $val : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },

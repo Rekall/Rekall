@@ -73,6 +73,7 @@ sub XMPOpen($)
 sub ValidateXMP($;$)
 {
     my ($xmpPt, $mode) = @_;
+    $$xmpPt =~ s/^\s*<!--.*?-->\s*//s; # remove leading comment if it exists
     unless ($$xmpPt =~ /^\0*<\0*\?\0*x\0*p\0*a\0*c\0*k\0*e\0*t/) {
         return '' unless $$xmpPt =~ /^<x(mp)?:x[ma]pmeta/;
         # add required xpacket header/trailer
@@ -262,7 +263,7 @@ sub SetPropertyPath($$;$$$$)
         $listType = 'Alt';
         # remove language code from property path if it exists
         $propList[-1] =~ s/-$$tagInfo{LangCode}$// if $$tagInfo{LangCode};
-        # handle lists of lang-alt lists (ie. XMP-plus:Custom tags)
+        # handle lists of lang-alt lists (eg. XMP-plus:Custom tags)
         if ($$tagInfo{List} and $$tagInfo{List} ne '1') {
             push @propList, "rdf:$$tagInfo{List}", 'rdf:li 10';
         }

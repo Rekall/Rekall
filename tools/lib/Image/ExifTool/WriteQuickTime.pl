@@ -198,7 +198,7 @@ sub WriteQuickTime($$$)
                     Write($outfile, Set32u($len+8), $tag, $newData) or $rtnVal = 0, last;
                     next;
                 } else {
-                    # bad things happen if 'mdat' atom is moved (ie. Adobe Bridge crashes --
+                    # bad things happen if 'mdat' atom is moved (eg. Adobe Bridge crashes --
                     # there must be some absolute offsets somewhere that point into mdat),
                     # so hold this atom and write it out later
                     push @hold, Set32u($len+8), $tag, $newData;

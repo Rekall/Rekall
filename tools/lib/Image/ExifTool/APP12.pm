@@ -256,7 +256,7 @@ sub ProcessAPP12($$$)
     pos($$dataPt) = 0;
 
     # this regular expression is a bit complex, but basically we are looking for
-    # section headers (ie. "[Camera Info]") and tag/value pairs (ie. "tag=value",
+    # section headers (eg. "[Camera Info]") and tag/value pairs (eg. "tag=value",
     # where "value" may contain white space), separated by spaces or CR/LF.
     # (APP12 uses CR/LF, but Olympus TextualInfo is similar and uses spaces)
     while ($$dataPt =~ /(\[.*?\]|[\w#-]+=[\x20-\x7e]+?(?=\s*([\n\r\0]|[\w#-]+=|\[|$)))/g) {

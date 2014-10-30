@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.46';
+$VERSION = '1.49';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -1289,17 +1289,27 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             2 => '+,0,-',
         },
     },
-    0x0106 => {
+    0x0106 => [{
         Name => 'AEBShotCount',
-        Count => -1,
-        Notes => '1 value for the 1DmkIII and 5DmkIII, 2 for the 1DmkIV',
-        PrintConv => [{
-            0 => 3,
-            1 => 2,
-            2 => 5,
-            3 => 7,
-        }],
-    },
+        Condition => '$count == 1',
+        Notes => 'one value for some models...',
+        PrintConv => {
+            0 => '3 shots',
+            1 => '2 shots',
+            2 => '5 shots',
+            3 => '7 shots',
+        },
+    },{
+        Name => 'AEBShotCount',
+        Count => 2,
+        Notes => 'two values for others',
+        PrintConv => {
+            '3 0' => '3 shots',
+            '2 1' => '2 shots',
+            '5 2' => '5 shots',
+            '7 3' => '7 shots',
+        },
+    }],
     0x0107 => {
         Name => 'SpotMeterLinkToAFPoint',
         PrintConv => {
@@ -1523,6 +1533,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             PrintConv => \%enableDisable,
         },
     ],
+    # 0x0205 - Added in 5DmkII firmware update
     #### 2b) Flash exposure
     0x0304 => {
         Name => 'ETTLII',
@@ -1852,7 +1863,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0516 => { # new for 7D and 1DmkIV
         Name => 'OrientationLinkedAFPoint',
         PrintConv => {
-            0 => 'Same for verical and horizontal',
+            0 => 'Same for vertical and horizontal',
             1 => 'Select different AF points',
         },
     },
@@ -2280,7 +2291,7 @@ sub ConvertPfnInv($)
 }
 
 #------------------------------------------------------------------------------
-# Read/Write Canon custom 2 directory (used by 1D Mark III)
+# Read/Write Canon custom 2 directory (new for 1D Mark III)
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
 sub ProcessCanonCustom2($$$)
@@ -2293,10 +2304,11 @@ sub ProcessCanonCustom2($$$)
     my $verbose = $et->Options('Verbose');
     my $newTags;
 
+    return 0 if $size < 2;
     # first entry in array must be the size
     my $len = Get16u($dataPt, $offset);
     unless ($len == $size and $len >= 8) {
-        $et->Warn("Invalid CanonCustom2 data");
+        $et->Warn('Invalid CanonCustom2 data');
         return 0;
     }
     # get group count
@@ -2318,7 +2330,11 @@ sub ProcessCanonCustom2($$$)
         last if $recLen < 8;    # must be at least 8 bytes for recNum and recLen
         $pos += 12;
         my $recPos = $pos;
-        my $recEnd = $pos + $recLen;
+        my $recEnd = $pos + $recLen - 8;
+        if ($recEnd > $end) {
+            $et->Warn('Corrupted CanonCustom2 group');
+            return 0;
+        }
         if ($verbose and not $write) {
             $et->VerboseDir("CanonCustom2 group $recNum", $recCount);
         }
@@ -2332,8 +2348,9 @@ sub ProcessCanonCustom2($$$)
             if ($write) {
                 # write new value
                 my $tagInfo = $$newTags{$tag};
-                next unless $tagInfo;
-                my $nvHash = $et->GetNewValueHash($tagInfo);
+                next unless $$newTags{$tag};
+                $tagInfo = $et->GetTagInfo($tagTablePtr, $tag, \$val, undef, $num) or next;
+                my $nvHash = $et->GetNewValueHash($tagInfo) or next;
                 next unless $et->IsOverwriting($nvHash, $val);
                 my $newVal = $et->GetNewValues($nvHash);
                 next unless defined $newVal;    # can't delete from a custom table
@@ -2358,7 +2375,7 @@ sub ProcessCanonCustom2($$$)
                 }
             }
         }
-        $pos += $recLen - 8;
+        $pos = $recEnd;
     }
     if ($pos != $end) {
         $et->Warn('Possibly corrupted CanonCustom2 data');

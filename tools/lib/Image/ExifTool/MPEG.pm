@@ -638,7 +638,7 @@ sub ParseMPEGAudioVideo($$)
     while ($$buffPt =~ /\0\0\x01(\xb3|\xc0)/g) {
         my $type = $1 eq "\xb3" ? 'video' : 'audio';
         unless ($didHdr) {
-            # make sure we didn't miss an audio frame sync before this (ie. MP3 file)
+            # make sure we didn't miss an audio frame sync before this (eg. MP3 file)
             # (the last byte of the 4-byte MP3 audio frame header word may be zero,
             # but the 2nd last must be non-zero, so we need only check to pos-3)
             my $buff = substr($$buffPt, 0, pos($$buffPt) - 3);

@@ -25,7 +25,7 @@ sub ConvertStruct($$$$;$);
 # Serialize a structure (or other object) into a simple string
 # Inputs: 0) HASH ref, ARRAY ref, or SCALAR, 1) closing bracket (or undef)
 # Returns: serialized structure string
-# ie) "{field=text with {braces|}|, and a comma, field2=val2,field3={field4=[a,b]}}"
+# eg) "{field=text with {braces|}|, and a comma, field2=val2,field3={field4=[a,b]}}"
 sub SerializeStruct($;$)
 {
     my ($obj, $ket) = @_;
@@ -196,7 +196,7 @@ Key:
             $fieldInfo = $$strTable{$tag = $fix} if $fix and not $specialStruct{$fix};
         }
         until (ref $fieldInfo eq 'HASH') {
-            # generate wildcard fields on the fly (ie. mwg-rs:Extensions)
+            # generate wildcard fields on the fly (eg. mwg-rs:Extensions)
             unless ($$strTable{NAMESPACE}) {
                 my ($grp, $tg, $langCode);
                 ($grp, $tg) = $tag =~ /^(.+):(.+)/ ? (lc $1, $2) : ('', $tag);
@@ -241,7 +241,7 @@ Key:
                 delete $$fieldInfo{Groups};
                 last; # write this dynamically-generated field
             }
-            # generate lang-alt fields on the fly (ie. Iptc4xmpExt:AOTitle)
+            # generate lang-alt fields on the fly (eg. Iptc4xmpExt:AOTitle)
             my ($tg, $langCode) = GetLangCode($tag);
             if (defined $langCode) {
                 $fieldInfo = $$strTable{$tg} unless $specialStruct{$tg};
@@ -725,7 +725,8 @@ sub RestoreStruct($;$)
         if ($err) {
             # this may happen if we have a structural error in the XMP
             # (like an improperly contained list for example)
-            $et->Warn("Error $err placing $$tagInfo{Name} in structure or list", 1);
+            my $ns = $$tagInfo{Namespace} || $$tagInfo{Table}{NAMESPACE} || '';
+            $et->Warn("Error $err placing $ns:$$tagInfo{TagID} in structure or list", 1);
             delete $structs{$strInfo} unless $oldStruct;
         } elsif ($tagInfo eq $strInfo) {
             # just a regular list tag

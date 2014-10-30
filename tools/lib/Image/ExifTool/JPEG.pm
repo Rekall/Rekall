@@ -11,7 +11,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 sub ProcessOcad($$$);
 sub ProcessJPEG_HDR($$$);
@@ -76,7 +76,7 @@ sub ProcessJPEG_HDR($$$);
       }, {
         Name => 'PreviewImage',
         Condition => '$$valPt =~ /^(|QVGA\0|BGTH)\xff\xd8\xff\xdb/',
-        Notes => 'Samsung APP2 preview image', # (Samsung="", BenQ="QVGA\0", Digilife="BGTH")
+        Notes => 'Samsung APP2 preview image', # (Samsung/GoPro="", BenQ="QVGA\0", Digilife="BGTH")
     }],
     APP3 => [{
         Name => 'Meta',
@@ -100,7 +100,7 @@ sub ProcessJPEG_HDR($$$);
         Condition => '$$valPt =~ /^FPXR\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::FlashPix::Main' },
       }, {
-        Name => 'PreviewImage', # (ie. Samsung S1060)
+        Name => 'PreviewImage', # (eg. Samsung S1060)
         Notes => 'continued from APP3',
     }],
     APP5 => [{
@@ -108,7 +108,7 @@ sub ProcessJPEG_HDR($$$);
         Condition => '$$valPt =~ /^RMETA\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::RMETA' },
       }, {
-        Name => 'PreviewImage', # (ie. BenQ DC E1050)
+        Name => 'PreviewImage', # (eg. BenQ DC E1050)
         Notes => 'continued from APP4',
     }],
     APP6 => [{
@@ -344,6 +344,8 @@ sub ProcessJPEG_HDR($$$);
         PrintConv => '$self->ConvertDateTime($val)',
     },
     Album        => { },
+    Caption      => { },
+    Keywords     => { },
     Name         => { },
     People       => { },
     Places       => { },
@@ -397,13 +399,19 @@ sub ProcessJPEG_HDR($$$);
     0 => 'DCTEncodeVersion',
     1 => {
         Name => 'APP14Flags0',
-        PrintConv => { BITMASK => {
-            15 => 'Encoded with Blend=1 downsampling'
-        } },
+        PrintConv => {
+            0 => '(none)',
+            BITMASK => {
+                15 => 'Encoded with Blend=1 downsampling'
+            },
+        },
     },
     2 => {
         Name => 'APP14Flags1',
-        PrintConv => { BITMASK => { } },
+        PrintConv => {
+            0 => '(none)',
+            BITMASK => { },
+        },
     },
     3 => {
         Name => 'ColorTransform',

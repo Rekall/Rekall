@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.27';
+$VERSION = '1.29';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
@@ -409,6 +409,7 @@ my %profileClass = (
         Name => 'MeasurementGeometry',
         Format => 'int32u',
         PrintConv => {
+            0 => 'Unknown',
             1 => '0/45 or 45/0',
             2 => '0/d or d/0',
         },
@@ -715,9 +716,9 @@ sub WriteICC_Profile($$;$)
     # (don't write AsShotICCProfile or CurrentICCProfile here)
     return undef unless $dirName eq 'ICC_Profile';
     my $nvHash = $et->GetNewValueHash($Image::ExifTool::Extra{$dirName});
-    return undef unless $et->IsOverwriting($nvHash);
     my $val = $et->GetNewValues($nvHash);
     $val = '' unless defined $val;
+    return undef unless $et->IsOverwriting($nvHash, $val);
     ++$$et{CHANGED};
     return $val;
 }

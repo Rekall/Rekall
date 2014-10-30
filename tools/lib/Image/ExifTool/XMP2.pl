@@ -1049,12 +1049,14 @@ my %sSubVersion = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-expressionmedia', 2 => 'Image' },
     NAMESPACE => 'expressionmedia',
-    NOTES => 'Microsoft Expression Media namespace tags.',
-    CatalogSets => {
-        List => 'Bag',
-        Avoid => 1,
-        Notes => 'avoided due to conflict with XMP-mediapro:CatalogSets',
+    NOTES => q{
+        Microsoft Expression Media namespace tags.  These tags are avoided when
+        writing due to name conflicts with tags in other schemas.
     },
+    Event       => { Avoid => 1 },
+    Status      => { Avoid => 1 },
+    People      => { Avoid => 1, List => 'Bag' },
+    CatalogSets => { Avoid => 1, List => 'Bag' },
 );
 
 # DigiKam namespace tags (ref PH)

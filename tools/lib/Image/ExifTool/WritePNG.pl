@@ -276,6 +276,7 @@ sub AddChunks($$;@)
             DirName => $dir,
         );
         if ($dir eq 'IFD0') {
+            $et->Warn('Creating non-standard EXIF in PNG', 1);
             $et->VPrint(0, "Creating EXIF profile:\n");
             $$et{TIFF_TYPE} = 'APP1';
             $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Exif::Main');
@@ -303,6 +304,7 @@ sub AddChunks($$;@)
                 Write($outfile, $hdr, $buff, $cbuf) or $err = 1;
             }
         } elsif ($dir eq 'IPTC') {
+            $et->Warn('Creating non-standard EXIF in PNG', 1);
             $et->VPrint(0, "Creating IPTC profile:\n");
             # write new IPTC data (stored in a Photoshop directory)
             $dirInfo{DirName} = 'Photoshop';
@@ -319,6 +321,18 @@ sub AddChunks($$;@)
             if (defined $buff and length $buff) {
                 WriteProfile($outfile, 'icm', \$buff, 'ICC') or $err = 1;
                 $et->Warn('Wrote ICC as a raw profile (no Compress::Zlib)');
+            }
+        } elsif ($dir eq 'PNG-pHYs') {
+            $et->VPrint(0, "Creating pHYs chunk:\n");
+            $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::PNG::PhysicalPixel');
+            my $blank = "\0\0\x0b\x12\0\0\x0b\x12\x01"; # 2834 pixels per meter (72 dpi)
+            $dirInfo{DataPt} = \$blank;
+            $buff = $et->WriteDirectory(\%dirInfo, $tagTablePtr);
+            if (defined $buff and length $buff) {
+                $buff = 'pHYs' . $buff; # CRC includes chunk name
+                my $hdr = pack('N', length($buff) - 4);
+                my $cbuf = pack('N', CalculateCRC(\$buff, undef));
+                Write($outfile, $hdr, $buff, $cbuf) or $err = 1;
             }
         } else {
             next;

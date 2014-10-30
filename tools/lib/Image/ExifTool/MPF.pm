@@ -5,7 +5,7 @@
 #
 # Revisions:    06/12/2009 - P. Harvey Created
 #
-# References:   1) http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-007_E.pdf
+# References:   1) http://www.cipa.jp/std/documents/e/DC-007_E.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::MPF;
@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub ProcessMPImageList($$$);
 
@@ -28,8 +28,8 @@ sub ProcessMPImageList($$$);
         from this segment is stored as a JPEG trailer.  The MPF tags are not
         writable, however the MPG segment may be deleted as a group (with "MPF:All")
         but then the JPEG trailer should also be deleted (with "Trailer:All").  See
-        L<http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-007_E.pdf> for the
-        official specification.
+        L<http://www.cipa.jp/std/documents/e/DC-007_E.pdf> for the official
+        specification.
     },
     0xb000 => 'MPFVersion',
     0xb001 => 'NumberOfImages',
@@ -279,7 +279,7 @@ under the same terms as Perl itself.
 
 =over 4
 
-=item L<http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-007_E.pdf>
+=item L<http://www.cipa.jp/std/documents/e/DC-007_E.pdf>
 
 =back
 

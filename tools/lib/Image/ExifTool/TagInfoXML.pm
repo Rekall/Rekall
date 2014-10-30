@@ -15,13 +15,13 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.23';
+$VERSION = '1.25';
 @ISA = qw(Exporter);
 
 # set this to a language code to generate Lang module with 'MISSING' entries
 my $makeMissing = '';
 
-sub LoadLangModules($);
+sub LoadLangModules($;$);
 sub WriteLangModule($$;$);
 sub NumbersFirst;
 
@@ -31,7 +31,7 @@ my %credits = (
     de   => 'Jens Duttke and Herbert Kauer',
     es   => 'Jens Duttke, Santiago del BrE<iacute>o GonzE<aacute>lez and Emilio Sancha',
     fi   => 'Jens Duttke and Jarkko ME<auml>kineva',
-    fr   => 'Jens Duttke, Bernard Guillotin, Jean Glasser, Jean Piquemal and Harry Nizard',
+    fr   => 'Jens Duttke, Bernard Guillotin, Jean Glasser, Jean Piquemal, Harry Nizard and Alphonse Philippe',
     it   => 'Jens Duttke, Ferdinando Agovino, Emilio Dati and Michele Locati',
     ja   => 'Jens Duttke and Kazunari Nishina',
     ko   => 'Jens Duttke and Jeong Beom Kim',
@@ -60,7 +60,7 @@ my $caseInsensitive;    # used internally by sort routine
 #------------------------------------------------------------------------------
 # Utility to print tag information database as an XML list
 # Inputs: 0) output file name (undef to send to console),
-#         1) group name (may be undef), 2) options hash ('Flags','NoDesc')
+#         1) group name (may be undef), 2) options hash ('Flags','NoDesc','Lang')
 # Returns: true on success
 sub Write(;$$%)
 {
@@ -72,9 +72,13 @@ sub Write(;$$%)
 
     Image::ExifTool::LoadAllTables();   # first load all our tables
     unless ($opts{NoDesc}) {
-        LoadLangModules(\%langInfo);    # load all existing Lang modules
-        @langs = sort keys %langInfo;
         $defaultLang = $Image::ExifTool::defaultLang;
+        LoadLangModules(\%langInfo, $opts{Lang}); # load necessary Lang modules
+        if ($opts{Lang}) {
+            @langs = grep /^$opts{Lang}$/i, keys %langInfo;
+        } else {
+            @langs = sort keys %langInfo;
+        }
     }
     if (defined $file) {
         open PTIFILE, ">$file" or return 0;
@@ -215,7 +219,10 @@ PTILoop:    for ($index=0; $index<@infoArray; ++$index) {
                 }
                 # print tag descriptions
                 $desc = Image::ExifTool::XMP::EscapeXML($desc);
-                print $fp ">\n  <desc lang='$defaultLang'>$desc</desc>$altDescr\n";
+                unless ($opts{Lang} and $altDescr) {
+                    print $fp ">\n  <desc lang='$defaultLang'>$desc</desc>";
+                }
+                print $fp "$altDescr\n";
                 for (my $i=0; ; ++$i) {
                     my $conv = $$tagInfo{PrintConv};
                     my $idx = '';
@@ -245,9 +252,9 @@ PTILoop:    for ($index=0; $index<@infoArray; ++$index) {
                         my $val = $$conv{$key};
                         my $xmlVal = Image::ExifTool::XMP::EscapeXML($val);
                         my $xmlKey = Image::ExifTool::XMP::FullEscapeXML($key);
-                        print $fp "   <key id='$xmlKey'>";
-                        print $fp "\n    <val lang='$defaultLang'>$xmlVal</val>\n";
+                        print $fp "   <key id='$xmlKey'>\n";
                         # add alternate language values
+                        my $altConv = '';
                         foreach (@langConv) {
                             my $lv = $langConv{$_};
                             # handle indexed PrintConv entries
@@ -256,9 +263,12 @@ PTILoop:    for ($index=0; $index<@infoArray; ++$index) {
                             # ignore values that are missing or same as default
                             next unless defined $lv and $lv ne $val;
                             $lv = Image::ExifTool::XMP::EscapeXML($lv);
-                            print $fp "    <val lang='$_'>$lv</val>\n";
+                            $altConv .= "    <val lang='$_'>$lv</val>\n";
                         }
-                        print $fp "   </key>\n";
+                        unless ($opts{Lang} and $altConv) {
+                            print $fp "    <val lang='$defaultLang'>$xmlVal</val>\n"
+                        }
+                        print $fp "$altConv   </key>\n";
                     }
                     print $fp "  </values>\n";
                 }
@@ -639,13 +649,13 @@ FOOTER
 
 #------------------------------------------------------------------------------
 # load all lang modules into hash
-# Inputs: 0) Hash reference
-sub LoadLangModules($)
+# Inputs: 0) Hash reference, 1) specific language to load (undef for all)
+sub LoadLangModules($;$)
 {
-    my $langHash = shift;
-    my $lang;
+    my ($langHash, $lang) = @_;
     require Image::ExifTool;
-    foreach $lang (@Image::ExifTool::langs) {
+    my @langs = $lang ? ($lang) : @Image::ExifTool::langs;
+    foreach $lang (@langs) {
         next if $lang eq $Image::ExifTool::defaultLang;
         eval "require Image::ExifTool::Lang::$lang" or warn("Can't load Lang::$lang\n"), next;
         my $xlat = "Image::ExifTool::Lang::${lang}::Translate";
@@ -722,6 +732,7 @@ be written to any IFD.  Saves all groups if not specified.
 
     Flags   - Set to output 'flags' attribute
     NoDesc  - Set to suppress output of descriptions
+    Lang    - Select a single language for output
 
 =item Return Value:
 
