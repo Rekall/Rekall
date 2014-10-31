@@ -185,9 +185,9 @@ Rekall.prototype.start = function() {
 	var globalTime = 0;
 	setInterval(function() {
 		if(rekall != undefined) {
-			if(rekall.timeline.bar.update()) {
+			if(rekall.timeline.bar.update())
 				rekall.timeline.barLayer.draw();
-			}
+			
 			if((rekall.timeline.shouldRedraw) && (rekall.timeline != undefined)) {
 				rekall.timeline.tagLayer.draw();
 				rekall.timeline.gridLayer.draw();
@@ -198,6 +198,7 @@ Rekall.prototype.start = function() {
 				}
 				rekall.timeline.shouldRedraw = false;
 			}
+			
 			if((rekall.shouldAnalyse) && (rekall.project != undefined)) {
 				rekall.project.analyse(rekall.shouldAnalyseFull);
 				rekall.shouldAnalyse = false;
@@ -597,3 +598,6 @@ Rekall.prototype.redraw = function(full) {
 }
 
 
+window.onbeforeunload = function() {
+    return "Are-you sure you want to leave your Rekall project?";
+};

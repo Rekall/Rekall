@@ -47,10 +47,12 @@ Timeline.prototype.play = function(timeCurrentOffset) {
 	this.timeStart         = moment();
 	this.state = 1;
 	rekall.captationVideoPlayers.play(timeCurrentOffset);
+	this.updateFlattenTimeline();
 }
 Timeline.prototype.stop = function() {
 	this.state = 0;
 	rekall.captationVideoPlayers.pause();
+	this.updateFlattenTimeline();
 }
 Timeline.prototype.rewind = function(timeCurrentOffset) {
 	if(timeCurrentOffset == undefined)
@@ -59,6 +61,7 @@ Timeline.prototype.rewind = function(timeCurrentOffset) {
 	this.timeCurrentOffset = timeCurrentOffset;
 	this.state = 2;
 	rekall.captationVideoPlayers.rewind(timeCurrentOffset);
+	this.updateFlattenTimeline();
 }
 
 Timeline.prototype.toggle = function() {
@@ -80,6 +83,8 @@ Timeline.prototype.update = function() {
 			this.line.setPoints(timeBarPoints);
 			this.text.setText((this.timeCurrent+"").toHHMMSSmmm());
 			this.text.setX(timeBarPoints[0] + 3);
+			
+			this.updateFlattenTimeline();			
 			return true;
 		}
 	}
@@ -88,5 +93,29 @@ Timeline.prototype.update = function() {
 		return true;
 	}
 	return false;
+}
+
+Timeline.prototype.updateFlattenTimeline = function() {
+	var thiss = this;			
+	$.each(Tags.byTime, function(key, tag) {
+		var progress = (thiss.timeCurrent - tag.timeStart) / (tag.timeEnd - tag.timeStart);
+		if(progress < 0) {
+			tag.flattenTimelineDom.slideDown();
+			tag.flattenTimelineDom.css("opacity", 0.1);
+		}
+		else {
+			if(thiss.state != 1) {
+				tag.flattenTimelineDom.slideDown();
+				tag.flattenTimelineDom.css("opacity", 1.0);
+			}
+			else if((0 <= progress) && (progress < 1)) {
+				tag.flattenTimelineDom.slideDown();
+				tag.flattenTimelineDom.css("opacity", 1.0);
+			}
+			else {
+				tag.flattenTimelineDom.slideUp();
+			}			
+		}
+	});
 }
 

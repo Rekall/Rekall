@@ -26,7 +26,7 @@ function Sorting(metadataKey, valCanBeFloats, metadataSearch) {
 	this.categories = new Object();
 	this.tabVisible = true;
 }
-Sorting.prefix = "_";
+
 Sorting.prototype.setCriterias = function(metadataConfigStr, valCanBeFloats, metadataSearch, analyse) {
 	this.metadataConfigStr  = metadataConfigStr;
 	this.metadataKey        = undefined;
@@ -89,16 +89,23 @@ Sorting.prototype.setCriterias = function(metadataConfigStr, valCanBeFloats, met
 }
 
 
+Sorting.prefix = "_";
 Sorting.prototype.parseMeta = function(metadata) {
 	if(metadata != undefined) {
-		if(this.metadataKeyPortion.date != '')
+		var prefix = Sorting.prefix;
+		if(this.metadataKeyPortion.date != '') {
 			metadata = moment(metadata, "YYYY:MM:DD HH:mm:ss", true).format(this.metadataKeyPortion.date);
+			if(metadata.toLowerCase() == "invalid date") {
+				metadata = "Undated";
+				prefix = "0";
+			}
+		}
 		metadata = (""+metadata).replace(/:/g, "");
 		if(this.metadataKeyPortion.left > -1) {
-			if(this.metadataKeyPortion.length > -1)		return  Sorting.prefix + metadata.substr(this.metadataKeyPortion.left, this.metadataKeyPortion.length);
-			else										return  Sorting.prefix + metadata.substr(this.metadataKeyPortion.left);
+			if(this.metadataKeyPortion.length > -1)		return  prefix + metadata.substr(this.metadataKeyPortion.left, this.metadataKeyPortion.length);
+			else										return  prefix + metadata.substr(this.metadataKeyPortion.left);
 		}
-		return Sorting.prefix + metadata;
+		return prefix + metadata;
 	}
 	return metadata;
 }

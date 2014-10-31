@@ -95,9 +95,12 @@ Project.prototype.analyse = function(full) {
 		rekall.sortings["corpus"]    .analyseStart();
 		rekall.sortings["horizontal"].analyseStart();
 		rekall.sortings["vertical"].analyseStart();
+		Tags.byTime = [];
 	    $.each(this.sources, function(key, source) {
 		    $.each(source.documents, function(key, document) {
 			    $.each(document.tags, function(key, tag) {
+					Tags.byTime.push(tag);
+					
 					//Filtrage
 					var isOk = true;
 					if((false) && (!tag.isGoodVersion()))
@@ -348,6 +351,19 @@ Project.prototype.analyse = function(full) {
 				rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);
 			}
 		});
+		if(this.firstAnalysis) {
+			$("#tag_workspaces_save").click(function() {
+				var friendlyName = prompt("Please type a name for this preset", "My preset");
+				if((friendlyName != null) && (friendlyName != "")) {
+					$("#tag_workspaces_menu").append("<li action='horizontal=" + rekall.sortings["horizontal"].metadataConfigStr + " ; vertical=" + rekall.sortings["vertical"].metadataConfigStr + " ; groups=" + rekall.sortings["groups"].metadataConfigStr + "'>" + friendlyName + "</li>");
+					$("#tag_workspaces_menu").menu("refresh");
+				}
+			});
+			$("#tag_workspaces_menu").menu();
+			$("#tag_workspaces_menu li").first().trigger("click");
+		}
+		
+		$("#tag_workspaces_menu li").unbind("click");
 		$("#tag_workspaces_menu li").click(function() {
 			var actions = $(this).attr("action");
 			$("#tag_workspaces_menu").find("li").removeClass("selected");
@@ -364,18 +380,17 @@ Project.prototype.analyse = function(full) {
 				});
 			}
 		});
-		if(this.firstAnalysis)
-			$("#tag_workspaces_menu li").first().trigger("click");
-		
-		
-		
-		
-		//Workspaces
-		$("#tag_workspaces_save").click(function() {
-			$("#tag_workspaces_menu").append("<li action='horizontal=Rekall->Author ; vertical=Rekall->Type ; groups='>Types &times; Authors</li>");
-			$("#tag_workspaces_menu").menu();
+		$("#tag_workspaces_menu li").unbind("dblclick");
+		$("#tag_workspaces_menu li").dblclick(function() {
+			var friendlyName = prompt("Please type a name for this preset", $(this).text());
+			if((friendlyName != null) && (friendlyName != "")) {
+				$(this).text(friendlyName);
+			}
 		});
-		$("#tag_workspaces_menu").menu();
+
+		
+		
+		
 
 	
 		//Actions sur le cochage
@@ -606,8 +621,7 @@ Project.prototype.analyse = function(full) {
 		rekall.timeline.tagLayer.scrollbars.bounds = {x: xMax, y: y};	
 		Tag.displayMetadata();
 	}
-
-
+	
 	//Hightlights graphiques au survol ou sélections
 	$.each(rekall.sortings["groups"].categories, function(key, groupSortingCategory) {
 		groupSortingCategory.text.setFill("#F5F8EE");
@@ -730,6 +744,27 @@ Project.prototype.analyse = function(full) {
 				category.path.setOpacity(1);
 		}
 	});	
+	
+	
+	//Timeline applatie
+	if(full != false) {
+		Tags.byTime.sort(function(a, b) {
+			if(a.timeStart < b.timeStart) return -1;
+			if(a.timeStart > b.timeStart) return 1;
+			return 0;
+		});
+		$("#flattentimeline_items").html("");
+    	$.each(Tags.byTime, function(key, tag) {
+			$('#flattentimeline_items').append(function() {
+				var html = "<div style='background-color: " + tag.color + "'>";
+				html    += tag.getMetadata("Rekall->Name");
+				html    += "</div>";
+				
+				tag.flattenTimelineDom = $(html);
+				return tag.flattenTimelineDom;
+			});
+		});
+	}
 	
 	rekall.redraw(full);
 	this.firstAnalysis = false;

@@ -267,8 +267,15 @@ Tag.prototype.displayMetadata = function() {
 }
 Tag.displayMetadata = function() {	
 	//Restaure un truc propre
-	if(Tags.count() == 0)	$("#metadatas").hide();
-	else 					$("#metadatas").show();
+	if(Tags.count() == 0) {
+		$("#metadatas").hide();
+		$("#flattentimeline").show();
+	}
+	else {
+		$("#metadatas").show();
+		$("#flattentimeline").hide();
+	}
+
 		
 	//Titre
 	if(Tags.count() == 1) {

@@ -785,3 +785,11 @@ input[type="text"], textarea {
 	padding:			5px;
 }
 
+
+#flattentimeline {
+	background-color: rgb(80, 86, 87);
+}
+#flattentimeline_items div {
+	height: 	50px;
+	color:		white;
+}
