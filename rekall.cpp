@@ -218,7 +218,7 @@ void Rekall::trayIconToOnPrivate() {
         if(trayIconIndexOld != trayIconIndex)
             trayIcon->setIcon(trayIcons.at(trayIconIndex));
         trayIconIndexOld = trayIconIndex;
-        trayIconIndex = (trayIconIndex+1) % (trayIcons.length()-1);
+        trayIconIndex = (trayIconIndex+1) % (trayIcons.length());
     }
 }
 void Rekall::trayIconToOffPrivate() {
