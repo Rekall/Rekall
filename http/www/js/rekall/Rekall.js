@@ -265,18 +265,18 @@ Rekall.prototype.start = function() {
 	});
 	$("#maximizeTabNav").trigger("click");
 	$("#rendersTabNav").trigger("click");
-
+	
 	//$(".layout_cell").resizable();
 	
 	//Déploiement d'une section à gauche
 	$(".tab_title.openable").click(function() {
 		if($(this).parent().find('.tab_content').is(":visible")) {
-			$(this).parent().find('.tab_content').hide();
-			$(this).find("span").html("+");
+			$(this).parent().find('.tab_content').slideUp();
+			$(this).find("span").html("&#x25B8;");
 		}
 		else {
-			$(this).parent().find('.tab_content').show();
-			$(this).find("span").html("–");
+			$(this).parent().find('.tab_content').slideDown();
+			$(this).find("span").html("&#x25BE;");
 		}
 	});
 

@@ -13,11 +13,6 @@ html, body {
 u {
 	cursor:		pointer;
 }
-h1, h2, h3 {
-	font-family:	"open_sanssemibold";
-	font-size:		14px;
-	color:			white;
-}
 
 
 .imgBackgroundBg {
@@ -78,6 +73,9 @@ h1, h2, h3 {
 	left:	180px;
 	width: 	122px;
 }
+#intro h1 {
+	
+}
 
 
 .menu_page {
@@ -95,7 +93,7 @@ h1, h2, h3 {
 .menu h1{
 	font-size:		14px;
 	text-align:		center;
-	margin:			0px 0px 5px 0px;
+	margin:			0px 0px 5px -10px;
 	text-transform:	uppercase;
 	text-align:		left;
 }
@@ -103,6 +101,18 @@ h1, h2, h3 {
 	font-size:		8px;
 	cursor:			pointer;
 	text-transform:	uppercase;
+}
+.menu h1 > span > span {
+	border-bottom:  1px dotted rgba(245, 248, 238, 0.6);	
+}
+.menu h1 > span {
+	opacity: 0;
+}
+.menu:hover h1 > span {
+	opacity: 0.75;
+}
+.menu:hover h1 > span:hover {
+	opacity:		1;
 }
 
 .menu > div {
@@ -216,11 +226,13 @@ h1, h2, h3 {
 #timeline {
 }
 #navigateur h2 {
-	border-top:  1px solid rgb(245, 248, 238);
-	margin-left: 5px;
+	font-family:	"open_sanssemibold";
+	font-size:		14px;
+	border-top:  	1px solid rgb(245, 248, 238);
+	margin-left: 	5px;
 	margin-top: 	5px;
 	padding-top:	5px;
-	color: white;
+	color: 			white;
 }
 
 
@@ -351,6 +363,34 @@ h1, h2, h3 {
 	
 }
 
+.ui-menu {
+	width: 55%;
+	margin-left: 		15px;
+	border:				0px solid transparent;
+	background:			none;
+	background-color:	none;
+	font-size:	 		10px;
+	color: 				rgba(255, 255, 255, 0.7);
+}
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus, .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+	background: 		none;
+	background-image: 	none;
+	background-color: 	transparent;
+	font-weight:		normal;
+	border:				0px solid black;
+	margin:				0px;
+	color:				white;
+}
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+	font-weight:		normal;
+}
+.ui-menu .ui-menu-item {
+	list-style-image: 	none;
+}
+.ui-autocomplete.ui-widget, .ui-menu.ui-widget {
+	font-family: 		"open_sansregular";
+	font-size:	 		10px;
+}
 .ui-autocomplete {
 	font-family: 		"open_sansregular";
 	font-size:	 		10px;
@@ -377,9 +417,7 @@ h1, h2, h3 {
 	background:			none;
 	background-color:	white;
 }
-.ui-menu {
-	width: 60%;
-}
+
 
 
 
@@ -642,6 +680,14 @@ h1, h2, h3 {
 	text-transform: uppercase;
 	font-size:		8px;
 	border-bottom:  1px dotted rgba(245, 248, 238, 0.6);	
+}
+#tag_workspaces_menu li.selected {
+	font-weight:	bold;
+}
+#tag_workspaces_save {
+	cursor: pointer;
+	font-style:	italic;
+	border-bottom:  1px dotted rgba(245, 248, 238, 0.6);
 }
 .tab_list {
 	background-color: 	rgba(0, 0, 0, 0.2);

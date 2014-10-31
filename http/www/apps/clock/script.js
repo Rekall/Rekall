@@ -88,7 +88,7 @@ function showInRuban(message, duration) {
 
 	if(message == undefined) {
 		clearInterval(rubanTimeout);
-		$("#ruban").hide();
+		$("#ruban").slideUp();
 	}
 	else {
 		showInRuban();
@@ -102,7 +102,7 @@ function showInRuban(message, duration) {
 				else
 					messageWithClose = message + "&nbsp;&nbsp;&nbsp;&nbsp;<u onClick='javascript:showInRuban();'>&times;&nbsp;autoclose in " + rubanTimeoutTime + " sec.</u>";
 				$("#ruban").html(messageWithClose);
-				$("#ruban").show();
+				$("#ruban").slideDown();
 			}
 			else
 				showInRuban();

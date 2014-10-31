@@ -24,6 +24,7 @@
 function Project(url) {
 	this.sources = new Object();
 	this.url = url;
+	this.firstAnalysis = true;
 }
 
 Project.prototype.addDocument = function(key, document) {
@@ -231,8 +232,18 @@ Project.prototype.analyse = function(full) {
 			availableMetadatas.push(i);
 		availableMetadatas.sort();
 		
-		var availableMetadatasSorted = new Object();
+		var availableMetadatas2 = new Array();
 		$.each(availableMetadatas, function(index, metadata) {
+			if(metadata.startsWith("Rekall->"))
+				availableMetadatas2.push(metadata);
+		});
+		$.each(availableMetadatas, function(index, metadata) {
+			if(!metadata.startsWith("Rekall->"))
+				availableMetadatas2.push(metadata);
+		});
+		
+		var availableMetadatasSorted = new Object();
+		$.each(availableMetadatas2, function(index, metadata) {
 			var metadataSplit = metadata.split("->");
 			if(availableMetadatasSorted[metadataSplit[0]] == undefined)
 				availableMetadatasSorted[metadataSplit[0]] = new Array();
@@ -259,7 +270,12 @@ Project.prototype.analyse = function(full) {
 			if(keyword == "horizontal")
 				extraChoice = "<li metadataKey='Time'>Time</li>"
 			htmlDom  = $("#" + keyword + "Tab .tab_list");
-			$("#" + keyword + "Tab .tab_choice").html("<div metadataKey='" + sorting.metadataConfigStr + "' class='tab_choice_toggle'>" + sorting.metadataConfigStr + " <span class='invisible'>(change)</span></div><ul class='tag_metadatas_menu invisible' id='" + keyword + "Menu' sorting='" + keyword + "'>" + extraChoice + availableMetadatasHtml + "</ul>");
+			var metadataConfigFormated = sorting.metadataConfigStr;
+			if(metadataConfigFormated != undefined) {
+				metadataConfigFormated = metadataConfigFormated.replace("->", "&nbsp;&#x25B8;&nbsp;");
+				metadataConfigFormated = metadataConfigFormated.replace("|",  "&nbsp;&#x25B9;&nbsp;");
+			}
+			$("#" + keyword + "Tab .tab_choice").html("<div metadataKey='" + sorting.metadataConfigStr + "' class='tab_choice_toggle'>" + metadataConfigFormated + " <span class='invisible'>(change)</span></div><ul class='tag_metadatas_menu invisible' id='" + keyword + "Menu' sorting='" + keyword + "'>" + extraChoice + availableMetadatasHtml + "</ul>");
 			
 			sortingVerbose = keyword;
 			if(htmlDom.get(0)) {
@@ -310,7 +326,6 @@ Project.prototype.analyse = function(full) {
 		});
 	
 		$(".tag_metadatas_menu").menu();
-		$(".tag_workspaces_menu").menu();
 		$(".tab_choice_toggle").click(function() {
 			$(this).next().toggle();
 			if($(this).attr("metadataKey")) {
@@ -333,8 +348,10 @@ Project.prototype.analyse = function(full) {
 				rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);
 			}
 		});
-		$(".tag_workspaces_menu li.ui-menu-item").click(function() {
+		$("#tag_workspaces_menu li").click(function() {
 			var actions = $(this).attr("action");
+			$("#tag_workspaces_menu").find("li").removeClass("selected");
+			$(this).addClass("selected");
 			if(actions != undefined) {
 				var actionsList = actions.split(";");
 				$.each(actionsList, function(index, action) {
@@ -347,6 +364,18 @@ Project.prototype.analyse = function(full) {
 				});
 			}
 		});
+		if(this.firstAnalysis)
+			$("#tag_workspaces_menu li").first().trigger("click");
+		
+		
+		
+		
+		//Workspaces
+		$("#tag_workspaces_save").click(function() {
+			$("#tag_workspaces_menu").append("<li action='horizontal=Rekall->Author ; vertical=Rekall->Type ; groups='>Types &times; Authors</li>");
+			$("#tag_workspaces_menu").menu();
+		});
+		$("#tag_workspaces_menu").menu();
 
 	
 		//Actions sur le cochage
@@ -703,4 +732,5 @@ Project.prototype.analyse = function(full) {
 	});	
 	
 	rekall.redraw(full);
+	this.firstAnalysis = false;
 }

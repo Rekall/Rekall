@@ -246,6 +246,8 @@ public:
 public:
     explicit ProjectInterface(QObject *parent = 0) : QObject(parent) {
         sync = 0;
+        isPublic  = true;
+        isRemoved = false;
     }
 
 public:
@@ -254,7 +256,7 @@ public:
 public:
     QString name, friendlyName;
     QFileInfo path;
-    bool isPublic;
+    bool isPublic, isRemoved;
     QDomDocument xmlDoc;
 public:
     void setFriendlyName(const QString &_friendlyName) {

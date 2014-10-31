@@ -26,6 +26,9 @@
 Http::Http(QObject *parent)
     : HttpInterface(parent) {
     Global::configFileName = QFileInfo(Global::pathApplication.absoluteFilePath() + "/http/webapp.ini").absoluteFilePath();
+    if(Global::pathApplication.absoluteFilePath().contains("buzzinglight/Projets/Rekall"))
+        Global::configFileName = QFileInfo(Global::pathApplication.absoluteFilePath() + "/http/webappDev.ini").absoluteFilePath();
+    qDebug("Config file: %s", qPrintable(Global::configFileName));
 
     externalHost.type = "wan";
     externalHost.name = "Externe";

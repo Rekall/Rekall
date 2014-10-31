@@ -85,12 +85,15 @@
 						<div class='tab_title'>Presets</div>
 						<div class='tab_content'>
 							<div class='tab_choice'>
-								<ul class='tag_workspaces_menu'>
+								<ul id='tag_workspaces_menu'>
 									<li action='horizontal=Time ; vertical=Rekall->Date/Time|month ; groups=Rekall->Date/Time|year'>Historical view</li>
 									<li action='horizontal=Rekall->Author ; vertical=Rekall->Date/Time|month ; groups=Rekall->Date/Time|year'>Authors</li>
 									<li action='horizontal=Rekall->Author ; vertical=Rekall->Import Date|hour_only ; groups=Rekall->Import Date|day'>Imports</li>
 									<li action='horizontal=Rekall->Author ; vertical=Rekall->Type ; groups='>Types &times; Authors</li>
 								</ul>
+								<div>
+									<span id='tag_workspaces_save'>Save this workspace</span>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -108,7 +111,7 @@
 					</div>
 
 					<div id='colorsTab'>
-						<div class='tab_title openable'><span>+</span>&nbsp;Documents colors</div>
+						<div class='tab_title openable'><span>&#x25B8;</span>&nbsp;Documents colors</div>
 						<div class='tab_choice'></div>
 						<div class='tab_content invisible'>
 							<div class='tab_list'></div>
@@ -116,8 +119,8 @@
 						</div>
 					</div>
 
-					<div id='groupsTab'>
-						<div class='tab_title openable'><span>+</span>&nbsp;Groups</div>
+					<div id='groupsTab'>  
+						<div class='tab_title openable'><span>&#x25B8;</span>&nbsp;Groups</div>
 						<div class='tab_choice'></div>
 						<div class='tab_content invisible'>
 							<div class='tab_list'></div>
@@ -126,7 +129,7 @@
 					</div>
 
 					<div id='highlightTab'>
-						<div class='tab_title openable'><span>+</span>&nbsp;Highlight</div>
+						<div class='tab_title openable'><span>&#x25B8;</span>&nbsp;Highlight</div>
 						<div class='tab_choice'></div>
 						<div class='tab_content invisible'>
 							<div class='tab_search'><input type='text' placeholder="Filter…"></div>
@@ -135,7 +138,7 @@
 					</div>
 
 					<div id='keywordsTab'>
-						<div class='tab_title openable'><span>–</span>&nbsp;Keywords</div>
+						<div class='tab_title openable'><span>&#x25BE;</span>&nbsp;Keywords</div>
 						<div class='tab_content'>
 							<div class='tab_list'></div>
 							<div class='darker tab_search'><input type='text' placeholder="Display only…"></div>
@@ -145,7 +148,7 @@
 					<br/><h2>Filters</h2>
 
 					<div id='authorsTab'>
-						<div class='tab_title openable'><span>+</span>&nbsp;Authors</div>
+						<div class='tab_title openable'><span>&#x25B8;</span>&nbsp;Authors</div>
 						<div class='tab_choice'></div>
 						<div class='tab_content invisible'>
 							<div class='tab_list'></div>
@@ -153,7 +156,7 @@
 						</div>
 					</div>
 					<div id='typesTab'>
-						<div class='tab_title openable'><span>+</span>&nbsp;Types</div>
+						<div class='tab_title openable'><span>&#x25B8;</span>&nbsp;Types</div>
 						<div class='tab_choice'></div>
 						<div class='tab_content invisible'>
 							<div class='tab_list'></div>
@@ -163,7 +166,7 @@
 
 					<br/><h2>Documents</h2>
 					<div id='corpusTab'>
-						<div class='tab_title openable'><span>+</span>&nbsp;Corpus</div>
+						<div class='tab_title openable'><span>&#x25B8;</span>&nbsp;Corpus</div>
 						<div class='tab_content invisible'>
 							<div class='darker tab_search'><input type='text' placeholder="Display only…"></div>
 							<div class='tab_list'></div>

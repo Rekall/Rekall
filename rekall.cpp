@@ -100,6 +100,7 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
         qsrand(QDateTime::currentDateTime().toTime_t());
         updateAnonymousId = QString::number(qrand());
         globalSettings->setValue("id", updateAnonymousId);
+        globalSettings->setValue("version", "");
         globalSettings->setValue("updatePeriod", 1);
         globalSettings->setValue("lastUpdate",   QDateTime(QDate(2000, 01, 01)));
     }
@@ -109,6 +110,12 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
         QDateTime updateLastDate  = globalSettings->value("lastUpdate")  .toDateTime();
         quint16   updatePeriod    = globalSettings->value("updatePeriod").toUInt();
         updateAnonymousId         = globalSettings->value("id")          .toString();
+        QString applicationVersionSettings = globalSettings->value("version").toString();
+        if(applicationVersionSettings != QCoreApplication::applicationVersion()) {
+            globalSettings->setValue("version", QCoreApplication::applicationVersion());
+            firstTimeOpened = true;
+        }
+
         qDebug("Last update : %s (should update each %d day(s))", qPrintable(updateLastDate.toString("dd/MM/yyyy hh:mm:ss")), updatePeriod);
         if((updateLastDate.daysTo(QDateTime::currentDateTime()) >= updatePeriod) || (forceUpdate))
             checkForUpdates();
@@ -117,7 +124,7 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     askScreenshot = askAddProject = 0;
     startTimer(50);
     if(firstTimeOpened)
-        showMessage(tr("Welcome!\nRekall runs as a background icon next to your clock."));
+        showMessage(tr("Welcome!\nRekall is now running!"));
     else
         showMessage(tr("Rekall is now running!"));
 
@@ -180,6 +187,7 @@ void Rekall::removeProject(ProjectInterface *project) {
     trayMenu->removeAction(project->trayMenuWeb);
     trayMenu->removeAction(project->trayMenuSeparator);
     Global::projects.removeOne(project);
+    project->isRemoved = true;
     updateGUI();
 }
 void Rekall::updateGUI() {

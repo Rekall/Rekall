@@ -55,11 +55,12 @@ void Analyse::run() {
     while(okThread) {
         if(metadataQueue.count()) {
             AnalyseProcess *analyseProcess = metadataQueue.dequeue();
-            trayIconToOn(10000);
+            if(!analyseProcess->project->isRemoved) {
+                trayIconToOn(10000);
 
-            if(analyseProcess->process())   thumbnailQueue.append(analyseProcess);
-            else                            analyseProcess->deleteLater();
-
+                if(analyseProcess->process())   thumbnailQueue.append(analyseProcess);
+                else                            analyseProcess->deleteLater();
+            }
             //QCoreApplication::processEvents();
             //msleep(5);
         }
@@ -71,10 +72,12 @@ void Analyse::run() {
         }
 
         if((thumbnailQueue.count()) && (thumbnailThreadsCount < 5)) {
-            thumbnailThreadsCount++;
-            trayIconToOn(10000);
             AnalyseProcess *analyseProcess = thumbnailQueue.dequeue();
-            analyseProcess->start();
+            if(!analyseProcess->project->isRemoved) {
+                thumbnailThreadsCount++;
+                trayIconToOn(10000);
+                analyseProcess->start();
+            }
         }
 
         QString text;

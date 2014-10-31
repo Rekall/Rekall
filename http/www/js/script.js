@@ -91,19 +91,29 @@ function documentReadyMenu() {
 				}
 			});
 			$("#menu_shares h1").click(function() {
-				if($("#menu_shares div").is(":visible"))	$("#menu_shares h1>span").text("(+)");
-				else										$("#menu_shares h1>span").text("(-)");
-				$("#menu_shares div").toggle();
-				$("#menu_shares p").toggle();
+				if($("#menu_shares div").is(":visible")) {
+					$("#menu_shares h1>span").html("&#x25B6;");
+					$("#menu_shares div").slideUp();
+					$("#menu_shares p").slideUp();
+				}
+				else {
+					$("#menu_shares h1>span").html("&#x25BC;");
+					$("#menu_shares div").slideDown();
+					$("#menu_shares p").slideDown();
+				}
 			});
-			$("#menu_shares h1").trigger("click");
 			$("#menu_tools h1").click(function() {
-				if($("#menu_tools div").is(":visible"))	$("#menu_tools h1>span").text("(+)");
-				else									$("#menu_tools h1>span").text("(-)");
-				$("#menu_tools div").toggle();
-				$("#menu_tools p").toggle();
+				if($("#menu_tools div").is(":visible")) {
+					$("#menu_tools h1>span").html("&#x25B6;");
+					$("#menu_tools div").slideUp();
+					$("#menu_tools p").slideUp();
+				}
+				else {
+					$("#menu_tools h1>span").html("&#x25BC;");
+					$("#menu_tools div").slideDown();
+					$("#menu_tools p").slideDown();
+				}
 			});
-			$("#menu_tools h1").trigger("click");
 			
 			$("#menu_projects > div").html("");
 			$.each(infos.projects, function(index, project) {
@@ -127,7 +137,7 @@ function documentReadyMenu() {
 				
 				$("#menu_projects > div").append()
 				if(rekall_common.isLocal)
-					html += "<div class='menu_renameproject invisible'>rename</div><div class='menu_finderproject invisible'>show folder</div><div class='menu_removeproject invisible'>&times;</div></div>";
+					html += "<div class='menu_renameproject invisible' title='Rename project name'>rename</div><div class='menu_finderproject invisible' title='Show the folder of this project'>show folder</div><div class='menu_removeproject invisible' title='Remove project'>&times;</div></div>";
 				$("#menu_projects > div").append(html + "</div>");
 			});
 			if(infos.projects.length == 0)
@@ -210,6 +220,16 @@ function reload() {
 
 function documentReadyIntro() {
 	documentReadyCommon();
+	
+	setTimeout(function() {
+		$("#intro img").fadeIn(750, function() {
+		});
+		$("#intro h1").fadeIn(2000, function() {
+			$("#intro p").fadeIn(1000, function() {
+
+			});
+		});
+	}, 250);
 
 	/*
 	var scenarioTime = 0;
