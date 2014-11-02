@@ -424,8 +424,8 @@ Rekall.prototype.start = function() {
 				tag.rect.x      = dimensions.x;
 				tag.rect.width  = dimensions.width;
 				tag.updatePosititon();
+				tag.projectChangedXml = "<tag key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>";
 			});
-			rekall.projectChanged();
 			rekall.analyse(false);
 			rekall.timeline.tagLayer.draw();
 		}
@@ -470,6 +470,15 @@ Rekall.prototype.start = function() {
 				}
 			}
 			else {
+				var projectChangedXml = "";
+				$.each(Tags.selectedTags, function(index, tag) {
+					if((tag.projectChangedXml) && (tag.projectChangedXml.length)) {
+						projectChangedXml += tag.projectChangedXml + "\n";
+						tag.projectChangedXml = undefined;
+					}
+				});
+				if(projectChangedXml.length)
+					rekall.projectChanged(projectChangedXml);
 			}
 			rekall.doNotChangeSelection = false;
 			rekall.timeline.selectionLayer.path.polygon.clear();
@@ -496,9 +505,10 @@ Rekall.prototype.loadXMLFile = function() {
 	    url = oldURL.substring(0, index);
 	if(!url.endsWith("/"))
 		url = url + "/";
+	this.baseUrl = url;
 	
 	var thiss = this;
-	$.ajax(url + "project", {
+	$.ajax(rekall.baseUrl + "project", {
 		type: "GET",
 		dataType: "json",
 		success: function(infos) {
@@ -507,7 +517,7 @@ Rekall.prototype.loadXMLFile = function() {
 		}
 	});
 
-	$.ajax(url + "xml", {
+	$.ajax(rekall.baseUrl + "xml", {
 		type: "GET",
 		dataType: "xml",
 		success: function(xml) {
@@ -519,10 +529,16 @@ Rekall.prototype.loadXMLFile = function() {
 		}
 	});
 }
-
 Rekall.prototype.projectChanged = function(xml) {
-	window.document.title = "Rekall — " + rekall.infos.friendlyName + "*";
-	//alert(xml);
+	window.document.title = "Rekall — " + rekall.infos.friendlyName + " (save in progress)";
+	xml = "<!DOCTYPE rekall>\n<changes>\n" + xml + "</changes>";
+	$.ajax(rekall.baseUrl + "xml", {
+		type: "POST",
+		data: {change: xml},
+		success: function(infos) {
+			window.document.title = "Rekall — " + rekall.infos.friendlyName;
+		}
+	});
 }
 
 

@@ -137,10 +137,27 @@ void Project::projectChanged(SyncEntry *file, bool firstChange) {
         xmlProject.appendChild(event->serialize(xmlDoc));
     }
     xmlProject.appendChild(file->metadatas.serialize(xmlDoc));
+    projectChanged();
+}
+void Project::projectChanged(const QString &strChanges) {
+    QDomDocument xmlChanges("rekall");
+    xmlChanges.setContent(strChanges);
+
+    QDomElement racine = xmlChanges.documentElement();
+    QDomNode xmlNode = racine.firstChild();
+    while(!xmlNode.isNull()) {
+        QDomElement xmlElement = xmlNode.toElement();
+        xmlProject.appendChild(xmlDoc.importNode(xmlElement, true));
+        xmlNode = xmlNode.nextSibling();
+    }
+    projectChanged();
+}
+void Project::projectChanged() {
     hasChanged = true;
     saveTimer.stop();
     saveTimer.start();
 }
+
 QAction* Project::addEvent(SyncEntryEvent *event) {
     events.prepend(event);
     qSort(events.begin(), events.end(), Project::sortEventFunction);

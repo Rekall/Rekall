@@ -59,7 +59,8 @@ public slots:
     void updateGUI();
     void fileChanged(SyncEntry *file);
     void projectChanged(SyncEntry *file, bool firstChange);
-
+    void projectChanged(const QString &strChanges);
+    void projectChanged();
 };
 
 #endif // PROJECT_H

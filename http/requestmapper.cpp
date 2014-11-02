@@ -86,10 +86,15 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
                 return;
             }
             else if(path.startsWith("/" + project->name + "/xml")) {
-                //request.path = "/rekall_cache/project.xml";
-                //project->fileController->service(request, response);
-                response.setHeader("Content-Type", "application/xml");
-                response.write(project->xmlDoc.toString().toUtf8(), true);
+                if(request.getParameterMap().contains("change")) {
+                    project->projectChanged(request.getParameter("change"));
+                }
+                else {
+                    //request.path = "/rekall_cache/project.xml";
+                    //project->fileController->service(request, response);
+                    response.setHeader("Content-Type", "application/xml");
+                    response.write(project->xmlDoc.toString().toUtf8(), true);
+                }
                 return;
             }
             else if(path.startsWith("/" + project->name + "/remove")) {

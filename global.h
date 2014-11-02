@@ -47,33 +47,23 @@ class Metadatas : public QHash<QString, QString> {
 public:
     inline QDomElement serialize(QDomDocument &xmlDoc) const {
         QDomElement xmlDocument = xmlDoc.createElement("document");
-
-        QDomElement xmlMetadata = xmlDoc.createElement("metadata");
         QHashIterator<QString, QString> metadataIterator(*this);
         while (metadataIterator.hasNext()) {
             metadataIterator.next();
             QDomElement xmlMeta = xmlDoc.createElement("meta");
             xmlMeta.setAttribute("ctg", metadataIterator.key());
             xmlMeta.setAttribute("cnt",  metadataIterator.value());
-            xmlMetadata.appendChild(xmlMeta);
+            xmlDocument.appendChild(xmlMeta);
         }
-
-        xmlDocument.appendChild(xmlMetadata);
         return xmlDocument;
     }
     inline void deserialize(const QDomElement &xmlElement) {
         QDomNode metadataNode = xmlElement.firstChild();
         while(!metadataNode.isNull()) {
             QDomElement metadataElement = metadataNode.toElement();
-            if((!metadataElement.isNull()) && (metadataElement.nodeName() == "metadata")) {
-                QDomNode metaNode = metadataElement.firstChild();
-                while(!metaNode.isNull()) {
-                    QDomElement metaElement = metaNode.toElement();
-                    if((!metaElement.isNull()) && (metaElement.nodeName() == "meta"))
-                        (*this)[metaElement.attribute("ctg")] = metaElement.attribute("cnt");
-                    metaNode = metaNode.nextSibling();
-                }
-            }
+            if((!metadataElement.isNull()) && (metadataElement.nodeName() == "meta"))
+                (*this)[metadataElement.attribute("ctg")] = metadataElement.attribute("cnt");
+
             metadataNode = metadataNode.nextSibling();
         }
     }
@@ -270,6 +260,7 @@ public slots:
     virtual void updateGUI() = 0;
     virtual void fileChanged(SyncEntry *file) = 0;
     virtual void projectChanged(SyncEntry *file, bool firstChange) = 0;
+    virtual void projectChanged(const QString &xmlString) = 0;
 };
 
 class WatcherInterface : public QObject {

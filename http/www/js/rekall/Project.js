@@ -52,6 +52,7 @@ Project.prototype.loadXML = function(xml) {
 	xml.find('document').each(function() {
 		var rekallDoc = new Document();
 		counts.documents++;
+		/*
 		$(this).find('tags').each(function() {
 			$(this).find('tag').each(function() {
 				var rekallDocTag = new Tag(rekallDoc);
@@ -61,19 +62,37 @@ Project.prototype.loadXML = function(xml) {
 				counts.tags++;
 			});
 		});
-		
-		$(this).find('metadata').each(function() {
-			$(this).find('meta').each(function() {
-				var rekallDocMeta = new Metadata();
-				rekallDocMeta.content 	  = $(this).attr('cnt');
-				rekallDocMeta.metadataKey = $(this).attr('ctg');
-				rekallDoc.setMetadata(rekallDocMeta);
-				counts.metadatas++;
-			});
+		*/
+		$(this).find('meta').each(function() {
+			var rekallDocMeta = new Metadata();
+			rekallDocMeta.content 	  = $(this).attr('cnt');
+			rekallDocMeta.metadataKey = $(this).attr('ctg');
+			rekallDoc.setMetadata(rekallDocMeta);
+			counts.metadatas++;
 		});
 		thiss.addDocument("Files", rekallDoc);
 	});
-	
+	xml.find('edition').each(function() {
+		var key           = $(this).attr('key');
+		var version       = $(this).attr('version');
+		var metadataKey   = $(this).attr('metadataKey');
+		var metadataValue = $(this).attr('metadataValue');
+		thiss.sources["Files"].documents[key].setMetadata(metadataKey, metadataValue, version);
+	});
+	xml.find('tag').each(function() {
+		var key       = $(this).attr('key');
+		var version   = $(this).attr('version');
+		var timeStart = $(this).attr('timeStart') + 0.;
+		var timeEnd   = $(this).attr('timeEnd')   + 0.;
+		$.each(thiss.sources["Files"].documents[key].tags, function(index, tag) {
+			tag.setTimeStart(timeStart);
+			tag.setTimeEnd(timeEnd);
+		});
+	});
+	/*
+	xml.find('event').each(function() {
+	});
+	*/
 	console.log(counts.documents + " documents analysés, " + counts.metadatas + " métadonnées extraites et " + counts.tags + " tags affichés !");
 	rekall.analyse();
 }

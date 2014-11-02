@@ -373,7 +373,7 @@ Tag.displayMetadata = function() {
 			Tags.unique().document.goodVersion = Tags.unique().version;
 			rekall.analyse(true);
 			Tag.displayMetadata();
-			rekall.projectChanged("<edition key=\"" + Tags.unique().document.key + "\" version=\"" + Tags.unique().version + "\" goodVersionIs=\"" + Tags.unique().document.goodVersion + "\"/>\n");
+			rekall.projectChanged("<edition key=\"" + Tags.unique().document.key + "\" version=\"" + Tags.unique().version + "\" goodVersionIs=\"" + Tags.unique().document.goodVersion + "\" />\n");
 		});
 		$("#metadatas_menu_bar_open").click(function() {
 			Tags.unique().openFile();
@@ -522,7 +522,7 @@ Tag.displayMetadata = function() {
 	
 	//Fonction temporaire de validation de l'édition d'un élément
 	function changeValueTo(obj, metadataKey, metadataValue) {
-		var xmlChanged = "";
+		var projectChangedXml = "";
 		if((obj != undefined) && (!Tag.metadataCancel)) {
 			var changed = false;
 			var reopen  = false;
@@ -536,7 +536,7 @@ Tag.displayMetadata = function() {
 					var hasChanged = tag.setMetadata(metadataKey, metadataValue.trim());
 					changed |= hasChanged;
 					if(hasChanged)
-						xmlChanged += "<edition key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" metadataKey=\"" + metadataKey + "\" metadataValue=\"" + metadataValue.trim() + "\"/>\n";
+						projectChangedXml += "<edition key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" metadataKey=\"" + metadataKey + "\" metadataValue=\"" + metadataValue.trim() + "\" />\n";
 				});
 			}
 			else {
@@ -574,7 +574,7 @@ Tag.displayMetadata = function() {
 					var hasChanged = tag.setMetadata(metadataKey, Utils.joinKeywords(keywords));
 					changed |= hasChanged;
 					if(hasChanged)
-						xmlChanged += "<edition key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" metadataKey=\"" + metadataKey + "\" metadataValue=\"" + Utils.joinKeywords(keywords) + "\"/>\n";
+						projectChangedXml += "<edition key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" metadataKey=\"" + metadataKey + "\" metadataValue=\"" + Utils.joinKeywords(keywords) + "\" />\n";
 				});
 			}
 		}
@@ -588,7 +588,7 @@ Tag.displayMetadata = function() {
 			Tag.metadataEditionKey = new Array();
 		if(changed) {
 			rekall.analyse();
-			rekall.projectChanged(xmlChanged);
+			rekall.projectChanged(projectChangedXml);
 		}
 	}
 
