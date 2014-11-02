@@ -154,6 +154,7 @@ void Project::projectChanged(const QString &strChanges) {
 }
 void Project::projectChanged() {
     hasChanged = true;
+    state++;
     saveTimer.stop();
     saveTimer.start();
 }

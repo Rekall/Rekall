@@ -212,7 +212,7 @@ void FileController::setContentType(QString filename, HttpResponse& response, co
                 mimeCache.insert(filename, entry);
             }
             if(!entry.mimeType.isEmpty()) {
-                response.setHeader("Content-Type", entry.mimeType.toLatin1());
+                response.setHeader("Content-Type", qPrintable(entry.mimeType));
                 qDebug("FileController: Content-Type = %s for %s", qPrintable(entry.mimeType), qPrintable(filename));
             }
             if(entry.duration > 0) {

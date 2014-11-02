@@ -532,10 +532,12 @@ Rekall.prototype.loadXMLFile = function() {
 Rekall.prototype.projectChanged = function(xml) {
 	window.document.title = "Rekall — " + rekall.infos.friendlyName + " (save in progress)";
 	xml = "<!DOCTYPE rekall>\n<changes>\n" + xml + "</changes>";
+	rekall_common.enableRubanNextTime = false;
 	$.ajax(rekall.baseUrl + "xml", {
 		type: "POST",
 		data: {change: xml},
 		success: function(infos) {
+			rekall_common.enableRubanNextTime = false;
 			window.document.title = "Rekall — " + rekall.infos.friendlyName;
 		}
 	});

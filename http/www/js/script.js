@@ -42,6 +42,45 @@ function documentReadyCommon() {
 		url = url + "/";
 	rekall_common.isLocal = ((window.url("domain", url) == "localhost") || (window.url("domain", url) == "127.0.0.1"));
 	rekall_common.jcropCoords = undefined;
+	rekall_common.enableRubanNextTime = true;
+	
+	if(sessionStorage != null) {
+		setInterval(function() {
+			$.ajax("/async", {
+				type: "GET",
+				dataType: "json",
+				success: function(infos) {
+					if(sessionStorage.firstTimeOpened != infos.firstTimeOpened) {
+						sessionStorage.firstTimeOpened = infos.firstTimeOpened;
+						if(sessionStorage.firstTimeOpened == 1)
+							showInRuban("It's the first time you open Rekall. Please have a look at our documentation!");
+					}
+					if(sessionStorage.newVersionOfRekall != infos.newVersionOfRekall) {
+						sessionStorage.newVersionOfRekall = infos.newVersionOfRekall;
+						if(sessionStorage.newVersionOfRekall == 1)
+							showInRuban("A new version a Rekall is available. Please visit <a href='http://www.rekall.fr' target='_blank'><u>rekall.fr</u></a> to discover new features and to download it.");
+					}
+					if((rekall != undefined) && (rekall.infos != undefined)) {
+						$.each(infos.projects, function(index, project) {
+							if(project.name == rekall.infos.name) {
+								if(sessionStorage["project_" + project.name] != project.state) {
+									if(sessionStorage["project_" + project.name] >= 0) {
+										if(rekall_common.enableRubanNextTime)
+											showInRuban("The project has changed (analysis is finished or a someone edited the project remotely). It's strongly recommended to <a href='javascript: reload();'><u>refresh this page</u></a>!");
+										rekall_common.enableRubanNextTime = true;
+									}
+									sessionStorage["project_" + project.name] = project.state;
+								}
+							}
+						});
+					}
+				}, 
+				error: function(infos) {
+
+				}
+			});
+		}, 2000);
+	}
 }
 
 function documentReadyRekall() {
@@ -215,6 +254,7 @@ function documentReadyMenu() {
 	*/
 }
 function reload() {
+	window.onbeforeunload = undefined;
 	window.location.reload();
 }
 
@@ -250,4 +290,41 @@ function documentReadyIntro() {
 		scenarioTime++;
 	}, 60);
 	*/
+}
+
+
+
+var rubanTimeout = 0;
+var rubanMessage = "";
+var rubanTimeoutTime = 0;
+function showInRuban(message, duration) {
+	if(typeof window.orientation !== 'undefined')
+		return;
+
+	if(message == undefined) {
+		clearInterval(rubanTimeout);
+		$("#ruban").slideUp(function() {
+			$("#ruban").html("");
+		});
+	}
+	else if($("#ruban").text().length == 0) {
+		showInRuban();
+		messageWithClose = message;
+		if(duration == undefined)
+			duration = 15;
+		rubanTimeoutTime = duration;
+		rubanTimeout = setInterval(function() {
+			rubanTimeoutTime--;
+			if(rubanTimeoutTime > 0) {
+				if(rubanTimeoutTime > 1000)
+					messageWithClose = message + "&nbsp;&nbsp;&nbsp;&nbsp;<u onClick='javascript:showInRuban();'>&times;&nbsp;close</u>";
+				else
+					messageWithClose = message + "&nbsp;&nbsp;&nbsp;&nbsp;<u onClick='javascript:showInRuban();'>&times;&nbsp;autoclose in " + rubanTimeoutTime + " sec.</u>";
+				$("#ruban").html(messageWithClose);
+				$("#ruban").slideDown();
+			}
+			else
+				showInRuban();
+		}, 1000);
+	}
 }

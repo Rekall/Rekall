@@ -105,7 +105,7 @@ public:
 
 class RekallInterface {
 public:
-    bool trayIconWorking;
+    bool trayIconWorking, newVersionOfRekall, firstTimeOpened;
     virtual void trayIconToOn(qint16 duration) = 0;
     virtual void trayIconToOff() = 0;
 
@@ -236,6 +236,7 @@ public:
 public:
     explicit ProjectInterface(QObject *parent = 0) : QObject(parent) {
         sync = 0;
+        state = 0;
         isPublic  = true;
         isRemoved = false;
     }
@@ -245,6 +246,7 @@ public:
 
 public:
     QString name, friendlyName;
+    quint16 state;
     QFileInfo path;
     bool isPublic, isRemoved;
     QDomDocument xmlDoc;

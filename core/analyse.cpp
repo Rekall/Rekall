@@ -126,6 +126,7 @@ void AnalyseProcess::getMetadatas() {
         file->metadatas["Rekall->Flag"] = "Bundled File";
     else
         file->metadatas["Rekall->Flag"] = "File";
+    file->metadatas["Rekall->Import Date"] = QDateTime::currentDateTime().toString("yyyy:MM:dd hh:mm:ss");
 
     if(file->userInfos) {
         QHashIterator<QString, QString> metadataIterator(*file->userInfos);
@@ -144,23 +145,19 @@ void AnalyseProcess::getMetadatas() {
     }
     else if(previousMeta.count() != file->metadatas.count()) {
         noChanges = false;
-        if(previousMeta.count() > 0)
-            qDebug("COUNT: %d vs. %d", previousMeta.count(), file->metadatas.count());
+        qDebug("COUNT: %d vs. %d", previousMeta.count(), file->metadatas.count());
     }
     else {
         QHashIterator<QString, QString> metadataIterator(file->metadatas);
         while (metadataIterator.hasNext()) {
             metadataIterator.next();
-            if(previousMeta.value(metadataIterator.key()) != metadataIterator.value()) {
+            if((previousMeta.value(metadataIterator.key()) != metadataIterator.value()) && (metadataIterator.key() != "Rekall->Import Date")) {
                 noChanges = false;
                 qDebug("META %s: %s vs. %s", qPrintable(metadataIterator.key()), qPrintable(previousMeta.value(metadataIterator.key())), qPrintable(metadataIterator.value()));
                 break;
             }
         }
     }
-
-    if(!noChanges)
-        file->metadatas["Rekall->Import Date"] = QDateTime::currentDateTime().toString("yyyy:MM:dd hh:mm:ss");
 }
 void AnalyseProcess::getThumbnails() {
     //Path des vignettes
@@ -254,7 +251,7 @@ void AnalyseProcess::run() {
 bool AnalyseProcess::process() {
     QDateTime s = QDateTime::currentDateTime();
     getMetadatas();
-    qDebug("[%lld ms] Analyse de %s terminée", s.msecsTo(QDateTime::currentDateTime()), qPrintable(file->fileName()));
+    qDebug("[%lld ms] Analyse de %s terminée avec le code %d", s.msecsTo(QDateTime::currentDateTime()), qPrintable(file->fileName()), noChanges);
 
     return !noChanges;
 }

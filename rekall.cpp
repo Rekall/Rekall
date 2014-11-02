@@ -37,7 +37,7 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     //Update
     updateManager = 0;
     forceUpdate = false;
-    firstTimeOpened = false;
+    firstTimeOpened = newVersionOfRekall = false;
     if(arguments.contains("-forceupdate"))
         forceUpdate = true;
 
@@ -55,7 +55,7 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     //
     Global::userInfos = new UserInfos(this);
     Global::http      = new Http(this);
-    Analyse *analyse = new Analyse(this);
+    Analyse *analyse  = new Analyse(this);
     Global::analyse   = analyse;
     connect(analyse, SIGNAL(trayChanged(QString,bool)), SLOT(analyseTrayChanged(QString,bool)));
     connect(analyse, SIGNAL(trayIconToOff()), SLOT(trayIconToOff()));
@@ -153,11 +153,8 @@ void Rekall::checkForUpdatesFinished(QNetworkReply *reply) {
         if(globalSettings)
             globalSettings->setValue("lastUpdate", QDateTime::currentDateTime());
         QString info = reply->readAll().trimmed();
-        if((info.length() > 0) || (forceUpdate)) {
-            int rep = QMessageBox::information(0, tr("Rekall Update Center"), tr("A new version of Rekall is available. Would you like to update Rekall with the new version ?"), QMessageBox::Yes, QMessageBox::No);
-            if(rep == QMessageBox::Yes)
-                QDesktopServices::openUrl(QUrl("http://www.rekall.fr/", QUrl::TolerantMode));
-        }
+        if((info.length() > 0) || (forceUpdate))
+            newVersionOfRekall = true;
     }
 }
 

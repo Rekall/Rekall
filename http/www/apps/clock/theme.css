@@ -13,9 +13,8 @@ html, body {
 u {
 	cursor:		pointer;
 }
-
 #ruban {
-	font-family: "open_sanssemibold";
+	font-family: 		"open_sanssemibold";
 	width: 				100%;
 	background-color: 	white;
 	color: 				black;
@@ -23,6 +22,7 @@ u {
 	text-align:			center;
 	text-transform: 	uppercase;
 }
+
 
 #clock_sync {
 	font-family: 	"open_sanslight";

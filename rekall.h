@@ -48,7 +48,7 @@ private:
 
 private:
     QSettings *globalSettings;
-    bool forceUpdate, firstTimeOpened;
+    bool forceUpdate;
     QString updateAnonymousId;
     QNetworkAccessManager *updateManager;
 private slots:

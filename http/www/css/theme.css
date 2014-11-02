@@ -13,7 +13,15 @@ html, body {
 u {
 	cursor:		pointer;
 }
-
+#ruban {
+	font-family: 		"open_sanssemibold";
+	width: 				100%;
+	background-color: 	white;
+	color: 				black;
+	line-height:		30px;
+	text-align:			center;
+	text-transform: 	uppercase;
+}
 
 .imgBackgroundBg {
   -webkit-background-size: 	cover;

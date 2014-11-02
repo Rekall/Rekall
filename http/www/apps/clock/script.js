@@ -78,34 +78,3 @@ function updateClock() {
 		}
 	});
 }
-
-var rubanTimeout = 0;
-var rubanMessage = "";
-var rubanTimeoutTime = 0;
-function showInRuban(message, duration) {
-	if(typeof window.orientation !== 'undefined')
-		return;
-
-	if(message == undefined) {
-		clearInterval(rubanTimeout);
-		$("#ruban").slideUp();
-	}
-	else {
-		showInRuban();
-		messageWithClose = message;
-		rubanTimeoutTime = 15;
-		rubanTimeout = setInterval(function() {
-			rubanTimeoutTime--;
-			if(rubanTimeoutTime > 0) {
-				if(rubanTimeoutTime > 1000)
-					messageWithClose = message + "&nbsp;&nbsp;&nbsp;&nbsp;<u onClick='javascript:showInRuban();'>&times;&nbsp;close</u>";
-				else
-					messageWithClose = message + "&nbsp;&nbsp;&nbsp;&nbsp;<u onClick='javascript:showInRuban();'>&times;&nbsp;autoclose in " + rubanTimeoutTime + " sec.</u>";
-				$("#ruban").html(messageWithClose);
-				$("#ruban").slideDown();
-			}
-			else
-				showInRuban();
-		}, 1000);
-	}
-}

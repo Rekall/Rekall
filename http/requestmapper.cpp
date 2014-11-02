@@ -187,6 +187,28 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
         response.write(json.toUtf8(), true);
         return;
     }
+    else if (path.startsWith("/async")) {
+        bool chop = false;
+        QString json;
+        json += "{";
+        json += "  \"firstTimeOpened\": \""    + QString("%1").arg(Global::rekall->firstTimeOpened)    + "\",";
+        json += "  \"newVersionOfRekall\": \"" + QString("%1").arg(Global::rekall->newVersionOfRekall) + "\",";
+        json += "  \"projects\": [";    chop = false;
+        foreach(ProjectInterface *project, Global::projects) {
+            json += "{";
+            json += "\"name\": \""  + project->name                   + "\",";
+            json += "\"state\": \"" + QString::number(project->state) + "\"";
+            json += "},";
+            chop = true;
+        }
+        if(chop)
+            json.chop(1);
+        json += "]";
+        json += "}";
+        response.setHeader("Content-Type", "application/json");
+        response.write(json.toUtf8(), true);
+        return;
+    }
     else if (path.startsWith("/osc")) {
         response.setHeader("Content-Type", "text/plain");
         request.path = request.path.replace("/osc", "");
