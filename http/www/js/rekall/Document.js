@@ -81,7 +81,7 @@ Document.prototype.setMetadata = function(metadataKey, metadataValue, version) {
 	if((!metadataKey.toLowerCase().startsWith("exiftool")) && (metadataValue.toLowerCase().indexOf("use -b option to extract") === -1)) {
 		currentValue = this.getMetadatas(version)[metadataKey];
 		this.getMetadatas(version)[metadataKey] = metadataValue;
-		
+	
 		if(Document.availableMetadataKeys[metadataKey] == undefined)
 			Document.availableMetadataKeys[metadataKey] = {count: 0};
 		Document.availableMetadataKeys[metadataKey].count++;

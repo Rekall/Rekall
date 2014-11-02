@@ -26,7 +26,7 @@ function Rekall() {
 	this.sortings["colors"]     = new Sorting("Rekall->Type", false, "");
 	this.sortings["groups"]     = new Sorting("Rekall->Date/Time|year", false, "");//Rekall->Date/Time|year
 	this.sortings["vertical"]   = new Sorting("Rekall->Date/Time|month", false, "");//Rekall->Date/Time|month
-	this.sortings["horizontal"] = new Sorting("Time", true, "");//"Time");//File->File Size MB//EXIF->Aperture Value
+	this.sortings["horizontal"] = new Sorting("Rekall->Author", true, "");//"Time");//File->File Size MB//EXIF->Aperture Value
 	this.sortings["highlight"]  = new Sorting("File->MIME Type", false, "");//"Rekall->Extension", false, "max");
 	this.sortings["search"]     = new Sorting("", false, "");
 	this.sortings["authors"]    = new Sorting("Rekall->Author");
@@ -321,7 +321,7 @@ Rekall.prototype.start = function() {
 	//Marqueurs
 	$(document).keyup(function(e) {
 		if(e.keyCode == 77) {
-			window.document.title = rekall.timeline.bar.timeCurrent;
+			//window.document.title = rekall.timeline.bar.timeCurrent;
 		}
 		else if(e.keyCode == 82) {
 			$.each(rekall.project.sources, function(key, source) {
@@ -364,7 +364,6 @@ Rekall.prototype.start = function() {
 		$.each(Tags.selectedTags, function(index, tag) {
 			var tagCenter = tag.getTimeStart() + (tag.getTimeEnd() - tag.getTimeStart())/2;
 			var tagDurationTolerence = max((tag.getTimeEnd() - tag.getTimeStart()) * 0.15, 0.2);
-			window.document.title = tagDurationTolerence + " / " + tag.timeStartMouse + " / " + tag.timeEndMouse;
 			if(((tagCenter - tagDurationTolerence/2) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tagCenter + tagDurationTolerence/2)))
 				rekall.mousePressedMode = "move";
 				
@@ -411,12 +410,12 @@ Rekall.prototype.start = function() {
 
 			$.each(Tags.selectedTags, function(index, tag) {
 				if     (rekall.mousePressedMode == "resizeL")
-					tag.timeStart = constrain(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime), tag.timeEnd);
+					tag.setTimeStart(constrain(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime), tag.timeEnd));
 				else if(rekall.mousePressedMode == "resizeR")
-					tag.timeEnd   = max(tag.timeStart, tag.timeEndMouse + (rekall.mouseMoveTime - rekall.mousePressedTime));
+					tag.setTimeEnd(max(tag.timeStart, tag.timeEndMouse + (rekall.mouseMoveTime - rekall.mousePressedTime)));
 				else if(rekall.mousePressedMode == "move") {
-					tag.timeStart = max(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime));
-					tag.timeEnd   = max(tag.timeStart, tag.timeEndMouse + (rekall.mouseMoveTime - rekall.mousePressedTime));
+					tag.setTimeStart(max(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime)));
+					tag.setTimeEnd  (max(tag.timeStart, tag.timeEndMouse + (rekall.mouseMoveTime - rekall.mousePressedTime)));
 				}
 				rekall.doNotChangeSelection = true;
 
@@ -426,6 +425,7 @@ Rekall.prototype.start = function() {
 				tag.rect.width  = dimensions.width;
 				tag.updatePosititon();
 			});
+			rekall.projectChanged();
 			rekall.analyse(false);
 			rekall.timeline.tagLayer.draw();
 		}
@@ -503,7 +503,7 @@ Rekall.prototype.loadXMLFile = function() {
 		dataType: "json",
 		success: function(infos) {
 			thiss.infos = infos;
-			window.document.title = "Rekall — " + thiss.infos.friendlyName;
+			window.document.title = "Rekall — " + rekall.infos.friendlyName;
 		}
 	});
 
@@ -518,6 +518,11 @@ Rekall.prototype.loadXMLFile = function() {
 			});
 		}
 	});
+}
+
+Rekall.prototype.projectChanged = function(xml) {
+	window.document.title = "Rekall — " + rekall.infos.friendlyName + "*";
+	//alert(xml);
 }
 
 

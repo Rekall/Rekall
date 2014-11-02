@@ -27,7 +27,7 @@ function Source(hash) {
 }
 
 Source.prototype.addDocument = function(document) {
-	var key = this.mapPath(Utils.getLocalFilePath(document));
+	var key = this.mapPath(Utils.getLocalFilePath(document, "", true));
 	if(key == "")
 		key = CryptoJS.SHA1(moment() + random() + "").toString();
 
