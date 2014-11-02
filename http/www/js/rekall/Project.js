@@ -615,12 +615,6 @@ Project.prototype.analyse = function(full) {
 			y += Tag.tagHeight*2;
 		});
 	}
-			
-	//Bornes du scroll + display meta
-	if(full != false) {
-		rekall.timeline.tagLayer.scrollbars.bounds = {x: xMax, y: y};	
-		Tag.displayMetadata();
-	}
 	
 	//Hightlights graphiques au survol ou sélections
 	$.each(rekall.sortings["groups"].categories, function(key, groupSortingCategory) {
@@ -630,9 +624,12 @@ Project.prototype.analyse = function(full) {
 		});
 	});
 	rekall.selectionId++;
+	var bounds = {x: 0, y: 0};
 	$.each(rekall.project.sources, function(key, source) {
 		$.each(source.documents, function(key, document) {
 	    	$.each(document.tags, function(key, tag) {
+				bounds.x = max(bounds.x, tag.rect.x+tag.rect.width);
+				bounds.y = max(bounds.y, tag.rect.y+tag.rect.height);
 				if(($.inArray(tag, Tags.selectedTags) !== -1) && (rekall.sortings["groups"].getCategory(tag) != undefined)) {
 					rekall.sortings["groups"].getCategory(tag).text.setFill("#2DCAE1");
 					if(rekall.sortings["groups"].getCategory(tag).verticalSorting.getCategory(tag) != undefined)
@@ -645,6 +642,11 @@ Project.prototype.analyse = function(full) {
 		});
 	});
 	
+	//Bornes du scroll + display meta
+	rekall.timeline.tagLayer.scrollbars.bounds = bounds;
+	if(full != false)
+		Tag.displayMetadata();
+
 	//Highlight
 	rekall.timeline.tagLayer.groupUnderlay.removeChildren();
 	$.each(rekall.sortings["highlight"].categories, function(key, category) {

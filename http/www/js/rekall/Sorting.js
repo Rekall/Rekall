@@ -132,7 +132,7 @@ Sorting.prototype.analyseAdd = function(tag, metadata, alwaysIncludeTags, useThi
 
 	if(this.metadataKey == "Time") {
 		this.valMin = min(this.valMin, tag.getTimeStart());
-		this.valMax = max(this.valMax, tag.getTimeEnd());
+		this.valMax = max(40, max(this.valMax, tag.getTimeEnd()));
 		return true;
 	}
 	else {

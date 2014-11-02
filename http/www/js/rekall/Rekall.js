@@ -47,6 +47,10 @@ function Rekall() {
 
 	this.previewVideoPlayer = new VideoPlayer($("#previewVideo"), "previewVideoPlayer", false);
 	this.captationVideoPlayers = new VideoPlayers();
+	
+	//Other events
+	this.mousePressed = false;
+	this.mousePressedPos = {x: 0, y: 0};
 }
 
 Rekall.prototype.start = function() {
@@ -335,7 +339,33 @@ Rekall.prototype.start = function() {
 
 	//Survols et sélections
 	$("#timeline").mousedown(function(event){
+		//Déplacement
+		rekall.mousePressedPos  = rekall.timeline.getPointerPosition();
+		rekall.mousePressedTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.mousePressedPos.x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
+		
+		$.each(Tags.selectedTags, function(index, tag) {
+			tag.timeStartMouse = tag.timeStart;
+			tag.timeEndMouse   = tag.timeEnd;
+		});
+
+		rekall.mousePressedMode = "";
+		if(Tags.selectedTags.length)
+			rekall.mousePressedMode = "move";
+		$.each(Tags.selectedTags, function(index, tag) {
+			var tagCenter = tag.getTimeStart() + (tag.getTimeEnd() - tag.getTimeStart())/2;
+			var tagDurationTolerence = max((tag.getTimeEnd() - tag.getTimeStart()) * 0.15, 0.2);
+			window.document.title = tagDurationTolerence + " / " + tag.timeStartMouse + " / " + tag.timeEndMouse;
+			if(((tagCenter - tagDurationTolerence/2) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tagCenter + tagDurationTolerence/2)))
+				rekall.mousePressedMode = "move";
+				
+			else if (((tag.getTimeStart() - tagDurationTolerence) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tag.getTimeStart() + tagDurationTolerence)))
+				rekall.mousePressedMode = "resizeL";
+			else if(((tag.getTimeEnd()   - tagDurationTolerence) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tag.getTimeEnd()   + tagDurationTolerence)))
+				rekall.mousePressedMode = "resizeR";
+		});
+
 		rekall.mousePressed = true;
+		
 		rekall.timeline.selectionLayer.path.polygon.clear();
 		if(Tags.hoveredTag == undefined)
 			drawSelection(event);
@@ -353,7 +383,7 @@ Rekall.prototype.start = function() {
 		//Survol
 		var hoveredTagOld = Tags.hoveredTag;
 		Tags.hoveredTag = undefined;
-		if(rekall.project) {
+		if((rekall.project) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0)) {
 			$.each(rekall.project.sources, function(key, source) {
 				$.each(source.documents, function(key, document) {
 			  	  $.each(document.tags, function(key, tag) {
@@ -365,37 +395,73 @@ Rekall.prototype.start = function() {
 			});
 		}
 		
-		if((rekall.mousePressed) && (Tags.hoveredTag == undefined)) {
-			window.document.body.style.cursor = 'crosshair';
+		if((rekall.mousePressed) && (Tags.selectedTags.length) && (rekall.sortings["horizontal"].metadataKey == "Time")) {
+			//Déplacement
+			rekall.mouseMoveTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.timeline.getPointerPosition().x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
+
+			$.each(Tags.selectedTags, function(index, tag) {
+				if     (rekall.mousePressedMode == "resizeL")
+					tag.timeStart = constrain(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime), tag.timeEnd);
+				else if(rekall.mousePressedMode == "resizeR")
+					tag.timeEnd   = max(tag.timeStart, tag.timeEndMouse + (rekall.mouseMoveTime - rekall.mousePressedTime));
+				else if(rekall.mousePressedMode == "move") {
+					tag.timeStart = max(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime));
+					tag.timeEnd   = max(tag.timeStart, tag.timeEndMouse + (rekall.mouseMoveTime - rekall.mousePressedTime));
+				}
+				rekall.doNotChangeSelection = true;
+
+				//Update
+				var dimensions = rekall.sortings["horizontal"].positionFor(tag);
+				tag.rect.x      = dimensions.x;
+				tag.rect.width  = dimensions.width;
+				tag.updatePosititon();
+			});
+			rekall.analyse(false);
+			rekall.timeline.tagLayer.draw();
+		}
+		else if((rekall.mousePressed) && (Tags.hoveredTag == undefined)) {
 			rekall.timeline.selectionLayer.path.polygon.addPoint(pos);
 			drawSelection(event);
 		}
 		else if(Tags.hoveredTag != undefined) {
-			window.document.body.style.cursor = 'pointer';
 			if(hoveredTagOld != Tags.hoveredTag)
 				Tags.hoveredTag.displayMetadata();
 		}
+			
+		/*if(((rekall.mousePressed) || (Tags.hoveredTag != undefined)) && (rekall.mousePressedMode == "move"))
+			window.document.body.style.cursor = 'move';
+		else if(((rekall.mousePressed) || (Tags.hoveredTag != undefined)) && (rekall.mousePressedMode.startsWith("resize")))
+			window.document.body.style.cursor = 'col-resize';
+		else*/if((rekall.mousePressed) && (Tags.hoveredTag == undefined))
+			window.document.body.style.cursor = 'crosshair';
+		else if(Tags.hoveredTag != undefined)
+			window.document.body.style.cursor = 'pointer';
 		else
-			window.document.body.style.cursor = 'default';
+			window.document.body.style.cursor = 'default';		
 	});
 	function mouseRelease(event) {
 		if(rekall.mousePressed){
 			rekall.mousePressed = false;
-			Tags.clear();
-			if((Tags.hoveredTag != undefined) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0)) {
-				Tags.addOne(Tags.hoveredTag, true);
+			
+			if(rekall.doNotChangeSelection != true) {
+				Tags.clear();
+				if((Tags.hoveredTag != undefined) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0)) {
+					Tags.addOne(Tags.hoveredTag, true);
+				}
+				else if(rekall.timeline.selectionLayer.path.polygon.points.length > 0) {
+					$.each(rekall.project.sources, function(key, source) {
+						$.each(source.documents, function(key, document) {
+					    	$.each(document.tags, function(key, tag) {
+								if((tag.isVisible()) && (tag.isSelectable) && (rekall.timeline.selectionLayer.path.polygon.contains(tag.rect.getPosition())))
+									Tags.add(tag, true);
+								});
+				    		});
+						});
+				}
 			}
-			else if(rekall.timeline.selectionLayer.path.polygon.points.length > 0) {
-				$.each(rekall.project.sources, function(key, source) {
-					$.each(source.documents, function(key, document) {
-				    	$.each(document.tags, function(key, tag) {
-							if((tag.isVisible()) && (tag.isSelectable) && (rekall.timeline.selectionLayer.path.polygon.contains(tag.rect.getPosition())))
-								Tags.add(tag, true);
-							});
-			    		});
-					});
+			else {
 			}
-
+			rekall.doNotChangeSelection = false;
 			rekall.timeline.selectionLayer.path.polygon.clear();
 			drawSelection(event);
 			Tag.displayMetadata();
