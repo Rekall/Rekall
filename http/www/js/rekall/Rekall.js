@@ -336,6 +336,16 @@ Rekall.prototype.start = function() {
 		}
 	});
 	
+	
+	//Zoom
+	$("#timeline-unzoom").click(function() {
+		Sorting.size -= 3;
+		rekall.analyse(true);
+	});
+	$("#timeline-zoom").click(function() {
+		Sorting.size += 3;
+		rekall.analyse(true);
+	});
 
 	//Survols et sélections
 	$("#timeline").mousedown(function(event){
