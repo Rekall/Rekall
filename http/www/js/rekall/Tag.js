@@ -150,10 +150,12 @@ Tag.prototype.getTimeEnd = function() {
 	return this.timeEnd;
 }
 Tag.prototype.setTimeStart = function(val) {
-	this.timeStart = val;
+	if(!isNaN(val))
+		this.timeStart = val;
 }
 Tag.prototype.setTimeEnd = function(val) {
-	this.timeEnd = val;
+	if(!isNaN(val))
+		this.timeEnd = val;
 }
 
 

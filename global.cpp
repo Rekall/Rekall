@@ -95,7 +95,6 @@ Metadatas Global::getMetadatas(QFileInfo file, ProjectInterface *project, bool d
             exifToolProcess->waitForStarted();
         }
 
-        qDebug("===> %s", qPrintable(file.absoluteFilePath() + "\n"));
         exifToolProcess->write(qPrintable(file.absoluteFilePath() + "\n"));
         exifToolProcess->write("-G\n");
         exifToolProcess->write("-c\n%+.6f\n");
@@ -120,7 +119,6 @@ Metadatas Global::getMetadatas(QFileInfo file, ProjectInterface *project, bool d
          */
         QStringList lines = QString(linesString).split('\n');
         foreach(const QString &line, lines) {
-            qDebug("===> %s", qPrintable(line));
             QStringList metadatas = line.split('\t');
             if(metadatas.length() > 2) {
                 QString metadataKey   = metadatas.at(0) + "->" + metadatas.at(1);
