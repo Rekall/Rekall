@@ -410,7 +410,7 @@ Tag.displayMetadata = function() {
 	else
 		$("#metadatas_menu_bar_map").hide();
 		
-	if((Tags.count() == 1) && (Tags.unique().thumbnail != undefined)) {
+	if((Tags.count() == 1) && (Tags.unique().isImage())) {
 		$("#metadatas_menu_bar_zoom").show();
 		$("#metadatas_menu_bar_zoom").click(function() {
 			$("#pannerTabNav").trigger("click");

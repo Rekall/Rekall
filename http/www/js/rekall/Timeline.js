@@ -73,6 +73,7 @@ Timeline.prototype.toggle = function() {
 
 Timeline.prototype.update = function() {
 	if(rekall.sortings["horizontal"].metadataKey == "Time") {
+		rekall.timeline.barLayer.group.setVisible(true);
 		var timeBarPoints = this.line.points();
 		if((this.state) || (isNaN(timeBarPoints[0]))) {
 			if(isNaN(timeBarPoints[0]))

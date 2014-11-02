@@ -23,7 +23,7 @@
 
 function Rekall() {
 	this.sortings = new Object();
-	this.sortings["colors"]     = new Sorting("Rekall->Author", false, "");
+	this.sortings["colors"]     = new Sorting("Rekall->Type", false, "");
 	this.sortings["groups"]     = new Sorting("Rekall->Date/Time|year", false, "");//Rekall->Date/Time|year
 	this.sortings["vertical"]   = new Sorting("Rekall->Date/Time|month", false, "");//Rekall->Date/Time|month
 	this.sortings["horizontal"] = new Sorting("Time", true, "");//"Time");//File->File Size MB//EXIF->Aperture Value
