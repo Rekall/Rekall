@@ -85,8 +85,8 @@ Project.prototype.loadXML = function(xml) {
 		var timeStart = $(this).attr('timeStart') + 0.;
 		var timeEnd   = $(this).attr('timeEnd')   + 0.;
 		$.each(thiss.sources["Files"].documents[key].tags, function(index, tag) {
-			tag.setTimeStart(timeStart);
-			tag.setTimeEnd(timeEnd);
+			tag.setTimeStart(parseFloat(timeStart));
+			tag.setTimeEnd(parseFloat(timeEnd));
 		});
 	});
 	/*
@@ -180,7 +180,7 @@ Project.prototype.analyse = function(full) {
 		rekall.sortings["search"]    .analyseEnd();
 
 	
-		//Positionnement des tags
+		//Extractions d'infos sur le GPS, les vignettes
 		rekall.sortings["colors"]   .analyseStart();
 		rekall.sortings["highlight"].analyseStart();
 		rekall.sortings["hashes"]   .analyseStart();
@@ -235,7 +235,7 @@ Project.prototype.analyse = function(full) {
 	}
 	
 
-	//Cases à cocher
+	//Cases à cocher ont changées
 	if(full != false) {
 		/*
 		var availableMetadatas = new Array();
@@ -407,11 +407,6 @@ Project.prototype.analyse = function(full) {
 			}
 		});
 
-		
-		
-		
-
-	
 		//Actions sur le cochage
 		$(".tab_list_item input").click(function(event) {
 			var sorting  = $(this).parent().parent().parent().parent().parent().attr("id").replace("Tab", "");
@@ -428,6 +423,7 @@ Project.prototype.analyse = function(full) {
 				sorting.categories[category].checked = value;
 			rekall.analyse();
 		});
+		
 		//Action sur la recherche
 		$(".tab_search input").keyup(function(event) {
 			event.stopPropagation();
@@ -452,78 +448,76 @@ Project.prototype.analyse = function(full) {
 			rekall.analyse();
 		});
 	}
-	
-	
-	//Affectation des couleurs
-	if(full != false) {
-		$.each(rekall.sortings["colors"].categories, function(key, colorSortingCategory) {
-			$.each(colorSortingCategory.tags, function(key, tag) {
-				tag.update(colorSortingCategory.color);
-				tag.isSelectable = colorSortingCategory.checked;
-			});
-		});
-	}
 
 		
-	//Etiquettes horizontales et verticales
+	//Etiquettes horizontales et verticales à refaire
 	if(full != false) {
 		rekall.timeline.gridLayer.group.destroyChildren();
 		rekall.timeline.timeLayer.group.destroyChildren();
-	
-	
-		//Étiquettes horizontales
-		var alternate = 0;
-		$.each(rekall.sortings["horizontal"].categories, function(key, horizontalSortingCategory) {
-			var horizontalSortingCategoryPos = rekall.sortings["horizontal"].positionFor(undefined, horizontalSortingCategory.index);
-			var horizontalSortingCategoryRectAlternate = new Kinetic.Rect({
-				x: 			horizontalSortingCategoryPos.x,
-				y: 			y,
-				width: 		horizontalSortingCategoryPos.xMax - horizontalSortingCategoryPos.x,
-				height: 	rekall.timeline.height(),
+	}
+	//Étiquettes horizontales
+	var alternate = 0;
+	$.each(rekall.sortings["horizontal"].categories, function(key, horizontalSortingCategory) {
+		var horizontalSortingCategoryPos = rekall.sortings["horizontal"].positionFor(undefined, horizontalSortingCategory.index);
+		if(horizontalSortingCategory.rectAlternate == undefined) {
+			horizontalSortingCategory.rectAlternate = new Kinetic.Rect({
 				fill: 		'#4D5355',
-				opacity:    (((alternate++)%2)==0)?(0.):(0.2),
 				listening: 	false,
 			});
-			rekall.timeline.timeLayer.group.add(horizontalSortingCategoryRectAlternate);
-			var horizontalSortingCategoryText = new Kinetic.Text({
-				x: 			horizontalSortingCategoryPos.x+5,
-				y: 			9,
+		}
+		if(full != false)
+			rekall.timeline.timeLayer.group.add(horizontalSortingCategory.rectAlternate);
+		horizontalSortingCategory.rectAlternate.setPosition({x: horizontalSortingCategoryPos.x, y: y});
+		horizontalSortingCategory.rectAlternate.setSize({width: horizontalSortingCategoryPos.xMax - horizontalSortingCategoryPos.x, height: rekall.timeline.height()});
+		horizontalSortingCategory.rectAlternate.setOpacity((((alternate++)%2)==0)?(0.):(0.2));
+		
+		if(horizontalSortingCategory.categoryText == undefined) {
+			horizontalSortingCategory.categoryText = new Kinetic.Text({
 				fill: 		'#F5F8EE',
-				text: 		horizontalSortingCategory.categoryVerbose,
 				fontSize: 	9,
 				fontFamily: 'open_sansregular',
 				listening: 	false,
 			});
-			rekall.timeline.timeLayer.group.add(horizontalSortingCategoryText);
-		});
-	
-	
-		//Disposition des tags + étiquettes
-		var xMax = 0, y = 0, alternate = 0;
-		var yMaxGroupSortingCategory = 0;
-		$.each(rekall.sortings["groups"].categories, function(key, groupSortingCategory) {
+		}
+		if(full != false)
+			rekall.timeline.timeLayer.group.add(horizontalSortingCategory.categoryText);
+		horizontalSortingCategory.categoryText.setPosition({x: horizontalSortingCategoryPos.x+5, y: 9});
+		horizontalSortingCategory.categoryText.setText(horizontalSortingCategory.categoryVerbose);
+	});
+
+
+	//Disposition des tags + étiquettes
+	rekall.selectionId++;
+	var bounds = {x: 0, y: 0};
+	var xMax = 0, y = 0, alternate = 0;
+	var yMaxGroupSortingCategory = 0;
+	$.each(rekall.sortings["groups"].categories, function(key, groupSortingCategory) {
+		if(full != false) {
 			if(groupSortingCategory.verticalSorting == undefined)
 				groupSortingCategory.verticalSorting = new Sorting();
 			groupSortingCategory.verticalSorting.setCriterias(rekall.sortings["vertical"].metadataConfigStr, rekall.sortings["vertical"].valCanBeFloats, rekall.sortings["vertical"].metadataSearch, false);
-		
-			groupSortingCategory.verticalSorting.analyseStart();
-			$.each(groupSortingCategory.tags, function(key, tag) {
-				groupSortingCategory.verticalSorting.analyseAdd(tag);
-			});
-			groupSortingCategory.verticalSorting.analyseEnd();
-		
-			$.each(groupSortingCategory.verticalSorting.categories, function(key, verticalSortingCategory) {
-				$.each(verticalSortingCategory.tags, function(key, tag) {
-					var dimensions = rekall.sortings["horizontal"].positionFor(tag);
-					tag.rect.x      = dimensions.x;
-					tag.rect.y      = 0;
-					tag.rect.width  = dimensions.width;
-					tag.rect.height = Tag.tagHeight;
+	
+			if(full != false) {
+				groupSortingCategory.verticalSorting.analyseStart();
+				$.each(groupSortingCategory.tags, function(key, tag) {
+					groupSortingCategory.verticalSorting.analyseAdd(tag);
 				});
+				groupSortingCategory.verticalSorting.analyseEnd();
+			}
+		}
+	
+		$.each(groupSortingCategory.verticalSorting.categories, function(key, verticalSortingCategory) {
+			$.each(verticalSortingCategory.tags, function(key, tag) {
+				var dimensions = rekall.sortings["horizontal"].positionFor(tag);
+				tag.rect.x      = dimensions.x;
+				tag.rect.y      = 0;
+				tag.rect.width  = dimensions.width;
+				tag.rect.height = Tag.tagHeight;
 			});
-		
-		
-			//Label de groupe
+		});
+	
+		//Label de groupe
+		if((groupSortingCategory.rect == undefined) || (full != false)) {
 			groupSortingCategory.rect = new Kinetic.Rect({
 				x: 			0,
 				y: 			y,
@@ -533,23 +527,28 @@ Project.prototype.analyse = function(full) {
 				listening: 	false,
 			});
 			rekall.timeline.gridLayer.group.add(groupSortingCategory.rect);
+		}
+		if((groupSortingCategory.text == undefined) || (full != false)) {
 			groupSortingCategory.text = new Kinetic.Text({
 				x: 			2,
 				y: 			groupSortingCategory.rect.y(),
-				fill: 		'#F5F8EE',
 				text: 		groupSortingCategory.categoryVerbose,
+				
+				fill: 		'#F5F8EE',
 				fontSize: 	10,
 				fontFamily: 'open_sansregular',
 				rotation: 	-90,
 				listening: 	false,
 			});
 			rekall.timeline.gridLayer.group.add(groupSortingCategory.text);
-		
+		}
+	
 
-			//Affectation du placement
-			var yMaxVerticalSortingCategory = 0;
-			$.each(groupSortingCategory.verticalSorting.categories, function(key, verticalSortingCategory) {
-				//Label de catégorie
+		//Affectation du placement
+		var yMaxVerticalSortingCategory = 0;
+		$.each(groupSortingCategory.verticalSorting.categories, function(key, verticalSortingCategory) {
+			//Label de catégorie
+			if((verticalSortingCategory.rect == undefined) || (full != false)) {
 				verticalSortingCategory.rect = new Kinetic.Rect({
 					x: 			0,
 					y: 			y,
@@ -559,6 +558,8 @@ Project.prototype.analyse = function(full) {
 					listening: 	false,
 				});
 				rekall.timeline.gridLayer.group.add(verticalSortingCategory.rect);
+			}
+			if((verticalSortingCategory.rectAlternate == undefined) || (full != false)) {
 				verticalSortingCategory.rectAlternate = new Kinetic.Rect({
 					x: 			rekall.timeline.gridLayer.rect.width(),
 					y: 			y,
@@ -569,6 +570,8 @@ Project.prototype.analyse = function(full) {
 					listening: 	false,
 				});
 				rekall.timeline.gridLayer.group.add(verticalSortingCategory.rectAlternate);
+			}
+			if((verticalSortingCategory.text == undefined) || (full != false)) {
 				verticalSortingCategory.text = new Kinetic.Text({
 					x: 			verticalSortingCategory.rect.x() + 20,
 					y: 			verticalSortingCategory.rect.y(),
@@ -579,59 +582,85 @@ Project.prototype.analyse = function(full) {
 					listening: 	false,
 				});
 				rekall.timeline.gridLayer.group.add(verticalSortingCategory.text);
+			}
+			verticalSortingCategory.text.setY(verticalSortingCategory.rect.y());
 
 
-				var linearScale = (groupSortingCategory.verticalSorting.valCanBeFloats) && (groupSortingCategory.verticalSorting.valAreFloats);
-				if(linearScale) {
-					var dimensions = groupSortingCategory.verticalSorting.positionFor(undefined, key);
-					//y						    = dimensions.x/5;
-					//yMaxVerticalSortingCategory = dimensions.x/5+dimensions.width/5;
+			var linearScale = (groupSortingCategory.verticalSorting.valCanBeFloats) && (groupSortingCategory.verticalSorting.valAreFloats);
+			if(linearScale) {
+				var dimensions = groupSortingCategory.verticalSorting.positionFor(undefined, key);
+				//y						    = dimensions.x/5;
+				//yMaxVerticalSortingCategory = dimensions.x/5+dimensions.width/5;
+			}
+			var tagsAdded = new Object();
+			$.each(verticalSortingCategory.tags, function(key, tag) {
+				var iterationInCaseOfInfiniteLoop = 100;
+				var dimensions = rekall.sortings["horizontal"].positionFor(tag);
+
+				var previousTag = tagsAdded[tag.document.key];
+				if((previousTag != undefined) && (!previousTag.isGoodVersion()) && (!tag.isGoodVersion())) {
+					documentWasAdded = true;
+					tag.rect.x = tagsAdded[tag.document.key].rect.x;
+					tag.rect.y = tagsAdded[tag.document.key].rect.y;
 				}
-				var tagsAdded = new Object();
-				$.each(verticalSortingCategory.tags, function(key, tag) {
-					var iterationInCaseOfInfiniteLoop = 100;
-					var dimensions = rekall.sortings["horizontal"].positionFor(tag);
-
-					var previousTag = tagsAdded[tag.document.key];
-					if((previousTag != undefined) && (!previousTag.isGoodVersion()) && (!tag.isGoodVersion())) {
-						documentWasAdded = true;
-						tag.rect.x = tagsAdded[tag.document.key].rect.x;
-						tag.rect.y = tagsAdded[tag.document.key].rect.y;
-					}
-					else {
-						tag.rect.x = dimensions.x;
-						tag.rect.y = y + Tag.tagHeight/2;
-						while((tag.intersectsAll(verticalSortingCategory.tags)) && (iterationInCaseOfInfiniteLoop-- >= 0)) {
-							tag.rect.x += tag.rect.width;
-							if((tag.rect.x+tag.rect.width) > dimensions.xMax) {
-								tag.rect.x = dimensions.x;
-								tag.rect.y += tag.rect.height + Tag.tagHeight/2;
-							}
-							else {
-							}
+				else {
+					tag.rect.x = dimensions.x;
+					tag.rect.y = y + Tag.tagHeight/2;
+					while((tag.intersectsAll(verticalSortingCategory.tags)) && (iterationInCaseOfInfiniteLoop-- >= 0)) {
+						tag.rect.x += tag.rect.width;
+						if((tag.rect.x+tag.rect.width) > dimensions.xMax) {
+							tag.rect.x = dimensions.x;
+							tag.rect.y += tag.rect.height + Tag.tagHeight/2;
 						}
-						tagsAdded[tag.document.key] = tag;
+						else {
+						}
 					}
-					yMaxVerticalSortingCategory = max(yMaxVerticalSortingCategory, tag.rect.y);
-					xMax = max(xMax, tag.rect.x + tag.rect.width);
-					tag.updatePosititon();
-				});
-				y = yMaxVerticalSortingCategory + Tag.tagHeight + Tag.tagHeight/2;
-				verticalSortingCategory.rect.setHeight(y - verticalSortingCategory.rect.y());
-				verticalSortingCategory.rectAlternate.setHeight(verticalSortingCategory.rect.height());
-				verticalSortingCategory.text.setY(verticalSortingCategory.text.y() + verticalSortingCategory.rect.height()/2 - verticalSortingCategory.text.height()/2);
-
-				yMaxGroupSortingCategory = max(yMaxGroupSortingCategory, y);
-				y += 2;
+					tagsAdded[tag.document.key] = tag;
+				}
+				yMaxVerticalSortingCategory = max(yMaxVerticalSortingCategory, tag.rect.y);
+				xMax = max(xMax, tag.rect.x + tag.rect.width);
+				tag.updatePosititon();
+				
+				//Bounds et sélection
+				bounds.x = max(bounds.x, tag.rect.x+tag.rect.width);
+				bounds.y = max(bounds.y, tag.rect.y+tag.rect.height);
+				if(($.inArray(tag, Tags.selectedTags) !== -1) && (rekall.sortings["groups"].getCategory(tag) != undefined)) {
+					rekall.sortings["groups"].getCategory(tag).text.setFill("#2DCAE1");
+					if(rekall.sortings["groups"].getCategory(tag).verticalSorting.getCategory(tag) != undefined)
+						rekall.sortings["groups"].getCategory(tag).verticalSorting.getCategory(tag).text.setFill(rekall.sortings["groups"].getCategory(tag).text.getFill());
+					tag.setSelected(true, Tags.isStrong);
+				}
+				else
+					tag.setSelected(false, Tags.isStrong);		
+				
 			});
-		
-			y = yMaxGroupSortingCategory;
-			groupSortingCategory.rect.setHeight(y - groupSortingCategory.rect.y());
-			groupSortingCategory.text.setY(groupSortingCategory.rect.y() + groupSortingCategory.text.width() + 2);
-			groupSortingCategory.rect.moveToTop();
-			groupSortingCategory.text.moveToTop();
+			y = yMaxVerticalSortingCategory + Tag.tagHeight + Tag.tagHeight/2;
+			verticalSortingCategory.rect.setHeight(y - verticalSortingCategory.rect.y());
+			verticalSortingCategory.rectAlternate.setHeight(verticalSortingCategory.rect.height());
+			verticalSortingCategory.text.setY(verticalSortingCategory.text.y() + verticalSortingCategory.rect.height()/2 - verticalSortingCategory.text.height()/2);
 
-			y += Tag.tagHeight*2;
+			yMaxGroupSortingCategory = max(yMaxGroupSortingCategory, y);
+			y += 2;
+		});
+	
+		y = yMaxGroupSortingCategory;
+		groupSortingCategory.rect.setHeight(y - groupSortingCategory.rect.y());
+		groupSortingCategory.text.setY(groupSortingCategory.rect.y() + groupSortingCategory.text.width() + 2);
+		groupSortingCategory.rect.moveToTop();
+		groupSortingCategory.text.moveToTop();
+
+		y += Tag.tagHeight*2;
+	});
+	rekall.timeline.tagLayer.scrollbars.bounds = bounds;
+
+	
+	//Affectation des couleurs
+	if(full != false) {
+		$.each(rekall.sortings["colors"].categories, function(key, colorSortingCategory) {
+			$.each(colorSortingCategory.tags, function(key, tag) {
+				tag.update(colorSortingCategory.color);
+				tag.isSelectable = colorSortingCategory.checked;
+			});
 		});
 	}
 	
@@ -642,31 +671,14 @@ Project.prototype.analyse = function(full) {
 			verticalSortingCategory.text.setFill("#F5F8EE");
 		});
 	});
-	rekall.selectionId++;
-	var bounds = {x: 0, y: 0};
-	$.each(rekall.project.sources, function(key, source) {
-		$.each(source.documents, function(key, document) {
-	    	$.each(document.tags, function(key, tag) {
-				bounds.x = max(bounds.x, tag.rect.x+tag.rect.width);
-				bounds.y = max(bounds.y, tag.rect.y+tag.rect.height);
-				if(($.inArray(tag, Tags.selectedTags) !== -1) && (rekall.sortings["groups"].getCategory(tag) != undefined)) {
-					rekall.sortings["groups"].getCategory(tag).text.setFill("#2DCAE1");
-					if(rekall.sortings["groups"].getCategory(tag).verticalSorting.getCategory(tag) != undefined)
-						rekall.sortings["groups"].getCategory(tag).verticalSorting.getCategory(tag).text.setFill(rekall.sortings["groups"].getCategory(tag).text.getFill());
-					tag.setSelected(true, Tags.isStrong);
-				}
-				else
-					tag.setSelected(false, Tags.isStrong);
-			});
-		});
-	});
+
 	
-	//Bornes du scroll + display meta
-	rekall.timeline.tagLayer.scrollbars.bounds = bounds;
+	//Display meta
 	if(full != false)
 		Tag.displayMetadata();
 
-	//Highlight
+
+	//Highlight / chemins de hightlight
 	rekall.timeline.tagLayer.groupUnderlay.removeChildren();
 	$.each(rekall.sortings["highlight"].categories, function(key, category) {
 		if(category.category != Sorting.prefix) {
@@ -737,34 +749,36 @@ Project.prototype.analyse = function(full) {
 	});	
 	
 	//Duplicates
-	$.each(rekall.sortings["hashes"].categories, function(key, category) {
-		if((category.visible) && (category.checked)) {
-			category.path = new Kinetic.Path({
-				stroke: 			'#FFFFFF',
-				strokeWidth: 		1,
-				opacity: 			0.5,
-				listening: 			false,
-				transformsEnabled: 	'none',
-				dash: 				[2, 2],
-			});
-			rekall.timeline.tagLayer.groupUnderlay.add(category.path);
+	if(true) {
+		$.each(rekall.sortings["hashes"].categories, function(key, category) {
+			if((category.visible) && (category.checked)) {
+				category.path = new Kinetic.Path({
+					stroke: 			'#FFFFFF',
+					strokeWidth: 		1,
+					opacity: 			0.5,
+					listening: 			false,
+					transformsEnabled: 	'none',
+					dash: 				[2, 2],
+				});
+				rekall.timeline.tagLayer.groupUnderlay.add(category.path);
 			
-			var path = "";
-			var selected = category.tags[0].isSelected();
-			for(var i = 1 ; i < category.tags.length ; i++) {
-				selected |= category.tags[i].isSelected();
-				path += Utils.movePath(category.tags[0].rect.getCenter());
-				var offset = 0;
-				if(category.tags[0].rect.getCenter().y == category.tags[i].rect.getCenter().y)
-					offset = -Tag.tagHeight*2;
-				path += Utils.cubicPathLine(category.tags[0].rect.getCenter(), category.tags[i].rect.getCenter(), undefined, offset);
+				var path = "";
+				var selected = category.tags[0].isSelected();
+				for(var i = 1 ; i < category.tags.length ; i++) {
+					selected |= category.tags[i].isSelected();
+					path += Utils.movePath(category.tags[0].rect.getCenter());
+					var offset = 0;
+					if(category.tags[0].rect.getCenter().y == category.tags[i].rect.getCenter().y)
+						offset = -Tag.tagHeight*2;
+					path += Utils.cubicPathLine(category.tags[0].rect.getCenter(), category.tags[i].rect.getCenter(), undefined, offset);
+				}
+				category.path.setData(path);
+			
+				if(selected)
+					category.path.setOpacity(1);
 			}
-			category.path.setData(path);
-			
-			if(selected)
-				category.path.setOpacity(1);
-		}
-	});	
+		});	
+	}
 	
 	
 	//Timeline applatie
@@ -777,8 +791,20 @@ Project.prototype.analyse = function(full) {
 		$("#flattentimeline_items").html("");
     	$.each(Tags.byTime, function(key, tag) {
 			$('#flattentimeline_items').append(function() {
-				var html = "<div style='background-color: " + tag.color + "'>";
-				html    += tag.getMetadata("Rekall->Name");
+				var styleColor = "background-color: " + tag.color + ";";
+				if(tag.getMetadata("File->Thumbnail") != undefined) {
+					var thumbUrl = Utils.getPreviewPath(tag);
+					if(tag.isVideo())	thumbUrl += "_1.jpg";
+					else				thumbUrl +=  ".jpg";
+					styleImage = "background-image: url(" + thumbUrl + ");";
+					styleColor += "opacity: 0.75;";
+				}
+				
+				var html = "<div class='flattentimeline_item'>";
+				html 	+= "<div class='flattentimeline_image' style='" + styleImage + "'></div>";
+				html 	+= "<div class='flattentimeline_color' style='" + styleColor + "'></div>";
+				html 	+= "<div class='flattentimeline_bar'   style=''></div>";
+				html 	+= "<div class='flattentimeline_text'><span></span>" + tag.getMetadata("Rekall->Name") + "</div>";
 				html    += "</div>";
 				
 				tag.flattenTimelineDom = $(html);
@@ -788,5 +814,6 @@ Project.prototype.analyse = function(full) {
 	}
 	
 	rekall.redraw(full);
+	rekall.timeline.bar.updateFlattenTimeline();
 	this.firstAnalysis = false;
 }

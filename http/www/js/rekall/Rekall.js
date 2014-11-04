@@ -66,7 +66,8 @@ Rekall.prototype.start = function() {
 	this.timeline.add(this.timeline.timeLayer);
 	this.timeline.timeLayer.rect = new Kinetic.Rect({ fill: '#373C3F' });
 	this.timeline.timeLayer.rect.on("click", function(e) {
-		rekall.timeline.bar.rewind(Sorting.timeForPosition(Sorting.unmapPosition(rekall.timeline.getPointerPosition().x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x())));
+		if(rekall.sortings["horizontal"].metadataKey == "Time")
+			rekall.timeline.bar.rewind(Sorting.timeForPosition(Sorting.unmapPosition(rekall.timeline.getPointerPosition().x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x())));
 	})
 	this.timeline.timeLayer.add(this.timeline.timeLayer.rect);
 	this.timeline.timeLayer.group = new Kinetic.Group();
@@ -340,11 +341,13 @@ Rekall.prototype.start = function() {
 	//Zoom
 	$("#timeline-unzoom").click(function() {
 		Sorting.size -= 3;
-		rekall.analyse(true);
+		rekall.analyse(false);
+		rekall.redraw(true);
 	});
 	$("#timeline-zoom").click(function() {
 		Sorting.size += 3;
-		rekall.analyse(true);
+		rekall.analyse(false);
+		rekall.redraw(true);
 	});
 
 	//Survols et sélections
@@ -420,10 +423,6 @@ Rekall.prototype.start = function() {
 				rekall.doNotChangeSelection = true;
 
 				//Update
-				var dimensions = rekall.sortings["horizontal"].positionFor(tag);
-				tag.rect.x      = dimensions.x;
-				tag.rect.width  = dimensions.width;
-				tag.updatePosititon();
 				tag.projectChangedXml = "<tag key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>";
 			});
 			rekall.analyse(false);

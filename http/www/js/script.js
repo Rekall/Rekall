@@ -66,7 +66,7 @@ function documentReadyCommon() {
 								if(sessionStorage["project_" + project.name] != project.state) {
 									if(sessionStorage["project_" + project.name] >= 0) {
 										if(rekall_common.enableRubanNextTime)
-											showInRuban("The project has changed (analysis is finished or a someone edited the project remotely). It's strongly recommended to <a href='javascript: reload();'><u>refresh this page</u></a>!");
+											showInRuban("The project has changed (new files, document analysis finished or someone edited the project remotely). It's strongly recommended to <a href='javascript: reload();'><u>refresh this page</u></a>!");
 										rekall_common.enableRubanNextTime = true;
 									}
 									sessionStorage["project_" + project.name] = project.state;

@@ -99,23 +99,38 @@ Timeline.prototype.update = function() {
 Timeline.prototype.updateFlattenTimeline = function() {
 	var thiss = this;			
 	$.each(Tags.byTime, function(key, tag) {
-		var progress = (thiss.timeCurrent - tag.timeStart) / (tag.timeEnd - tag.timeStart);
-		if(progress < 0) {
-			tag.flattenTimelineDom.slideDown();
-			tag.flattenTimelineDom.css("opacity", 0.1);
+		var progress = 0;
+		if(thiss.timeCurrent < tag.timeStart)
+			progress = thiss.timeCurrent - tag.timeStart;
+		else if((tag.timeStart < thiss.timeCurrent) && (thiss.timeCurrent < tag.timeEnd))
+			progress = (thiss.timeCurrent - tag.timeStart) / (tag.timeEnd - tag.timeStart);
+		else
+			progress = undefined;
+		
+		if(progress == undefined) {
+			tag.flattenTimelineDom.slideUp();
+			return;
 		}
 		else {
-			if(thiss.state != 1) {
+			tag.flattenTimelineDom.find(".flattentimeline_bar").css("width", constrain(progress, 0, 1)*100 + "%");
+			
+			if((0 <= progress) && (progress < 1)) {
 				tag.flattenTimelineDom.slideDown();
 				tag.flattenTimelineDom.css("opacity", 1.0);
+				//tag.flattenTimelineDom.find("div span").text("=>" + progress);
 			}
-			else if((0 <= progress) && (progress < 1)) {
+			else if((-5 <= progress) && (progress <= 0)) {
 				tag.flattenTimelineDom.slideDown();
-				tag.flattenTimelineDom.css("opacity", 1.0);
+				tag.flattenTimelineDom.css("opacity", 0.50);
+				//tag.flattenTimelineDom.find("div span").text(floor(progress));
+			}
+			else if(progress < 0) {
+				tag.flattenTimelineDom.slideDown();
+				tag.flattenTimelineDom.css("opacity", 0.15);
 			}
 			else {
 				tag.flattenTimelineDom.slideUp();
-			}			
+			}
 		}
 	});
 }
