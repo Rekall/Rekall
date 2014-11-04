@@ -114,12 +114,9 @@ Project.prototype.analyse = function(full) {
 		rekall.sortings["corpus"]    .analyseStart();
 		rekall.sortings["horizontal"].analyseStart();
 		rekall.sortings["vertical"].analyseStart();
-		Tags.byTime = [];
 	    $.each(this.sources, function(key, source) {
 		    $.each(source.documents, function(key, document) {
 			    $.each(document.tags, function(key, tag) {
-					Tags.byTime.push(tag);
-					
 					//Filtrage
 					var isOk = true;
 					if((false) && (!tag.isGoodVersion()))
@@ -487,6 +484,8 @@ Project.prototype.analyse = function(full) {
 
 
 	//Disposition des tags + étiquettes
+	if(full != false)
+		Tags.byTime = [];
 	rekall.selectionId++;
 	var bounds = {x: 0, y: 0};
 	var xMax = 0, y = 0, alternate = 0;
@@ -594,6 +593,9 @@ Project.prototype.analyse = function(full) {
 			}
 			var tagsAdded = new Object();
 			$.each(verticalSortingCategory.tags, function(key, tag) {
+				if(full != false)
+					Tags.byTime.push(tag);
+				
 				var iterationInCaseOfInfiniteLoop = 100;
 				var dimensions = rekall.sortings["horizontal"].positionFor(tag);
 
