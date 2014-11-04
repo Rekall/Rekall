@@ -855,7 +855,7 @@ input[type="text"], textarea {
 	color:			  		white;
 	margin-bottom:			1px;
 }
-.flattentimeline_image, .flattentimeline_color, .flattentimeline_bar, .flattentimeline_text {
+.flattentimeline_image, .flattentimeline_color, .flattentimeline_bar, .flattentimeline_text, .flattentimeline_counter {
 	line-height:			40px;
 	top:					0px;
 	left:					0px;
@@ -869,7 +869,16 @@ input[type="text"], textarea {
     -o-background-size: 	cover;
     background-size: 		cover;
 	font-size:				14px;
-	text-align:				center;
+	text-align:				left;
+}
+.flattentimeline_text {
+	left: 40px;
+}
+.flattentimeline_counter {
+	font-family:			"open_sanslight";
+	font-size:				40px;
+	text-align: 			left;
+	padding-left:			3px;
 }
 .flattentimeline_bar {
 	height: 100%;

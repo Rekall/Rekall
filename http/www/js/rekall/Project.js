@@ -804,7 +804,8 @@ Project.prototype.analyse = function(full) {
 				html 	+= "<div class='flattentimeline_image' style='" + styleImage + "'></div>";
 				html 	+= "<div class='flattentimeline_color' style='" + styleColor + "'></div>";
 				html 	+= "<div class='flattentimeline_bar'   style=''></div>";
-				html 	+= "<div class='flattentimeline_text'><span></span>" + tag.getMetadata("Rekall->Name") + "</div>";
+				html 	+= "<div class='flattentimeline_counter'></div>";
+				html 	+= "<div class='flattentimeline_text'>" + tag.getMetadata("Rekall->Name") + "</div>";
 				html    += "</div>";
 				
 				tag.flattenTimelineDom = $(html);

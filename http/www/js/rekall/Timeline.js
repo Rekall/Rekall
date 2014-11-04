@@ -109,6 +109,7 @@ Timeline.prototype.updateFlattenTimeline = function() {
 		
 		if(progress == undefined) {
 			tag.flattenTimelineDom.slideUp();
+			tag.flattenTimelineDom.find(".flattentimeline_counter").text("");
 			return;
 		}
 		else {
@@ -117,19 +118,21 @@ Timeline.prototype.updateFlattenTimeline = function() {
 			if((0 <= progress) && (progress < 1)) {
 				tag.flattenTimelineDom.slideDown();
 				tag.flattenTimelineDom.css("opacity", 1.0);
-				//tag.flattenTimelineDom.find("div span").text("=>" + progress);
+				tag.flattenTimelineDom.find(".flattentimeline_counter").text("");
 			}
 			else if((-5 <= progress) && (progress <= 0)) {
 				tag.flattenTimelineDom.slideDown();
-				tag.flattenTimelineDom.css("opacity", 0.50);
-				//tag.flattenTimelineDom.find("div span").text(floor(progress));
+				tag.flattenTimelineDom.css("opacity", 0.75);
+				tag.flattenTimelineDom.find(".flattentimeline_counter").text(ceil(-progress));
 			}
 			else if(progress < 0) {
 				tag.flattenTimelineDom.slideDown();
 				tag.flattenTimelineDom.css("opacity", 0.15);
+				tag.flattenTimelineDom.find(".flattentimeline_counter").text("");
 			}
 			else {
 				tag.flattenTimelineDom.slideUp();
+				tag.flattenTimelineDom.find(".flattentimeline_counter").text("");
 			}
 		}
 	});
