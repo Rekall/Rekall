@@ -130,23 +130,27 @@ Panner.prototype.show = function(filter, bounds) {
 		this.markers = new Array();
 	}
 	var scrollTo = undefined;
-	$.each(this.thumbnails, function(category, thumbnails) {
-		var verboseCategories = {images: "Photos", videos: "Videos", documents: "Documents", others: "Others"};
-		if((recreateGallery) && (thumbnails.thumbnails.length)) {
+	$.each(this.thumbnails, function(category, contents) {
+		if((recreateGallery) && (contents.thumbnails.length)) {
 			var target = "#panner-gallery1";
-			var categoryVerbose = thumbnails.category.categoryVerbose;
-			if(thumbnails.category.category == Sorting.prefix) {
+			var categoryVerbose = contents.category.categoryVerbose;
+			if(contents.category.category == Sorting.prefix) {
 				target          = "#panner-gallery2";
 				categoryVerbose = "Not specified";
 			}
-			$(target).append("<h1 style='color: " + thumbnails.category.color + "'>" + categoryVerbose + "</h1>");
+			$(target).append("<h1 style='color: " + contents.category.color + "'>" + categoryVerbose + "</h1>");
 		}
 		
-		$.each(thumbnails.thumbnails, function(index, thumbnail) {
+		$.each(contents.thumbnails, function(index, thumbnail) {
 			thiss.filtredTags.push(thumbnail.tag);		
 			if(recreateGallery) {
 				$(target).append(function() {
-					var dom = $("<div><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
+					var dom = "";
+
+					if(thumbnail.url != undefined)
+						dom = $("<div class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
+					else
+						dom = $("<div class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
 					dom.mouseenter(function(event) {
 						if(!Tags.isStrong) {
 							thiss.recreateGallery = false;

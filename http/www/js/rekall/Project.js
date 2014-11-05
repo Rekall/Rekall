@@ -654,20 +654,18 @@ Project.prototype.analyse = function(full) {
 				tag.isSelectable = colorSortingCategory.checked;
 
 				//Analyse de vignettes
+				var thumbUrl = undefined
 				if((tag.getMetadata("File->Thumbnail") != undefined) && (tag.getMetadata("File->Thumbnail") != "")) {
 					var thumbUrl = Utils.getPreviewPath(tag);
 
 					if(tag.isVideo())	thumbUrl += "_1.jpg";
 					else				thumbUrl +=  ".jpg";
-
-					tag.thumbnail = {url: thumbUrl, tag: tag};
-
-					if(rekall.panner.thumbnails[colorSortingCategory.category] == undefined)
-						rekall.panner.thumbnails[colorSortingCategory.category] = {category: colorSortingCategory, thumbnails: []};
-					rekall.panner.thumbnails[colorSortingCategory.category].thumbnails.push(tag.thumbnail);	
 				}
-				else
-					tag.thumbnail = undefined
+				tag.thumbnail = {url: thumbUrl, tag: tag};
+
+				if(rekall.panner.thumbnails[colorSortingCategory.category] == undefined)
+					rekall.panner.thumbnails[colorSortingCategory.category] = {category: colorSortingCategory, thumbnails: [], documents: []};
+				rekall.panner.thumbnails[colorSortingCategory.category].thumbnails.push(tag.thumbnail);
 			});
 		});
 	}
@@ -802,11 +800,8 @@ Project.prototype.analyse = function(full) {
 			$('#flattentimeline_items').append(function() {
 				var styleColor = "background-color: " + tag.color + ";";
 				var styleColor2 = styleColor;
-				var thumbUrl = Utils.getPreviewPath(tag);
-				if(thumbUrl != undefined) {
-					if(tag.isVideo())	thumbUrl += "_1.jpg";
-					else				thumbUrl +=  ".jpg";
-					styleImage = "background-image: url(" + thumbUrl + ");";
+				if(tag.thumbnail.url != undefined) {
+					styleImage = "background-image: url(" + tag.thumbnail.url + ");";
 					styleColor += "opacity: 0.2;";
 				}
 				

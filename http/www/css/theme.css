@@ -459,10 +459,16 @@ u {
 	color:		white;
 	padding:	15px 5px 5px 5px;
 }
-#panner .gallery div {
+#panner .gallery div.thumbnail {
 	float:			left;
 	color:			white;
 	padding:	    15px 5px 5px 5px;
+}
+#panner .gallery div.thumbnail {
+	/*color: 			red;*/
+}
+#panner .gallery div.nothumbnail {
+	/*color: 			blue;*/
 }
 #panner .gallery h1 {
 	font-size:	14px;
