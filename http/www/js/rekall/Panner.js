@@ -164,7 +164,6 @@ Panner.prototype.show = function(filter, bounds) {
 						event.stopPropagation();
 						Tags.addOne(thumbnail.tag, true);
 						Tag.displayMetadata();
-						rekall.panner.showPhoto(thumbnail.tag);
 					});
 					thumbnail.dom = dom;
 					return dom;
@@ -178,10 +177,8 @@ Panner.prototype.show = function(filter, bounds) {
 					scrollTo = thumbnail;
 				}
 				else if(Tags.isStrong) {
-					/*
-					opacity = 0.3;
+					opacity = 0.5;
 					border = 'dotted';
-					*/
 					if(filter.length > 1)
 						add = false;
 				}
@@ -198,8 +195,10 @@ Panner.prototype.show = function(filter, bounds) {
 	});
 	if(filter == undefined)
 		this.hidePhoto();
-	else if((filter.length == 1) && (Tags.isStrong))
-		this.showPhoto(filter[0]);
+	else if((filter.length == 1) && (Tags.isStrong)) {
+		if((filter[0].isImage()) || (filter[0].getMetadata("File->MIME Type").endsWith("pdf")))
+			rekall.panner.showPhoto(filter[0]);
+	}
 	else
 		this.hidePhoto();
 		
