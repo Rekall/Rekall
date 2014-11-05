@@ -151,6 +151,7 @@ Panner.prototype.show = function(filter, bounds) {
 						dom = $("<div class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
 					else
 						dom = $("<div class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
+						
 					dom.mouseenter(function(event) {
 						if(!Tags.isStrong) {
 							thiss.recreateGallery = false;

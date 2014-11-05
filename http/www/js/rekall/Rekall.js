@@ -430,8 +430,9 @@ Rekall.prototype.start = function() {
 				else if(rekall.mousePressedMode == "resizeR")
 					tag.setTimeEnd(max(tag.timeStart, tag.timeEndMouse + (rekall.mouseMoveTime - rekall.mousePressedTime)));
 				else if(rekall.mousePressedMode == "move") {
+					var duration = tag.timeEndMouse - tag.timeStartMouse;
 					tag.setTimeStart(max(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime)));
-					tag.setTimeEnd  (max(tag.timeStart, tag.timeEndMouse + (rekall.mouseMoveTime - rekall.mousePressedTime)));
+					tag.setTimeEnd  (tag.timeStart + duration);
 				}
 				rekall.doNotChangeSelection = true;
 
