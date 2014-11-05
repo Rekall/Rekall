@@ -109,7 +109,7 @@ Timeline.prototype.updateFlattenTimeline = function() {
 		
 		if(progress == undefined) {
 			tag.flattenTimelineDom.slideUp();
-			tag.flattenTimelineDom.find(".flattentimeline_counter").text("");
+			tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 			return;
 		}
 		else {
@@ -118,21 +118,22 @@ Timeline.prototype.updateFlattenTimeline = function() {
 			if((0 <= progress) && (progress < 1)) {
 				tag.flattenTimelineDom.slideDown();
 				tag.flattenTimelineDom.css("opacity", 1.0);
-				tag.flattenTimelineDom.find(".flattentimeline_counter").text("");
+				tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 			}
 			else if((-5 <= progress) && (progress <= 0)) {
 				tag.flattenTimelineDom.slideDown();
 				tag.flattenTimelineDom.css("opacity", 0.75);
 				tag.flattenTimelineDom.find(".flattentimeline_counter").text(ceil(-progress));
+				tag.flattenTimelineDom.find(".flattentimeline_counter").show();
 			}
 			else if(progress < 0) {
 				tag.flattenTimelineDom.slideDown();
 				tag.flattenTimelineDom.css("opacity", 0.15);
-				tag.flattenTimelineDom.find(".flattentimeline_counter").text("");
+				tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 			}
 			else {
 				tag.flattenTimelineDom.slideUp();
-				tag.flattenTimelineDom.find(".flattentimeline_counter").text("");
+				tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 			}
 		}
 	});

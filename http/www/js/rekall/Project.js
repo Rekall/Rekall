@@ -794,20 +794,23 @@ Project.prototype.analyse = function(full) {
     	$.each(Tags.byTime, function(key, tag) {
 			$('#flattentimeline_items').append(function() {
 				var styleColor = "background-color: " + tag.color + ";";
+				var styleColor2 = styleColor;
 				if(tag.getMetadata("File->Thumbnail") != undefined) {
 					var thumbUrl = Utils.getPreviewPath(tag);
 					if(tag.isVideo())	thumbUrl += "_1.jpg";
 					else				thumbUrl +=  ".jpg";
 					styleImage = "background-image: url(" + thumbUrl + ");";
-					styleColor += "opacity: 0.75;";
+					styleColor += "opacity: 0.2;";
 				}
 				
 				var html = "<div class='flattentimeline_item'>";
-				html 	+= "<div class='flattentimeline_image' style='" + styleImage + "'></div>";
-				html 	+= "<div class='flattentimeline_color' style='" + styleColor + "'></div>";
-				html 	+= "<div class='flattentimeline_bar'   style=''></div>";
+				html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";
+				html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "'></div>";
+				html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";
+				html 	+= "<div class='flattentimeline_bar'        style=''></div>";
 				html 	+= "<div class='flattentimeline_counter'></div>";
-				html 	+= "<div class='flattentimeline_text'>" + tag.getMetadata("Rekall->Name") + "</div>";
+				html 	+= "<div class='flattentimeline_title'>" + tag.getMetadata("Rekall->Name") + "</div>";
+				html 	+= "<div class='flattentimeline_subtitle'>" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "</div>";
 				html    += "</div>";
 				
 				tag.flattenTimelineDom = $(html);
