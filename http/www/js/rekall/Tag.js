@@ -311,7 +311,7 @@ Tag.displayMetadata = function() {
 		}
 		else {
 			if(Tags.unique().thumbnail != undefined) {
-				if($("#previewImage img").attr("src") != Tags.unique().thumbnail.url)
+				if(($("#previewImage img").attr("src") != Tags.unique().thumbnail.url) && (Tags.unique().thumbnail.url != undefined))
 					$("#previewImage").html("<img src=\"" + Tags.unique().thumbnail.url + "\">");
 				$("#previewImage").show();
 				$("#preview_menu_bar").show();
