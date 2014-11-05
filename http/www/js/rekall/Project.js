@@ -790,7 +790,7 @@ Project.prototype.analyse = function(full) {
 	
 	
 	//Timeline applatie
-	if(full != false) {
+	if((full != false) && (true)) {
 		Tags.byTime.sort(function(a, b) {
 			if(a.timeStart < b.timeStart) return -1;
 			if(a.timeStart > b.timeStart) return 1;
@@ -802,6 +802,7 @@ Project.prototype.analyse = function(full) {
 			$('#flattentimeline_items').append(function() {
 				var styleColor = "background-color: " + tag.color + ";";
 				var styleColor2 = styleColor;
+				var styleImage = "";
 				if(tag.thumbnail.url != undefined) {
 					styleImage = "background-image: url(" + tag.thumbnail.url + ");";
 					styleColor += "opacity: 0.2;";

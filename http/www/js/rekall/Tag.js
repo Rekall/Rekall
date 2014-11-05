@@ -34,29 +34,41 @@ function Tag(document) {
 	this.isSelectable = true;
 	this.selected = false;
 	this.rect = new Rect();
+
+	this.visuel = new Object();
+	/*
 	this.visuel = new Kinetic.Group({
 		x: 0,
 		y: 0,
 		listening: false,
 	});
 	rekall.timeline.tagLayer.group.add(this.visuel);
+	*/
+	
 	this.visuel.rect = new Kinetic.Rect({
-		transformsEnabled: 'none',
+		transformsEnabled: 'position',
 		listening: 			false,
 		cornerRadius: 		Tag.tagHeight/3,
 	});
-	this.visuel.add(this.visuel.rect);
+	//this.visuel.add(this.visuel.rect);
+	rekall.timeline.tagLayer.group.add(this.visuel.rect);
+	
 	this.visuel.rect.path = new Kinetic.Path({
 		stroke:  			'#828382',
-		transformsEnabled: 	'none',
+		transformsEnabled: 	'position',
 		listening: 			false,
 		strokeWidth: 		1,
 	});
-	this.visuel.add(this.visuel.rect.path);
+	//this.visuel.add(this.visuel.rect.path);
+	rekall.timeline.tagLayer.group.add(this.visuel.rect.path);
+	
 	this.visuel.tag = this;
 }
 Tag.prototype.updatePosititon = function() {
-	this.visuel.setPosition(this.rect.getPosition());
+	//this.visuel.setPosition(this.rect.getPosition());
+	this.visuel.rect.setPosition(this.rect.getPosition());
+	this.visuel.rect.path.setPosition(this.rect.getPosition());
+	
 	this.visuel.rect.setSize(this.rect.getSize());
 	this.visuel.rect.path.setData("M0,0 l0," + Tag.tagHeight + " m0,-" + (Tag.tagHeight/2) + " l" + this.visuel.rect.width() + ",0 m0" + (-Tag.tagHeight/2) + " l0," + Tag.tagHeight);
 	this.visuel.rect.setVisible(true);
@@ -161,10 +173,13 @@ Tag.prototype.setTimeEnd = function(val) {
 
 
 Tag.prototype.setVisible = function(val) {
-	this.visuel.setVisible(val);
+	//this.visuel.setVisible(val);
+	this.visuel.rect.setVisible(val);
+	this.visuel.rect.path.setVisible(val);
 }
 Tag.prototype.isVisible = function() {
-	return this.visuel.getVisible();
+	//return this.visuel.getVisible();
+	return this.visuel.rect.getVisible();
 }
 
 Tag.prototype.isGoodVersion = function() {

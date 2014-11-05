@@ -188,7 +188,7 @@ Rekall.prototype.start = function() {
 
 	//Animation	
 	var globalTime = 0;
-	setInterval(function() {
+	function refresh() {
 		if(rekall != undefined) {
 			if(rekall.timeline.bar.update())
 				rekall.timeline.barLayer.draw();
@@ -210,8 +210,10 @@ Rekall.prototype.start = function() {
 				rekall.shouldAnalyseFull = false;
 			}
 		}
-	}, 30);
-	
+		//setTimeout(refresh, 50);
+	}
+	//refresh();
+	setInterval(refresh, 50);
 	
 	
 	$("#rendersTabNav").click(function() {

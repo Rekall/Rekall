@@ -28,6 +28,7 @@ function Map() {
 
 	var thiss = this;
 	this.map = undefined;
+	this.gpsPositions = new Array();
 	
 	try {
 		this.myOptions = {

@@ -78,7 +78,7 @@ Document.prototype.setMetadata = function(metadataKey, metadataValue, version) {
 		metadataValue = metadataKey.content + "";
 		metadataKey   = metadataKey.metadataKey + "";
 	}
-	if((!metadataKey.toLowerCase().startsWith("exiftool")) && (metadataValue.toLowerCase().indexOf("use -b option to extract") === -1)) {
+	if((metadataKey.toLowerCase() != "exiftool") && (metadataValue.toLowerCase().indexOf("use -b option to extract") === -1)) {
 		currentValue = this.getMetadatas(version)[metadataKey];
 		this.getMetadatas(version)[metadataKey] = metadataValue;
 	
