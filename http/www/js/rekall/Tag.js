@@ -414,8 +414,8 @@ Tag.displayMetadata = function() {
 		$("#previewImage").hide();
 		$("#previewVideo").hide();
 		$("#preview_menu_bar").hide();
-		$("#inspecteur")      .css("background-color", "#869092");
-		$("#inspecteurTabNav").css("background-color", "#869092");
+		$("#inspecteur")      .css("background-color", "#2C3032");
+		$("#inspecteurTabNav").css("background-color", "#2C3032");
 		rekall.previewVideoPlayer.hide();
 	}
 	
