@@ -322,7 +322,7 @@ Rekall.prototype.start = function() {
 	//Marqueurs
 	$(document).keyup(function(e) {
 		if(e.keyCode == 77) {
-			//window.document.title = rekall.timeline.bar.timeCurrent;
+			window.document.title = rekall.timeline.bar.timeCurrent;
 		}
 		else if(e.keyCode == 82) {
 			$.each(rekall.project.sources, function(key, source) {
@@ -348,6 +348,19 @@ Rekall.prototype.start = function() {
 		Sorting.size += 3;
 		rekall.analyse(false);
 		rekall.redraw(true);
+	});
+	$("#timeline-ff").click(function() {
+		rekall.timeline.bar.rewind();
+	});
+	$("#timeline-play").click(function() {
+		rekall.timeline.bar.toggle();
+	});
+	$("#timeline-pause").click(function() {
+		rekall.timeline.bar.toggle();
+	});
+	
+	$("#flattentimeline div:first span").click(function() {
+		rekall.analyse(true);
 	});
 
 	//Survols et sélections

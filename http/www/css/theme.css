@@ -847,13 +847,15 @@ input[type="text"], textarea {
 
 
 #flattentimeline {
-	background-color: black;
+	color:				white;
+	background-color: 	black;
 }
 .flattentimeline_item {
 	position:				relative;
 	height: 		  		100px;
 	color:			  		white;
 	margin-bottom:			2px;
+	cursor:					pointer;
 }
 .flattentimeline_image, .flattentimeline_color, .flattentimeline_opacifiant, .flattentimeline_bar, .flattentimeline_title, .flattentimeline_subtitle, .flattentimeline_counter {
 	top:					0px;
@@ -885,6 +887,7 @@ input[type="text"], textarea {
 	top:					27px;
 }
 .flattentimeline_counter {
+	font-family:			"open_sanslight";
 	top:					3px;
 	left:					3px;
 	width:					35px;
@@ -895,7 +898,7 @@ input[type="text"], textarea {
   	-moz-border-radius: 	20px;
   	border-radius: 			20px;
 	
-	border: 				2px solid white;
+	border: 				1px solid white;
 	font-size:				30px;
 	text-align: 			center;
 }

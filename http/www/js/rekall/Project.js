@@ -791,6 +791,7 @@ Project.prototype.analyse = function(full) {
 			return 0;
 		});
 		$("#flattentimeline_items").html("");
+		var counter = 0;
     	$.each(Tags.byTime, function(key, tag) {
 			$('#flattentimeline_items').append(function() {
 				var styleColor = "background-color: " + tag.color + ";";
@@ -814,12 +815,17 @@ Project.prototype.analyse = function(full) {
 				html    += "</div>";
 				
 				tag.flattenTimelineDom = $(html);
+				tag.flattenTimelineDom.click(function(event) {
+					Tags.addOne(tag, true);
+					Tag.displayMetadata();
+				});
+			
 				return tag.flattenTimelineDom;
 			});
 		});
 	}
 	
-	rekall.redraw(full);
 	rekall.timeline.bar.updateFlattenTimeline();
+	rekall.redraw(full);
 	this.firstAnalysis = false;
 }

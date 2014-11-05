@@ -48,11 +48,15 @@ Timeline.prototype.play = function(timeCurrentOffset) {
 	this.state = 1;
 	rekall.captationVideoPlayers.play(timeCurrentOffset);
 	this.updateFlattenTimeline();
+	$("#timeline-play").hide();
+	$("#timeline-pause").show();
 }
 Timeline.prototype.stop = function() {
 	this.state = 0;
 	rekall.captationVideoPlayers.pause();
 	this.updateFlattenTimeline();
+	$("#timeline-play").show();
+	$("#timeline-pause").hide();
 }
 Timeline.prototype.rewind = function(timeCurrentOffset) {
 	if(timeCurrentOffset == undefined)
@@ -62,6 +66,8 @@ Timeline.prototype.rewind = function(timeCurrentOffset) {
 	this.state = 2;
 	rekall.captationVideoPlayers.rewind(timeCurrentOffset);
 	this.updateFlattenTimeline();
+	$("#timeline-play").show();
+	$("#timeline-pause").hide();
 }
 
 Timeline.prototype.toggle = function() {
@@ -73,7 +79,10 @@ Timeline.prototype.toggle = function() {
 
 Timeline.prototype.update = function() {
 	if(rekall.sortings["horizontal"].metadataKey == "Time") {
-		rekall.timeline.barLayer.group.setVisible(true);
+		if(!rekall.timeline.barLayer.group.visible()) {
+			$("#timeline-transport").show();
+			rekall.timeline.barLayer.group.setVisible(true);
+		}
 		var timeBarPoints = this.line.points();
 		if((this.state) || (isNaN(timeBarPoints[0]))) {
 			if(isNaN(timeBarPoints[0]))
@@ -91,6 +100,7 @@ Timeline.prototype.update = function() {
 	}
 	else if(rekall.timeline.barLayer.group.visible()) {
 		rekall.timeline.barLayer.group.setVisible(false);
+		$("#timeline-transport").hide();
 		return true;
 	}
 	return false;
@@ -100,20 +110,25 @@ Timeline.prototype.updateFlattenTimeline = function() {
 	var thiss = this;			
 	$.each(Tags.byTime, function(key, tag) {
 		var progress = 0;
+		var timeEndExtended = tag.timeStart + max(3, tag.timeEnd - tag.timeStart);
 		if(thiss.timeCurrent < tag.timeStart)
 			progress = thiss.timeCurrent - tag.timeStart;
-		else if((tag.timeStart < thiss.timeCurrent) && (thiss.timeCurrent < tag.timeEnd))
-			progress = (thiss.timeCurrent - tag.timeStart) / (tag.timeEnd - tag.timeStart);
+		else if((tag.timeStart < thiss.timeCurrent) && (thiss.timeCurrent < timeEndExtended))
+			progress = (thiss.timeCurrent - tag.timeStart) / (timeEndExtended - tag.timeStart);
 		else
 			progress = undefined;
-		
+			
 		if(progress == undefined) {
 			tag.flattenTimelineDom.slideUp();
 			tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 			return;
 		}
 		else {
-			tag.flattenTimelineDom.find(".flattentimeline_bar").css("width", constrain(progress, 0, 1)*100 + "%");
+			if(timeEndExtended == tag.timeEnd)
+				tag.flattenTimelineDom.find(".flattentimeline_bar").css("width", constrain(progress, 0, 1)*100 + "%");
+			else {
+				tag.flattenTimelineDom.find(".flattentimeline_bar").css("width", "0%");
+			}
 			
 			if((0 <= progress) && (progress < 1)) {
 				tag.flattenTimelineDom.slideDown();
