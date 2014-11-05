@@ -137,7 +137,7 @@ Timeline.prototype.updateFlattenTimeline = function() {
 			}
 			else if((-5 <= progress) && (progress <= 0)) {
 				tag.flattenTimelineDom.slideDown();
-				tag.flattenTimelineDom.css("opacity", 0.5);
+				tag.flattenTimelineDom.css("opacity", 0.75);
 				tag.flattenTimelineDom.find(".flattentimeline_counter").text(ceil(-progress));
 				tag.flattenTimelineDom.find(".flattentimeline_counter").show();
 			}

@@ -804,17 +804,15 @@ Project.prototype.analyse = function(full) {
 				var styleColor2 = styleColor;
 				var styleImage = "";
 				if(tag.thumbnail.url != undefined) {
-					styleImage = "background-image: url(" + tag.thumbnail.url + "); opacity: 0.5;";
-					styleColor += "opacity: 0.15;"; 
-				} else styleImage = "background-color: rgba(0,0,0,.9)";
+					styleImage = "background-image: url(" + tag.thumbnail.url + ");";
+					styleColor += "opacity: 0.2;";
+				}
 				
 				var html = "<div class='flattentimeline_item'>";
 				html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";
 				html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "'></div>";
 				html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";
-				
 				html 	+= "<div class='flattentimeline_bar'        style=''></div>";
-				/*html 	+= "<div class='flattentimeline_counter'      style='" + styleColor2 + "'></div>";*/
 				html 	+= "<div class='flattentimeline_counter'></div>";
 				html 	+= "<div class='flattentimeline_title'>" + tag.getMetadata("Rekall->Name") + "</div>";
 				html 	+= "<div class='flattentimeline_subtitle'>" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "</div>";

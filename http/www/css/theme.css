@@ -219,7 +219,7 @@ u {
 	height: 	100%;
 }
 #inspecteur {
-	background:	#3D3F40;
+	background:	#869092;
 }             
 #navigateur { 
 	background:	#57AA8E;
@@ -230,8 +230,6 @@ u {
 	background: black;
 }
 #timeline {
-	border-right:1px solid #000;
-	border-left:1px solid #000;
 }
 #navigateur h2 {
 	font-family:	"open_sanslight";
@@ -847,8 +845,6 @@ input[type="text"], textarea {
 #middlebar {
 	color: 		white;
 	text-align: center;
-	border-right:1px solid #000;
-	border-left:1px solid #000;
 }
 #middlebar span {
 	color: white;
@@ -870,36 +866,14 @@ input[type="text"], textarea {
 	color:				white;
 	background-color: 	black;
 }
-#flattentimeline_main_title {
-	font-family:			"open_sanslight";
-	height:40px;
-	line-height:40px;
-	text-align:center;
-	background:#2C3032;
-	text-transform:uppercase;
-	color:rgba(255,255,255,1);
-	border-bottom:2px solid #000;
-	font-size:18px;
-}
-.reload_btn {
-	background-image:url("images/reload.png");
-	width:16px;
-	height:16px;
-	float:right;
-	margin:12px;
-	cursor:pointer;
-}
-.reload_btn:hover {
-	background-color:#000;
-}
 .flattentimeline_item {
 	position:				relative;
-	height: 		  		50px;
+	height: 		  		100px;
 	color:			  		white;
 	margin-bottom:			2px;
 	cursor:					pointer;
 }
-.flattentimeline_image, .flattentimeline_color, .flattentimeline_opacifiant, .flattentimeline_bar {
+.flattentimeline_image, .flattentimeline_color, .flattentimeline_opacifiant, .flattentimeline_bar, .flattentimeline_title, .flattentimeline_subtitle, .flattentimeline_counter {
 	top:					0px;
 	left:					0px;
 	width:					100%;
@@ -912,66 +886,39 @@ input[type="text"], textarea {
     -o-background-size: 	cover;
     background-size: 		cover;
 	text-align:				left;
-	overflow:hidden;
-}
-.flattentimeline_title, .flattentimeline_subtitle, .flattentimeline_counter {
-	top:					0px;
-	left:					0px;
-	position:				absolute;
-	background-position:	center center;
-	background-repeat:		no-repeat; 
-	text-align:				left;
-	overflow:hidden;
-}
-.flattentimeline_color {
-	top:					0px;
-	height:					100%;
 }
 .flattentimeline_bar, .flattentimeline_opacifiant {
-	background-color:		rgba(0, 0, 0, 0.75);
-	height:					5px;
-	top:					45px;
+	background-color:		rgba(0, 0, 0, 0.4);
+	height:					45px;
 }
 
-.flattentimeline_title {
-	font-family:			"open_sanssemibold";
+.flattentimeline_title, .flattentimeline_subtitle {
+	font-family:			"open_sanslight";
 	font-size:				12px;
-	left: 					40px;
-	line-height:			30px;
-	height:					30px;
+	left: 					50px;
+	top:					5px;
 }
 .flattentimeline_subtitle {
-	font-family:			"open_sanslight";
-	top:					20px;
 	font-size:				10px;
-	left: 					40px;
-	line-height:			20px;
-	height:					20px;
+	top:					27px;
 }
 .flattentimeline_counter {
-	font-family:			"open_sanssemibold";
-	top:					9px;
-	left:					6px;
-	width:					26px;
-	height:					26px;
-	line-height:			24px;
+	font-family:			"open_sanslight";
+	top:					3px;
+	left:					3px;
+	width:					35px;
+	height:					35px;
+	line-height:			35px;
 	
 	-webkit-border-radius: 	20px;
   	-moz-border-radius: 	20px;
   	border-radius: 			20px;
 	
-	/*border: 				2px solid rgba(255,255,255,1);
-	background:				rgba(0,0,0,.5);*/
-/*	background:				rgba(255,255,255,.75);
-	color:					#000;*/
-	background: 			rgba(255,255,255,1);
-	background:				rgba(0,0,0,1);
-	
-	font-size:				18px;
+	border: 				1px solid white;
+	font-size:				30px;
 	text-align: 			center;
 }
 .flattentimeline_bar {
 	width: 			  0%;
 	background-color: black;/*#2DCAE1;*/
-	opacity:.65;
 }
