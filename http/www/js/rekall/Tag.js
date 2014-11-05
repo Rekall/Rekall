@@ -265,7 +265,7 @@ Tag.prototype.isSelected = function() {
 Tag.metadataSorting        = new Sorting();
 Tag.metadataSortingVisible = {"Rekall":{'visible': true}};
 Tag.metadataCancel 		   = false;
-Tag.metadataEditionKey     = new Array();
+Tag.metadataEditionKey     = ["Rekall->Comments"];
 Tag.displayMetadataEditing = "";
 Tag.prototype.displayMetadata = function() {
 	if((!Tags.isStrong) && (this.isSelectable)) {
@@ -587,7 +587,7 @@ Tag.displayMetadata = function() {
 		$("#metadatas_table").find(".metadatas_table_element_value_editor").html("");
 
 		if(!reopen)
-			Tag.metadataEditionKey = new Array();
+			Tag.metadataEditionKey = ["Rekall->Comments"];
 		if(changed) {
 			rekall.analyse();
 			rekall.projectChanged(projectChangedXml);
@@ -839,6 +839,6 @@ Tag.displayMetadata = function() {
 			$(this).find("input, textarea").trigger("autocompleteselect");
 		}
 	});
-	$(".metadatas_table_element .metadatas_table_element_category").filter(function() { return $.inArray($(this).text(), Tag.metadataEditionKey) !== -1; } ).trigger("click");
+	$(".metadatas_table_element .metadatas_table_element_category").filter(function() { return $.inArray($(this).text(), Tag.metadataEditionKey) !== -1; }).trigger("click");
 	rekall.analyse(false);
 }

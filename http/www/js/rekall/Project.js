@@ -654,18 +654,20 @@ Project.prototype.analyse = function(full) {
 				tag.isSelectable = colorSortingCategory.checked;
 
 				//Analyse de vignettes
-				var thumbUrl = undefined
-				if((tag.getMetadata("File->Thumbnail") != undefined) && (tag.getMetadata("File->Thumbnail") != "")) {
-					var thumbUrl = Utils.getPreviewPath(tag);
+				if(true) {
+					var thumbUrl = undefined
+					if((tag.getMetadata("File->Thumbnail") != undefined) && (tag.getMetadata("File->Thumbnail") != "")) {
+						var thumbUrl = Utils.getPreviewPath(tag);
 
-					if(tag.isVideo())	thumbUrl += "_1.jpg";
-					else				thumbUrl +=  ".jpg";
+						if(tag.isVideo())	thumbUrl += "_1.jpg";
+						else				thumbUrl +=  ".jpg";
+					}
+					tag.thumbnail = {url: thumbUrl, tag: tag};
+
+					if(rekall.panner.thumbnails[colorSortingCategory.category] == undefined)
+						rekall.panner.thumbnails[colorSortingCategory.category] = {category: colorSortingCategory, thumbnails: [], documents: []};
+					rekall.panner.thumbnails[colorSortingCategory.category].thumbnails.push(tag.thumbnail);
 				}
-				tag.thumbnail = {url: thumbUrl, tag: tag};
-
-				if(rekall.panner.thumbnails[colorSortingCategory.category] == undefined)
-					rekall.panner.thumbnails[colorSortingCategory.category] = {category: colorSortingCategory, thumbnails: [], documents: []};
-				rekall.panner.thumbnails[colorSortingCategory.category].thumbnails.push(tag.thumbnail);
 			});
 		});
 	}
