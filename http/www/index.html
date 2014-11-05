@@ -180,7 +180,7 @@
 					<ul>
 						<li class='tab_left'   id='navigateurTabNav' title='Toggle filter panel'>&times;</li>
 						<li class='tab_middle' id='rendersTabNav' title='Show videos'>Videos</a></li>
-						<li class='tab_middle' id='pannerTabNav' title='Show photos'>Photos</li>
+						<li class='tab_middle' id='pannerTabNav' title='Show thumbnails'>Thumbnails</li>
 						<li class='tab_middle' id='mapTabNav' title='Show map'>Map</li>
 						<li class='tab_right'  id='inspecteurTabNav' title='Toggle inspector panel'>&times;</li>
 						<li class='tab_middle' id='maximizeTabNav' title='Toggle maximisation'>&#9634;</li>
@@ -192,7 +192,8 @@
 							<div id='map-canvas'></div>
 						</div>
 						<div id='panner' class='invisible'>
-							<div class="gallery"></div>
+							<div class="gallery" id='panner-gallery1'></div>
+							<div class="gallery" id='panner-gallery2'></div>
 							<div class='panzoom-container'>
 								<div class="buttons">
 									<div><span id='panzoom-close'>&times;&nbsp;&nbsp;Close photo</span></div>

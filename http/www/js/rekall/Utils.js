@@ -75,8 +75,19 @@ Utils.closePath = function(pt) {
 }
 
 
+
+Utils.elide = function(text, length) {
+	if(text.length < length)
+		return text;
+	else
+		return text.substr(0, length) + "…";
+}
+
 Utils.getPreviewPath = function(tagOrDoc) {
-	return rekall.project.url + "file/rekall_cache/" + tagOrDoc.getMetadata("File->Thumbnail");
+	if(tagOrDoc.getMetadata("File->Thumbnail") != undefined)
+		return rekall.project.url + "file/rekall_cache/" + tagOrDoc.getMetadata("File->Thumbnail");
+	else
+		return undefined;
 }
 Utils.getLocalFilePath = function(tagOrDoc, action, prefix) {
 	var fileName      = tagOrDoc.getMetadata("File->File Name");

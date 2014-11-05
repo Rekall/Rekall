@@ -456,13 +456,23 @@ u {
     position:	relative;
 }
 #panner .gallery {
+	color:		white;
 	padding:	15px 5px 5px 5px;
+}
+#panner .gallery div {
+	float:			left;
+	color:			white;
+	padding:	    15px 5px 5px 5px;
+}
+#panner .gallery h1 {
+	font-size:	14px;
+	clear:		left;
 }
 #panner .gallery img {
 	cursor:		pointer;
 	border: 	1px dotted white;
-	margin: 	0px 5px 5px 0px;
 }
+
 #panner .panzoom-parent {
 	position: 	absolute;
 	width:		100%;

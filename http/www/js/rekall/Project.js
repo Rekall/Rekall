@@ -177,41 +177,11 @@ Project.prototype.analyse = function(full) {
 		rekall.sortings["search"]    .analyseEnd();
 
 	
-		//Extractions d'infos sur le GPS, les vignettes
+		//Extractions d'infos
 		rekall.sortings["colors"]   .analyseStart();
 		rekall.sortings["highlight"].analyseStart();
 		rekall.sortings["hashes"]   .analyseStart();
-		rekall.map.gpsPositions = new Array();
-		rekall.panner.thumbnails = new Array();
 	    $.each(filtredTags, function(key, tag) {
-			//Analyse GPS
-			var gpsPosition = {latitude: NaN, longitude: NaN, tag: undefined};
-			$.each(tag.getMetadatas(), function(key, meta) {
-				if((key.toLowerCase().indexOf("gps") > -1) && (meta.indexOf(",") > -1)) {
-					var metaPos = meta.split(",");
-					gpsPosition.latitude  = parseFloat(metaPos[0]);
-					gpsPosition.longitude = parseFloat(metaPos[1]);
-					gpsPosition.tag	      = tag;
-				}
-			});
-			if((!isNaN(gpsPosition.latitude)) && (!isNaN(gpsPosition.longitude))) {
-				tag.gpsPosition = gpsPosition;
-				rekall.map.gpsPositions.push(tag.gpsPosition);
-			}
-			else
-				tag.gpsPosition = undefined;
-
-			//Analyse de vignettes
-			if((tag.getMetadata("File->Thumbnail") != undefined) && (tag.getMetadata("File->Thumbnail") != "")) {
-				if(!tag.isVideoOrAudio()) {
-					tag.thumbnail = {url: Utils.getPreviewPath(tag) + ".jpg", tag: tag};
-					if(tag.isImage())
-						rekall.panner.thumbnails.push(tag.thumbnail);
-				}
-			}
-			else
-				tag.thumbnail = undefined
-									
 			var isOk = true;
 			rekall.sortings["colors"].analyseAdd(tag, undefined, true);
 			rekall.sortings["hashes"].analyseAdd(tag);
@@ -484,8 +454,10 @@ Project.prototype.analyse = function(full) {
 
 
 	//Disposition des tags + étiquettes
-	if(full != false)
+	if(full != false) {
 		Tags.byTime = [];
+		rekall.map.gpsPositions = new Array();
+	}
 	rekall.selectionId++;
 	var bounds = {x: 0, y: 0};
 	var xMax = 0, y = 0, alternate = 0;
@@ -593,8 +565,25 @@ Project.prototype.analyse = function(full) {
 			}
 			var tagsAdded = new Object();
 			$.each(verticalSortingCategory.tags, function(key, tag) {
-				if(full != false)
+				if(full != false) {
 					Tags.byTime.push(tag);
+					//Analyse GPS
+					var gpsPosition = {latitude: NaN, longitude: NaN, tag: undefined};
+					$.each(tag.getMetadatas(), function(key, meta) {
+						if((key.toLowerCase().indexOf("gps") > -1) && (meta.indexOf(",") > -1)) {
+							var metaPos = meta.split(",");
+							gpsPosition.latitude  = parseFloat(metaPos[0]);
+							gpsPosition.longitude = parseFloat(metaPos[1]);
+							gpsPosition.tag	      = tag;
+						}
+					});
+					if((!isNaN(gpsPosition.latitude)) && (!isNaN(gpsPosition.longitude))) {
+						tag.gpsPosition = gpsPosition;
+						rekall.map.gpsPositions.push(tag.gpsPosition);
+					}
+					else
+						tag.gpsPosition = undefined;
+				}
 				
 				var iterationInCaseOfInfiniteLoop = 100;
 				var dimensions = rekall.sortings["horizontal"].positionFor(tag);
@@ -658,10 +647,27 @@ Project.prototype.analyse = function(full) {
 	
 	//Affectation des couleurs
 	if(full != false) {
+		rekall.panner.thumbnails = new Object();
 		$.each(rekall.sortings["colors"].categories, function(key, colorSortingCategory) {
 			$.each(colorSortingCategory.tags, function(key, tag) {
 				tag.update(colorSortingCategory.color);
 				tag.isSelectable = colorSortingCategory.checked;
+
+				//Analyse de vignettes
+				if((tag.getMetadata("File->Thumbnail") != undefined) && (tag.getMetadata("File->Thumbnail") != "")) {
+					var thumbUrl = Utils.getPreviewPath(tag);
+
+					if(tag.isVideo())	thumbUrl += "_1.jpg";
+					else				thumbUrl +=  ".jpg";
+
+					tag.thumbnail = {url: thumbUrl, tag: tag};
+
+					if(rekall.panner.thumbnails[colorSortingCategory.category] == undefined)
+						rekall.panner.thumbnails[colorSortingCategory.category] = {category: colorSortingCategory, thumbnails: []};
+					rekall.panner.thumbnails[colorSortingCategory.category].thumbnails.push(tag.thumbnail);	
+				}
+				else
+					tag.thumbnail = undefined
 			});
 		});
 	}
@@ -796,8 +802,8 @@ Project.prototype.analyse = function(full) {
 			$('#flattentimeline_items').append(function() {
 				var styleColor = "background-color: " + tag.color + ";";
 				var styleColor2 = styleColor;
-				if(tag.getMetadata("File->Thumbnail") != undefined) {
-					var thumbUrl = Utils.getPreviewPath(tag);
+				var thumbUrl = Utils.getPreviewPath(tag);
+				if(thumbUrl != undefined) {
 					if(tag.isVideo())	thumbUrl += "_1.jpg";
 					else				thumbUrl +=  ".jpg";
 					styleImage = "background-image: url(" + thumbUrl + ");";

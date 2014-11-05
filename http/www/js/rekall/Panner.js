@@ -130,53 +130,66 @@ Panner.prototype.show = function(filter, bounds) {
 		this.markers = new Array();
 	}
 	var scrollTo = undefined;
-	$.each(this.thumbnails, function(index, thumbnail) {
-		thiss.filtredTags.push(thumbnail.tag);		
-		if(recreateGallery) {
-			$('#panner .gallery').append(function() {
-				var dom = $("<img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/>'");
-				dom.mouseenter(function(event) {
-					if(!Tags.isStrong) {
+	$.each(this.thumbnails, function(category, thumbnails) {
+		var verboseCategories = {images: "Photos", videos: "Videos", documents: "Documents", others: "Others"};
+		if((recreateGallery) && (thumbnails.thumbnails.length)) {
+			var target = "#panner-gallery1";
+			var categoryVerbose = thumbnails.category.categoryVerbose;
+			if(thumbnails.category.category == Sorting.prefix) {
+				target          = "#panner-gallery2";
+				categoryVerbose = "Not specified";
+			}
+			$(target).append("<h1 style='color: " + thumbnails.category.color + "'>" + categoryVerbose + "</h1>");
+		}
+		
+		$.each(thumbnails.thumbnails, function(index, thumbnail) {
+			thiss.filtredTags.push(thumbnail.tag);		
+			if(recreateGallery) {
+				$(target).append(function() {
+					var dom = $("<div><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
+					dom.mouseenter(function(event) {
+						if(!Tags.isStrong) {
+							thiss.recreateGallery = false;
+							Tags.addOne(thumbnail.tag, false);
+							Tag.displayMetadata();
+						}
+					});
+					dom.click(function(event) {
 						thiss.recreateGallery = false;
-						Tags.addOne(thumbnail.tag, false);
+						event.stopPropagation();
+						Tags.addOne(thumbnail.tag, true);
 						Tag.displayMetadata();
-					}
+						rekall.panner.showPhoto(thumbnail.tag);
+					});
+					thumbnail.dom = dom;
+					return dom;
 				});
-				dom.click(function(event) {
-					thiss.recreateGallery = false;
-					event.stopPropagation();
-					Tags.addOne(thumbnail.tag, true);
-					Tag.displayMetadata();
-					rekall.panner.showPhoto(thumbnail.tag);
-				});
-				thumbnail.dom = dom;
-				return dom;
-			});
-		}
-		if((thumbnail.dom != undefined) && (filter != undefined)) {
-			var opacity = 1, border = 'dashed', add = true;
-		 	if($.inArray(thumbnail.tag, filter) !== -1) {
-				opacity = 1;
-				border = 'solid';
-				scrollTo = thumbnail;
 			}
-			else if(Tags.isStrong) {
-				/*
-				opacity = 0.3;
-				border = 'dotted';
-				*/
-				if(filter.length > 1)
-					add = false;
+			if((thumbnail.dom != undefined) && (filter != undefined)) {
+				var opacity = 1, border = 'dashed', add = true;
+			 	if($.inArray(thumbnail.tag, filter) !== -1) {
+					opacity = 1;
+					border = 'solid';
+					scrollTo = thumbnail;
+				}
+				else if(Tags.isStrong) {
+					/*
+					opacity = 0.3;
+					border = 'dotted';
+					*/
+					if(filter.length > 1)
+						add = false;
+				}
+				else {
+					opacity = 0.8;
+					border = 'dotted';
+				}
+				thumbnail.dom.css("opacity", opacity);
+				thumbnail.dom.css("border-style", border);
+				if(add)	thumbnail.dom.show();
+				else	thumbnail.dom.hide();
 			}
-			else {
-				opacity = 0.8;
-				border = 'dotted';
-			}
-			thumbnail.dom.css("opacity", opacity);
-			thumbnail.dom.css("border-style", border);
-			if(add)	thumbnail.dom.show();
-			else	thumbnail.dom.hide();
-		}
+		});
 	});
 	if(filter == undefined)
 		this.hidePhoto();
