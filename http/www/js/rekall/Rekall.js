@@ -397,31 +397,42 @@ Rekall.prototype.start = function() {
 	});
 	
 	
+	$.event.props.push('dataTransfer');
 	$('#timeline').on({
-		dragstart: function(e) {
-			alert("dragstart");
-			e.preventDefault();
+		dragenter: function(event) {
+			//alert("dragenter");
+			event.preventDefault();
 		},
-		dragenter: function(e) {
-			alert("dragenter");
-			e.preventDefault();
-		},
-		dragleave: function(e) {
-			alert("dragleave");
-			e.preventDefault();
-		},
-		dragover: function(e) {
+		dragover: function(event) {
 			//alert("dragover");
-			e.preventDefault();
+			event.preventDefault();
 		},
-		drop: function(e) {
-			alert("drop");
-			e.preventDefault();
+		drop: function(event) {
+			//alert("drop");
+			var tag = undefined;
+			if((event.dataTransfer.getData("key") != undefined) && (event.dataTransfer.getData("version") != undefined)) {
+				for(var index in rekall.project.sources["Files"].documents[event.dataTransfer.getData("key")].tags) {
+					var tagTmp = rekall.project.sources["Files"].documents[event.dataTransfer.getData("key")].tags[index];
+					if(tagTmp.version == event.dataTransfer.getData("version")) {
+						tag = tagTmp;
+						break;
+					}
+				}
+			}
+			if(tag != undefined) {
+				console.log(tag);
+				event.preventDefault();
+			}
 		},
-		dragend: function(e) {
-			alert("dragend");
-			e.preventDefault();
+		/*
+		dragleave: function(event) {
+			//alert("dragleave");
+			event.preventDefault();
 		},
+		dragend: function(event) {
+			//alert("dragend");
+			event.preventDefault();
+		},*/
 	});
 	
 	

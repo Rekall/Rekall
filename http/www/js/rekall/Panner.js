@@ -169,6 +169,12 @@ Panner.prototype.show = function(filter, bounds) {
 						Tags.addOne(thumbnail.tag, true);
 						Tag.displayMetadata();
 					});
+					thumbnail.dom.on({
+						dragstart: function(event) {
+				            event.dataTransfer.setData("key", 	  thumbnail.tag.document.key);
+				            event.dataTransfer.setData("version", thumbnail.tag.version);
+						}
+					});
 					return thumbnail.dom;
 				});
 			}

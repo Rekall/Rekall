@@ -873,7 +873,12 @@ Project.prototype.analyse = function(full) {
 					Tags.addOne(tag, true);
 					Tag.displayMetadata();
 				});
-			
+				tag.flattenTimelineDom.on({
+					dragstart: function(event) {
+			            event.dataTransfer.setData("key", 	  tag.document.key);
+			            event.dataTransfer.setData("version", tag.version);
+					}
+				});
 				return tag.flattenTimelineDom;
 			});
 		});
