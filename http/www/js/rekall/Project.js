@@ -319,8 +319,8 @@ Project.prototype.analyse = function(full) {
 			}
 		}
 	
-		$(".tag_metadatas_menu").menu();
-		$(".tab_choice_toggle").click(function() {
+		$("#navigateur .tag_metadatas_menu").menu();
+		$("#navigateur .tab_choice_toggle").click(function() {
 			$(this).next().toggle();
 			if($(this).attr("metadataKey")) {
 				var dom = $(this).next().find("li[metadataKey='" + $(this).attr("metadataKey") + "']");
@@ -330,7 +330,7 @@ Project.prototype.analyse = function(full) {
 			}
 			
 		});
-		$(".tag_metadatas_menu li.ui-menu-item").click(function() {
+		$("#navigateur .tag_metadatas_menu li.ui-menu-item").click(function() {
 			var metadataKey = $(this).attr("metadataKey");
 			if(metadataKey != "Time") {
 				var sorting = $(this).parent().parent().parent().attr("sorting");
@@ -381,7 +381,7 @@ Project.prototype.analyse = function(full) {
 		});
 
 		//Actions sur le cochage
-		$(".tab_list_item input").click(function(event) {
+		$("#navigateur .tab_list_item input").click(function(event) {
 			var sorting  = $(this).parent().parent().parent().parent().parent().attr("id").replace("Tab", "");
 			sorting = rekall.sortings[sorting]
 			var category = $(this).parent().parent().find(".tab_list_item_category").text();
@@ -399,7 +399,7 @@ Project.prototype.analyse = function(full) {
 		});
 		
 		//Action sur la recherche
-		$(".tab_search input").keyup(function(event) {
+		$("#navigateur .tab_search input").keyup(function(event) {
 			event.stopPropagation();
 			var searchText = $(this).val().toLowerCase();
 			var sorting    = $(this).parent().parent().parent().attr("id").replace("Tab", "");
@@ -585,7 +585,9 @@ Project.prototype.analyse = function(full) {
 			for (var key in verticalSortingCategory.tags) {
 				var tag = verticalSortingCategory.tags[key];
 				if(full != false) {
-					Tags.byTime.push(tag);
+					if(tag.isGoodVersion())
+						Tags.byTime.push(tag);
+						
 					//Analyse GPS
 					var gpsPosition = {latitude: NaN, longitude: NaN, tag: undefined};
 					for (var key in tag.getMetadatas()) {
@@ -826,8 +828,11 @@ Project.prototype.analyse = function(full) {
 		});
 		$("#flattentimeline_items").html("");
 		var counter = 0;
+		/*
 		for (var key in Tags.byTime) {
 			var tag = Tags.byTime[key];
+			*/
+		$.each(Tags.byTime, function(key, tag) {
 			$('#flattentimeline_items').append(function() {
 				var styleColor = "background-color: " + tag.color + ";";
 				var styleColor2 = styleColor;
@@ -870,7 +875,7 @@ Project.prototype.analyse = function(full) {
 			
 				return tag.flattenTimelineDom;
 			});
-		}
+		});
 	}
 	
 	rekall.timeline.bar.updateFlattenTimeline();

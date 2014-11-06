@@ -209,21 +209,13 @@ VideoPlayers.prototype.resize = function(visible) {
 		$.each(this.videos, function(playerId, player) {
 			var y = floor(player.index/2) * height;
 			yOffset = max(yOffset, y);
-			$("#" + playerId).css("top",  y);
-			$("#" + playerId).css("left", (player.index%2) * width);
-			$("#" + playerId).width(width);
-			$("#" + playerId).height(height);
-			$("#" + playerId).css("z-index", 1);
+			$("#" + playerId).css("top",  y).css("left", (player.index%2) * width).width(width).height(height).css("z-index", 1);
 		});
 		yOffset += height;
 		var width  = $("#renders").width() / constrain(1, this.audiosCount, 2);
 		var height = VideoPlayer.audioHeight;
 		$.each(this.audios, function(playerId, player) {
-			$("#" + playerId).width(width);
-			$("#" + playerId).height(height);
-			$("#" + playerId).css("top",  floor(player.index/2) * height + yOffset);
-			$("#" + playerId).css("left", (player.index%2) * width);
-			$("#" + playerId).css("z-index", 1);
+			$("#" + playerId).width(width).height(height).css("top",  floor(player.index/2) * height + yOffset).css("left", (player.index%2) * width).css("z-index", 1);
 		});
 	}
 	else if((disposition == "grid") || (disposition == "pip")) {
@@ -237,18 +229,16 @@ VideoPlayers.prototype.resize = function(visible) {
 		var videothumbsHeight = (mainHeight - audiothumbsHeight) / this.videosCount;
 		var thumbX = mainWidth, thumbY = 0;
 		$.each(this.videos, function(playerId, player) {
-			if(playerId == mainPlayerId) {
+			if(playerId == mainPlayerId)
 				$("#" + playerId).width(mainWidth).height(mainHeight).css("top",  0).css("left", 0).css("z-index", 1);
-			}
 			else {
 				$("#" + playerId).width(thumbWidth).height(videothumbsHeight).css("top",  thumbY).css("left", thumbX).css("z-index", 1000);
 				thumbY += videothumbsHeight;
 			}
 		});
 		$.each(this.audios, function(playerId, player) {
-			if(playerId == mainPlayerId) {
+			if(playerId == mainPlayerId)
 				$("#" + playerId).width(mainWidth).height(mainHeight).css("top",  0).css("left", 0).css("z-index", 1);
-			}
 			else {
 				$("#" + playerId).width(thumbWidth).height(audiothumbsHeight).css("top",  thumbY).css("left", thumbX).css("z-index", 1000);
 				thumbY += audiothumbsHeight;

@@ -251,7 +251,7 @@ Tag.displayMetadata = function() {
 		}
 		
 
-		$("#metadatas_title")   .text(Tags.unique().getMetadata("Rekall->Name"));
+		$("#metadatas_title").text(Tags.unique().getMetadata("Rekall->Name"));
 		var version = "";
 		if(Tags.unique().document.currentVersion > 0) {
 			version += "version " + (Tags.unique().version+1);
@@ -448,7 +448,7 @@ Tag.displayMetadata = function() {
 	$("#metadatas_table").html(html);
 
 	//Clic pour déploiement d'une section
-	$(".metadatas_table_category_title").click(function() {
+	$("#metadatas .metadatas_table_category_title").click(function() {
 		var category = $(this).text();
 		if(Tag.metadataSortingVisible[category] == undefined)
 			Tag.metadataSortingVisible[category] = new Object();
@@ -536,7 +536,7 @@ Tag.displayMetadata = function() {
 
 
 	//Affichage de l'éditeur
-	$(".metadatas_table_element").click(function(event) {
+	$("#metadatas .metadatas_table_element").click(function(event) {
 		event.stopPropagation();
 		var metadataKey = $(this).find(".metadatas_table_element_category").text();
 		
@@ -782,6 +782,6 @@ Tag.displayMetadata = function() {
 			$(this).find("input, textarea").trigger("autocompleteselect");
 		}
 	});
-	$(".metadatas_table_element .metadatas_table_element_category").filter(function() { return $.inArray($(this).text(), Tag.metadataEditionKey) !== -1; }).trigger("click");
+	$("#metadatas .metadatas_table_element .metadatas_table_element_category").filter(function() { return $.inArray($(this).text(), Tag.metadataEditionKey) !== -1; }).trigger("click");
 	rekall.analyse(false);
 }

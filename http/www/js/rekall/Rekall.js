@@ -332,10 +332,8 @@ Rekall.prototype.start = function() {
 	$("#maximizeTabNav").trigger("click");
 	$("#rendersTabNav").trigger("click");
 	
-	//$(".layout_cell").resizable();
-	
 	//Déploiement d'une section à gauche
-	$(".tab_title.openable").click(function() {
+	$("#navigateur .tab_title.openable").click(function() {
 		if($(this).parent().find('.tab_content').is(":visible")) {
 			$(this).parent().find('.tab_content').slideUp();
 			$(this).find("span").html("&#x25B8;");
@@ -403,12 +401,12 @@ Rekall.prototype.start = function() {
 	$("#timeline-unzoom").click(function() {
 		Sorting.size -= 3;
 		rekall.analyse(false);
-		rekall.redraw(true);
+		rekall.redraw();
 	});
 	$("#timeline-zoom").click(function() {
 		Sorting.size += 3;
 		rekall.analyse(false);
-		rekall.redraw(true);
+		rekall.redraw();
 	});
 	$("#timeline-ff").click(function() {
 		rekall.timeline.bar.rewind();

@@ -270,26 +270,6 @@ function documentReadyIntro() {
 			});
 		});
 	}, 250);
-
-	/*
-	var scenarioTime = 0;
-	var colors = ["#57AA8E", "#FBA682", "#F7634C", "#FCC376", "#F94B32", "#F87439", "#000000"];
-	setInterval(function() {
-		if((20 <= scenarioTime) && (scenarioTime < 26))
-			$("#intro_letter" + (scenarioTime-20)).show();
-		else if((26 <= scenarioTime) && (scenarioTime < (26+4*7)))
-			$("#intro").css("background-color", colors[floor(scenarioTime-26)/4]);
-		else if(26+4*7+3 == scenarioTime) {
-			$(".intro_letters").animate({'left': '190px', 'opacity': '0'}, 1000);
-			$("#intro_logo2").fadeIn(1000);
-		}
-		else if(26+4*7+15 == scenarioTime)
-			$("#intro_logo3").fadeIn(500);
-		else if(26+4*7+20 == scenarioTime)
-			$("#intro_logo4").fadeIn(500);
-		scenarioTime++;
-	}, 60);
-	*/
 }
 
 

@@ -24,6 +24,7 @@
 function Panner() {
 	this.filtredTags = new Array();
 	this.visible     = false; 
+	this.recreateGallery = true;
 	$("#panner .gallery").click(function(event) {
 		event.stopPropagation();
 		Tags.clear(true);
@@ -54,7 +55,7 @@ function Panner() {
 		}
 	});
 	$("#panner .panzoom").load(function(event) {
-		$(this).css("width", "auto").css("height", "auto");
+		$(this).css({"width": "auto", "height": "auto"});
 		var maxWidth = $(this).parent().width();
 		var maxHeight = $(this).parent().height();
 		var ratio = 0;
@@ -65,8 +66,7 @@ function Panner() {
 			// Check if the current width is larger than the max
 			if(width > maxWidth){
 				ratio = maxWidth / width;
-				$(this).css("width", maxWidth);
-				$(this).css("height", height * ratio);
+				$(this).css({"width": maxWidth, "height": height * ratio});
 				height = height * ratio;
 				width = width * ratio;
 			}
@@ -74,16 +74,14 @@ function Panner() {
 			// Check if current height is larger than max
 			if(height > maxHeight) {
 				ratio = maxHeight / height;
-				$(this).css("height", maxHeight);
-				$(this).css("width", width * ratio);
+				$(this).css({"height": maxHeight, "width": width * ratio});
 				width = width * ratio;
 				height = height * ratio;
 			}
 		}
 		else if(false) {
 			var ratio = Math.max(maxWidth / width, maxHeight / height);
-			$(this).css("width", width*ratio);
-			$(this).css("height", height*ratio);
+			$(this).css({"width": width*ratio, "height": height*ratio});
 		}
 		$("#panner .panzoom").show();
 		$("#panner .panzoom").panzoom('resetDimensions');
@@ -93,8 +91,6 @@ function Panner() {
 		$("#panner #panzoom-slider").slider({value: zoom});
 		$("#panner .panzoom").panzoom('zoom', zoom);
 	});
-
-	this.recreateGallery = true;
 }
 
 
@@ -118,7 +114,6 @@ Panner.prototype.resize = function(visible, bounds) {
 	$("#panner .panzoom").trigger("load");
 }
 Panner.prototype.show = function(filter, bounds) {
-	this.filtredTags = new Array();
 	var recreateGallery = this.recreateGallery;
 	this.recreateGallery = true;
 	
@@ -126,60 +121,65 @@ Panner.prototype.show = function(filter, bounds) {
 	//return;
 	
 	var thiss = this;
+	var gallery1 = $("#panner-gallery1");
+	var gallery2 = $("#panner-gallery2");
+	
 	if(recreateGallery) {
-		$("#panner .gallery").html("");
+		this.filtredTags = new Array();
+		var parent1 = gallery1.parent();
+		var parent2 = gallery2.parent();
+		gallery1.detach();
+		gallery2.detach();
+		gallery1.html("");
+		gallery2.html("");
 		this.markers = new Array();
 	}
 	var scrollTo = undefined;
 	for (var category in this.thumbnails) {
 		var contents = this.thumbnails[category];
 		if((recreateGallery) && (contents.thumbnails.length)) {
-			var target = "#panner-gallery1";
+			var target = gallery1;
 			var categoryVerbose = contents.category.categoryVerbose;
 			if(contents.category.category == Sorting.prefix) {
-				target          = "#panner-gallery2";
+				target          = gallery2;
 				categoryVerbose = "Not specified";
 			}
-			$(target).append("<h1 style='color: " + contents.category.color + "'>" + categoryVerbose + "</h1>");
+			target.append("<h1 style='color: " + contents.category.color + "'>" + categoryVerbose + "</h1>");
 		}
 		
-		for (var index in contents.thumbnails) {
-			var thumbnail = contents.thumbnails[index];
-			thiss.filtredTags.push(thumbnail.tag);		
+		/*for (var index in contents.thumbnails) {
+			var thumbnail = contents.thumbnails[index];*/
+		$.each(contents.thumbnails, function(index, thumbnail) {
 			if(recreateGallery) {
-				$(target).append(function() {
-					var dom = "";
+				thiss.filtredTags.push(thumbnail.tag);		
+				target.append(function() {
+					if(thumbnail.url != undefined)	thumbnail.dom = $("<div class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
+					else							thumbnail.dom = $("<div class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
 
-					if(thumbnail.url != undefined)	dom = $("<div class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
-					else							dom = $("<div class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
-
-					dom.mouseenter(function(event) {
+					thumbnail.dom.mouseenter(function(event) {
 						if(!Tags.isStrong) {
 							thiss.recreateGallery = false;
 							Tags.addOne(thumbnail.tag, false);
 							Tag.displayMetadata();
 						}
 					});
-					dom.click(function(event) {
+					thumbnail.dom.click(function(event) {
 						thiss.recreateGallery = false;
 						event.stopPropagation();
 						Tags.addOne(thumbnail.tag, true);
 						Tag.displayMetadata();
 					});
-					thumbnail.dom = dom;
-					return dom;
+					return thumbnail.dom;
 				});
 			}
 			if((thumbnail.dom != undefined) && (filter != undefined)) {
-				var opacity = 1, border = 'dashed', add = true;
+				var opacity = 1, add = true;
 			 	if($.inArray(thumbnail.tag, filter) !== -1) {
 					opacity = 1;
-					border = 'solid';
 					scrollTo = thumbnail;
 				}
 				else if(Tags.isStrong) {
 					opacity = 0.5;
-					border = 'dotted';
 					if(filter.length > 1)
 						add = false;
 				}
@@ -187,13 +187,17 @@ Panner.prototype.show = function(filter, bounds) {
 					opacity = 0.8;
 					border = 'dotted';
 				}
-				thumbnail.dom.css("opacity", opacity);
-				thumbnail.dom.css("border-style", border);
-				if(add)	thumbnail.dom.show();
-				else	thumbnail.dom.hide();
+				if(add)	thumbnail.dom.show().css("opacity", opacity);
+				else	thumbnail.dom.hide().css("opacity", opacity);
 			}
-		}
+		});
 	}
+	if(recreateGallery) {
+		parent1.prepend(gallery1);
+		parent2.prepend(gallery2);
+	}
+	
+	
 	if(filter == undefined)
 		this.hidePhoto();
 	else if((filter.length == 1) && (Tags.isStrong)) {
@@ -203,9 +207,8 @@ Panner.prototype.show = function(filter, bounds) {
 	else
 		this.hidePhoto();
 		
-	if((scrollTo) && (recreateGallery) && ($("#panner .gallery").is(":visible"))) {
+	if((scrollTo) && (recreateGallery) && ($("#panner .gallery").is(":visible")))
 		$("#panner").scrollTop(scrollTo.dom.position().top + $("#panner").scrollTop());
-	}
 }
 Panner.prototype.showPhoto = function(tag) {
 	$("#panner .gallery").hide();

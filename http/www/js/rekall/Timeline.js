@@ -143,7 +143,6 @@ Timeline.prototype.updateFlattenTimeline = function() {
 				}
 				else if(progress < 0) {
 					tag.flattenTimelineDom.slideDown();
-					tag.flattenTimelineDom.css("opacity", 0.15);
 					tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 				}
 				else {
