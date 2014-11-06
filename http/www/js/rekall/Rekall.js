@@ -141,7 +141,7 @@ Rekall.prototype.start = function() {
 	this.timeline.add(this.timeline.tagLayer);
 	this.timeline.tagLayer.groupUnderlay = new Kinetic.Group({
 		listening: false, 
-		transformsEnabled: 'position',
+		transformsEnabled: 'none',
 	});
 	this.timeline.tagLayer.add(this.timeline.tagLayer.groupUnderlay);
 	this.timeline.tagLayer.group = new Kinetic.Group({
@@ -332,8 +332,10 @@ Rekall.prototype.start = function() {
 	$("#maximizeTabNav").trigger("click");
 	$("#rendersTabNav").trigger("click");
 	
+	//$(".layout_cell").resizable();
+	
 	//Déploiement d'une section à gauche
-	$("#navigateur .tab_title.openable").click(function() {
+	$(".tab_title.openable").click(function() {
 		if($(this).parent().find('.tab_content').is(":visible")) {
 			$(this).parent().find('.tab_content').slideUp();
 			$(this).find("span").html("&#x25B8;");
@@ -440,12 +442,12 @@ Rekall.prototype.start = function() {
 	$("#timeline-unzoom").click(function() {
 		Sorting.size -= 3;
 		rekall.analyse(false);
-		rekall.redraw();
+		rekall.redraw(true);
 	});
 	$("#timeline-zoom").click(function() {
 		Sorting.size += 3;
 		rekall.analyse(false);
-		rekall.redraw();
+		rekall.redraw(true);
 	});
 	$("#timeline-ff").click(function() {
 		rekall.timeline.bar.rewind();

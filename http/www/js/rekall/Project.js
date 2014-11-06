@@ -836,6 +836,7 @@ Project.prototype.analyse = function(full) {
 		$.each(Tags.byTime, function(key, tag) {
 			$('#flattentimeline_items').append(function() {
 				var styleColor = "background-color: " + tag.color + ";";
+				/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
 				var styleColor2 = styleColor;
 				var styleImage = "";
 				if(tag.thumbnail.url != undefined) {
@@ -845,7 +846,7 @@ Project.prototype.analyse = function(full) {
 				
 				var icnType = "";
 				if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("application/msword")>=0) icnType = "background-image:url(../../css/images/icn-word.png);";
-				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("application/")>=0) icnType = "background-image:url(../../css/images/icn-pdf.png);";
+				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("application/pdf")>=0) icnType = "background-image:url(../../css/images/icn-pdf.png);";
 				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("application/")>=0) icnType = "background-image:url(../../css/images/icn-document.png);";
 				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("audio/")>=0) icnType = "background-image:url(../../css/images/icn-music.png);";
 				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("image/")>=0) icnType = "background-image:url(../../css/images/icn-image.png);";
