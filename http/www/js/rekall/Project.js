@@ -181,7 +181,8 @@ Project.prototype.analyse = function(full) {
 		rekall.sortings["colors"]   .analyseStart();
 		rekall.sortings["highlight"].analyseStart();
 		rekall.sortings["hashes"]   .analyseStart();
-	    $.each(filtredTags, function(key, tag) {
+		for (var key in filtredTags) {
+			var tag = filtredTags[key];
 			var isOk = true;
 			rekall.sortings["colors"].analyseAdd(tag, undefined, true);
 			rekall.sortings["hashes"].analyseAdd(tag);
@@ -194,8 +195,7 @@ Project.prototype.analyse = function(full) {
 			}
 			else
 				tag.setVisible(false);
-
-		});
+		}
 		rekall.sortings["colors"]   .analyseEnd();
 		rekall.sortings["highlight"].analyseEnd();
 		rekall.sortings["hashes"]   .analyseEnd(1);

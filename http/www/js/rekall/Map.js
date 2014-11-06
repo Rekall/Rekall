@@ -48,12 +48,13 @@ function Map() {
 		
 			//Déselectionne les tags hors du bounds
 			thiss.filtredTags = new Array();
-			$.each(thiss.markers, function(index, marker) {
+			for (var index in thiss.markers) {
+				var marker = thiss.markers[index];
 				if ((thiss.map.getBounds()) && (thiss.map.getBounds().contains(marker.getPosition())))
 					thiss.filtredTags.push(marker.rekall.tag);
 				//marker.rekall.tag.update();
 				rekall.analyse(false);
-			});
+			}
 		});	
 		var homeControlDiv = document.createElement('div');
 		var homeControl = new HomeControl(homeControlDiv, this.map);

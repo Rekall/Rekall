@@ -126,31 +126,32 @@ Utils.splitKeywords = function(val, strong, really) {
 		return vals;
 
 	var retour = new Array();
-	$.each(vals, function(index, val) {
-		val = val.trim();
+	for (var index in vals) {
+		var val = vals[index].trim();
 		if((val != "") && ($.inArray(val, retour) === -1))
 			retour.push(val);
-	});
+	}
 	return retour;
 }
 Utils.joinKeywords = function(vals) {
 	var retour = "";
-	$.each(vals, function(index, val) {
-		val = val.trim();
+	for (var index in vals) {
+		var val = vals[index].trim();
 		if(val != "")
 			retour += val + ", ";
-	});
+	}
 	retour = retour.substr(0, retour.length - 2);
 	return retour;
 }
 Utils.inArray = function(array, check) {
 	var retour = false;
-	$.each(array, function(index, variable) {
+	for (var variable in array) {
+		var val = array[variable];
 		if(variable == check) {
 			retour = true;
 			return retour;
 		}
-	});
+	}
 	return retour;
 }
 

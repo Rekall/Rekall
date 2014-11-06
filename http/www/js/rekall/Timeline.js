@@ -108,9 +108,12 @@ Timeline.prototype.update = function() {
 
 Timeline.prototype.updateFlattenTimeline = function() {
 	var thiss = this;			
-	$.each(Tags.byTime, function(key, tag) {
+	for (var key in Tags.byTime) {
+		var tag = Tags.byTime[key];
+		
 		var progress = 0;
 		var timeEndExtended = tag.timeStart + max(3, tag.timeEnd - tag.timeStart);
+		
 		if(thiss.timeCurrent < tag.timeStart)
 			progress = thiss.timeCurrent - tag.timeStart;
 		else if((tag.timeStart < thiss.timeCurrent) && (thiss.timeCurrent < timeEndExtended))
@@ -121,7 +124,6 @@ Timeline.prototype.updateFlattenTimeline = function() {
 		if(progress == undefined) {
 			tag.flattenTimelineDom.slideUp();
 			tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
-			return;
 		}
 		else {
 			if(timeEndExtended == tag.timeEnd)
@@ -151,6 +153,6 @@ Timeline.prototype.updateFlattenTimeline = function() {
 				tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 			}
 		}
-	});
+	}
 }
 

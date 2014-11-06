@@ -81,12 +81,11 @@ Tag.prototype.updatePosititon = function() {
 Tag.prototype.intersectsAll = function(tags) {
 	var intersection = false;
 	var thiss = this;
-	$.each(tags, function(key, tag) {
-		if((thiss != tag) && (thiss.rect.intersects(tag.rect))) {
-			intersection = true;
-			return false;
-		}
-	});
+	for (var key in tags) {
+		var tag = tags[key];
+		if((thiss != tag) && (thiss.rect.intersects(tag.rect)))
+			return true;
+	}
 	return intersection;
 }	
 
@@ -207,9 +206,11 @@ Tag.prototype.setSelected = function(val, strong) {
 		this.document.selected = rekall.selectionId;
 	else if(this.document.selected != rekall.selectionId)
 		this.document.selected = 0;
-	$.each(this.document.tags, function(index, tag) {
+
+	for (var key in this.document.tags) {
+		var tag = this.document.tags[key];
 		tag.update(undefined, false);
-	});
+	}
 	this.update(undefined, strong);
 }
 Tag.prototype.update = function(color, strong) {
@@ -694,7 +695,8 @@ Tag.displayMetadata = function() {
 				
 				//Valeurs déjà existantes
 				var count = 0;
-				$.each(values, function(value, details) {
+				for (var value in values) {
+					var details = values[value];
 					var valueClass2 = "";
 					if(details.count == Tags.selectedTags.length)
 						valueClass2 = "single";
@@ -702,15 +704,16 @@ Tag.displayMetadata = function() {
 						editor += "<div title='Value of one document in the multiple selection' class='values " + valueClass + " " + valueClass2 + "'>" + value + "</div>";
 						count++;
 					}
-				});
+				}
 
 				//Valeurs proposées
-				$.each(availableTags, function(index, value) {
+				for (var index in availableTags) {
+					var value = availableTags[index];
 					if(values[value] == undefined) {
 						editor += "<div title='Suggested value' class='autocompleteValues " + valueClass + "'>" + value + "</div>";				
 						count++;
 					}
-				});
+				}
 				
 				if((valueClass != "") && (originalMetadatas != undefined) && (originalMetadatas[metadataKey] != undefined)) {
 					var originalValue = originalMetadatas[metadataKey];

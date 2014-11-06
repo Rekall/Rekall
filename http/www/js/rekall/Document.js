@@ -96,17 +96,17 @@ Document.prototype.compareMetadatas = function(metadatas) {
 	var metadatasCompared = new Metadata();
 	var metadatasSource   = this.getMetadatas();
 	var thiss = this;
-	$.each(metadatas, function(metadataKey, metadataValue) {
+	for (var metadataKey in metadatas) {
+		var metadataValue = metadatas[metadataKey];
 		if(metadatasSource[metadataKey] != metadataValue)
 			metadatasCompared[metadataKey] = metadataValue;
-	});
+	}
 	return metadatasCompared;
 }
 Document.prototype.cloneMetadatas = function(version) {
 	var metadatasCloned = new Metadata();
-	$.each(this.getMetadatas(version), function(metadataKey, metadataValue) {
-		metadatasCloned[metadataKey] = metadataValue;
-	});
+	for (var metadataKey in this.getMetadatas(version))
+		metadatasCloned[metadataKey] = this.getMetadatas(version)[metadataKey];
 	return metadatasCloned;
 }
 
@@ -118,21 +118,23 @@ Document.prototype.addVersion = function(document) {
 	this.setMetadatas(document.getMetadatas(), this.currentVersion);
 	var thiss = this;
 	if(document.tags.length == 0) {
-		$.each(this.tags, function(index, tag) {
+		for (var index in this.tags) {
+			var tag = this.tags[index];
 			if(tag.version == thisVersion) {
 				var newTag = new Tag(thiss);
 				newTag.timeStart = tag.getTimeStart();
 				newTag.timeEnd   = tag.getTimeEnd();
 				thiss.addTag(newTag);
 			}
-		});
+		}
 	}
 	else {
-		$.each(document.tags, function(index, tag) {
+		for (var index in document.tags) {
+			var tag = document.tags[index];
 			tag.version = thiss.currentVersion;
 			tag.document = thiss;
 			thiss.tags.push(tag);
-		});
+		}
 	}
 }
 
