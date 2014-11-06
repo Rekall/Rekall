@@ -241,11 +241,7 @@ VideoPlayers.prototype.resize = function(visible) {
 				$("#" + playerId).width(mainWidth).height(mainHeight).css("top",  0).css("left", 0).css("z-index", 1);
 			}
 			else {
-				$("#" + playerId).width(thumbWidth);
-				$("#" + playerId).height(videothumbsHeight);
-				$("#" + playerId).css("top",  thumbY);
-				$("#" + playerId).css("left", thumbX);
-				$("#" + playerId).css("z-index", 1000);
+				$("#" + playerId).width(thumbWidth).height(videothumbsHeight).css("top",  thumbY).css("left", thumbX).css("z-index", 1000);
 				thumbY += videothumbsHeight;
 			}
 		});

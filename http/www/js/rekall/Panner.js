@@ -123,7 +123,7 @@ Panner.prototype.show = function(filter, bounds) {
 	this.recreateGallery = true;
 	
 	//TODO
-	return;
+	//return;
 	
 	var thiss = this;
 	if(recreateGallery) {
