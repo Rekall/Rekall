@@ -397,6 +397,34 @@ Rekall.prototype.start = function() {
 	});
 	
 	
+	$('#timeline').on({
+		dragstart: function(e) {
+			alert("dragstart");
+			e.preventDefault();
+		},
+		dragenter: function(e) {
+			alert("dragenter");
+			e.preventDefault();
+		},
+		dragleave: function(e) {
+			alert("dragleave");
+			e.preventDefault();
+		},
+		dragover: function(e) {
+			//alert("dragover");
+			e.preventDefault();
+		},
+		drop: function(e) {
+			alert("drop");
+			e.preventDefault();
+		},
+		dragend: function(e) {
+			alert("dragend");
+			e.preventDefault();
+		},
+	});
+	
+	
 	//Zoom
 	$("#timeline-unzoom").click(function() {
 		Sorting.size -= 3;

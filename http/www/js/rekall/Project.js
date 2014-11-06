@@ -855,7 +855,7 @@ Project.prototype.analyse = function(full) {
 				
 				//alert(icnType);
 				
-				var html = "<div class='flattentimeline_item'>";
+				var html = "<div draggable=true class='flattentimeline_item'>";
 				html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";
 				html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "'></div>";
 				html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";

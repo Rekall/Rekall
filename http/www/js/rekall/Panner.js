@@ -153,8 +153,8 @@ Panner.prototype.show = function(filter, bounds) {
 			if(recreateGallery) {
 				thiss.filtredTags.push(thumbnail.tag);		
 				target.append(function() {
-					if(thumbnail.url != undefined)	thumbnail.dom = $("<div class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
-					else							thumbnail.dom = $("<div class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
+					if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
+					else							thumbnail.dom = $("<div draggable=true class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
 
 					thumbnail.dom.mouseenter(function(event) {
 						if(!Tags.isStrong) {
