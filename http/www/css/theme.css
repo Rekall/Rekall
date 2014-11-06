@@ -876,7 +876,6 @@ input[type="text"], textarea {
 #flattentimeline_main_title {
 	font-family:			"open_sanslight";
 	height:40px;
-	padding-left:40px;
 	line-height:40px;
 	text-align:center;
 	background:#2C3032;
@@ -884,21 +883,43 @@ input[type="text"], textarea {
 	color:rgba(255,255,255,1);
 	font-size:18px;
 }
+#flattentimeline_settings {
+	font-family:			"open_sanslight";
+	height:240px;
+	line-height:40px;
+	text-align:center;
+	background:#26292B;
+	text-transform:uppercase;
+	color:#FFF;
+	font-size:18px;
+	margin-top:4px;
+	display:none;
+}
 #flattentimeline_items {
 	width:100%;
 	height:100%;
 	overflow:scroll;
 }
-.reload_btn {
-	background-image:url("images/reload.png");
-	width:16px;
-	height:16px;
+.reload_btn, .settings_btn {
+	background-position:	center center;
+	background-repeat:		no-repeat;
+	width:30px;
+	height:30px;
 	float:right;
-	margin:12px;
 	cursor:pointer;
+	opacity:.5;
+	margin:5px 5px 5px -5px;
 }
-.reload_btn:hover {
-	background-color:#000;
+.reload_btn:hover, .settings_btn:hover {
+	background-color:#090909;
+}
+.reload_btn {
+	background-image:url("images/icn-reload.png");
+}
+.settings_btn {
+	background-image:url("images/icn-list.png");
+	
+	display:none;
 }
 .flattentimeline_item {
 	position:				relative;
@@ -925,7 +946,7 @@ input[type="text"], textarea {
 	text-align:				left;
 	overflow:hidden;
 }
-.flattentimeline_title, .flattentimeline_subtitle, .flattentimeline_counter {
+.flattentimeline_title, .flattentimeline_subtitle, .flattentimeline_counter, .flattentimeline_type {
 	top:					0px;
 	left:					0px;
 	position:				absolute;
@@ -948,8 +969,8 @@ input[type="text"], textarea {
 	font-family:			"open_sanssemibold";
 	font-size:				12px;
 	left: 					40px;
-	line-height:			40px;
-	height:					40px;
+	line-height:			55px;
+	height:					60px;
 }
 .flattentimeline_subtitle {
 	font-family:			"open_sanslight";
@@ -958,6 +979,16 @@ input[type="text"], textarea {
 	left: 					40px;
 	line-height:			20px;
 	height:					20px;
+	display:none;
+}
+.flattentimeline_type {
+	top:					14px;
+	left:					6px;
+	width:					26px;
+	height:					26px;
+	background-position:	center center;
+	background-repeat:		no-repeat;
+	opacity:				.5;
 }
 .flattentimeline_counter {
 	font-family:			"open_sanssemibold";
@@ -975,8 +1006,8 @@ input[type="text"], textarea {
 	background:				rgba(0,0,0,.5);*/
 /*	background:				rgba(255,255,255,.75);
 	color:					#000;*/
-	background: 			rgba(255,255,255,1);
-	background:				rgba(0,0,0,1);
+	background-color: 			rgba(255,255,255,1);
+	background-color:				rgba(0,0,0,1);
 	
 	font-size:				18px;
 	text-align: 			center;
