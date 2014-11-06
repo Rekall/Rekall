@@ -879,6 +879,11 @@ Project.prototype.analyse = function(full) {
 		});
 	}
 	
+	if(this.firstAnalysis) {
+		rekall.timeline.bar.rewind();
+		rekall.timeline.bar.update();
+	}
+	
 	rekall.timeline.bar.updateFlattenTimeline();
 	rekall.redraw(full);
 	this.firstAnalysis = false;

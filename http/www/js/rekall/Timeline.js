@@ -111,9 +111,9 @@ Timeline.prototype.updateFlattenTimeline = function() {
 		var tag = Tags.byTime[key];
 		if(tag.flattenTimelineDom != undefined) {
 			var progress = 0;
-			var timeEndExtended = tag.timeStart + max(3, tag.timeEnd - tag.timeStart);
+			var timeEndExtended = tag.timeStart + max(2, tag.timeEnd - tag.timeStart);
 
-			if(this.timeCurrent < tag.timeStart)
+			if(this.timeCurrent <= tag.timeStart)
 				progress = this.timeCurrent - tag.timeStart;
 			else if((tag.timeStart < this.timeCurrent) && (this.timeCurrent < timeEndExtended))
 				progress = (this.timeCurrent - tag.timeStart) / (timeEndExtended - tag.timeStart);
@@ -141,12 +141,14 @@ Timeline.prototype.updateFlattenTimeline = function() {
 					tag.flattenTimelineDom.find(".flattentimeline_counter").text(ceil(-progress));
 					tag.flattenTimelineDom.find(".flattentimeline_counter").show();
 				}
-				else if(progress < 0) {
+				else if(progress < -20) {
+					tag.flattenTimelineDom.css("opacity", 0.1);
 					tag.flattenTimelineDom.slideDown();
 					tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 				}
 				else {
-					tag.flattenTimelineDom.slideUp();
+					tag.flattenTimelineDom.css("opacity", 0.1);
+					tag.flattenTimelineDom.hide();
 					tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 				}
 			}
