@@ -145,7 +145,7 @@ Sorting.prototype.analyseAdd = function(tag, metadata, alwaysIncludeTags, useThi
 			return false;
 				
 		metadata = this.parseMeta(metadataRaw);
-		
+
 		/*
 		if((metadata == Sorting.prefix) && (this.metadataKey != undefined) && (this.metadataKey != ""))
 			return false;
@@ -201,7 +201,6 @@ Sorting.prototype.analyseEnd = function(minTagCount) {
 			this.categoriesIndex++;
     }
 
-
 	//Echelle Linéaire
 	if((this.valCanBeFloats) && (this.valAreFloats)) {
 		//Echelle linéaire
@@ -215,7 +214,7 @@ Sorting.prototype.analyseEnd = function(minTagCount) {
 		else if(minMaxDiff < 0.01)		decimals = 3;
 		else if(minMaxDiff < 0.001)		decimals = 4;
 		else if(minMaxDiff < 0.0001)	decimals = 5;
-		
+
 		var categoriesTmp = new Object();
 		var valStep = minMaxDiff / Sorting.timeSteps;
 		if(this.metadataKey == "Time")
@@ -237,11 +236,10 @@ Sorting.prototype.analyseEnd = function(minTagCount) {
 			
 			if((this.metadataKey != undefined) && (this.metadataKey != "Time")) {
 				for (var key in this.categories) {
-					var category = this.categories[key];
-					for (var index in category.tags) {
-						var valCompare = parseFloat(this.parseMeta(category.tags[index].getMetadata(this.metadataKey)).substr(1));
+					for (var keyIndex in this.categories[key].tags) {
+						var valCompare = parseFloat(this.parseMeta(this.categories[key].tags[keyIndex].getMetadata(this.metadataKey)).substr(1));
 						if((val <= valCompare) && (valCompare < (val+valStep)))
-							categoriesTmp[metadata].tags.push(category.tags[index]);
+							categoriesTmp[metadata].tags.push(this.categories[key].tags[keyIndex]);
 					}
 			    }
 			}

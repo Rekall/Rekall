@@ -435,6 +435,7 @@ Project.prototype.analyse = function(full) {
 	
 	//Re-génération des étiquettes / grilles
 	var alternate = 0;
+
 	for (var key in rekall.sortings["horizontal"].categories) {
 		var horizontalSortingCategory    = rekall.sortings["horizontal"].categories[key];
 		var horizontalSortingCategoryPos = rekall.sortings["horizontal"].positionFor(undefined, horizontalSortingCategory.index);
