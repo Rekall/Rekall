@@ -58,6 +58,7 @@ public:
 
 
 public:
+    void syncSettings();
     void addProject(ProjectInterface *project);
     void removeProject(ProjectInterface *project);
 

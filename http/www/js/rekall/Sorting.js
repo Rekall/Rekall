@@ -121,9 +121,8 @@ Sorting.prototype.analyseStart = function(tags) {
 	else {
 		this.categoriesIndex = 0;
 		for (var key in this.categories) {
-			var category = this.categories[key];
-			category.shoudBeRemoved = true;
-			category.tags = new Array();
+			this.categories[key].shoudBeRemoved = true;
+			this.categories[key].tags = new Array();
 		}
 	}
 }
@@ -192,16 +191,14 @@ Sorting.prototype.analyseAdd = function(tag, metadata, alwaysIncludeTags, useThi
 	}
 }
 Sorting.prototype.analyseEnd = function(minTagCount) {
-	var thiss = this;
 	this.categoriesIndex = 0;
 	for (var key in this.categories) {
-		var category = this.categories[key];
-		if((minTagCount != undefined) && (category.tags.length <= minTagCount))
-			category.shoudBeRemoved = true;
-		if(category.shoudBeRemoved)
-			delete thiss.categories[key];
+		if((minTagCount != undefined) && (this.categories[key].tags.length <= minTagCount))
+			this.categories[key].shoudBeRemoved = true;
+		if(this.categories[key].shoudBeRemoved)
+			delete this.categories[key];
 		else
-			thiss.categoriesIndex++;
+			this.categoriesIndex++;
     }
 
 
@@ -242,10 +239,9 @@ Sorting.prototype.analyseEnd = function(minTagCount) {
 				for (var key in this.categories) {
 					var category = this.categories[key];
 					for (var index in category.tags) {
-						var tag = category.tags[index];
-						var valCompare = parseFloat(thiss.parseMeta(tag.getMetadata(thiss.metadataKey)).substr(1));
+						var valCompare = parseFloat(this.parseMeta(category.tags[index].getMetadata(this.metadataKey)).substr(1));
 						if((val <= valCompare) && (valCompare < (val+valStep)))
-							categoriesTmp[metadata].tags.push(tag);
+							categoriesTmp[metadata].tags.push(category.tags[index]);
 					}
 			    }
 			}
@@ -268,7 +264,7 @@ Sorting.prototype.analyseEnd = function(minTagCount) {
 		for (var key in this.categories) {
 			var category = this.categories[key];
 			category.index = categoryNewIndex++;
-			category.size  = thiss.categoriesIndex;
+			category.size  = this.categoriesIndex;
 			if(key == Sorting.prefix)
 				category.color = Sorting.defaultColor;
 			else
@@ -276,8 +272,8 @@ Sorting.prototype.analyseEnd = function(minTagCount) {
 			category.tagsSize = categoryTagsCount;
 			if((!category.checked) || (!category.visible))
 				category.color = category.color.setAlpha(0.2);
-			if(thiss.valAreDates)
-				category.categoryVerbose = moment(category.categoryRaw, "YYYY:MM:DD HH:mm:ss", true).format(thiss.metadataKeyPortion.dateFormat);
+			if(this.valAreDates)
+				category.categoryVerbose = moment(category.categoryRaw, "YYYY:MM:DD HH:mm:ss", true).format(this.metadataKeyPortion.dateFormat);
 		}
 	}
 }

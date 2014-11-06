@@ -69,6 +69,7 @@ Project.prototype.loadXML = function(xml) {
 			rekallDocMeta.metadataKey = $(this).attr('ctg');
 			rekallDoc.setMetadata(rekallDocMeta);
 			counts.metadatas++;
+			counts.tags++;
 		});
 		thiss.addDocument("Files", rekallDoc);
 	});
@@ -85,9 +86,8 @@ Project.prototype.loadXML = function(xml) {
 		var timeStart = $(this).attr('timeStart') + 0.;
 		var timeEnd   = $(this).attr('timeEnd')   + 0.;
 		for (var index in thiss.sources["Files"].documents[key].tags) {
-			var tag = thiss.sources["Files"].documents[key].tags[index];
-			tag.setTimeStart(parseFloat(timeStart));
-			tag.setTimeEnd(parseFloat(timeEnd));
+			thiss.sources["Files"].documents[key].tags[index].setTimeStart(parseFloat(timeStart));
+			thiss.sources["Files"].documents[key].tags[index].setTimeEnd(parseFloat(timeEnd));
 		}
 	});
 	/*
@@ -115,12 +115,10 @@ Project.prototype.analyse = function(full) {
 		rekall.sortings["corpus"]    .analyseStart();
 		rekall.sortings["horizontal"].analyseStart();
 		rekall.sortings["vertical"].analyseStart();
-		for (var key in this.sources) {
-			var source = this.sources[key];
-			for (var key in source.documents) {
-				var document = source.documents[key];
-				for (var key in document.tags) {
-					var tag = document.tags[key];
+		for (var keySource in this.sources) {
+			for (var keyDocument in this.sources[keySource].documents) {
+				for (var key in this.sources[keySource].documents[keyDocument].tags) {
+					var tag = this.sources[keySource].documents[keyDocument].tags[key];
 					
 					//Filtrage
 					var isOk = true;
@@ -228,14 +226,12 @@ Project.prototype.analyse = function(full) {
 		
 		var availableMetadatas2 = new Array();
 		for (var index in availableMetadatas) {
-			var metadata = availableMetadatas[index];
-			if(metadata.startsWith("Rekall->"))
-				availableMetadatas2.push(metadata);
+			if(availableMetadatas[index].startsWith("Rekall->"))
+				availableMetadatas2.push(availableMetadatas[index]);
 		}
 		for (var index in availableMetadatas) {
-			var metadata = availableMetadatas[index];
-			if(!metadata.startsWith("Rekall->"))
-				availableMetadatas2.push(metadata);
+			if(!availableMetadatas[index].startsWith("Rekall->"))
+				availableMetadatas2.push(availableMetadatas[index]);
 		}
 		
 		var availableMetadatasSorted = new Object();
@@ -255,9 +251,8 @@ Project.prototype.analyse = function(full) {
 				availableMetadatasHtml += "<li>" + category + "s";
 			availableMetadatasHtml += "<ul>";
 			for (var index in metadatas) {
-				var metadata = metadatas[index];
-				var metadataKey = category + "->" + metadata;
-				availableMetadatasHtml += "<li metadataKey='" + metadataKey + "'>" + metadata + "</li>";
+				var metadataKey = category + "->" + metadatas[index];
+				availableMetadatasHtml += "<li metadataKey='" + metadataKey + "'>" + metadatas[index] + "</li>";
 			}
 			availableMetadatasHtml += "</ul>";
 			availableMetadatasHtml += "</li>";
@@ -694,13 +689,10 @@ Project.prototype.analyse = function(full) {
 	}
 	
 	//Hightlights graphiques au survol ou sélections
-	for (var key in rekall.sortings["groups"].categories) {
-		var groupSortingCategory = rekall.sortings["groups"].categories[key];
-		groupSortingCategory.text.setFill("#F5F8EE");
-		for (var key in groupSortingCategory.verticalSorting.categories) {
-			var verticalSortingCategory = groupSortingCategory.verticalSorting.categories[key];
-			verticalSortingCategory.text.setFill("#F5F8EE");
-		}
+	for (var keyCat in rekall.sortings["groups"].categories) {
+		rekall.sortings["groups"].categories[keyCat].text.setFill("#F5F8EE");
+		for (var keyVCat in rekall.sortings["groups"].categories[keyCat].verticalSorting.categories)
+			rekall.sortings["groups"].categories[keyCat].verticalSorting.categories[keyVCat].text.setFill("#F5F8EE");
 	}
 
 	

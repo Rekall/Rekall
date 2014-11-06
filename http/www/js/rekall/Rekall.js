@@ -327,12 +327,10 @@ Rekall.prototype.start = function() {
 			window.document.title = rekall.timeline.bar.timeCurrent;
 		}
 		else if(e.keyCode == 82) {
-			for (var key in rekall.project.sources) {
-				var source = rekall.project.sources[key];
-				for (var key in source.documents) {
-					var document = source.documents[key];
-					for (var key in document.tags) {
-						var tag = document.tags[key];
+			for (var keySource in rekall.project.sources) {
+				for (var keyDocument in rekall.project.sources[keySource].documents) {
+					for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
+						var tag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
 						tag.timeStart = random(0, 100);
 						tag.timeEnd   = tag.timeStart + random(0, 20);
 					}
@@ -416,12 +414,10 @@ Rekall.prototype.start = function() {
 		var hoveredTagOld = Tags.hoveredTag;
 		Tags.hoveredTag = undefined;
 		if((rekall.project) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0)) {
-			for (var key in rekall.project.sources) {
-				var source = rekall.project.sources[key];
-				for (var key in source.documents) {
-					var document = source.documents[key];
-					for (var key in document.tags) {
-						var tag = document.tags[key];
+			for (var keySource in rekall.project.sources) {
+				for (var keyDocument in rekall.project.sources[keySource].documents) {
+					for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
+						var tag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
 						if((Tags.hoveredTag == undefined) && (tag.isVisible()) && (tag.rect.contains(pos))) {
 							Tags.hoveredTag = tag;
 						}
@@ -483,12 +479,10 @@ Rekall.prototype.start = function() {
 					Tags.addOne(Tags.hoveredTag, true);
 				}
 				else if(rekall.timeline.selectionLayer.path.polygon.points.length > 0) {
-					for (var key in rekall.project.sources) {
-						var source = rekall.project.sources[key];
-						for (var key in source.documents) {
-							var document = source.documents[key];
-							for (var key in document.tags) {
-								var tag = document.tags[key];
+					for (var keySource in rekall.project.sources) {
+						for (var keyDocument in rekall.project.sources[keySource].documents) {
+							for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
+								var tag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
 								if((tag.isVisible()) && (tag.isSelectable) && (rekall.timeline.selectionLayer.path.polygon.contains(tag.rect.getPosition())))
 									Tags.add(tag, true);
 							}
@@ -499,10 +493,9 @@ Rekall.prototype.start = function() {
 			else {
 				var projectChangedXml = "";
 				for (var index in Tags.selectedTags) {
-					var tag = Tags.selectedTags[index];
-					if((tag.projectChangedXml) && (tag.projectChangedXml.length)) {
-						projectChangedXml += tag.projectChangedXml + "\n";
-						tag.projectChangedXml = undefined;
+					if((Tags.selectedTags[index].projectChangedXml) && (Tags.selectedTags[index].projectChangedXml.length)) {
+						projectChangedXml += Tags.selectedTags[index].projectChangedXml + "\n";
+						Tags.selectedTags[index].projectChangedXml = undefined;
 					}
 				}
 				if(projectChangedXml.length)

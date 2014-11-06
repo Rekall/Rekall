@@ -107,17 +107,16 @@ Timeline.prototype.update = function() {
 }
 
 Timeline.prototype.updateFlattenTimeline = function() {
-	var thiss = this;			
 	for (var key in Tags.byTime) {
 		var tag = Tags.byTime[key];
 		
 		var progress = 0;
 		var timeEndExtended = tag.timeStart + max(3, tag.timeEnd - tag.timeStart);
 		
-		if(thiss.timeCurrent < tag.timeStart)
-			progress = thiss.timeCurrent - tag.timeStart;
-		else if((tag.timeStart < thiss.timeCurrent) && (thiss.timeCurrent < timeEndExtended))
-			progress = (thiss.timeCurrent - tag.timeStart) / (timeEndExtended - tag.timeStart);
+		if(this.timeCurrent < tag.timeStart)
+			progress = this.timeCurrent - tag.timeStart;
+		else if((tag.timeStart < this.timeCurrent) && (this.timeCurrent < timeEndExtended))
+			progress = (this.timeCurrent - tag.timeStart) / (timeEndExtended - tag.timeStart);
 		else
 			progress = undefined;
 			
@@ -128,9 +127,8 @@ Timeline.prototype.updateFlattenTimeline = function() {
 		else {
 			if(timeEndExtended == tag.timeEnd)
 				tag.flattenTimelineDom.find(".flattentimeline_bar").css("width", constrain(progress, 0, 1)*100 + "%");
-			else {
+			else
 				tag.flattenTimelineDom.find(".flattentimeline_bar").css("width", "0%");
-			}
 			
 			if((0 <= progress) && (progress < 1)) {
 				tag.flattenTimelineDom.slideDown();

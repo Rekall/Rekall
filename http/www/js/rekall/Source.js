@@ -48,12 +48,10 @@ Source.prototype.addDocument = function(document) {
 }
 Source.prototype.getDocument = function(path) {
 	var retour = undefined;
-	for (var key in this.documents) {
-		var document = this.documents[key];
-		for (var key in document.tags) {
-			var tag = document.tags[key];
-			if((retour == undefined) && (Utils.getLocalFilePath(tag).toLowerCase() == path.toLowerCase()))
-				retour = tag.document;
+	for (var keyDocument in this.documents) {
+		for (var key in this.documents[keyDocument].tags) {
+			if((retour == undefined) && (Utils.getLocalFilePath(this.documents[keyDocument].tags[key]).toLowerCase() == path.toLowerCase()))
+				retour = this.documents[keyDocument].tags[key].document;
 		}
 	}
 	return retour;

@@ -80,52 +80,10 @@ Tag.prototype.updatePosititon = function() {
 
 Tag.prototype.intersectsAll = function(tags) {
 	var intersection = false;
-	var thiss = this;
-	for (var key in tags) {
-		var tag = tags[key];
-		if((thiss != tag) && (thiss.rect.intersects(tag.rect)))
+	for (var key in tags)
+		if((this != tags[key]) && (this.rect.intersects(tags[key].rect)))
 			return true;
-	}
 	return intersection;
-}	
-
-Tag.prototype.getPreview = function(essai) {
-	return;
-	if(essai == undefined)
-		essai = 0;
-	var preview = {url: "", type: ""};
-	if(essai == 0) {
-		if(this.getMetadata("File->File Name") != undefined) {
-			preview.type = "img";
-			preview.url  = this.thumbnail + ".jpg";
-		}
-	}
-	else if(essai == 1) {
-		$("#previewImage").hide();
-		$("#preview_menu_bar").show();
-	}
-	var thiss = this;
-	if(preview.url != "") {
-		$.ajax({
-			url: 	preview.url,
-			type: 	'HEAD',
-			error: function() {
-				thiss.getPreview(essai+1);
-			},
-			success: function() {
-				if(preview.type == "img") {
-					if($("#previewImage img").attr("src") != preview.url)
-						$("#previewImage").html("<img src=\"" + preview.url + "\">");
-					$("#previewImage").show();
-					$("#preview_menu_bar").show();
-				}
-				else {
-					$("#previewImage").hide();
-					$("#preview_menu_bar").show();
-				}
-			}
-		});
-	}
 }
 
 Tag.prototype.getMetadata = function(metadataKey, metadataValue) {
@@ -207,10 +165,8 @@ Tag.prototype.setSelected = function(val, strong) {
 	else if(this.document.selected != rekall.selectionId)
 		this.document.selected = 0;
 
-	for (var key in this.document.tags) {
-		var tag = this.document.tags[key];
-		tag.update(undefined, false);
-	}
+	for (var key in this.document.tags)
+		this.document.tags[key].update(undefined, false);
 	this.update(undefined, strong);
 }
 Tag.prototype.update = function(color, strong) {
@@ -338,13 +294,14 @@ Tag.displayMetadata = function() {
 				max: 	Tags.unique().document.currentVersion,
 				step: 	1,
 				slide: function(event, ui) {
-					$.each(Tags.unique().document.tags, function(index, tag) {
+					for (var index in Tags.unique().document.tags) {
+						var tag = Tags.unique().document.tags[index];
 						if(tag.version == ui.value) {
 							Tags.addOne(tag, true);
 							Tag.displayMetadata();
 							return;
 						}
-					});
+					}
 				}
 			});
 			$("#metadatas_version .ui-slider-handle").show();
@@ -422,10 +379,9 @@ Tag.displayMetadata = function() {
 	
 	//Position GPS
 	var gpsPositions = new Array();
-	$.each(Tags.selectedTags, function(index, tag) {
-		if(tag.gpsPosition != undefined)
-			gpsPositions.push(tag.gpsPosition);
-	});
+	for (var index in Tags.selectedTags)
+		if(Tags.selectedTags[index].gpsPosition != undefined)
+			gpsPositions.push(Tags.selectedTags[index].gpsPosition);
 	if((gpsPositions.length > 0) && ($("#mapTabNav").is(":visible"))) {
 		$("#metadatas_menu_bar_map").show();
 		$("#metadatas_menu_bar_map").click(function() {
@@ -460,19 +416,18 @@ Tag.displayMetadata = function() {
 	
 	//Metadatas du groupe
 	Tag.metadataSorting.analyseStart();
-	$.each(Tags.selectedTags, function(index, tag) {
-		$.each(this.document.getMetadatas(), function(metadataKeysStr, metadataValue) {
-			Tag.metadataSorting.analyseAdd(tag, metadataKeysStr);
-		});
-	});
+	for (var index in Tags.selectedTags)
+		for (var metadataKeysStr in Tags.selectedTags[index].document.getMetadatas())
+			Tag.metadataSorting.analyseAdd(Tags.selectedTags[index], metadataKeysStr);
 	Tag.metadataSorting.analyseEnd();
-
 
 	//Sortie HTML
 	var html = "";
 	var htmls = new Object();
 	$("#metadatas_table").html(html);
-	$.each(Tag.metadataSorting.categories, function(key, metadataSortingCategory) {
+	for (var key in Tag.metadataSorting.categories) {
+		var metadataSortingCategory = Tag.metadataSorting.categories[key];
+
 		var metadataKeys = metadataSortingCategory.categoryVerbose.split("->");
 		if(htmls[metadataKeys[0]] == undefined) {
 			htmls[metadataKeys[0]] = "";
@@ -488,15 +443,15 @@ Tag.displayMetadata = function() {
 		//Analyse des valeurs
 		var value = undefined;
 		var elementClass = "";
-		$.each(metadataSortingCategory.tags, function(key, tag) {
-			var newValue = tag.getMetadata(metadataKey);
+		for (var key in metadataSortingCategory.tags) {
+			var newValue = metadataSortingCategory.tags[key].getMetadata(metadataKey);
 			if(value == undefined)
 				value = newValue;
 			else if((newValue != undefined) && (newValue != value)) {
 				elementClass = "differentValues";
-				return;
+				continue;
 			}
-		});
+		}
 
 		//Clef
 		var key    = metadataKeys[1];
@@ -517,14 +472,11 @@ Tag.displayMetadata = function() {
 			htmls[metadataKeys[0]] += "					<div class='metadatas_table_element_value_editor unselectable invisible'></div>";
 			htmls[metadataKeys[0]] += "				</div>";
 		}
-	});
-	$.each(htmls, function(key, htmlItem) {
-		htmlItem += "</div></div></div>";
-		html += htmlItem;
-	});	
+	}
+	for (var key in htmls)
+		html += htmls[key] + "</div></div></div>";
 	$("#metadatas_table").html(html);
 
-	
 	//Clic pour déploiement d'une section
 	$(".metadatas_table_category_title").click(function() {
 		var category = $(this).text();
@@ -550,12 +502,13 @@ Tag.displayMetadata = function() {
 				if(metadataValue == "—")
 					metadataValue = "";
 				
-				$.each(Tags.selectedTags, function(index, tag) {
+				for (var index in Tags.selectedTags) {
+					var tag = Tags.selectedTags[index];
 					var hasChanged = tag.setMetadata(metadataKey, metadataValue.trim());
 					changed |= hasChanged;
 					if(hasChanged)
 						projectChangedXml += "<edition key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" metadataKey=\"" + metadataKey + "\" metadataValue=\"" + metadataValue.trim() + "\" />\n";
-				});
+				}
 			}
 			else {
 				if(metadataValue)
@@ -565,9 +518,9 @@ Tag.displayMetadata = function() {
 				var keywordsToAdd = new Object(), keywordsToRemove = new Object();
 				if(!metadataValue)
 					metadataValue = obj.parent().find("input, textarea").val();
-				$.each(Utils.splitKeywords(metadataValue), function(index, value) {
-					keywordsToAdd[value] = true;
-				});
+				var splits = Utils.splitKeywords(metadataValue);
+				for (var index in splits)
+					keywordsToAdd[splits[index]] = true;
 				obj.parent().find(".added").each(function() {
 					keywordsToAdd[$(this).text().trim()] = true;
 				});
@@ -579,21 +532,22 @@ Tag.displayMetadata = function() {
 				});
 				
 				//Applique les changements
-				$.each(Tags.selectedTags, function(index, tag) {
+				for (var index in Tags.selectedTags) {
+					var tag = Tags.selectedTags[index];
 					var keywords = Utils.splitKeywords(tag.getMetadata(metadataKey));
-					$.each(keywordsToAdd, function(keyword, bool) {
+					for (var keyword in keywordsToAdd) {
 						if($.inArray(keyword, keywords) === -1)
 							keywords.push(keyword);
-					});
-					$.each(keywordsToRemove, function(keyword, bool) {
+					}
+					for (var keyword in keywordsToRemove) {
 						if($.inArray(keyword, keywords) !== -1)
 							keywords.splice(keywords.indexOf(keyword), 1);
-					});
+					}
 					var hasChanged = tag.setMetadata(metadataKey, Utils.joinKeywords(keywords));
 					changed |= hasChanged;
 					if(hasChanged)
 						projectChangedXml += "<edition key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" metadataKey=\"" + metadataKey + "\" metadataValue=\"" + Utils.joinKeywords(keywords) + "\" />\n";
-				});
+				}
 			}
 		}
 
@@ -638,10 +592,12 @@ Tag.displayMetadata = function() {
 					availableTagsCount["Contextual"] = {count: 1};
 					availableTagsCount["Render"]	 = {count: 1};
 				}
-				$.each(rekall.project.sources, function(key, source) {
-					$.each(source.documents, function(key, document) {
-				    	$.each(document.tags, function(key, tag) {
-					    	$.each(Utils.splitKeywords(tag.getMetadata(metadataKey), undefined, shouldSplit), function(index, val) {
+				for (var keySource in rekall.project.sources) {
+					for (var keyDocument in rekall.project.sources[keySource].documents) {
+						for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
+							var splits = Utils.splitKeywords(rekall.project.sources[keySource].documents[keyDocument].tags[key].getMetadata(metadataKey), undefined, shouldSplit);
+							for (var index in splits) {
+								var val = splits[index];
 								if(val.trim() != "") {
 									if(availableTagsCount[val] == undefined) {
 										availableTagsCount[val] = new Object();
@@ -649,10 +605,10 @@ Tag.displayMetadata = function() {
 									}
 									availableTagsCount[val].count++;
 								}
-							});
-						});
-					});
-				});
+							}
+						}
+					}
+				}
 				for (var i in availableTagsCount)
 					availableTags.push(i);
 				availableTags.sort(function(a, b) {
@@ -668,21 +624,22 @@ Tag.displayMetadata = function() {
 			var values = new Object();
 			var value  = undefined;
 			var isDifferentValues = false;
-			$.each(Tag.metadataSorting.categories[Sorting.prefix + metadataKey].tags, function(key, tag) {
-				var newValue = tag.getMetadata(metadataKey);
-				$.each(Utils.splitKeywords(newValue, undefined, shouldSplit), function(index, newValue) {
+			for (var key in Tag.metadataSorting.categories[Sorting.prefix + metadataKey].tags) {
+				var newValue = Tag.metadataSorting.categories[Sorting.prefix + metadataKey].tags[key].getMetadata(metadataKey);
+				var splits = Utils.splitKeywords(newValue, undefined, shouldSplit);
+				for (var index in splits) {
+					var newValue = splits[index];
 					if(values[newValue] == undefined) {
 						values[newValue] = new Object()
 						values[newValue].count = 0;
 					}
 					values[newValue].count++;
-				});
+				}
 				if(value == undefined)
 					value = newValue;
-				else if((newValue != undefined) && (newValue != value)) {
+				else if((newValue != undefined) && (newValue != value))
 					isDifferentValues = true;
-				}
-			});
+			}
 
 
 			//Editeur
@@ -696,9 +653,8 @@ Tag.displayMetadata = function() {
 				//Valeurs déjà existantes
 				var count = 0;
 				for (var value in values) {
-					var details = values[value];
 					var valueClass2 = "";
-					if(details.count == Tags.selectedTags.length)
+					if(values[value].count == Tags.selectedTags.length)
 						valueClass2 = "single";
 					if(value != "") {
 						editor += "<div title='Value of one document in the multiple selection' class='values " + valueClass + " " + valueClass2 + "'>" + value + "</div>";
@@ -708,9 +664,8 @@ Tag.displayMetadata = function() {
 
 				//Valeurs proposées
 				for (var index in availableTags) {
-					var value = availableTags[index];
-					if(values[value] == undefined) {
-						editor += "<div title='Suggested value' class='autocompleteValues " + valueClass + "'>" + value + "</div>";				
+					if(values[availableTags[index]] == undefined) {
+						editor += "<div title='Suggested value' class='autocompleteValues " + valueClass + "'>" + availableTags[index] + "</div>";				
 						count++;
 					}
 				}

@@ -24,7 +24,6 @@
 function Panner() {
 	this.filtredTags = new Array();
 	this.visible     = false; 
-	var thiss = this;
 	$("#panner .gallery").click(function(event) {
 		event.stopPropagation();
 		Tags.clear(true);
@@ -123,6 +122,9 @@ Panner.prototype.show = function(filter, bounds) {
 	this.filtredTags = new Array();
 	var recreateGallery = this.recreateGallery;
 	this.recreateGallery = true;
+	
+	//TODO
+	return;
 	
 	var thiss = this;
 	if(recreateGallery) {

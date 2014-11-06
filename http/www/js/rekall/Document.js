@@ -95,11 +95,9 @@ Document.prototype.compareMetadatas = function(metadatas) {
 		
 	var metadatasCompared = new Metadata();
 	var metadatasSource   = this.getMetadatas();
-	var thiss = this;
 	for (var metadataKey in metadatas) {
-		var metadataValue = metadatas[metadataKey];
-		if(metadatasSource[metadataKey] != metadataValue)
-			metadatasCompared[metadataKey] = metadataValue;
+		if(metadatasSource[metadataKey] != metadatas[metadataKey])
+			metadatasCompared[metadataKey] = metadatas[metadataKey];
 	}
 	return metadatasCompared;
 }
@@ -116,24 +114,23 @@ Document.prototype.addVersion = function(document) {
 	this.currentVersion++;
 	this.goodVersion++;
 	this.setMetadatas(document.getMetadatas(), this.currentVersion);
-	var thiss = this;
 	if(document.tags.length == 0) {
 		for (var index in this.tags) {
 			var tag = this.tags[index];
 			if(tag.version == thisVersion) {
-				var newTag = new Tag(thiss);
+				var newTag = new Tag(this);
 				newTag.timeStart = tag.getTimeStart();
 				newTag.timeEnd   = tag.getTimeEnd();
-				thiss.addTag(newTag);
+				this.addTag(newTag);
 			}
 		}
 	}
 	else {
 		for (var index in document.tags) {
 			var tag = document.tags[index];
-			tag.version = thiss.currentVersion;
-			tag.document = thiss;
-			thiss.tags.push(tag);
+			tag.version = this.currentVersion;
+			tag.document = this;
+			this.tags.push(tag);
 		}
 	}
 }

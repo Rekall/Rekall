@@ -146,7 +146,6 @@ Utils.joinKeywords = function(vals) {
 Utils.inArray = function(array, check) {
 	var retour = false;
 	for (var variable in array) {
-		var val = array[variable];
 		if(variable == check) {
 			retour = true;
 			return retour;

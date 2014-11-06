@@ -121,6 +121,7 @@ public:
     virtual void addProject(ProjectInterface *project) = 0;
     virtual void removeProject(ProjectInterface *project) = 0;
     virtual void updateGUI() = 0;
+    virtual void syncSettings() = 0;
 };
 
 

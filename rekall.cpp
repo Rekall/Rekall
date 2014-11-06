@@ -159,11 +159,25 @@ void Rekall::checkForUpdatesFinished(QNetworkReply *reply) {
 }
 
 
+void Rekall::syncSettings() {
+    QSettings settings;
+    settings.beginWriteArray("projects");
+    quint16 projectIndex = 0;
+    foreach(ProjectInterface *project, Global::projects) {
+        settings.setArrayIndex(projectIndex++);
+        settings.setValue("name", project->name);
+        settings.setValue("friendlyName", project->friendlyName);
+        settings.setValue("path", project->path.absoluteFilePath());
+    }
+    settings.endArray();
+    settings.sync();
+}
 
 void Rekall::addProject() {
     QFileInfo dirToOpen(QFileDialog::getExistingDirectory(0, tr("Select a folder where you store the files of your creative project"), Global::pathDocuments.absoluteFilePath()));
     if(dirToOpen.exists()) {
         addProject(new Project(dirToOpen.baseName(), dirToOpen.baseName(), true, dirToOpen, this));
+        syncSettings();
         showMessage(tr("Rekall is analysing your project %1…").arg(dirToOpen.baseName()));
     }
 }
@@ -185,6 +199,7 @@ void Rekall::removeProject(ProjectInterface *project) {
     trayMenu->removeAction(project->trayMenuSeparator);
     Global::projects.removeOne(project);
     project->isRemoved = true;
+    syncSettings();
     updateGUI();
 }
 void Rekall::updateGUI() {
@@ -235,17 +250,7 @@ void Rekall::openWebPage() {
 }
 void Rekall::closeRekall() {
     Global::analyse->stop();
-    QSettings settings;
-    settings.beginWriteArray("projects");
-    quint16 projectIndex = 0;
-    foreach(ProjectInterface *project, Global::projects) {
-        settings.setArrayIndex(projectIndex++);
-        settings.setValue("name", project->name);
-        settings.setValue("friendlyName", project->friendlyName);
-        settings.setValue("path", project->path.absoluteFilePath());
-    }
-    settings.endArray();
-    settings.sync();
+    syncSettings();
     QApplication::exit();
 }
 

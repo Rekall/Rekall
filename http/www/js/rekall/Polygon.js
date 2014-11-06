@@ -33,9 +33,8 @@ Polygon.prototype.clear = function() {
 Polygon.prototype.toPath = function() {
 	var path = "";
 	for (var index in this.points) {
-		var point = this.points[index];
-		if(index == 0)  path += Utils.movePath(point);
-		else			path += Utils.linePath(point);
+		if(index == 0)  path += Utils.movePath(this.points[index]);
+		else			path += Utils.linePath(this.points[index]);
 	}
 	return path;
 }

@@ -49,9 +49,8 @@ function Map() {
 			//Déselectionne les tags hors du bounds
 			thiss.filtredTags = new Array();
 			for (var index in thiss.markers) {
-				var marker = thiss.markers[index];
-				if ((thiss.map.getBounds()) && (thiss.map.getBounds().contains(marker.getPosition())))
-					thiss.filtredTags.push(marker.rekall.tag);
+				if ((thiss.map.getBounds()) && (thiss.map.getBounds().contains(thiss.markers[index].getPosition())))
+					thiss.filtredTags.push(thiss.markers[index].rekall.tag);
 				//marker.rekall.tag.update();
 				rekall.analyse(false);
 			}
