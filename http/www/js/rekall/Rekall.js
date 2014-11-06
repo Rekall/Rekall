@@ -327,14 +327,17 @@ Rekall.prototype.start = function() {
 			window.document.title = rekall.timeline.bar.timeCurrent;
 		}
 		else if(e.keyCode == 82) {
-			$.each(rekall.project.sources, function(key, source) {
-				$.each(source.documents, function(key, document) {
-			  	  $.each(document.tags, function(key, tag) {
+			for (var key in rekall.project.sources) {
+				var source = rekall.project.sources[key];
+				for (var key in source.documents) {
+					var document = source.documents[key];
+					for (var key in document.tags) {
+						var tag = document.tags[key];
 						tag.timeStart = random(0, 100);
 						tag.timeEnd   = tag.timeStart + random(0, 20);
-					});
-			    });
-			});
+					}
+			    }
+			}
 			rekall.analyse(true);
 		}
 	});
@@ -371,15 +374,17 @@ Rekall.prototype.start = function() {
 		rekall.mousePressedPos  = rekall.timeline.getPointerPosition();
 		rekall.mousePressedTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.mousePressedPos.x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
 		
-		$.each(Tags.selectedTags, function(index, tag) {
+		for (var index in Tags.selectedTags) {
+			var tag = Tags.selectedTags[index];
 			tag.timeStartMouse = tag.timeStart;
 			tag.timeEndMouse   = tag.timeEnd;
-		});
+		}
 
 		rekall.mousePressedMode = "";
 		if(Tags.selectedTags.length)
 			rekall.mousePressedMode = "move";
-		$.each(Tags.selectedTags, function(index, tag) {
+		for (var index in Tags.selectedTags) {
+			var tag = Tags.selectedTags[index];
 			var tagCenter = tag.getTimeStart() + (tag.getTimeEnd() - tag.getTimeStart())/2;
 			var tagDurationTolerence = max((tag.getTimeEnd() - tag.getTimeStart()) * 0.15, 0.2);
 			if(((tagCenter - tagDurationTolerence/2) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tagCenter + tagDurationTolerence/2)))
@@ -389,7 +394,7 @@ Rekall.prototype.start = function() {
 				rekall.mousePressedMode = "resizeL";
 			else if(((tag.getTimeEnd()   - tagDurationTolerence) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tag.getTimeEnd()   + tagDurationTolerence)))
 				rekall.mousePressedMode = "resizeR";
-		});
+		}
 
 		rekall.mousePressed = true;
 		
@@ -411,22 +416,26 @@ Rekall.prototype.start = function() {
 		var hoveredTagOld = Tags.hoveredTag;
 		Tags.hoveredTag = undefined;
 		if((rekall.project) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0)) {
-			$.each(rekall.project.sources, function(key, source) {
-				$.each(source.documents, function(key, document) {
-			  	  $.each(document.tags, function(key, tag) {
+			for (var key in rekall.project.sources) {
+				var source = rekall.project.sources[key];
+				for (var key in source.documents) {
+					var document = source.documents[key];
+					for (var key in document.tags) {
+						var tag = document.tags[key];
 						if((Tags.hoveredTag == undefined) && (tag.isVisible()) && (tag.rect.contains(pos))) {
 							Tags.hoveredTag = tag;
 						}
-					});
-			    });
-			});
+					}
+			    }
+			}
 		}
 		
 		if((rekall.mousePressed) && (Tags.selectedTags.length) && (rekall.sortings["horizontal"].metadataKey == "Time")) {
 			//Déplacement
 			rekall.mouseMoveTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.timeline.getPointerPosition().x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
 
-			$.each(Tags.selectedTags, function(index, tag) {
+			for (var index in Tags.selectedTags) {
+				var tag = Tags.selectedTags[index];
 				if     (rekall.mousePressedMode == "resizeL")
 					tag.setTimeStart(constrain(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime), tag.timeEnd));
 				else if(rekall.mousePressedMode == "resizeR")
@@ -440,7 +449,7 @@ Rekall.prototype.start = function() {
 
 				//Update
 				tag.projectChangedXml = "<tag key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>";
-			});
+			}
 			rekall.analyse(false);
 			rekall.timeline.tagLayer.draw();
 		}
@@ -474,24 +483,28 @@ Rekall.prototype.start = function() {
 					Tags.addOne(Tags.hoveredTag, true);
 				}
 				else if(rekall.timeline.selectionLayer.path.polygon.points.length > 0) {
-					$.each(rekall.project.sources, function(key, source) {
-						$.each(source.documents, function(key, document) {
-					    	$.each(document.tags, function(key, tag) {
+					for (var key in rekall.project.sources) {
+						var source = rekall.project.sources[key];
+						for (var key in source.documents) {
+							var document = source.documents[key];
+							for (var key in document.tags) {
+								var tag = document.tags[key];
 								if((tag.isVisible()) && (tag.isSelectable) && (rekall.timeline.selectionLayer.path.polygon.contains(tag.rect.getPosition())))
 									Tags.add(tag, true);
-								});
-				    		});
-						});
+							}
+				    	}
+					}
 				}
 			}
 			else {
 				var projectChangedXml = "";
-				$.each(Tags.selectedTags, function(index, tag) {
+				for (var index in Tags.selectedTags) {
+					var tag = Tags.selectedTags[index];
 					if((tag.projectChangedXml) && (tag.projectChangedXml.length)) {
 						projectChangedXml += tag.projectChangedXml + "\n";
 						tag.projectChangedXml = undefined;
 					}
-				});
+				}
 				if(projectChangedXml.length)
 					rekall.projectChanged(projectChangedXml);
 			}

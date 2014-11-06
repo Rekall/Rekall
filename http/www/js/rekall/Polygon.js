@@ -32,10 +32,11 @@ Polygon.prototype.clear = function() {
 }
 Polygon.prototype.toPath = function() {
 	var path = "";
-	$.each(this.points, function(index, point) {
+	for (var index in this.points) {
+		var point = this.points[index];
 		if(index == 0)  path += Utils.movePath(point);
 		else			path += Utils.linePath(point);
-	});
+	}
 	return path;
 }
 Polygon.prototype.contains = function(pt) {

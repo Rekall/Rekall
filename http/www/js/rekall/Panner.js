@@ -130,7 +130,8 @@ Panner.prototype.show = function(filter, bounds) {
 		this.markers = new Array();
 	}
 	var scrollTo = undefined;
-	$.each(this.thumbnails, function(category, contents) {
+	for (var category in this.thumbnails) {
+		var contents = this.thumbnails[category];
 		if((recreateGallery) && (contents.thumbnails.length)) {
 			var target = "#panner-gallery1";
 			var categoryVerbose = contents.category.categoryVerbose;
@@ -141,17 +142,16 @@ Panner.prototype.show = function(filter, bounds) {
 			$(target).append("<h1 style='color: " + contents.category.color + "'>" + categoryVerbose + "</h1>");
 		}
 		
-		$.each(contents.thumbnails, function(index, thumbnail) {
+		for (var index in contents.thumbnails) {
+			var thumbnail = contents.thumbnails[index];
 			thiss.filtredTags.push(thumbnail.tag);		
 			if(recreateGallery) {
 				$(target).append(function() {
 					var dom = "";
 
-					if(thumbnail.url != undefined)
-						dom = $("<div class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
-					else
-						dom = $("<div class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
-						
+					if(thumbnail.url != undefined)	dom = $("<div class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
+					else							dom = $("<div class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
+
 					dom.mouseenter(function(event) {
 						if(!Tags.isStrong) {
 							thiss.recreateGallery = false;
@@ -191,8 +191,8 @@ Panner.prototype.show = function(filter, bounds) {
 				if(add)	thumbnail.dom.show();
 				else	thumbnail.dom.hide();
 			}
-		});
-	});
+		}
+	}
 	if(filter == undefined)
 		this.hidePhoto();
 	else if((filter.length == 1) && (Tags.isStrong)) {

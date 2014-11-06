@@ -120,10 +120,11 @@ Sorting.prototype.analyseStart = function(tags) {
 		this.valMin = 0;
 	else {
 		this.categoriesIndex = 0;
-		$.each(this.categories, function(key, category) {
+		for (var key in this.categories) {
+			var category = this.categories[key];
 			category.shoudBeRemoved = true;
 			category.tags = new Array();
-		});
+		}
 	}
 }
 Sorting.prototype.analyseAdd = function(tag, metadata, alwaysIncludeTags, useThisInsteadOfValue) {
@@ -193,14 +194,15 @@ Sorting.prototype.analyseAdd = function(tag, metadata, alwaysIncludeTags, useThi
 Sorting.prototype.analyseEnd = function(minTagCount) {
 	var thiss = this;
 	this.categoriesIndex = 0;
-	$.each(this.categories, function(key, category) {
+	for (var key in this.categories) {
+		var category = this.categories[key];
 		if((minTagCount != undefined) && (category.tags.length <= minTagCount))
 			category.shoudBeRemoved = true;
 		if(category.shoudBeRemoved)
 			delete thiss.categories[key];
 		else
 			thiss.categoriesIndex++;
-    });
+    }
 
 
 	//Echelle Linéaire
@@ -237,13 +239,15 @@ Sorting.prototype.analyseEnd = function(minTagCount) {
 				categoriesTmp[metadata].categoryVerbose = round(val, decimals);
 			
 			if((this.metadataKey != undefined) && (this.metadataKey != "Time")) {
-				$.each(this.categories, function(key, category) {
-					$.each(category.tags, function(index, tag) {
+				for (var key in this.categories) {
+					var category = this.categories[key];
+					for (var index in category.tags) {
+						var tag = category.tags[index];
 						var valCompare = parseFloat(thiss.parseMeta(tag.getMetadata(thiss.metadataKey)).substr(1));
 						if((val <= valCompare) && (valCompare < (val+valStep)))
 							categoriesTmp[metadata].tags.push(tag);
-					});
-			    });
+					}
+			    }
 			}
 		}
 		this.categories = categoriesTmp;
@@ -252,18 +256,17 @@ Sorting.prototype.analyseEnd = function(minTagCount) {
 		this.categories = Utils.sortObj(this.categories, this.valAreFloats);
 		if(this.analyse) {
 			console.log("----------------------------------------------------------------");
-			$.each(this.categories, function(key, category) {
+			for (var key in this.categories)
 				console.log(key);
-			});
 		}
 		
 		
 		var categoryNewIndex = 0;
 		var categoryTagsCount = 0;
-		$.each(this.categories, function(key, category) {
-			categoryTagsCount += category.tags.length;
-	    });
-	    $.each(this.categories, function(key, category) {
+		for (var key in this.categories)
+			categoryTagsCount += this.categories[key].tags.length;
+		for (var key in this.categories) {
+			var category = this.categories[key];
 			category.index = categoryNewIndex++;
 			category.size  = thiss.categoriesIndex;
 			if(key == Sorting.prefix)
@@ -275,7 +278,7 @@ Sorting.prototype.analyseEnd = function(minTagCount) {
 				category.color = category.color.setAlpha(0.2);
 			if(thiss.valAreDates)
 				category.categoryVerbose = moment(category.categoryRaw, "YYYY:MM:DD HH:mm:ss", true).format(thiss.metadataKeyPortion.dateFormat);
-		});
+		}
 	}
 }
 

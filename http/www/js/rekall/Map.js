@@ -114,16 +114,15 @@ Map.prototype.show = function(markers, filter, bounds) {
 	}
 	
 	//Clear les marqueurs
-	for(var i = 0 ; i < this.markers.length ; i++)
-	$.each(this.markers, function(index, marker) {
-        thiss.markers[i].setMap(null);
-	});
+	for (var index in this.markers)
+        this.markers[index].setMap(null);
 	this.markers = new Array();
 	
 	if(markers.length) {
 	    this.bounds  = new google.maps.LatLngBounds();
 		//Parcours les nouveaux marqueur à afficher
-		$.each(markers, function(index, markerTmp) {
+		for (var index in markers) {
+			var markerTmp = markers[index];
 			var opacity = opacityFactor;
 			if((filter != undefined) && (filter != markerTmp.tag))
 				opacity = 0.3;
@@ -154,7 +153,7 @@ Map.prototype.show = function(markers, filter, bounds) {
 				thiss.infowindow.setContent(markerTmp.tag.getMetadata("Rekall->Name"));
 				//thiss.infowindow.open(thiss.map, marker);
 			}
-		});
+		}
 	}
 	this.resize(undefined, bounds);
 }

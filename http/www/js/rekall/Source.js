@@ -48,12 +48,14 @@ Source.prototype.addDocument = function(document) {
 }
 Source.prototype.getDocument = function(path) {
 	var retour = undefined;
-	$.each(this.documents, function(key, document) {
-		$.each(document.tags, function(key, tag) {
+	for (var key in this.documents) {
+		var document = this.documents[key];
+		for (var key in document.tags) {
+			var tag = document.tags[key];
 			if((retour == undefined) && (Utils.getLocalFilePath(tag).toLowerCase() == path.toLowerCase()))
 				retour = tag.document;
-		});
-	});
+		}
+	}
 	return retour;
 }
 
@@ -65,12 +67,13 @@ Source.prototype.mapPath = function(path) {
 }
 Source.prototype.addMapping = function(path1, path2) {
 	var path1Exists = false, path2Exists = false;;
-	$.each(this.mapping, function(pathSrc, pathDst) {
+	for (var pathSrc in this.mapping) {
+		var pathDst = this.mapping[pathSrc];
 		if((pathSrc == path1) || (pathDst == path1))
 			path1Exists = true;
 		if((pathSrc == path2) || (pathDst == path2))
 			path2Exists = true;
-	});
+	}
 	if(!((path1Exists) && (path2Exists))) {
 		if((this.mapping[path1] != undefined) && (this.mapping[path2] == undefined))
 			this.mapping[path2] = path1;

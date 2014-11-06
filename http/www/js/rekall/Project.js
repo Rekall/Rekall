@@ -34,10 +34,10 @@ Project.prototype.addDocument = function(key, document) {
 }
 Project.prototype.getDocument = function(path) {
 	var retour = undefined;
-	$.each(this.sources, function(key, source) {
+	for (var key in this.sources) {
 		if(retour == undefined)
-			retour = source.getDocument(path);
-	});
+			retour = this.sources[key].getDocument(path);
+	}
 	return retour;
 }
 
@@ -84,10 +84,11 @@ Project.prototype.loadXML = function(xml) {
 		var version   = $(this).attr('version');
 		var timeStart = $(this).attr('timeStart') + 0.;
 		var timeEnd   = $(this).attr('timeEnd')   + 0.;
-		$.each(thiss.sources["Files"].documents[key].tags, function(index, tag) {
+		for (var index in thiss.sources["Files"].documents[key].tags) {
+			var tag = thiss.sources["Files"].documents[key].tags[index];
 			tag.setTimeStart(parseFloat(timeStart));
 			tag.setTimeEnd(parseFloat(timeEnd));
-		});
+		}
 	});
 	/*
 	xml.find('event').each(function() {
@@ -114,9 +115,13 @@ Project.prototype.analyse = function(full) {
 		rekall.sortings["corpus"]    .analyseStart();
 		rekall.sortings["horizontal"].analyseStart();
 		rekall.sortings["vertical"].analyseStart();
-	    $.each(this.sources, function(key, source) {
-		    $.each(source.documents, function(key, document) {
-			    $.each(document.tags, function(key, tag) {
+		for (var key in this.sources) {
+			var source = this.sources[key];
+			for (var key in source.documents) {
+				var document = source.documents[key];
+				for (var key in document.tags) {
+					var tag = document.tags[key];
+					
 					//Filtrage
 					var isOk = true;
 					if((false) && (!tag.isGoodVersion()))
@@ -125,11 +130,12 @@ Project.prototype.analyse = function(full) {
 					//Recherche forcée
 					if(isOk) {
 						var isOkTmp = false;
-						$.each(tag.document.getMetadatas(), function(metadataKey, metadataValue) {
+						for (var metadataKey in tag.document.getMetadatas()) {
+							var metadataValue = tag.document.getMetadatas()[metadataKey];
 							isOkTmp |= rekall.sortings["search"].analyseAdd(tag, metadataValue, false, Sorting.prefix + metadataKey.replace("->", " / "));
 							if((metadataValue != "") && (metadataValue != undefined))
 								isOkTmp |= rekall.sortings["search"].analyseAdd(tag, metadataKey, false, Sorting.prefix + metadataKey.replace("->", " / "));
-						});
+						}
 						isOk &= isOkTmp;
 					}
 
@@ -138,9 +144,8 @@ Project.prototype.analyse = function(full) {
 						//Listing de mots-clefs
 						var keywords = Utils.splitKeywords(tag.getMetadata("Rekall->Keywords"), false);
 						var isOkTmp = false;
-						$.each(keywords, function(index, keyword) {
-							isOkTmp |= rekall.sortings["keywords"].analyseAdd(tag, keyword);
-						});
+						for (var index in keywords)
+							isOkTmp |= rekall.sortings["keywords"].analyseAdd(tag, keywords[index]);
 						isOk &= isOkTmp;
 
 						isOk &= rekall.sortings["authors"] .analyseAdd(tag);
@@ -164,9 +169,9 @@ Project.prototype.analyse = function(full) {
 					}
 					else
 						tag.setVisible(false);
-				});
-			});
-		});
+				}
+			}
+		}
 		rekall.sortings["vertical"]  .analyseEnd();
 		rekall.sortings["groups"]    .analyseEnd();
 		rekall.sortings["authors"]   .analyseEnd();
@@ -222,39 +227,44 @@ Project.prototype.analyse = function(full) {
 		availableMetadatas.sort();
 		
 		var availableMetadatas2 = new Array();
-		$.each(availableMetadatas, function(index, metadata) {
+		for (var index in availableMetadatas) {
+			var metadata = availableMetadatas[index];
 			if(metadata.startsWith("Rekall->"))
 				availableMetadatas2.push(metadata);
-		});
-		$.each(availableMetadatas, function(index, metadata) {
+		}
+		for (var index in availableMetadatas) {
+			var metadata = availableMetadatas[index];
 			if(!metadata.startsWith("Rekall->"))
 				availableMetadatas2.push(metadata);
-		});
+		}
 		
 		var availableMetadatasSorted = new Object();
-		$.each(availableMetadatas2, function(index, metadata) {
-			var metadataSplit = metadata.split("->");
+		for (var index in availableMetadatas2) {
+			var metadataSplit = availableMetadatas2[index].split("->");
 			if(availableMetadatasSorted[metadataSplit[0]] == undefined)
 				availableMetadatasSorted[metadataSplit[0]] = new Array();
 			availableMetadatasSorted[metadataSplit[0]].push(metadataSplit[1]);
-		});
+		}
 
 		var availableMetadatasHtml = "";
-		$.each(availableMetadatasSorted, function(category, metadatas) {
+		for (var category in availableMetadatasSorted) {
+			var metadatas = availableMetadatasSorted[category];
 			if(category == "Rekall")
 				availableMetadatasHtml += "<li><b>" + category + "</b>";
 			else
 				availableMetadatasHtml += "<li>" + category + "s";
 			availableMetadatasHtml += "<ul>";
-			$.each(metadatas, function(index, metadata) {
+			for (var index in metadatas) {
+				var metadata = metadatas[index];
 				var metadataKey = category + "->" + metadata;
 				availableMetadatasHtml += "<li metadataKey='" + metadataKey + "'>" + metadata + "</li>";
-			});
+			}
 			availableMetadatasHtml += "</ul>";
 			availableMetadatasHtml += "</li>";
-		});
+		}
 		
-		$.each(rekall.sortings, function(keyword, sorting) {
+		for (var keyword in rekall.sortings) {
+			var sorting = rekall.sortings[keyword];
 			var extraChoice = "";
 			if(keyword == "horizontal")
 				extraChoice = "<li metadataKey='Time'>Time</li>"
@@ -271,7 +281,8 @@ Project.prototype.analyse = function(full) {
 				var html = "", postHtml = "";
 				htmlDom.html(html + postHtml);
 				if((sorting != rekall.sortings["search"]) || ((sorting == rekall.sortings["search"]) && (rekall.sortings["search"].metadataSearch != ""))) {
-					$.each(sorting.categories, function(key, category) {
+					for (var key in sorting.categories) {
+						var category     = sorting.categories[key];
 						var value        = category.category;
 						var percentage   = category.tags.length / category.tagsSize
 						var valueVerbose = category.categoryVerbose;
@@ -308,11 +319,11 @@ Project.prototype.analyse = function(full) {
 							}
 							html += "<div class='tab_list_item " + ((!category.visible)?("invisible'"):("visible")) + "'><label><input class='tab_list_item_check' type='checkbox'" + ((category.checked)?("checked"):("")) + "/><span></span>" + valueDisplayed + "</label>" + percentageDiv + "<div class='tab_list_item_category invisible'>" + value + "</div></div>";
 						}
-					});
+					}
 				}
 				htmlDom.html(html + postHtml);
 			}
-		});
+		}
 	
 		$(".tag_metadatas_menu").menu();
 		$(".tab_choice_toggle").click(function() {
@@ -356,14 +367,15 @@ Project.prototype.analyse = function(full) {
 			$(this).addClass("selected");
 			if(actions != undefined) {
 				var actionsList = actions.split(";");
-				$.each(actionsList, function(index, action) {
+				for (var index in actionsList) {
+					var action     = actionsList[index];
 					var actionList = action.split("=");
 					if(action.length > 1) {
 						var sorting = actionList[0].trim();
 						var metadataKey = actionList[1].trim();
 						rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);
 					}
-				});
+				}
 			}
 		});
 		$("#tag_workspaces_menu li").unbind("dblclick");
@@ -381,10 +393,11 @@ Project.prototype.analyse = function(full) {
 			var category = $(this).parent().parent().find(".tab_list_item_category").text();
 			var value = $(this).prop('checked'), valueBefore = !value;
 			if(event.shiftKey) {
-				$.each(sorting.categories, function(key, sortingCategory) {
+				for (var key in sorting.categories) {
+					var sortingCategory = sorting.categories[key];
 					if(sortingCategory.category == category)	sortingCategory.checked = value;
 					else										sortingCategory.checked = !value;
-				});
+				}
 			}
 			else		
 				sorting.categories[category].checked = value;
@@ -424,7 +437,8 @@ Project.prototype.analyse = function(full) {
 	}
 	//Étiquettes horizontales
 	var alternate = 0;
-	$.each(rekall.sortings["horizontal"].categories, function(key, horizontalSortingCategory) {
+	for (var key in rekall.sortings["horizontal"].categories) {
+		var horizontalSortingCategory    = rekall.sortings["horizontal"].categories[key];
 		var horizontalSortingCategoryPos = rekall.sortings["horizontal"].positionFor(undefined, horizontalSortingCategory.index);
 		if(horizontalSortingCategory.rectAlternate == undefined) {
 			horizontalSortingCategory.rectAlternate = new Kinetic.Rect({
@@ -450,7 +464,7 @@ Project.prototype.analyse = function(full) {
 			rekall.timeline.timeLayer.group.add(horizontalSortingCategory.categoryText);
 		horizontalSortingCategory.categoryText.setPosition({x: horizontalSortingCategoryPos.x+5, y: 9});
 		horizontalSortingCategory.categoryText.setText(horizontalSortingCategory.categoryVerbose);
-	});
+	}
 
 
 	//Disposition des tags + étiquettes
@@ -462,7 +476,8 @@ Project.prototype.analyse = function(full) {
 	var bounds = {x: 0, y: 0};
 	var xMax = 0, y = 0, alternate = 0;
 	var yMaxGroupSortingCategory = 0;
-	$.each(rekall.sortings["groups"].categories, function(key, groupSortingCategory) {
+	for (var key in rekall.sortings["groups"].categories) {
+		var groupSortingCategory = rekall.sortings["groups"].categories[key];
 		if(full != false) {
 			if(groupSortingCategory.verticalSorting == undefined)
 				groupSortingCategory.verticalSorting = new Sorting();
@@ -470,22 +485,23 @@ Project.prototype.analyse = function(full) {
 	
 			if(full != false) {
 				groupSortingCategory.verticalSorting.analyseStart();
-				$.each(groupSortingCategory.tags, function(key, tag) {
-					groupSortingCategory.verticalSorting.analyseAdd(tag);
-				});
+				for (var key in groupSortingCategory.tags)
+					groupSortingCategory.verticalSorting.analyseAdd(groupSortingCategory.tags[key]);
 				groupSortingCategory.verticalSorting.analyseEnd();
 			}
 		}
 	
-		$.each(groupSortingCategory.verticalSorting.categories, function(key, verticalSortingCategory) {
-			$.each(verticalSortingCategory.tags, function(key, tag) {
+		for (var key in groupSortingCategory.verticalSorting.categories) {
+			var verticalSortingCategory = groupSortingCategory.verticalSorting.categories[key];
+			for (var key in verticalSortingCategory.tags) {
+				var tag = verticalSortingCategory.tags[key];
 				var dimensions = rekall.sortings["horizontal"].positionFor(tag);
 				tag.rect.x      = dimensions.x;
 				tag.rect.y      = 0;
 				tag.rect.width  = dimensions.width;
 				tag.rect.height = Tag.tagHeight;
-			});
-		});
+			}
+		}
 	
 		//Label de groupe
 		if((groupSortingCategory.rect == undefined) || (full != false)) {
@@ -517,7 +533,8 @@ Project.prototype.analyse = function(full) {
 
 		//Affectation du placement
 		var yMaxVerticalSortingCategory = 0;
-		$.each(groupSortingCategory.verticalSorting.categories, function(key, verticalSortingCategory) {
+		for (var key in groupSortingCategory.verticalSorting.categories) {
+			var verticalSortingCategory = groupSortingCategory.verticalSorting.categories[key];
 			//Label de catégorie
 			if((verticalSortingCategory.rect == undefined) || (full != false)) {
 				verticalSortingCategory.rect = new Kinetic.Rect({
@@ -564,19 +581,21 @@ Project.prototype.analyse = function(full) {
 				//yMaxVerticalSortingCategory = dimensions.x/5+dimensions.width/5;
 			}
 			var tagsAdded = new Object();
-			$.each(verticalSortingCategory.tags, function(key, tag) {
+			for (var key in verticalSortingCategory.tags) {
+				var tag = verticalSortingCategory.tags[key];
 				if(full != false) {
 					Tags.byTime.push(tag);
 					//Analyse GPS
 					var gpsPosition = {latitude: NaN, longitude: NaN, tag: undefined};
-					$.each(tag.getMetadatas(), function(key, meta) {
+					for (var key in tag.getMetadatas()) {
+						var meta = tag.getMetadatas()[key];
 						if((key.toLowerCase().indexOf("gps") > -1) && (meta.indexOf(",") > -1)) {
 							var metaPos = meta.split(",");
 							gpsPosition.latitude  = parseFloat(metaPos[0]);
 							gpsPosition.longitude = parseFloat(metaPos[1]);
 							gpsPosition.tag	      = tag;
 						}
-					});
+					}
 					if((!isNaN(gpsPosition.latitude)) && (!isNaN(gpsPosition.longitude))) {
 						tag.gpsPosition = gpsPosition;
 						rekall.map.gpsPositions.push(tag.gpsPosition);
@@ -624,7 +643,7 @@ Project.prototype.analyse = function(full) {
 				else
 					tag.setSelected(false, Tags.isStrong);		
 				
-			});
+			}
 			y = yMaxVerticalSortingCategory + Tag.tagHeight + Tag.tagHeight/2;
 			verticalSortingCategory.rect.setHeight(y - verticalSortingCategory.rect.y());
 			verticalSortingCategory.rectAlternate.setHeight(verticalSortingCategory.rect.height());
@@ -632,7 +651,7 @@ Project.prototype.analyse = function(full) {
 
 			yMaxGroupSortingCategory = max(yMaxGroupSortingCategory, y);
 			y += 2;
-		});
+		}
 	
 		y = yMaxGroupSortingCategory;
 		groupSortingCategory.rect.setHeight(y - groupSortingCategory.rect.y());
@@ -641,15 +660,17 @@ Project.prototype.analyse = function(full) {
 		groupSortingCategory.text.moveToTop();
 
 		y += Tag.tagHeight*2;
-	});
+	}
 	rekall.timeline.tagLayer.scrollbars.bounds = bounds;
 
 	
 	//Affectation des couleurs
 	if(full != false) {
 		rekall.panner.thumbnails = new Object();
-		$.each(rekall.sortings["colors"].categories, function(key, colorSortingCategory) {
-			$.each(colorSortingCategory.tags, function(key, tag) {
+		for (var key in rekall.sortings["colors"].categories) {
+			var colorSortingCategory = rekall.sortings["colors"].categories[key];
+			for (var key in colorSortingCategory.tags) {
+				var tag = colorSortingCategory.tags[key];
 				tag.update(colorSortingCategory.color);
 				tag.isSelectable = colorSortingCategory.checked;
 
@@ -668,17 +689,19 @@ Project.prototype.analyse = function(full) {
 						rekall.panner.thumbnails[colorSortingCategory.category] = {category: colorSortingCategory, thumbnails: [], documents: []};
 					rekall.panner.thumbnails[colorSortingCategory.category].thumbnails.push(tag.thumbnail);
 				}
-			});
-		});
+			}
+		}
 	}
 	
 	//Hightlights graphiques au survol ou sélections
-	$.each(rekall.sortings["groups"].categories, function(key, groupSortingCategory) {
+	for (var key in rekall.sortings["groups"].categories) {
+		var groupSortingCategory = rekall.sortings["groups"].categories[key];
 		groupSortingCategory.text.setFill("#F5F8EE");
-		$.each(groupSortingCategory.verticalSorting.categories, function(key, verticalSortingCategory) {
+		for (var key in groupSortingCategory.verticalSorting.categories) {
+			var verticalSortingCategory = groupSortingCategory.verticalSorting.categories[key];
 			verticalSortingCategory.text.setFill("#F5F8EE");
-		});
-	});
+		}
+	}
 
 	
 	//Display meta
@@ -688,7 +711,8 @@ Project.prototype.analyse = function(full) {
 
 	//Highlight / chemins de hightlight
 	rekall.timeline.tagLayer.groupUnderlay.removeChildren();
-	$.each(rekall.sortings["highlight"].categories, function(key, category) {
+	for (var key in rekall.sortings["highlight"].categories) {
+		var category = rekall.sortings["highlight"].categories[key];
 		if(category.category != Sorting.prefix) {
 			if((category.visible) && (category.checked)) {
 				category.path = new Kinetic.Path({
@@ -707,7 +731,8 @@ Project.prototype.analyse = function(full) {
 				var areas = new Object();
 
 				var selected = false;
-				$.each(category.tags, function(key, tag) {
+				for (var key in category.tags) {
+					var tag = category.tags[key];
 					selected |= tag.isSelected();
 					var key = Sorting.prefix + tag.rect.y;
 					if(areas[key] == undefined) {
@@ -715,15 +740,17 @@ Project.prototype.analyse = function(full) {
 						areas[key].rects = new Array();
 					}
 					areas[key].rects.push(tag.rect.adjusted(2));
-				});
+				}
 				areas = Utils.sortObj(areas, true);
 				if(selected)
 					category.path.setOpacity(0.4);
 		
 				var path = "";
 				var aeraPrev = undefined;
-				$.each(areas, function(key, area) {
-					$.each(area.rects, function(index, rect) {
+				for (var key in areas) {
+					var area = areas[key];
+					for (var index in area.rects) {
+						var rect = area.rects[index];
 						if(aeraPrev == undefined) {
 							path += Utils.movePath(rect.getBottomLeft());
 							path += Utils.linePath(rect.getTopLeft());
@@ -732,13 +759,14 @@ Project.prototype.analyse = function(full) {
 							path += Utils.closePath();
 						}
 						if(aeraPrev) {
-							$.each(aeraPrev.rects, function(key, rectPrev) {
+							for (var key in aeraPrev.rects) {
+								var rectPrev = aeraPrev.rects[key];
 								path += Utils.movePath(rectPrev.getBottomLeft());
 								path += Utils.cubicPathLine(rectPrev.getBottomLeft(), rect.getTopLeft());
 								path += Utils.linePath(rect.getTopRight());
 								path += Utils.cubicPathLine(rect.getTopRight(), rectPrev.getBottomRight());
 								path += Utils.closePath();
-							});
+							}
 							path += Utils.movePath(rect.getBottomLeft());
 							path += Utils.linePath(rect.getTopLeft());
 							path += Utils.linePath(rect.getTopRight());
@@ -747,18 +775,19 @@ Project.prototype.analyse = function(full) {
 						}
 						path += " M" + (rect.getBottomLeft().x-5)  + "," + (rect.getCenter().y);
 						path += " L" + (rect.getBottomRight().x+5) + "," + (rect.getCenter().y);
-					});
+					}
 					aeraPrev = area;
-				});
+				}
 				path += Utils.closePath();
 				category.path.setData(path);
 			}
 		}
-	});	
+	}
 	
 	//Duplicates
 	if(true) {
-		$.each(rekall.sortings["hashes"].categories, function(key, category) {
+		for (var key in rekall.sortings["hashes"].categories) {
+			var category = rekall.sortings["hashes"].categories[key];
 			if((category.visible) && (category.checked)) {
 				category.path = new Kinetic.Path({
 					stroke: 			'#FFFFFF',
@@ -785,7 +814,7 @@ Project.prototype.analyse = function(full) {
 				if(selected)
 					category.path.setOpacity(1);
 			}
-		});	
+		}
 	}
 	
 	
@@ -798,7 +827,8 @@ Project.prototype.analyse = function(full) {
 		});
 		$("#flattentimeline_items").html("");
 		var counter = 0;
-    	$.each(Tags.byTime, function(key, tag) {
+		for (var key in Tags.byTime) {
+			var tag = Tags.byTime[key];
 			$('#flattentimeline_items').append(function() {
 				var styleColor = "background-color: " + tag.color + ";";
 				var styleColor2 = styleColor;
@@ -828,7 +858,7 @@ Project.prototype.analyse = function(full) {
 			
 				return tag.flattenTimelineDom;
 			});
-		});
+		}
 	}
 	
 	rekall.timeline.bar.updateFlattenTimeline();
