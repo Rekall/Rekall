@@ -141,7 +141,7 @@ Rekall.prototype.start = function() {
 	this.timeline.add(this.timeline.tagLayer);
 	this.timeline.tagLayer.groupUnderlay = new Kinetic.Group({
 		listening: false, 
-		transformsEnabled: 'none',
+		transformsEnabled: 'position',
 	});
 	this.timeline.tagLayer.add(this.timeline.tagLayer.groupUnderlay);
 	this.timeline.tagLayer.group = new Kinetic.Group({

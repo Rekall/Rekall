@@ -785,7 +785,7 @@ Project.prototype.analyse = function(full) {
 	}
 	
 	//Duplicates
-	if(false) {
+	if(true) {
 		for (var key in rekall.sortings["hashes"].categories) {
 			var category = rekall.sortings["hashes"].categories[key];
 			if((category.visible) && (category.checked)) {
