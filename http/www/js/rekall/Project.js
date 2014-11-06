@@ -49,9 +49,11 @@ Project.prototype.loadXML = function(xml) {
 	
 	var thiss = this;
 	var counts = {documents: 0, tags: 0, metadatas: 0};
+	
 	xml.find('document').each(function() {
 		var rekallDoc = new Document();
 		counts.documents++;
+		counts.tags++;
 		/*
 		$(this).find('tags').each(function() {
 			$(this).find('tag').each(function() {
@@ -69,7 +71,6 @@ Project.prototype.loadXML = function(xml) {
 			rekallDocMeta.metadataKey = $(this).attr('ctg');
 			rekallDoc.setMetadata(rekallDocMeta);
 			counts.metadatas++;
-			counts.tags++;
 		});
 		thiss.addDocument("Files", rekallDoc);
 	});
@@ -202,11 +203,9 @@ Project.prototype.analyse = function(full) {
 		rekall.sortings["colors"]   .analyseEnd();
 		rekall.sortings["highlight"].analyseEnd();
 		rekall.sortings["hashes"]   .analyseEnd(1);
-	}
-	
 
-	//Cases à cocher ont changées
-	if(full != false) {
+
+		//Cases à cocher à changer
 		/*
 		var availableMetadatas = new Array();
 		for (var i in Document.availableMetadataKeys)
@@ -422,15 +421,19 @@ Project.prototype.analyse = function(full) {
 			}
 			rekall.analyse();
 		});
-	}
 
-		
-	//Etiquettes horizontales et verticales à refaire
-	if(full != false) {
+
+		//Etiquettes horizontales et verticales à refaire
 		rekall.timeline.gridLayer.group.destroyChildren();
 		rekall.timeline.timeLayer.group.destroyChildren();
+		
+		//Besoins de trier et de classer
+		Tags.byTime = [];
+		rekall.map.gpsPositions = new Array();
 	}
-	//Étiquettes horizontales
+	
+	
+	//Re-génération des étiquettes / grilles
 	var alternate = 0;
 	for (var key in rekall.sortings["horizontal"].categories) {
 		var horizontalSortingCategory    = rekall.sortings["horizontal"].categories[key];
@@ -439,6 +442,7 @@ Project.prototype.analyse = function(full) {
 			horizontalSortingCategory.rectAlternate = new Kinetic.Rect({
 				fill: 		'#4D5355',
 				listening: 	false,
+				transformsEnabled: 'position',
 			});
 		}
 		if(full != false)
@@ -453,6 +457,7 @@ Project.prototype.analyse = function(full) {
 				fontSize: 	9,
 				fontFamily: 'open_sansregular',
 				listening: 	false,
+				transformsEnabled: 'position',
 			});
 		}
 		if(full != false)
@@ -462,11 +467,7 @@ Project.prototype.analyse = function(full) {
 	}
 
 
-	//Disposition des tags + étiquettes
-	if(full != false) {
-		Tags.byTime = [];
-		rekall.map.gpsPositions = new Array();
-	}
+	//Disposition des tags
 	rekall.selectionId++;
 	var bounds = {x: 0, y: 0};
 	var xMax = 0, y = 0, alternate = 0;
@@ -507,6 +508,7 @@ Project.prototype.analyse = function(full) {
 				height: 	10,
 				fill: 		'#4D5355',
 				listening: 	false,
+				transformsEnabled: 'position',
 			});
 			rekall.timeline.gridLayer.group.add(groupSortingCategory.rect);
 		}
@@ -521,6 +523,7 @@ Project.prototype.analyse = function(full) {
 				fontFamily: 'open_sansregular',
 				rotation: 	-90,
 				listening: 	false,
+				transformsEnabled: 'all',
 			});
 			rekall.timeline.gridLayer.group.add(groupSortingCategory.text);
 		}
@@ -539,6 +542,7 @@ Project.prototype.analyse = function(full) {
 					height: 	10,
 					fill: 		'#4D5355',
 					listening: 	false,
+					transformsEnabled: 'position',
 				});
 				rekall.timeline.gridLayer.group.add(verticalSortingCategory.rect);
 			}
@@ -551,6 +555,7 @@ Project.prototype.analyse = function(full) {
 					fill: 		'#4D5355',
 					opacity:    (((alternate++)%2)==0)?(0):(0.2),
 					listening: 	false,
+					transformsEnabled: 'position',
 				});
 				rekall.timeline.gridLayer.group.add(verticalSortingCategory.rectAlternate);
 			}
@@ -563,6 +568,7 @@ Project.prototype.analyse = function(full) {
 					fontSize: 	10,
 					fontFamily: 'open_sansregular',
 					listening: 	false,
+					transformsEnabled: 'position',
 				});
 				rekall.timeline.gridLayer.group.add(verticalSortingCategory.text);
 			}
@@ -777,7 +783,7 @@ Project.prototype.analyse = function(full) {
 	}
 	
 	//Duplicates
-	if(true) {
+	if(false) {
 		for (var key in rekall.sortings["hashes"].categories) {
 			var category = rekall.sortings["hashes"].categories[key];
 			if((category.visible) && (category.checked)) {

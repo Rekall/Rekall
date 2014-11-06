@@ -55,6 +55,7 @@ function Rekall() {
 
 Rekall.prototype.start = function() {
 	this.timeline = new Kinetic.Stage({
+		listening: 			true,
 		container: 			'timeline',
 		transformsEnabled: 	'none',
    	});
@@ -62,28 +63,45 @@ Rekall.prototype.start = function() {
 	this.timeline.shouldRedrawFull = true;
 
 	//Time Layer
-	this.timeline.timeLayer = new Kinetic.Layer();
+	this.timeline.timeLayer = new Kinetic.Layer({
+		listening: 			true,
+		transformsEnabled: 'position',
+	});
 	this.timeline.add(this.timeline.timeLayer);
-	this.timeline.timeLayer.rect = new Kinetic.Rect({ fill: '#373C3F' });
+	this.timeline.timeLayer.rect = new Kinetic.Rect({
+		fill: '#373C3F',
+		listening: 			true,
+		transformsEnabled: 'none',
+	});
 	this.timeline.timeLayer.rect.on("click", function(e) {
 		if(rekall.sortings["horizontal"].metadataKey == "Time")
 			rekall.timeline.bar.rewind(Sorting.timeForPosition(Sorting.unmapPosition(rekall.timeline.getPointerPosition().x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x())));
 	})
 	this.timeline.timeLayer.add(this.timeline.timeLayer.rect);
-	this.timeline.timeLayer.group = new Kinetic.Group();
+	this.timeline.timeLayer.group = new Kinetic.Group({
+		listening: false, 
+		transformsEnabled: 'position',
+	});
 	this.timeline.timeLayer.add(this.timeline.timeLayer.group);
 	
 	//Timeline bar
 	this.timeline.bar = new Timeline();
-	this.timeline.barLayer = new Kinetic.Layer();
+	this.timeline.barLayer = new Kinetic.Layer({
+		listening: false, 
+		transformsEnabled: 'position',
+	});
 	this.timeline.add(this.timeline.barLayer);	
-	this.timeline.barLayer.group = new Kinetic.Group();
+	this.timeline.barLayer.group = new Kinetic.Group({
+		listening: false, 
+		transformsEnabled: 'position',
+	});
 	this.timeline.barLayer.add(this.timeline.barLayer.group);
 	this.timeline.bar.line = new Kinetic.Line({
 		points: 		[NaN, 0, NaN, 0],
 		stroke: 		'#2DCAE1',
 		strokeWidth: 	2,
-		listening: 		false,
+		listening: false, 
+		transformsEnabled: 'none',
 	});
 	this.timeline.barLayer.group.add(this.timeline.bar.line);
 	this.timeline.bar.text = new Kinetic.Text({
@@ -92,56 +110,94 @@ Rekall.prototype.start = function() {
 		fontFamily: 'open_sansregular',
 		fill: 		'#2DCAE1',
 		text: 		"",
-		listening: 	false,
+		listening: false, 
+		transformsEnabled: 'position',
 	});
 	this.timeline.barLayer.group.add(this.timeline.bar.text);
 
 	//Grid Layer
-	this.timeline.gridLayer = new Kinetic.Layer();
+	this.timeline.gridLayer = new Kinetic.Layer({
+		listening: false, 
+		transformsEnabled: 'position',
+	});
 	this.timeline.add(this.timeline.gridLayer);
-	this.timeline.gridLayer.rect = new Kinetic.Rect({ fill: '#373C3F' });
+	this.timeline.gridLayer.rect = new Kinetic.Rect({
+		fill: '#373C3F',
+		listening: false, 
+		transformsEnabled: 'none',
+	});
 	this.timeline.gridLayer.add(this.timeline.gridLayer.rect);
-	this.timeline.gridLayer.group = new Kinetic.Group();
+	this.timeline.gridLayer.group = new Kinetic.Group({
+		listening: false, 
+		transformsEnabled: 'none',
+	});
 	this.timeline.gridLayer.add(this.timeline.gridLayer.group);
 	
 	//Data Layer
-	this.timeline.tagLayer = new Kinetic.Layer();
+	this.timeline.tagLayer = new Kinetic.Layer({
+		listening: false, 
+		transformsEnabled: 'position',
+	});
 	this.timeline.add(this.timeline.tagLayer);
-	this.timeline.tagLayer.groupUnderlay = new Kinetic.Group();
+	this.timeline.tagLayer.groupUnderlay = new Kinetic.Group({
+		listening: false, 
+		transformsEnabled: 'none',
+	});
 	this.timeline.tagLayer.add(this.timeline.tagLayer.groupUnderlay);
-	this.timeline.tagLayer.group = new Kinetic.Group();
+	this.timeline.tagLayer.group = new Kinetic.Group({
+		listening: false, 
+		transformsEnabled: 'position',		
+	});
 	this.timeline.tagLayer.add(this.timeline.tagLayer.group);
 	
 	//Selection layer
-	this.timeline.selectionLayer = new Kinetic.Layer();
+	this.timeline.selectionLayer = new Kinetic.Layer({
+		listening: false, 
+		transformsEnabled: 'position',		
+	});
 	this.timeline.add(this.timeline.selectionLayer);
-	this.timeline.selectionLayer.group = new Kinetic.Group();
+	this.timeline.selectionLayer.group = new Kinetic.Group({
+		listening: false, 
+		transformsEnabled: 'position',		
+	});
 	this.timeline.selectionLayer.add(this.timeline.selectionLayer.group);
 	this.timeline.selectionLayer.path = new Kinetic.Path({
 		stroke:  			'#828382',
-		listening: 			true,
 		dash: 				[5, 5],
 		cornerRadius: 		Tag.tagHeight/3,
+		listening: false, 
+		transformsEnabled: 'position',		
 	});
 	this.timeline.selectionLayer.group.add(this.timeline.selectionLayer.path);
 	this.timeline.selectionLayer.path.polygon = new Polygon();
 	
 	//Scrollbars
 	var stage = this.timeline;
-	this.timeline.tagLayer.scrollbars = new Kinetic.Group();
+	this.timeline.tagLayer.scrollbars = new Kinetic.Group({
+		listening: true, 
+		transformsEnabled: 'none',		
+	});
 	this.timeline.tagLayer.scrollbars.bounds = {x: 1000, y: 0};
-	this.timeline.tagLayer.scrollbars.aeras = new Kinetic.Group();
-	this.timeline.tagLayer.scrollbars.layer = new Kinetic.Layer();
+	this.timeline.tagLayer.scrollbars.aeras = new Kinetic.Group({
+		listening: false, 
+		transformsEnabled: 'none',		
+	});
+	this.timeline.tagLayer.scrollbars.layer = new Kinetic.Layer({
+		listening: true, 
+		transformsEnabled: 'position',		
+	});
 	this.timeline.tagLayer.scrollbars.hscrollArea = new Kinetic.Rect({
 		fill:   'white',
 		opacity: 0.1,
 		listening: false,
+		transformsEnabled: 'position',		
 	});
 	this.timeline.tagLayer.scrollbars.hscroll = new Kinetic.Rect({
 		fill:   'white',
 		cornerRadius: 7,
 		opacity: 0.2,
 		draggable: true,
+		transformsEnabled: 'position',		
 		dragBoundFunc: function(pos) {
 			return {
 				x: constrain(pos.x, rekall.timeline.tagLayer.scrollbars.hscrollArea.x(), rekall.timeline.tagLayer.scrollbars.hscrollArea.width()+rekall.timeline.tagLayer.scrollbars.hscrollArea.x()-rekall.timeline.tagLayer.scrollbars.hscroll.width()),
@@ -153,12 +209,14 @@ Rekall.prototype.start = function() {
 		fill: 	'white',
 		opacity: this.timeline.tagLayer.scrollbars.hscrollArea.opacity(),
 		listening: false,
+		transformsEnabled: 'position',		
 	});
 	this.timeline.tagLayer.scrollbars.vscroll = new Kinetic.Rect({
 		fill:   'white',
 		cornerRadius: this.timeline.tagLayer.scrollbars.hscroll.cornerRadius(),
 		opacity: this.timeline.tagLayer.scrollbars.hscroll.opacity(),
 		draggable: true,
+		transformsEnabled: 'position',		
 		dragBoundFunc: function(pos) {
 			return {
 				x: this.getAbsolutePosition().x,
@@ -415,14 +473,18 @@ Rekall.prototype.start = function() {
 		Tags.hoveredTag = undefined;
 		if((rekall.project) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0)) {
 			for (var keySource in rekall.project.sources) {
-				for (var keyDocument in rekall.project.sources[keySource].documents) {
-					for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
-						var tag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
-						if((Tags.hoveredTag == undefined) && (tag.isVisible()) && (tag.rect.contains(pos))) {
-							Tags.hoveredTag = tag;
+				if(Tags.hoveredTag == undefined) {
+					for (var keyDocument in rekall.project.sources[keySource].documents) {
+						if(Tags.hoveredTag == undefined) {
+							for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
+								if((Tags.hoveredTag == undefined) && (rekall.project.sources[keySource].documents[keyDocument].tags[key].isVisible()) && (rekall.project.sources[keySource].documents[keyDocument].tags[key].rect.contains(pos))) {
+									Tags.hoveredTag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
+									break;
+								}
+							}
 						}
 					}
-			    }
+				}
 			}
 		}
 		
@@ -479,15 +541,11 @@ Rekall.prototype.start = function() {
 					Tags.addOne(Tags.hoveredTag, true);
 				}
 				else if(rekall.timeline.selectionLayer.path.polygon.points.length > 0) {
-					for (var keySource in rekall.project.sources) {
-						for (var keyDocument in rekall.project.sources[keySource].documents) {
-							for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
-								var tag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
-								if((tag.isVisible()) && (tag.isSelectable) && (rekall.timeline.selectionLayer.path.polygon.contains(tag.rect.getPosition())))
-									Tags.add(tag, true);
-							}
-				    	}
-					}
+					for (var keySource in rekall.project.sources)
+						for (var keyDocument in rekall.project.sources[keySource].documents)
+							for (var key in rekall.project.sources[keySource].documents[keyDocument].tags)
+								if((rekall.project.sources[keySource].documents[keyDocument].tags[key].isVisible()) && (rekall.project.sources[keySource].documents[keyDocument].tags[key].isSelectable) && (rekall.timeline.selectionLayer.path.polygon.contains(rekall.project.sources[keySource].documents[keyDocument].tags[key].rect.getPosition())))
+									Tags.add(rekall.project.sources[keySource].documents[keyDocument].tags[key], true);
 				}
 			}
 			else {
