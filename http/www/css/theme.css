@@ -848,11 +848,50 @@ input[type="text"], textarea {
 	text-align: center;
 	border-right:1px solid #000;
 	border-left:1px solid #000;
+	height:40px;
+	background-color:#25292B;
 }
-#middlebar span {
+.middlebar_btn {
 	color: white;
-	margin-right: 20px;
+	margin: 8px 5px;
 	cursor: pointer;
+	width:24px;
+	height:24px;
+	display:inline-block;
+	background-color:rgba(0,0,0,.2);
+	border-radius:20px;
+}
+.middlebar_btn:hover {
+	background-color:#000;
+}
+.middlebar_label {
+	color:#777;
+	margin: 3px 5px;
+	width:100px;
+	line-height:24px;
+	height:24px;
+	display:none;
+	background-color:rgba(0,0,0,.2);
+}
+#timeline-ff {
+	background-image:url("images/icn24-ff.png");
+}
+#timeline-play {
+	background-image:url("images/icn24-play.png");
+}
+#timeline-pause {
+	background-image:url("images/icn24-pause.png");
+}
+#timeline-unzoom {
+	background-image:url("images/icn24-zoomout.png");
+}
+#timeline-zoom {
+	background-image:url("images/icn24-zoomin.png");
+}
+#timeline-transport {
+	display:inline-block;
+	width:200px;
+	height:40px;
 }
 
 

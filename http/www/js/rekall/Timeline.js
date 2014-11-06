@@ -80,6 +80,7 @@ Timeline.prototype.toggle = function() {
 Timeline.prototype.update = function() {
 	if(rekall.sortings["horizontal"].metadataKey == "Time") {
 		if(!rekall.timeline.barLayer.group.visible()) {
+			//$("#timeline-transport").css("opacity","1");
 			$("#timeline-transport").show();
 			rekall.timeline.barLayer.group.setVisible(true);
 		}
@@ -100,6 +101,7 @@ Timeline.prototype.update = function() {
 	}
 	else if(rekall.timeline.barLayer.group.visible()) {
 		rekall.timeline.barLayer.group.setVisible(false);
+		//$("#timeline-transport").css("opacity",".2");
 		$("#timeline-transport").hide();
 		return true;
 	}
