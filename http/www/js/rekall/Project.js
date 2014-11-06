@@ -817,7 +817,7 @@ Project.prototype.analyse = function(full) {
 	
 	
 	//Timeline applatie
-	if((full != false) && (true)) {
+	if((full != false) && (false)) {
 		Tags.byTime.sort(function(a, b) {
 			if(a.timeStart < b.timeStart) return -1;
 			if(a.timeStart > b.timeStart) return 1;

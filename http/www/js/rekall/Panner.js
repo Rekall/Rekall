@@ -54,8 +54,7 @@ function Panner() {
 		}
 	});
 	$("#panner .panzoom").load(function(event) {
-		$(this).css("width" , "auto");
-		$(this).css("height" , "auto");
+		$(this).css("width", "auto").css("height", "auto");
 		var maxWidth = $(this).parent().width();
 		var maxHeight = $(this).parent().height();
 		var ratio = 0;
@@ -124,7 +123,7 @@ Panner.prototype.show = function(filter, bounds) {
 	this.recreateGallery = true;
 	
 	//TODO
-	//return;
+	return;
 	
 	var thiss = this;
 	if(recreateGallery) {

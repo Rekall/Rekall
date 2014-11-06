@@ -124,12 +124,12 @@ Rekall.prototype.start = function() {
 	this.timeline.gridLayer.rect = new Kinetic.Rect({
 		fill: '#373C3F',
 		listening: false, 
-		transformsEnabled: 'none',
+		transformsEnabled: 'position',
 	});
 	this.timeline.gridLayer.add(this.timeline.gridLayer.rect);
 	this.timeline.gridLayer.group = new Kinetic.Group({
 		listening: false, 
-		transformsEnabled: 'none',
+		transformsEnabled: 'position',
 	});
 	this.timeline.gridLayer.add(this.timeline.gridLayer.group);
 	

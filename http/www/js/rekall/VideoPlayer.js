@@ -238,11 +238,7 @@ VideoPlayers.prototype.resize = function(visible) {
 		var thumbX = mainWidth, thumbY = 0;
 		$.each(this.videos, function(playerId, player) {
 			if(playerId == mainPlayerId) {
-				$("#" + playerId).width(mainWidth);
-				$("#" + playerId).height(mainHeight);
-				$("#" + playerId).css("top",  0);
-				$("#" + playerId).css("left", 0);
-				$("#" + playerId).css("z-index", 1);
+				$("#" + playerId).width(mainWidth).height(mainHeight).css("top",  0).css("left", 0).css("z-index", 1);
 			}
 			else {
 				$("#" + playerId).width(thumbWidth);
@@ -255,18 +251,10 @@ VideoPlayers.prototype.resize = function(visible) {
 		});
 		$.each(this.audios, function(playerId, player) {
 			if(playerId == mainPlayerId) {
-				$("#" + playerId).width(mainWidth);
-				$("#" + playerId).height(mainHeight);
-				$("#" + playerId).css("top",  0);
-				$("#" + playerId).css("left", 0);
-				$("#" + playerId).css("z-index", 1);
+				$("#" + playerId).width(mainWidth).height(mainHeight).css("top",  0).css("left", 0).css("z-index", 1);
 			}
 			else {
-				$("#" + playerId).width(thumbWidth);
-				$("#" + playerId).height(audiothumbsHeight);
-				$("#" + playerId).css("top",  thumbY);
-				$("#" + playerId).css("left", thumbX);
-				$("#" + playerId).css("z-index", 1000);
+				$("#" + playerId).width(thumbWidth).height(audiothumbsHeight).css("top",  thumbY).css("left", thumbX).css("z-index", 1000);
 				thumbY += audiothumbsHeight;
 			}
 		});
