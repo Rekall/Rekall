@@ -241,7 +241,8 @@ Tag.displayMetadata = function() {
 				if(($("#previewImage img").attr("src") != Tags.unique().thumbnail.url) && (Tags.unique().thumbnail.url != undefined))
 					$("#previewImage").html("<img src=\"" + Tags.unique().thumbnail.url + "\">");
 				$("#previewImage").show();
-				$("#preview_menu_bar").show();
+				//$("#preview_menu_bar").show();
+				$("#preview_menu_bar").hide();
 			}
 			else {
 				$("#previewImage").hide();

@@ -141,7 +141,7 @@ Rekall.prototype.start = function() {
 	this.timeline.add(this.timeline.tagLayer);
 	this.timeline.tagLayer.groupUnderlay = new Kinetic.Group({
 		listening: false, 
-		transformsEnabled: 'none',
+		transformsEnabled: 'position',
 	});
 	this.timeline.tagLayer.add(this.timeline.tagLayer.groupUnderlay);
 	this.timeline.tagLayer.group = new Kinetic.Group({
@@ -422,6 +422,9 @@ Rekall.prototype.start = function() {
 				}
 			}
 			if(tag != undefined) {
+				console.log(event.pageX);
+				rekall.mouseMoveTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.timeline.getPointerPosition().x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
+				console.log(rekall.mouseMoveTime);
 				console.log(tag);
 				event.preventDefault();
 			}
