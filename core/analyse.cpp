@@ -192,7 +192,9 @@ void AnalyseProcess::getThumbnails() {
                         QString exifKey = exifKeys[0].replace(" ", "") + ":" + exifKeys[1].replace(" ", "");
                         QProcess exifTool;
                         exifTool.setStandardOutputFile(thumbPath + ".jpg");
-#ifdef Q_OS_MAC
+#ifdef Q_OS_WIN
+                        exifTool.start(Global::pathApplication.absoluteFilePath() + "/tools/exiftool.exe", QStringList() << "−b" << "-" + exifKey << file->absoluteFilePath());
+#else
                         exifTool.start(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", QStringList() << "−b" << "-" + exifKey << file->absoluteFilePath());
 #endif
                         exifTool.waitForFinished();
@@ -217,7 +219,9 @@ void AnalyseProcess::getThumbnails() {
         if(!QFileInfo(thumbPath + "_1.jpg").exists()) {
             quint16 thumbsEach = 5, thumbIndex = 1;
             QProcess ffmpegTool;
-#ifdef Q_OS_MAC
+#ifdef Q_OS_WIN
+            ffmpegTool.start(Global::pathApplication.absoluteFilePath() + "/tools/ffmpeg.exe", QStringList() << "-i" << file->absoluteFilePath() << "-f" << "image2" << "-vf" << QString("fps=fps=1/%1").arg(thumbsEach) << thumbPath + "_%d.jpg");
+#else
             ffmpegTool.start(Global::pathApplication.absoluteFilePath() + "/tools/ffmpeg", QStringList() << "-i" << file->absoluteFilePath() << "-f" << "image2" << "-vf" << QString("fps=fps=1/%1").arg(thumbsEach) << thumbPath + "_%d.jpg");
 #endif
             ffmpegTool.waitForFinished();

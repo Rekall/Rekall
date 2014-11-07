@@ -24,15 +24,6 @@
 #include <QStringList>
 #include <QTimer>
 
-#if defined(Q_OS_WIN)
-#include "folderwatcher_win.h"
-#elif defined(Q_OS_MAC)
-#include "folderwatcher_mac.h"
-#elif defined(Q_OS_UNIX)
-#include "folderwatcher_linux.h"
-#endif
-
-
 namespace Mirall {
 
 FolderWatcher::FolderWatcher(const QString &root, QObject *parent)

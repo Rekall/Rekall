@@ -87,9 +87,13 @@ Metadatas Global::getMetadatas(QFileInfo file, ProjectInterface *project, bool d
         QStringList keywords;
 
         //ExifTool
+        QByteArray escape = "\n";
         if(!exifToolProcess) {
             exifToolProcess = new QProcess();
-#ifdef Q_OS_MAC
+#ifdef Q_OS_WIN
+            exifToolProcess->start(Global::pathApplication.absoluteFilePath() + "/tools/exiftool.exe", QStringList() << "-stay_open" << "True" << "-@" << "-");
+            escape = "\r\n";
+#else
             exifToolProcess->start(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", QStringList() << "-stay_open" << "True" << "-@" << "-");
 #endif
             exifToolProcess->waitForStarted();
@@ -104,20 +108,12 @@ Metadatas Global::getMetadatas(QFileInfo file, ProjectInterface *project, bool d
         exifToolProcess->waitForBytesWritten();
 
         QByteArray linesString;
-        while(linesString.endsWith("{ready}\n") == false) {
+        while(linesString.trimmed().endsWith("{ready}") == false) {
             exifToolProcess->waitForReadyRead();
             linesString += exifToolProcess->readAllStandardOutput();
         }
-        /*
-        QProcess exifTool;
-        //QDateTime s = QDateTime::currentDateTime();
-#ifdef Q_OS_MAC
-        exifTool.start(Global::pathApplication.absoluteFilePath() + "/tools/exiftool", QStringList() << "−c" << "%+.6f" << "-d" << "%Y:%m:%d %H:%M:%S" << "-G" << "-t" << file.absoluteFilePath());
-#endif
-        exifTool.waitForFinished();
-        linesString = exifTool.readAllStandardOutput().trimmed();
-         */
-        QStringList lines = QString(linesString).split('\n');
+
+        QStringList lines = QString(linesString).split(escape);
         foreach(const QString &line, lines) {
             QStringList metadatas = line.split('\t');
             if(metadatas.length() > 2) {
@@ -138,7 +134,6 @@ Metadatas Global::getMetadatas(QFileInfo file, ProjectInterface *project, bool d
             }
             //qDebug("\tEXIF %lld ms", s.msecsTo(QDateTime::currentDateTime()));
         }
-
 
         //XAttr
 #ifdef Q_OS_MAC

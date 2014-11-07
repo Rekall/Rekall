@@ -23,6 +23,9 @@
 
 namespace Mirall
 {
+
+class FolderWatcher;
+
 class FolderWatcherPrivate : public QObject
 {
     Q_OBJECT

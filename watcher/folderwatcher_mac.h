@@ -23,6 +23,8 @@
 namespace Mirall
 {
 
+class FolderWatcher;
+
 class FolderWatcherPrivate
 {
 public:

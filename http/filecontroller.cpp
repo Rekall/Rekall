@@ -147,7 +147,7 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
                         response.write(file.read(bytesRange.second - bytesRange.first));
                     }
                     else
-                        qWarning("Byte range error %d %d", bytesRange.first, bytesRange.second);
+                        qWarning("Byte range error %lld %lld", bytesRange.first, bytesRange.second);
                 }
             }
             file.close();

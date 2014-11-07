@@ -45,8 +45,12 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     trayTimer.setInterval(500);
     connect(&trayTimer,    SIGNAL(timeout()), SLOT(trayIconToOnPrivate()));
     connect(&trayTimerOff, SIGNAL(timeout()), SLOT(trayIconToOffPrivate()));
+    QString prefix = "mac";
+#ifdef Q_OS_WIN
+    prefix = "win";
+#endif
     for(quint16 i = 0 ; i <= 17 ; i++)
-        trayIcons << QIcon(QString(":/icons/rekall-menubar-%1.png").arg(i, 2, 10, QChar('0')));
+        trayIcons << QIcon(QString(":/icons/rekall-menubar-%1-%2.png").arg(prefix).arg(i, 2, 10, QChar('0')));
     //rekall-menubar-mini-00
     trayIcon = new QSystemTrayIcon(this);
     trayTimer.start();
@@ -303,6 +307,10 @@ void Rekall::takeScreenshot() {
 #endif
 }
 
-void Rekall::trayActivated(QSystemTrayIcon::ActivationReason) {
+void Rekall::trayActivated(QSystemTrayIcon::ActivationReason r) {
     updateGUI();
+#ifdef Q_OS_WIN
+    if(r == QSystemTrayIcon::Trigger)
+        openWebPage();
+#endif
 }

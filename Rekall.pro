@@ -70,14 +70,12 @@ win32 {
 }
 
 
-HEADERS += core/watcherlocal.h   watcher/folderwatcher.h
-SOURCES += core/watcherlocal.cpp watcher/folderwatcher.cpp
 
 linux {
     HEADERS += watcher/folderwatcher_linux.h
     SOURCES += watcher/folderwatcher_linux.cpp
 }
-win {
+win32 {
     HEADERS += watcher/folderwatcher_win.h
     SOURCES += watcher/folderwatcher_win.cpp
 }
@@ -85,6 +83,9 @@ macx {
     HEADERS += watcher/folderwatcher_mac.h
     SOURCES += watcher/folderwatcher_mac.cpp
 }
+HEADERS += core/watcherlocal.h   watcher/folderwatcher.h
+SOURCES += core/watcherlocal.cpp watcher/folderwatcher.cpp
+
 
 #WebApp
 HEADERS += http/http.h   http/requestmapper.h   http/static.h   http/filecontroller.h   http/udp.h

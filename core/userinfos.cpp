@@ -26,10 +26,10 @@
 UserInfos::UserInfos(QObject *parent)
     : QObject(parent) {
 
-    locationManager = 0;
     weatherManager  = 0;
 
 #ifdef Q_OS_MAC
+    locationManager = 0;
     //start_mac();
 #endif
 
@@ -81,13 +81,11 @@ void UserInfos::getWeatherFinished(QNetworkReply *reply) {
         doc.setContent(reply->readAll());
         QDomElement racine = doc.documentElement();
         QDomNode noeud = racine.firstChild();
-        bool weatherOk = false;
         while(!noeud.isNull()) {
             QDomElement noeudElement = noeud.toElement();
             if(noeudElement.tagName() == "temperature")
                 setInfo("Weather Temperature", QString::number(qFloor(noeudElement.attribute("value").toDouble())));
             else if(noeudElement.tagName() == "weather") {
-                weatherOk = true;
                 QString weatherSky  = noeudElement.attribute("value");
                 weatherSky  = weatherSky.left(1).toUpper() + weatherSky.mid(1).toLower();
                 setInfo("Weather Sky", weatherSky);
