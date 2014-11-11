@@ -116,11 +116,14 @@ void AnalyseProcess::getMetadatas() {
     firstAnalysis = (previousMeta.count() == 0);
 
     file->metadatas = Global::getMetadatas(*file, project);
+    if(file->isBundleForSure()) {
+        file->metadatas["File->File Name"] = file->fileName();
+    }
 
     file->metadatas["File->Hash"] = Global::getFileHash(*file);
 
     //Bundle
-    if(file->isBundle2())
+    if(file->isBundleForSure())
         file->metadatas["Rekall->Flag"] = "Bundle";
     else if(file->isIntoBundle())
         file->metadatas["Rekall->Flag"] = "Bundled File";

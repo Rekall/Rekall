@@ -40,7 +40,7 @@ void WatcherLocal::start() {
 }
 
 const QFileInfoList WatcherLocal::scanFolder(SyncEntry *path, bool returnsOnly) {
-    if((path->exists()) && (path->isDir()) && (!path->absoluteFilePath().contains("rekall_cache"))) {
+    if((path->exists()) && (path->isDir()) && (!path->absoluteFilePath().contains("rekall_cache")) && (!path->isIntoBundle())) {
         QCoreApplication::processEvents();
         QString pathName = path->absoluteFilePath();
         QFileInfoList files = QDir(pathName).entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
@@ -58,21 +58,24 @@ const QFileInfoList WatcherLocal::scanFolder(SyncEntry *path, bool returnsOnly) 
                 fileEntry = new SyncEntry(file);
                 folders[pathName].insert(file.absoluteFilePath(), fileEntry);
             }
-            fileEntry->isInMacOsBundle = path->isBundle2();
+            fileEntry->isInMacOsBundle = path->isBundleForSure() || path->isIntoBundle();
 
-#ifdef Q_OS_MAC
-            if((false) && (fileEntry->isDir())) {
+            if(fileEntry->isDirPure()) {
                 fileEntry->isMacOsBundle = fileEntry->isBundle();
-                if(!fileEntry->isMacOsBundle) {
+                //qDebug("%s\t%d\t%d", qPrintable(fileEntry->absoluteFilePath()), fileEntry->isIntoBundle(), fileEntry->isBundleForSure());
+#ifdef Q_OS_MAC
+                if((false) && (!fileEntry->isMacOsBundle)) {
                     QProcess mdlsTool;
                     mdlsTool.start("mdls", QStringList() << "-name" << "kMDItemContentTypeTree" << file.absoluteFilePath());
                     mdlsTool.waitForFinished();
                     fileEntry->isMacOsBundle = (mdlsTool.readAllStandardOutput().contains("com.apple.package") == true);
                 }
-            }
 #endif
+            }
+            else
+                qDebug("%s\t%d", qPrintable(fileEntry->absoluteFilePath()), fileEntry->isIntoBundle());
 
-            if(fileEntry->isDir())
+            if(fileEntry->isDirPure())
                 scanFolder(fileEntry, returnsOnly);
             else
                 Global::analyse->addToQueue(fileEntry, project);
@@ -123,7 +126,7 @@ void WatcherLocal::directoryChanged(const QString &path) {
                 else
                     log += "\t" + fileCache->baseName();
             }
-            else if(fileNow->isFile()) {
+            else if(fileNow->isFileOrBundle()) {
                 log += "(file new)\t-";
                 fileNow->action = SyncCreate;
                 emit(fileChanged(fileNow));
@@ -141,7 +144,7 @@ void WatcherLocal::directoryChanged(const QString &path) {
             SyncEntry *fileCache = fileCacheIterator.value();
             QString log = "\t-\n";
 
-            if(fileCache->isFile()) {
+            if(fileCache->isFileOrBundle()) {
                 log += "(file rem)\t" + fileCache->baseName();
                 fileCache->action = SyncDelete;
                 emit(fileChanged(fileCache));

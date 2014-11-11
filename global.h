@@ -163,10 +163,10 @@ public:
     UserInfosInterface *userInfos;
     bool isMacOsBundle, isInMacOsBundle;
 public:
-    bool isBundle2()    { return isMacOsBundle; }
-    bool isIntoBundle() { return isInMacOsBundle; }
-    bool isFile2()      { return (( isBundle2()) || (isFile())); }
-    bool isDir2()       { return ((!isBundle2()) && (isDir())); }
+    bool isBundleForSure()  { return isMacOsBundle; }
+    bool isIntoBundle()     { return isInMacOsBundle; }
+    bool isFileOrBundle()   { return (( isBundleForSure()) || (isFile())); }
+    bool isDirPure()        { return ((!isBundleForSure()) && (isDir())); }
 
 public:
     inline const QString parentDir() const { return dir().absolutePath(); }
