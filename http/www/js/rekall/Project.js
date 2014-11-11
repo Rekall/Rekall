@@ -838,7 +838,7 @@ Project.prototype.analyse = function(full) {
 				var styleColor = "background-color: " + tag.color + ";";
 				
 				/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
-				var styleColor2 = "background-color: #3EA8B1;";//styleColor;
+				var styleColor2 = styleColor;//"background-color: #3EA8B1;";
 				var styleImage = "";
 				if(tag.thumbnail.url != undefined) {
 					styleImage = "background-image: url(" + tag.thumbnail.url + ");";//" opacity: 0.5;";

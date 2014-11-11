@@ -1056,12 +1056,12 @@ input[type="text"], textarea {
 }
 
 .flattentimeline_title {
-	font-family:			"open_sanssemibold";
+	font-family:			"open_sansregular";
 	font-size:				10px;
 	left: 					60px;
 	line-height:			50px;
 	height:					50px;
-	color:#727A7F;
+	color:rgba(255,255,255,.5);
 }
 .flattentimeline_subtitle {
 	font-family:			"open_sanslight";
@@ -1099,14 +1099,14 @@ input[type="text"], textarea {
   	-moz-border-radius: 	20px;
   	border-radius: 			20px;
 	
-	background-color:				rgba(0,0,0,.8);
+	background-color:				rgba(0,0,0,1);
 	
 	font-size:				18px;
 	text-align: 			center;
 }
 .flattentimeline_bar {
 	/*width: 			  0%;*/
-	background-color:#1B1D1E;;/*#2DCAE1;*/
+	background-color:#26292B;/*#2DCAE1;*/
 	opacity:1;
 }
 
@@ -1127,4 +1127,8 @@ light
 lighter
 #2C3032
 #2C3033
+
+#727A7F
+
+#959FA5
 */
