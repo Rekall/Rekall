@@ -50,29 +50,30 @@ FileController::FileController(QSettings* settings, const QByteArray &_docroot, 
 void FileController::service(HttpRequest& request, HttpResponse& response, const QByteArray &contentType) {
     QByteArray path = request.getPath();
 
-    /*
-    qDebug("\n\n\nHEADERS");
-    QMapIterator<QByteArray,QByteArray> i(request.getHeaderMap());
-    while (i.hasNext()) {
-        i.next();
-        qDebug("%s = %s", i.key().data(), i.value().data());
-    }
+    if(true) {
+        qDebug("\n\nREQUEST PATH %s", qPrintable(QString(path)));
+        qDebug("\nHEADERS");
+        QMapIterator<QByteArray,QByteArray> i(request.getHeaderMap());
+        while (i.hasNext()) {
+            i.next();
+            qDebug("%s = %s", i.key().data(), i.value().data());
+        }
 
-    qDebug("\nPARAM");
-    i=QMapIterator<QByteArray,QByteArray>(request.getParameterMap());
-    while (i.hasNext()) {
-        i.next();
-        qDebug("%s = %s", i.key().data(), i.value().data());
-    }
+        qDebug("\nPARAM");
+        i=QMapIterator<QByteArray,QByteArray>(request.getParameterMap());
+        while (i.hasNext()) {
+            i.next();
+            qDebug("%s = %s", i.key().data(), i.value().data());
+        }
 
-    qDebug("\nCOOKIES");
-    i=QMapIterator<QByteArray,QByteArray>(request.getCookieMap());
-    while (i.hasNext()) {
-        i.next();
-        qDebug("%s = %s", i.key().data(), i.value().data());
+        qDebug("\nCOOKIES");
+        i=QMapIterator<QByteArray,QByteArray>(request.getCookieMap());
+        while (i.hasNext()) {
+            i.next();
+            qDebug("%s = %s", i.key().data(), i.value().data());
+        }
+        qDebug("\n\n");
     }
-    qDebug("\n\n");
-    */
 
     //Header
     response.setHeader("Accept-Ranges", "bytes");
@@ -112,13 +113,18 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
         if (file.open(QIODevice::ReadOnly)) {
             setContentType(path, response, contentType);
             response.setHeader("Cache-Control", "max-age="+QByteArray::number(maxAge/1000));
+            response.setHeader("Content-Length", file.size());
 
             QPair<qint64, qint64> bytesRange;
             bytesRange.first = bytesRange.second = -1;
             if(request.getHeader("Range").length() > 0) {
                 QStringList bytes = QString(request.getHeader("Range")).replace("bytes=", "").split("-");
-                if(bytes.length() == 2)
+                if(bytes.length() == 2) {
                     bytesRange = qMakePair(bytes.at(0).toLongLong(), bytes.at(1).toLongLong());
+                    if(bytesRange.second <= bytesRange.first)
+                        bytesRange.second = file.size()-1;
+                }
+                qDebug("Byte range ask %lld %lld", bytesRange.first, bytesRange.second);
             }
             if ((file.size() <= maxCachedFileSize) && (bytesRange.first == -1) && (bytesRange.second == -1)) {
                 // Return the file content and store it also in the cache
@@ -142,6 +148,7 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
                 }
                 else {
                     response.setStatus(206, "partial content");
+                    response.setHeader("Content-Range", qPrintable(QString("bytes %1-%2/%3").arg(bytesRange.first).arg(bytesRange.second).arg(file.size())));
                     if((!file.atEnd()) && (!file.error()) && (bytesRange.first < file.size()) && (bytesRange.second < file.size())) {
                         file.seek(bytesRange.first);
                         response.write(file.read(bytesRange.second - bytesRange.first));
@@ -164,6 +171,17 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
                 response.write("404 not found",true);
             }
         }
+
+        if(true) {
+            qDebug("\n\nRESPONSE PATH %s", qPrintable(file.fileName()));
+            qDebug("\nHEADERS");
+            QMapIterator<QByteArray,QByteArray> i(response.getHeaders());
+            while (i.hasNext()) {
+                i.next();
+                qDebug("%s = %s", i.key().data(), i.value().data());
+            }
+        }
+
     }
 }
 
@@ -192,8 +210,8 @@ void FileController::setContentType(QString filename, HttpResponse& response, co
         else {
             MimeCacheEntry entry;
             if (mimeCache.contains(filename)) {
-                qDebug("FileController: Metadatas from cache");
                 entry = mimeCache.value(filename);
+                qDebug("FileController: Metadatas from cache");
             }
             else {
                 entry.mimeType = "";
@@ -205,6 +223,14 @@ void FileController::setContentType(QString filename, HttpResponse& response, co
                 if(metadatas.contains("File->MIME Type")) {
                     entry.mimeType = metadatas["File->MIME Type"];
                     entry.mimeType = entry.mimeType.replace("video/quicktime", "video/mp4");
+                }
+                if(metadatas.contains("File->Extension")) {
+                    if(metadatas["File->Extension"].toLower() == "mp4")
+                        entry.mimeType = "video/mp4";
+                    if(metadatas["File->Extension"].toLower() == "ogv")
+                        entry.mimeType = "video/ogg";
+                    if(metadatas["File->Extension"].toLower() == "webm")
+                        entry.mimeType = "video/webm";
                 }
                 if(metadatas.contains("Rekall->Media Duration (s.)")) {
                     entry.duration = metadatas.value("Rekall->Media Duration (s.)").toDouble();
