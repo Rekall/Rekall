@@ -49,8 +49,9 @@ FileController::FileController(QSettings* settings, const QByteArray &_docroot, 
 
 void FileController::service(HttpRequest& request, HttpResponse& response, const QByteArray &contentType) {
     QByteArray path = request.getPath();
+    bool debug = false;
 
-    if(true) {
+    if(debug) {
         qDebug("\n\nREQUEST PATH %s", qPrintable(QString(path)));
         qDebug("\nHEADERS");
         QMapIterator<QByteArray,QByteArray> i(request.getHeaderMap());
@@ -108,6 +109,23 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
         }
         // Try to open the file
         path = docroot + path;
+        if(!QFileInfo(path).exists()) {
+            if(path.endsWith(".mp4")) {
+                QByteArray pathTmp = path.left(path.length()-4);
+                if(QFileInfo(pathTmp).exists())
+                    path = pathTmp;
+            }
+            else if(path.endsWith(".ogv")) {
+                QByteArray pathTmp = path.left(path.length()-4);
+                if(QFileInfo(pathTmp).exists())
+                    path = pathTmp;
+            }
+            else if(path.endsWith(".webm")) {
+                QByteArray pathTmp = path.left(path.length()-4);
+                if(QFileInfo(pathTmp).exists())
+                    path = pathTmp;
+            }
+        }
         QFile file(path);
         qDebug("FileController: Open file %s", qPrintable(file.fileName()));
         if (file.open(QIODevice::ReadOnly)) {
@@ -124,8 +142,14 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
                     if(bytesRange.second <= bytesRange.first)
                         bytesRange.second = file.size()-1;
                 }
-                qDebug("Byte range ask %lld %lld", bytesRange.first, bytesRange.second);
             }
+            /*
+            if((response.getHeaders().value("Content-Type").startsWith("video")) && (request.getHeader("Accept").startsWith("text"))) {
+                bytesRange.first = 0;
+                bytesRange.second = 1;
+            }
+            */
+
             if ((file.size() <= maxCachedFileSize) && (bytesRange.first == -1) && (bytesRange.second == -1)) {
                 // Return the file content and store it also in the cache
                 entry = new CacheEntry();
@@ -144,20 +168,27 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
                 // Return the file content, do not store in cache
                 if((bytesRange.first == -1) && (bytesRange.second == -1)) {
                     while (!file.atEnd() && !file.error())
-                        response.write(file.read(65536));
+                        response.write(file.read(65536));//8192
                 }
                 else {
                     response.setStatus(206, "partial content");
                     response.setHeader("Content-Range", qPrintable(QString("bytes %1-%2/%3").arg(bytesRange.first).arg(bytesRange.second).arg(file.size())));
-                    if((!file.atEnd()) && (!file.error()) && (bytesRange.first < file.size()) && (bytesRange.second < file.size())) {
+                    response.getHeaders().remove("X-Content-Duration");
+                    response.getHeaders().remove("Content-Duration");
+                    if((!file.atEnd()) && (!file.error()) && (bytesRange.first < file.size()) && (bytesRange.second < file.size()) && (bytesRange.second >= bytesRange.first)) {
                         file.seek(bytesRange.first);
-                        response.write(file.read(bytesRange.second - bytesRange.first));
+                        QByteArray data = file.read(bytesRange.second - bytesRange.first + 1);
+                        file.close();
+
+                        response.setHeader("Content-Length", data.length());
+                        response.write(data);
                     }
                     else
                         qWarning("Byte range error %lld %lld", bytesRange.first, bytesRange.second);
                 }
             }
-            file.close();
+            if(file.isOpen())
+                file.close();
             qWarning("FileController: File %s sent", qPrintable(file.fileName()));
         }
         else {
@@ -172,7 +203,7 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
             }
         }
 
-        if(true) {
+        if(debug) {
             qDebug("\n\nRESPONSE PATH %s", qPrintable(file.fileName()));
             qDebug("\nHEADERS");
             QMapIterator<QByteArray,QByteArray> i(response.getHeaders());
@@ -224,14 +255,14 @@ void FileController::setContentType(QString filename, HttpResponse& response, co
                     entry.mimeType = metadatas["File->MIME Type"];
                     entry.mimeType = entry.mimeType.replace("video/quicktime", "video/mp4");
                 }
-                if(metadatas.contains("File->Extension")) {
-                    if(metadatas["File->Extension"].toLower() == "mp4")
-                        entry.mimeType = "video/mp4";
-                    if(metadatas["File->Extension"].toLower() == "ogv")
-                        entry.mimeType = "video/ogg";
-                    if(metadatas["File->Extension"].toLower() == "webm")
-                        entry.mimeType = "video/webm";
-                }
+
+                if (filename.endsWith(".mp4"))
+                    response.setHeader("Content-Type", "video/mp4");
+                else if (filename.endsWith(".ogv"))
+                    response.setHeader("Content-Type", "video/ogg");
+                else if (filename.endsWith(".webm"))
+                    response.setHeader("Content-Type", "video/webm");
+
                 if(metadatas.contains("Rekall->Media Duration (s.)")) {
                     entry.duration = metadatas.value("Rekall->Media Duration (s.)").toDouble();
                 }
@@ -243,7 +274,8 @@ void FileController::setContentType(QString filename, HttpResponse& response, co
             }
             if(entry.duration > 0) {
                 response.setHeader("X-Content-Duration", entry.duration);
-                qDebug("FileController: X-Content-Duration = %d for %s", entry.duration, qPrintable(filename));
+                response.setHeader("Content-Duration", entry.duration);
+                qDebug("FileController: Content-Duration = %d for %s", entry.duration, qPrintable(filename));
             }
         }
     }

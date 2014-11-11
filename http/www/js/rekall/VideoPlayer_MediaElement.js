@@ -27,8 +27,8 @@ function VideoPlayer(dom, uniqueName, render) {
 	this.uniqueName   = uniqueName;
 	this.thumbPath    = "";
 	
-	//this.dom.append("<div class='videoItem invisible'><video width='100%' preload='metadata' id='" + this.uniqueName + "' class='video-js vjs-default-skin' controls></video></div>");
-	this.dom.append  ("<div class='videoItem'><video width='100%' preload='metadata' id='" + this.uniqueName + "' class='' controls='controls' src='/big_buck_bunny.mp4'></video></div>");
+	this.dom.append("<div class='videoItem invisible'><video width='100%' preload='metadata' id='" + this.uniqueName + "' class='video-js vjs-default-skin' controls></video></div>");
+	//this.dom.append  ("<div class='videoItem'><video width='100%' preload='metadata' id='" + this.uniqueName + "' class='' controls='controls' src='/big_buck_bunny.mp4'></video></div>");
 	this.activate();
 	this.hide();
 	this.autoplay = false;
@@ -55,6 +55,8 @@ VideoPlayer.prototype.loadLocal = function(tagOrDoc, play) {
 				this.poster    = "";
 			}
 			
+			//if(this.url.endsWith(".mov"))
+			//	this.url += ".mp4";
 			this.player.setPoster(this.poster);
 			this.player.setSrc(this.url);
 			this.player.load();
