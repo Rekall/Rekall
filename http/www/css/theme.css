@@ -705,12 +705,12 @@ u {
 	font-size: 		9px;
 	cursor:			pointer;
 	text-transform: uppercase;
-	color:			rgba(245, 248, 238, 0.6);
+	color:			white;
 	text-align:		center;
 	margin:			3px 0px 0px 10px;
 }
 .metadatas_table_element_value_editor_bubbles_ok:hover {
-	border-bottom:  1px dotted rgba(245, 248, 238, 0.6);
+	border-bottom:  1px dotted white;
 }
 
 .metadatas_table_element_value_editor input[type="text"], .metadatas_table_element_value_editor textarea {

@@ -141,7 +141,11 @@ void Project::projectChanged(SyncEntry *file, bool firstChange) {
 }
 void Project::projectChanged(const QString &strChanges) {
     QDomDocument xmlChanges("rekall");
-    xmlChanges.setContent(strChanges);
+    QString errorMsg;
+    int errorLine = 0, errorColumn = 0;
+    xmlChanges.setContent(strChanges, &errorMsg, &errorLine, &errorColumn);
+    if(!errorMsg.isEmpty())
+        qDebug("XML ERROR (%d : %d) %s", errorLine, errorColumn, qPrintable(errorMsg));
 
     QDomElement racine = xmlChanges.documentElement();
     QDomNode xmlNode = racine.firstChild();

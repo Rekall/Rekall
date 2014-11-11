@@ -95,6 +95,7 @@ public:
     static QString getFileHash(const QFileInfo &file);
     static void revealInFinder(const QFileInfo &file);
     static void openFile(const QFileInfo &file);
+    static void quickLook(const QFileInfo &file);
     static qreal getDuration(const QString &duration);
     static const QString timeToString(qreal time, bool millisec = false);
     static qreal stringToTime(const QString &timeStr);

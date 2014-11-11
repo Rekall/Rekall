@@ -58,7 +58,7 @@ function documentReadyCommon() {
 					if(sessionStorage.newVersionOfRekall != infos.newVersionOfRekall) {
 						sessionStorage.newVersionOfRekall = infos.newVersionOfRekall;
 						if(sessionStorage.newVersionOfRekall == 1)
-							showInRuban("A new version a Rekall is available. Please visit <a href='http://www.rekall.fr' target='_blank'><u>rekall.fr</u></a> to discover new features and to download it.");
+							showInRuban("A new version of Rekall is available. Please visit <a href='http://www.rekall.fr' target='_blank'><u>rekall.fr</u></a> to discover new features and to download it.");
 					}
 					if((rekall != undefined) && (rekall.infos != undefined)) {
 						$.each(infos.projects, function(index, project) {

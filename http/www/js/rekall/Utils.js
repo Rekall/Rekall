@@ -75,6 +75,20 @@ Utils.closePath = function(pt) {
 }
 
 
+var entityMap = {
+   "&": "&amp;",
+   "<": "&lt;",
+   ">": "&gt;",
+   '"': '&quot;',
+   "'": '&#39;',
+   "/": '&#x2F;'
+};
+Utils.escapeHtml = function(string) {
+	return String(string).replace(/[&<>"'\/]/g, function (s) {
+		return entityMap[s];
+	});
+}
+
 
 Utils.elide = function(text, length) {
 	if(text.length < length)

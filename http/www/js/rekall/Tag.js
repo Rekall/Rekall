@@ -121,6 +121,9 @@ Tag.prototype.openFile = function() {
 Tag.prototype.openFinder = function() {
 	return this.document.openFinder();
 }
+Tag.prototype.openQuickLook = function() {
+	return this.document.openQuickLook();
+}
 Tag.prototype.downloadFile = function() {
 	return this.document.downloadFile();
 }
@@ -295,12 +298,14 @@ Tag.displayMetadata = function() {
 			if(rekall_common.isLocal) {
 				$("#metadatas_menu_bar_open").show();
 				$("#metadatas_menu_bar_finder").show();
+				$("#metadatas_menu_bar_quicklook").show();
 				$("#metadatas_menu_bar_open_browser").hide();
 				$("#metadatas_menu_bar_download").hide();
 			}
 			else {
 				$("#metadatas_menu_bar_open").hide();
 				$("#metadatas_menu_bar_finder").hide();
+				$("#metadatas_menu_bar_quicklook").hide();
 				$("#metadatas_menu_bar_open_browser").show();
 				$("#metadatas_menu_bar_download").show();
 
@@ -311,6 +316,7 @@ Tag.displayMetadata = function() {
 		else {
 			$("#metadatas_menu_bar_open").hide();
 			$("#metadatas_menu_bar_finder").hide();
+			$("#metadatas_menu_bar_quicklook").hide();
 			$("#metadatas_menu_bar_open_browser").hide();
 			$("#metadatas_menu_bar_download").hide();
 		}
@@ -319,13 +325,16 @@ Tag.displayMetadata = function() {
 			Tags.unique().document.goodVersion = Tags.unique().version;
 			rekall.analyse(true);
 			Tag.displayMetadata();
-			rekall.projectChanged("<edition key=\"" + Tags.unique().document.key + "\" version=\"" + Tags.unique().version + "\" goodVersionIs=\"" + Tags.unique().document.goodVersion + "\" />\n");
+			rekall.projectChanged("<edition key=\"" + Utils.escapeHtml(Tags.unique().document.key) + "\" version=\"" + Tags.unique().version + "\" goodVersionIs=\"" + Tags.unique().document.goodVersion + "\" />\n");
 		});
 		$("#metadatas_menu_bar_open").click(function() {
 			Tags.unique().openFile();
 		});
 		$("#metadatas_menu_bar_finder").click(function() {
 			Tags.unique().openFinder();
+		});
+		$("#metadatas_menu_bar_quicklook").click(function() {
+			Tags.unique().openQuickLook();
 		});
 		var originalMetadatas = Tags.unique().document.compareMetadatas();
 	}
@@ -340,6 +349,7 @@ Tag.displayMetadata = function() {
 		$("#metadatas_version .ui-slider-handle").hide();
 		$("#metadatas_menu_bar_open").hide();
 		$("#metadatas_menu_bar_finder").hide();
+		$("#metadatas_menu_bar_quicklook").hide();
 		$("#previewImage").hide();
 		$("#previewVideo").hide();
 		$("#preview_menu_bar").hide();
@@ -472,13 +482,18 @@ Tag.displayMetadata = function() {
 					metadataValue = obj.parent().find(".selected").text();
 				if(metadataValue == "—")
 					metadataValue = "";
+				if(metadataKey.toLowerCase().indexOf("date/time") !== -1) {
+					var metadataValueTmp = moment(metadataValue);
+					if(metadataValueTmp.isValid())
+						metadataValue = metadataValueTmp.format("YYYY:MM:DD HH:mm:ss");
+				}
 				
 				for (var index in Tags.selectedTags) {
 					var tag = Tags.selectedTags[index];
 					var hasChanged = tag.setMetadata(metadataKey, metadataValue.trim());
 					changed |= hasChanged;
 					if(hasChanged)
-						projectChangedXml += "<edition key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" metadataKey=\"" + metadataKey + "\" metadataValue=\"" + metadataValue.trim() + "\" />\n";
+						projectChangedXml += "<edition key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" metadataKey=\"" + Utils.escapeHtml(metadataKey) + "\" metadataValue=\"" + Utils.escapeHtml(metadataValue.trim()) + "\" />\n";
 				}
 			}
 			else {
@@ -517,7 +532,7 @@ Tag.displayMetadata = function() {
 					var hasChanged = tag.setMetadata(metadataKey, Utils.joinKeywords(keywords));
 					changed |= hasChanged;
 					if(hasChanged)
-						projectChangedXml += "<edition key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" metadataKey=\"" + metadataKey + "\" metadataValue=\"" + Utils.joinKeywords(keywords) + "\" />\n";
+						projectChangedXml += "<edition key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" metadataKey=\"" + Utils.escapeHtml(metadataKey) + "\" metadataValue=\"" + Utils.escapeHtml(Utils.joinKeywords(keywords)) + "\" />\n";
 				}
 			}
 		}
@@ -654,7 +669,7 @@ Tag.displayMetadata = function() {
 				//Edition manuelle
 				editor += "			<input type='text' class='" + valueClass + "' placeholder='" + ((count)?("or type a new value"):("Type a value")) + "'/>";
 				if(valueClass != "one_selection")
-					editor += "		<span class='metadatas_table_element_value_editor_bubbles_ok " + valueClass + "'>OK</span>";
+					editor += "		<span class='metadatas_table_element_value_editor_bubbles_ok " + valueClass + "'>Save&nbsp;changes</span>";
 				editor += "</div>";
 			}
 				

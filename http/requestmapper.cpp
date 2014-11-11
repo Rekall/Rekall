@@ -29,7 +29,7 @@ RequestMapper::RequestMapper(QObject *parent)
 }
 
 void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
-    QString path = QString(request.getPath()).normalized(QString::NormalizationForm_D);
+    QString path = QString(request.getPath());//.normalized(QString::NormalizationForm_D);
     request.path = qPrintable(path);
     //qDebug("RequestMapper: path=%s", qPrintable(path));
     foreach(ProjectInterface *project, Global::projects) {
@@ -48,6 +48,14 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
                 QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/finder"));
                 qDebug("RequestMapper: reveal in finder %s", qPrintable(filename.absoluteFilePath()));
                 Global::revealInFinder(filename);
+                if(filename.exists())   response.setStatus(200, "OK");
+                else                    response.setStatus(404, "not found");
+                return;
+            }
+            else if(path.startsWith("/" + project->name + "/quicklook")) {
+                QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/quicklook"));
+                qDebug("RequestMapper: quicklook %s", qPrintable(filename.absoluteFilePath()));
+                Global::quickLook(filename);
                 if(filename.exists())   response.setStatus(200, "OK");
                 else                    response.setStatus(404, "not found");
                 return;

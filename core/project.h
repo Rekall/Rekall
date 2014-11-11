@@ -27,6 +27,7 @@
 #include <QObject>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QTextDocument>
 #include <QTimer>
 #include <QAction>
 #include "http/filecontroller.h"

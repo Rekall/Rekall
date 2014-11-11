@@ -548,7 +548,7 @@ Rekall.prototype.start = function() {
 				rekall.doNotChangeSelection = true;
 
 				//Update
-				tag.projectChangedXml = "<tag key=\"" + tag.document.key + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>";
+				tag.projectChangedXml = "<tag key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>";
 			}
 			rekall.analyse(false);
 			rekall.timeline.tagLayer.draw();
@@ -578,15 +578,15 @@ Rekall.prototype.start = function() {
 			rekall.mousePressed = false;
 			
 			if(rekall.doNotChangeSelection != true) {
-				Tags.clear();
-				if((Tags.hoveredTag != undefined) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0)) {
-					Tags.addOne(Tags.hoveredTag, true);
-				}
+				if((!event.shiftKey) && (!event.ctrlKey))
+					Tags.clear();
+				if((Tags.hoveredTag != undefined) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0))
+					Tags.add(Tags.hoveredTag, true);
 				else if(rekall.timeline.selectionLayer.path.polygon.points.length > 0) {
 					for (var keySource in rekall.project.sources)
 						for (var keyDocument in rekall.project.sources[keySource].documents)
 							for (var key in rekall.project.sources[keySource].documents[keyDocument].tags)
-								if((rekall.project.sources[keySource].documents[keyDocument].tags[key].isVisible()) && (rekall.project.sources[keySource].documents[keyDocument].tags[key].isSelectable) && (rekall.timeline.selectionLayer.path.polygon.contains(rekall.project.sources[keySource].documents[keyDocument].tags[key].rect.getPosition())))
+								if((rekall.project.sources[keySource].documents[keyDocument].tags[key].isVisible()) && (rekall.project.sources[keySource].documents[keyDocument].tags[key].isSelectable) && (rekall.timeline.selectionLayer.path.polygon.contains(rekall.project.sources[keySource].documents[keyDocument].tags[key].rect.getPosition()))) 
 									Tags.add(rekall.project.sources[keySource].documents[keyDocument].tags[key], true);
 				}
 			}

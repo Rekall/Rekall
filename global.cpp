@@ -336,14 +336,19 @@ void Global::revealInFinder(const QFileInfo &filename) {
 #ifdef Q_OS_MAC
     QStringList scriptArgs;
     scriptArgs << QLatin1String("-e") << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(filename.absoluteFilePath());
-    QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+    QProcess::execute("osascript", scriptArgs);
     scriptArgs.clear();
     scriptArgs << QLatin1String("-e") << QLatin1String("tell application \"Finder\" to activate");
-    QProcess::execute("/usr/bin/osascript", scriptArgs);
+    QProcess::execute("osascript", scriptArgs);
 #endif
 }
 void Global::openFile(const QFileInfo &filename) {
     QDesktopServices::openUrl(QUrl::fromLocalFile(filename.absoluteFilePath()));
+}
+void Global::quickLook(const QFileInfo &file) {
+#ifdef Q_OS_MAC
+    QProcess::execute("qlmanage", QStringList() << "-p" << file.absoluteFilePath());
+#endif
 }
 
 
