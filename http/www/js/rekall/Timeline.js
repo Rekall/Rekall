@@ -128,9 +128,9 @@ Timeline.prototype.updateFlattenTimeline = function() {
 			}
 			else {
 				if(timeEndExtended == tag.timeEnd)
-					tag.flattenTimelineDom.find(".flattentimeline_bar").css("width", constrain(progress, 0, 1)*100 + "%");
+					tag.flattenTimelineDom.find(".flattentimeline_opacifiant").css("width", constrain(progress, 0, 1)*100 + "%");
 				else
-					tag.flattenTimelineDom.find(".flattentimeline_bar").css("width", "0%");
+					tag.flattenTimelineDom.find(".flattentimeline_opacifiant").css("width", "0%");
 
 				if((0 <= progress) && (progress < 1)) {
 					tag.flattenTimelineDom.slideDown();
