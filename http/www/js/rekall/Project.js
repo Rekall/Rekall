@@ -387,7 +387,7 @@ Project.prototype.analyse = function(full) {
 			}
 		});
 		
-		$("#navigateur .tag_metadatas_menu li.ui-menu-item").click(function() {
+		$("#navigateur .tag_metadatas_menu li.ui-menu-item").click(function(e) {
 			var metadataKey = $(this).attr("metadataKey");
 			if(metadataKey != "Time") {
 				var sorting = $(this).parent().parent().parent().attr("sorting");
@@ -398,6 +398,7 @@ Project.prototype.analyse = function(full) {
 				var sorting = $(this).parent().attr("sorting");
 				rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);
 			}
+			e.stopPropagation();
 		});
 		if(this.firstAnalysis) {
 			$("#tag_workspaces_save").click(function() {
@@ -589,6 +590,7 @@ Project.prototype.analyse = function(full) {
 
 		//Affectation du placement
 		var yMaxVerticalSortingCategory = 0;
+		groupSortingCategory.text.setFill("#F5F8EE");
 		for (var key in groupSortingCategory.verticalSorting.categories) {
 			var verticalSortingCategory = groupSortingCategory.verticalSorting.categories[key];
 			//Label de catégorie
@@ -640,6 +642,8 @@ Project.prototype.analyse = function(full) {
 				//yMaxVerticalSortingCategory = dimensions.x/5+dimensions.width/5;
 			}
 			var tagsAdded = new Object();
+
+			verticalSortingCategory.text.setFill("#F5F8EE");
 			for (var key in verticalSortingCategory.tags) {
 				var tag = verticalSortingCategory.tags[key];
 				if(full != false) {
@@ -696,6 +700,7 @@ Project.prototype.analyse = function(full) {
 				//Bounds et sélection
 				bounds.x = max(bounds.x, tag.rect.x+tag.rect.width);
 				bounds.y = max(bounds.y, tag.rect.y+tag.rect.height);
+
 				if(($.inArray(tag, Tags.selectedTags) !== -1) && (rekall.sortings["groups"].getCategory(tag) != undefined)) {
 					rekall.sortings["groups"].getCategory(tag).text.setFill("#2DCAE1");
 					if(rekall.sortings["groups"].getCategory(tag).verticalSorting.getCategory(tag) != undefined)
@@ -756,11 +761,13 @@ Project.prototype.analyse = function(full) {
 	}
 	
 	//Hightlights graphiques au survol ou sélections
+	/*
 	for (var keyCat in rekall.sortings["groups"].categories) {
 		rekall.sortings["groups"].categories[keyCat].text.setFill("#F5F8EE");
 		for (var keyVCat in rekall.sortings["groups"].categories[keyCat].verticalSorting.categories)
 			rekall.sortings["groups"].categories[keyCat].verticalSorting.categories[keyVCat].text.setFill("#F5F8EE");
 	}
+	*/
 
 	
 	//Display meta
