@@ -831,6 +831,13 @@ u {
 }
 
 
+.dropable.dragStart {
+	border:	1px dashed white;
+}
+.dropable.dragStart.dragEnter {
+	border:	1px dashed red;
+}
+
 
 
 label {

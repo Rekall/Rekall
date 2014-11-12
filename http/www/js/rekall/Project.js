@@ -332,6 +332,30 @@ Project.prototype.analyse = function(full) {
 			}
 			
 		});
+		$('#navigateur .tab_choice.dropable').on({
+			dragenter: function(event) {
+				$(this).addClass("dragEnter");
+				event.preventDefault();
+			},
+			dragleave: function(event) {
+				$(this).removeClass("dragEnter");
+				event.preventDefault();
+			},
+			dragover: function(event) {
+				$(this).addClass("dragEnter");
+				event.preventDefault();
+			},
+			drop: function(event) {
+				if(event.dataTransfer.getData("metadataKey") != undefined) {
+					var metadataKey = event.dataTransfer.getData("metadataKey");
+					var sorting = $(this).find(".tag_metadatas_menu").attr("sorting");
+					if((metadataKey != undefined) && (metadataKey != "") && (sorting != undefined))
+						rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);					
+					event.preventDefault();
+				}
+			}
+		});
+		
 		$("#navigateur .tag_metadatas_menu li.ui-menu-item").click(function() {
 			var metadataKey = $(this).attr("metadataKey");
 			if(metadataKey != "Time") {

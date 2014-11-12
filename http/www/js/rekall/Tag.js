@@ -802,6 +802,18 @@ Tag.displayMetadata = function() {
 			$(this).find("input, textarea").trigger("autocompleteselect");
 		}
 	});
+	$("#metadatas .metadatas_table_element").on({
+		dragstart: function(event) {
+            event.dataTransfer.setData("metadataKey", $(this).find(".metadatas_table_element_category").text());
+			$("#navigateur .navigateur_tab .dropable").addClass("dragStart");
+		},
+		dragend: function(event) {
+			$("#navigateur .navigateur_tab .dropable").removeClass("dragStart");
+			$("#navigateur .navigateur_tab .dropable").removeClass("dragEnter");
+			$("#navigateur .navigateur_tab .dropable").removeClass("dragOver");
+		}
+	});
 	$("#metadatas .metadatas_table_element .metadatas_table_element_category").filter(function() { return $.inArray($(this).text(), Tag.metadataEditionKey) !== -1; }).trigger("click");
+	
 	rekall.analyse(false);
 }

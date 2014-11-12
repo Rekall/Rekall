@@ -30,6 +30,8 @@
 var rekall = undefined;
 var rekall_common = new Object();
 function documentReadyCommon() {
+	$.event.props.push('dataTransfer');
+	
 	var oldURL = window.document.location + "";
 	var index = 0;
 	var url = oldURL;

@@ -443,7 +443,6 @@ Rekall.prototype.start = function() {
 	});
 	
 	
-	$.event.props.push('dataTransfer');
 	$('#timeline').on({
 		dragenter: function(event) {
 			//alert("dragenter");
