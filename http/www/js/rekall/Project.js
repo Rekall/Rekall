@@ -441,7 +441,7 @@ Project.prototype.analyse = function(full) {
 		var horizontalSortingCategoryPos = rekall.sortings["horizontal"].positionFor(undefined, horizontalSortingCategory.index);
 		if(horizontalSortingCategory.rectAlternate == undefined) {
 			horizontalSortingCategory.rectAlternate = new Kinetic.Rect({
-				fill: 		'#2C3033', //4D5355
+				fill: 		'rgba(255,255,255,.1)', //4D5355
 				listening: 	false,
 				transformsEnabled: 'position',
 			});
@@ -553,7 +553,7 @@ Project.prototype.analyse = function(full) {
 					y: 			y,
 					width: 		rekall.timeline.tagLayer.width(),
 					height: 	10,
-					fill: 		'#2C3033', //4D5355
+					fill: 		'rgba(255,255,255,.1)', //4D5355
 					opacity:    (((alternate++)%2)==0)?(0):(0.2),
 					listening: 	false,
 					transformsEnabled: 'position',
@@ -845,7 +845,7 @@ Project.prototype.analyse = function(full) {
 					/*styleColor += "opacity: 0.25;"; */
 				} else styleImage = "background-color: rgba(0,0,0,.9)";
 				
-			/*	var icnType = "";
+				var icnType = "";
 				if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("application/msword")>=0) icnType = "background-image:url(../../css/images/icn-word.png);";
 				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("application/pdf")>=0) icnType = "background-image:url(../../css/images/icn-pdf.png);";
 				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("application/")>=0) icnType = "background-image:url(../../css/images/icn-document.png);";
@@ -853,7 +853,7 @@ Project.prototype.analyse = function(full) {
 				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("image/")>=0) icnType = "background-image:url(../../css/images/icn-image.png);";
 				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("text/x-vcard")>=0) icnType = "background-image:url(../../css/images/icn-user.png);";
 				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("text/")>=0) icnType = "background-image:url(../../css/images/icn-document.png);";
-				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("video/")>=0) icnType = "background-image:url(../../css/images/icn-video.png);";*/
+				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("video/")>=0) icnType = "background-image:url(../../css/images/icn-video.png);";
 				
 				//alert(icnType);
 				
@@ -866,8 +866,8 @@ Project.prototype.analyse = function(full) {
 				html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";
 				
 				/*html 	+= "<div class='flattentimeline_counter'      style='" + styleColor2 + "'></div>";*/
-			/*	html 	+= "<div class='flattentimeline_type'		style='" + icnType + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";*/
-				html 	+= "<div class='flattentimeline_type'		style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";
+				html 	+= "<div class='flattentimeline_type'		style='" + icnType + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";
+			/*	html 	+= "<div class='flattentimeline_type'		style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";*/
 				html 	+= "<div class='flattentimeline_counter' ></div>";
 				html 	+= "<div class='flattentimeline_title'>" + tag.getMetadata("Rekall->Name") + "</div>";
 				/*html 	+= "<div class='flattentimeline_subtitle'>" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "</div>";*/

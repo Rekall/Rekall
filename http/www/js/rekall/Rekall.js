@@ -124,7 +124,7 @@ Rekall.prototype.start = function() {
 	this.timeline.add(this.timeline.gridLayer);
 	this.timeline.gridLayer.rect = new Kinetic.Rect({
 		/*fill: '#373C3F',*/
-		fill: '#1D2021', //26292B',
+		fill: '#161A1A', //26292B',
 		listening: false, 
 		transformsEnabled: 'position',
 	});

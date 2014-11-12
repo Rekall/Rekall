@@ -354,7 +354,7 @@ Tag.displayMetadata = function() {
 		$("#previewVideo").hide();
 		$("#preview_menu_bar").hide();
 		$("#inspecteur")      .css("background-color", "#2C3032");
-		$("#inspecteurTabNav").css("background-color", "#2C3032");
+		$("#inspecteurTabNav").css("background-color", "#57A5AF");
 		rekall.previewVideoPlayer.hide();
 	}
 	

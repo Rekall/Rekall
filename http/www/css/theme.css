@@ -236,8 +236,8 @@ u {
 	height:40px;
 	line-height:40px;
 	text-align:center;
-	background:#57A5AF;
-	background-image: -webkit-linear-gradient(left, #EC8960 0%, #57A5AF 100%);
+	background:#EC8960;
+	/*background-image: -webkit-linear-gradient(left, #EC8960 0%, #57A5AF 100%);*/
 	text-transform:uppercase;
 	color:rgba(255,255,255,1);
 	font-size:18px;
@@ -377,7 +377,8 @@ u {
 }
 #central li#navigateurTabNav {
 	/*background: #5AA98E;*/
-	background:	#57A5AF;
+	/*background:	#57A5AF;*/
+	background:#EC8960;
 	color: 		#F5F8EE;
 	margin-right:	20px;
 }
@@ -951,7 +952,8 @@ input[type="text"], textarea {
 	line-height:40px;
 	text-align:center;
 	/*background:#2C3032;*/
-	background:#2C3033;
+	/*background:#2C3033;*/
+	background:#57A5AF;
 	/*background-image: -webkit-linear-gradient(left, #EC8960 0%, #57A5AF 100%);*/
 	/*background-image: -webkit-linear-gradient(left, #94CA6F 0%, #B495CC 100%);*/
 	text-transform:uppercase;
@@ -1081,11 +1083,19 @@ input[type="text"], textarea {
 	background-repeat:		no-repeat;
 	opacity:				.5;
 }*/
-.flattentimeline_type {
+/*.flattentimeline_type {
 	width:10px; height:10px;
 	border-radius:10px;
 	float:right;
 	margin:20px 15px 20px 0;
+}*/
+.flattentimeline_type {
+	width:26px; height:26px;
+	float:right;
+	background-position:	center center;
+	background-repeat:		no-repeat;
+	margin:12px 7px 12px 0;
+	opacity:.75;
 }
 .flattentimeline_counter {
 	font-family:			"open_sanssemibold";
