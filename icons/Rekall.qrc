@@ -65,5 +65,14 @@
         <file>rekall-menubar-win-16@2x.png</file>
         <file>rekall-menubar-win-17.png</file>
         <file>rekall-menubar-win-17@2x.png</file>
+        <file>rekall-menubar-mac-00.png</file>
+        <file>rekall-menubar-mac-00@2x.png</file>
+        <file>rekall-menubar-mac-01.png</file>
+        <file>rekall-menubar-mac-01@2x.png</file>
+        <file>rekall-menubar-mac-02.png</file>
+        <file>rekall-menubar-mac-02@2x.png</file>
+        <file>rekall-menubar-mac-03.png</file>
+        <file>rekall-menubar-mac-03@2x.png</file>
+        <file>rekall-menubar-mac-04.png</file>
     </qresource>
 </RCC>
