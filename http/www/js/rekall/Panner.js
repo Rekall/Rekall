@@ -207,7 +207,7 @@ Panner.prototype.show = function(filter, bounds) {
 	if(filter == undefined)
 		this.hidePhoto();
 	else if((filter.length == 1) && (Tags.isStrong)) {
-		if((filter[0].isImage()) || (filter[0].getMetadata("File->MIME Type").endsWith("pdf")))
+		if((filter[0].isImage()) || (filter[0].getMetadata("Rekall->Type").endsWith("pdf")))
 			rekall.panner.showPhoto(filter[0]);
 	}
 	else

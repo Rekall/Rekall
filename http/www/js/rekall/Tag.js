@@ -39,7 +39,6 @@ function Tag(document) {
 	this.visuel.rect = new Kinetic.Rect({
 		transformsEnabled: 'position',
 		listening: 			false,
-		cornerRadius: 		Tag.tagHeight/3,
 	});
 	rekall.timeline.tagLayer.group.add(this.visuel.rect);
 	this.visuel.tag = this;
@@ -48,8 +47,7 @@ Tag.prototype.updatePosititon = function() {
 	this.visuel.rect.setPosition(this.rect.getPosition());
 	this.visuel.rect.setSize(this.rect.getSize());
 	this.visuel.rect.setVisible(true);
-	if(this.isMarker())
-		this.visuel.rect.setVisible(false);
+	//this.visuel.rect.setVisible(false);
 }
 
 
@@ -147,6 +145,14 @@ Tag.prototype.update = function(color, strong) {
 	if(color != undefined) {
 		this.colorRaw  = color;
 		this.color     = color.toString();
+		
+		this.isMarkerCache = this.isMarker();
+		if(this.isMarkerCache) {
+			this.visuel.rect.setCornerRadius(0);
+		}
+		else {
+			this.visuel.rect.setCornerRadius(Tag.tagHeight/3);
+		}
 	}
 	if(this.color == undefined)
 		this.color = "#000000";
@@ -154,23 +160,17 @@ Tag.prototype.update = function(color, strong) {
 	var fillColor   = '';
 	var strokeColor = '';
 	var strokeWidth = 0;
-	var markerStrokeColor = '';
-	var markerStrokeWidth = '';
 	var opacity = 1;
 		
 	if(this.isGoodVersion()) {
 		fillColor   = this.color;
 		strokeWidth = 0;
 		strokeColor = "";
-		markerStrokeWidth = 1;
-		markerStrokeColor = this.color;
 	}
 	else {
 		fillColor   = tinycolor(this.colorRaw.toString()).setAlpha(0.1).toString();
 		strokeColor = this.color;
 		strokeWidth = 0.8;
-		markerStrokeWidth = 1;
-		markerStrokeColor = this.color;
 	}
 	
 	if((rekall.map.isVisible()) && ($.inArray(this, rekall.map.filtredTags) === -1)) {
@@ -185,20 +185,24 @@ Tag.prototype.update = function(color, strong) {
 		if(this.selected) {
 			if(strong)		strokeWidth = 2;
 			else			strokeWidth = 1.5;
-			if(strong)		markerStrokeWidth = 4;
-			else			markerStrokeWidth = 3;
 		}
-		else {
+		else
 			strokeWidth       = 0.8;
-			markerStrokeWidth = 2;
-		}
 	}
-	this.visuel.rect.setFill       (fillColor);
-	this.visuel.rect.setStroke     (strokeColor);	
-	this.visuel.rect.setStrokeWidth(strokeWidth);
+	
+	if(this.isMarkerCache) {
+		if(strokeColor == "")
+			this.visuel.rect.setStroke(fillColor);	
+		else
+			this.visuel.rect.setStroke(strokeColor);
+		this.visuel.rect.setStrokeWidth(max(1, strokeWidth));
+	}
+	else {
+		this.visuel.rect.setFill       (fillColor);
+		this.visuel.rect.setStroke     (strokeColor);	
+		this.visuel.rect.setStrokeWidth(strokeWidth);
+	}
 	this.visuel.rect.setOpacity(opacity);
-	//this.visuel.rect.path.setStroke     (markerStrokeColor);
-	//this.visuel.rect.path.setStrokeWidth(markerStrokeWidth);
 }
 Tag.prototype.isSelected = function() {
 	return this.selected;
@@ -240,7 +244,7 @@ Tag.displayMetadata = function() {
 			$("#preview_menu_bar").hide();
 		}
 		else {
-			if(Tags.unique().thumbnail != undefined) {
+			if((Tags.unique().thumbnail != undefined) && (Tags.unique().thumbnail.url != undefined)) {
 				if(($("#previewImage img").attr("src") != Tags.unique().thumbnail.url) && (Tags.unique().thumbnail.url != undefined))
 					$("#previewImage").html("<img src=\"" + Tags.unique().thumbnail.url + "\">");
 				$("#previewImage").show();
@@ -446,7 +450,7 @@ Tag.displayMetadata = function() {
 		if(value == "")			value = "&nbsp;";
 		if(elementClass != "")	value = "Multiple values";
 		if(value != undefined) {
-			htmls[metadataKeys[0]] += "				<div class='metadatas_table_element selectable " + elementClass + "'>";
+			htmls[metadataKeys[0]] += "				<div draggable=true class='metadatas_table_element selectable " + elementClass + "'>";
 			htmls[metadataKeys[0]] += "					<div class='metadatas_table_element_category invisible'>" + metadataKey + "</div>";
 			htmls[metadataKeys[0]] += "					<div class='metadatas_table_element_key'   title='" + keyTip + "'>" + key + "</div>";
 			htmls[metadataKeys[0]] += "					<div class='metadatas_table_element_value' title='" + value.replace(/'/g, "\\'") + "'>" + value + "</div>";

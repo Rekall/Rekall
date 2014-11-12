@@ -74,6 +74,7 @@ function documentReadyCommon() {
 							}
 						});
 					}
+					rekall_common.owner = infos.owner;
 				}, 
 				error: function(infos) {
 

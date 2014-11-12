@@ -29,7 +29,7 @@ function Source(hash) {
 Source.prototype.addDocument = function(document) {
 	var key = this.mapPath(Utils.getLocalFilePath(document, "", true));
 	if(key == "")
-		key = CryptoJS.SHA1(moment() + random() + "").toString();
+		key = "marker-" + CryptoJS.SHA1(moment() + random() + "").toString();
 
 	if(this.documents[key] == undefined) {
 		if(document.tags.length == 0) {

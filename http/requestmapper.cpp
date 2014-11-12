@@ -201,6 +201,11 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
         json += "{";
         json += "  \"firstTimeOpened\": \""    + QString("%1").arg(Global::rekall->firstTimeOpened)    + "\",";
         json += "  \"newVersionOfRekall\": \"" + QString("%1").arg(Global::rekall->newVersionOfRekall) + "\",";
+        json += "  \"owner\": {";
+        json += "       \"author\": \"" + QString("%1").arg(Global::userInfos->getAuthor()) + "\",";
+        json += "       \"locationGps\": \"" + QString("%1").arg(Global::userInfos->getLocationGPS()) + "\",";
+        json += "       \"locationName\": \"" + QString("%1").arg(Global::userInfos->getLocationName()) + "\"";
+        json += "  },";
         json += "  \"projects\": [";    chop = false;
         foreach(ProjectInterface *project, Global::projects) {
             json += "{";

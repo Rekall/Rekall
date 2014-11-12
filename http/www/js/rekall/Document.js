@@ -50,16 +50,32 @@ Document.prototype.isVideoOrAudio = function(version) {
 	return this.isAudio(version) || this.isVideo(version); 
 }
 Document.prototype.isAudio = function(version) {
-	return this.getMetadata("File->MIME Type", version).startsWith("audio"); 
+	var type = this.getMetadata("Rekall->Type", version);
+	if(type == undefined)
+		return false;
+	else
+		return type.startsWith("audio"); 
 }
 Document.prototype.isVideo = function(version) {
-	return this.getMetadata("File->MIME Type", version).startsWith("video"); 
+	var type = this.getMetadata("Rekall->Type", version);
+	if(type == undefined)
+		return false;
+	else
+		return type.startsWith("video"); 
 }
 Document.prototype.isMarker = function(version) {
-	return this.getMetadata("File->MIME Type", version) == "Marker"; 
+	var type = this.getMetadata("Rekall->Type", version);
+	if(type == undefined)
+		return true;
+	else
+		return (type == "rekall/marker"); 
 }
 Document.prototype.isImage = function(version) {
-	return this.getMetadata("File->MIME Type", version).startsWith("image"); 
+	var type = this.getMetadata("Rekall->Type", version);
+	if(type == undefined)
+		return false;
+	else
+		return type.startsWith("image"); 
 }
 
 

@@ -27,7 +27,7 @@ function Rekall() {
 	this.sortings["groups"]     = new Sorting("Rekall->Date/Time|year", false, "");//Rekall->Date/Time|year
 	this.sortings["vertical"]   = new Sorting("Rekall->Date/Time|month", false, "");//Rekall->Date/Time|month
 	this.sortings["horizontal"] = new Sorting("Rekall->Author", true, "");//"Time");//File->File Size MB//EXIF->Aperture Value
-	this.sortings["highlight"]  = new Sorting("File->MIME Type", false, "");//"Rekall->Extension", false, "max");
+	this.sortings["highlight"]  = new Sorting("Rekall->Type", false, "");//"Rekall->Extension", false, "max");
 	this.sortings["search"]     = new Sorting("", false, "");
 	this.sortings["authors"]    = new Sorting("Rekall->Author");
 	this.sortings["types"]      = new Sorting("Rekall->Type");
@@ -384,7 +384,38 @@ Rekall.prototype.start = function() {
 	//Marqueurs
 	$(document).keyup(function(e) {
 		if(e.keyCode == 77) {
-			window.document.title = rekall.timeline.bar.timeCurrent;
+			var currentDate = moment().format("YYYY:MM:DD HH:mm:ss");
+
+			window.document.title = rekall.timeline.bar.timeCurrent + " @ " + currentDate;
+			
+			var marker = new Document();
+			var tag = new Tag(marker);
+			tag.setTimeStart(rekall.timeline.bar.timeCurrent);
+			tag.setTimeEnd  (rekall.timeline.bar.timeCurrent + 4);
+			tag.setMetadata("Rekall->Comments",    "");
+			tag.setMetadata("Rekall->Date/Time",   currentDate);
+			tag.setMetadata("Rekall->Flag",        "Marker");
+			tag.setMetadata("Rekall->Group",       "");
+			tag.setMetadata("Rekall->Import Date", currentDate);
+			tag.setMetadata("Rekall->Keywords",    "");
+			tag.setMetadata("Rekall->Name",        "Markeur");
+			tag.setMetadata("Rekall->Type",        "rekall/marker");
+
+			if(rekall_common.owner != undefined) {
+				tag.setMetadata("Rekall->Author",      			    rekall_common.owner.author);
+				tag.setMetadata("Rekall User Infos->User Name",     rekall_common.owner.author);
+				tag.setMetadata("Rekall User Infos->Location Name", rekall_common.owner.locationName);
+			}
+			marker.addTag(tag);
+
+/*
+			var xmlChanged = "";
+			xmlChanged += "<document key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>";
+			xmlChanged += "<tag key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>");
+*/
+			rekall.projectChanged(xmlChanged);
+			rekall.project.addDocument("Files", marker);
+			rekall.analyse();	
 		}
 		else if(e.keyCode == 82) {
 			for (var keySource in rekall.project.sources) {
