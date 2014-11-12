@@ -547,7 +547,7 @@ Tag.displayMetadata = function() {
 		$("#metadatas_table").find(".metadatas_table_element_value_editor").html("");
 
 		if(!reopen)
-			Tag.metadataEditionKey = ["Rekall->Comments"];
+			Tag.metadataEditionKey = [/*"Rekall->Comments"*/];
 		if(changed) {
 			rekall.analyse();
 			rekall.projectChanged(projectChangedXml);
@@ -644,7 +644,7 @@ Tag.displayMetadata = function() {
 				var count = 0;
 				for (var value in values) {
 					var valueClass2 = "";
-					if(values[value].count == Tags.selectedTags.length)
+					if(values[value].count == Tags.count())
 						valueClass2 = "single";
 					if(value != "") {
 						editor += "<div title='Value of one document in the multiple selection' class='values " + valueClass + " " + valueClass2 + "'>" + value + "</div>";

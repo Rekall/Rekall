@@ -383,7 +383,31 @@ Rekall.prototype.start = function() {
 	
 	//Marqueurs
 	$(document).keyup(function(e) {
-		if(e.keyCode == 77) {
+		if((e.keyCode == 8) || (e.keyCode == 46)) {
+			var markers = [];
+			for (var index in Tags.selectedTags)
+				if(Tags.selectedTags[index].isMarker())
+					markers.push(Tags.selectedTags[index].document)
+			
+			if(markers.length) {
+				var phrase = "Are-you sure to remove this marker?";
+				if(Tags.count() > 1)
+					phrase = "Are-you sure to remove theses " + markers.length + " markers?";
+				var sur = confirm(phrase);
+				if(sur == true) {
+					var projectChangedXml = "";
+					for (var markerIndex in markers) {
+						for (var tagIndex in markers[markerIndex].tags)
+							markers[markerIndex].tags[tagIndex].visuel.rect.remove();
+						projectChangedXml += "<document key=\"" + markers[markerIndex].key + "\" remove=\"true\" />\n";
+						delete rekall.project.sources["Files"].documents[markers[markerIndex].key];
+					}
+					rekall.projectChanged(projectChangedXml);
+					rekall.analyse();
+				}
+			}
+		}
+		else if(e.keyCode == 77) {
 			var currentDate = moment().format("YYYY:MM:DD HH:mm:ss");
 
 			var state = rekall.timeline.bar.state;
@@ -413,15 +437,15 @@ Rekall.prototype.start = function() {
 
 				rekall.project.addDocument("Files", marker);
 
-				var xmlChanged = "<document key=\"" + marker.key + "\">\n";
+				var projectChangedXml = "<document key=\"" + marker.key + "\">\n";
 				var metadatas = marker.tags[0].getMetadatas();
 				for (var key in metadatas) {
 					var meta = metadatas[key];
-					xmlChanged += "<meta cnt=\"" + Utils.escapeHtml(meta) + "\" ctg=\"" + Utils.escapeHtml(key) + "\" />\n";
+					projectChangedXml += "<meta cnt=\"" + Utils.escapeHtml(meta) + "\" ctg=\"" + Utils.escapeHtml(key) + "\" />\n";
 				}
-				xmlChanged += "</document>\n";
-				xmlChanged += "<tag key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>\n";
-				rekall.projectChanged(xmlChanged);
+				projectChangedXml += "</document>\n";
+				projectChangedXml += "<tag key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>\n";
+				rekall.projectChanged(projectChangedXml);
 
 				rekall.analyse();
 			}
@@ -522,7 +546,7 @@ Rekall.prototype.start = function() {
 		}
 
 		rekall.mousePressedMode = "";
-		if(Tags.selectedTags.length)
+		if(Tags.count())
 			rekall.mousePressedMode = "move";
 		for (var index in Tags.selectedTags) {
 			var tag = Tags.selectedTags[index];
@@ -573,7 +597,7 @@ Rekall.prototype.start = function() {
 			}
 		}
 		
-		if((rekall.mousePressed) && (Tags.selectedTags.length) && (rekall.sortings["horizontal"].metadataKey == "Time")) {
+		if((rekall.mousePressed) && (Tags.count()) && (rekall.sortings["horizontal"].metadataKey == "Time")) {
 			//Déplacement
 			rekall.mouseMoveTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.timeline.getPointerPosition().x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
 

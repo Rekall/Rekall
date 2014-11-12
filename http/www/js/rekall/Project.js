@@ -51,46 +51,60 @@ Project.prototype.loadXML = function(xml) {
 	var counts = {documents: 0, tags: 0, metadatas: 0};
 	
 	xml.find('document').each(function() {
-		var rekallDoc = new Document();
-		counts.documents++;
-		counts.tags++;
-		/*
-		$(this).find('tags').each(function() {
-			$(this).find('tag').each(function() {
-				var rekallDocTag = new Tag(rekallDoc);
-				rekallDocTag.timeStart 		 = $(this).attr('timeStart');
-				rekallDocTag.timeEnd 		 = $(this).attr('timeEnd');
-				rekallDoc.addTag(rekallDocTag);
-				counts.tags++;
+		if(($(this).attr("remove") != undefined) && ($(this).attr("key") != undefined) && ($(this).attr("remove") == "true")) {
+			var rekallDoc = thiss.sources["Files"].documents[$(this).attr("key")];
+			if(rekallDoc != undefined) {
+				for (var tagIndex in rekallDoc.tags)
+					rekallDoc.tags[tagIndex].visuel.rect.remove();
+				delete rekall.project.sources["Files"].documents[rekallDoc.key];
+			}
+		}
+		else {
+			var rekallDoc = new Document();
+			counts.documents++;
+			counts.tags++;
+			/*
+			$(this).find('tags').each(function() {
+				$(this).find('tag').each(function() {
+					var rekallDocTag = new Tag(rekallDoc);
+					rekallDocTag.timeStart 		 = $(this).attr('timeStart');
+					rekallDocTag.timeEnd 		 = $(this).attr('timeEnd');
+					rekallDoc.addTag(rekallDocTag);
+					counts.tags++;
+				});
 			});
-		});
-		*/
-		$(this).find('meta').each(function() {
-			var rekallDocMeta = new Metadata();
-			rekallDocMeta.content 	  = $(this).attr('cnt');
-			rekallDocMeta.metadataKey = $(this).attr('ctg');
-			rekallDoc.setMetadata(rekallDocMeta);
-			counts.metadatas++;
-		});
-		if($(this).attr("key") != undefined)
-			rekallDoc.key = $(this).attr("key");
-		thiss.addDocument("Files", rekallDoc);
+			*/
+			$(this).find('meta').each(function() {
+				var rekallDocMeta = new Metadata();
+				rekallDocMeta.content 	  = $(this).attr('cnt');
+				rekallDocMeta.metadataKey = $(this).attr('ctg');
+				rekallDoc.setMetadata(rekallDocMeta);
+				counts.metadatas++;
+			});
+			if($(this).attr("key") != undefined)
+				rekallDoc.key = $(this).attr("key");
+			thiss.addDocument("Files", rekallDoc);
+		}
 	});
 	xml.find('edition').each(function() {
-		var key           = $(this).attr('key');
-		var version       = $(this).attr('version');
-		var metadataKey   = $(this).attr('metadataKey');
-		var metadataValue = $(this).attr('metadataValue');
-		thiss.sources["Files"].documents[key].setMetadata(metadataKey, metadataValue, version);
+		var key = $(this).attr('key');
+		if(thiss.sources["Files"].documents[key] != undefined) {
+			var version       = $(this).attr('version');
+			var metadataKey   = $(this).attr('metadataKey');
+			var metadataValue = $(this).attr('metadataValue');
+			thiss.sources["Files"].documents[key].setMetadata(metadataKey, metadataValue, version);
+		}
 	});
 	xml.find('tag').each(function() {
-		var key       = $(this).attr('key');
-		var version   = $(this).attr('version');
-		var timeStart = parseFloat($(this).attr('timeStart')) + 0.;
-		var timeEnd   = parseFloat($(this).attr('timeEnd'))   + 0.;
-		for (var index in thiss.sources["Files"].documents[key].tags) {
-			thiss.sources["Files"].documents[key].tags[index].setTimeStart(timeStart);
-			thiss.sources["Files"].documents[key].tags[index].setTimeEnd(timeEnd);
+		var key = $(this).attr('key');
+		if(thiss.sources["Files"].documents[key] != undefined) {
+			var version   = $(this).attr('version');
+			var timeStart = parseFloat($(this).attr('timeStart')) + 0.;
+			var timeEnd   = parseFloat($(this).attr('timeEnd'))   + 0.;
+			for (var index in thiss.sources["Files"].documents[key].tags) {
+				thiss.sources["Files"].documents[key].tags[index].setTimeStart(timeStart);
+				thiss.sources["Files"].documents[key].tags[index].setTimeEnd(timeEnd);
+			}
 		}
 	});
 	/*
@@ -353,6 +367,9 @@ Project.prototype.analyse = function(full) {
 						rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);					
 					event.preventDefault();
 				}
+				$("#navigateur .navigateur_tab .dropable").removeClass("dragStart");
+				$("#navigateur .navigateur_tab .dropable").removeClass("dragEnter");
+				$("#navigateur .navigateur_tab .dropable").removeClass("dragOver");
 			}
 		});
 		
