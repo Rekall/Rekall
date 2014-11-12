@@ -141,6 +141,10 @@ Project.prototype.analyse = function(full) {
 					var isOk = true;
 					if((false) && (!tag.isGoodVersion()))
 						isOk = false;
+
+					if(rekall.sortings["horizontal"].metadataKey == "Time") {
+						isOk = (tag.getMetadata("Rekall->Visibility").indexOf("Visible") !== -1);
+					}
 				
 					//Recherche forcée
 					if(isOk) {
@@ -951,6 +955,12 @@ Project.prototype.analyse = function(full) {
 		rekall.timeline.bar.rewind();
 		rekall.timeline.bar.update();
 	}
+	
+	if((localStorage != null) && (rekall.sortings["horizontal"].metadataKey == "Time") && (localStorage.timelineInfo != "1")) {
+		localStorage.timelineInfo = "1";
+		showInRuban("To see documents in Timeline mode, you have to set their visibility in the metadata “Rekall&nbsp;&#x25B8;&nbsp;Visibility”.");
+	}
+	
 	
 	rekall.timeline.bar.updateFlattenTimeline();
 	rekall.redraw(full);

@@ -130,7 +130,7 @@ Timeline.prototype.updateFlattenTimeline = function() {
 				if(timeEndExtended == tag.timeEnd)
 					tag.flattenTimelineDom.find(".flattentimeline_opacifiant").css("width", constrain(progress, 0, 1)*100 + "%");
 				else
-					tag.flattenTimelineDom.find(".flattentimeline_opacifiant").css("width", "0%");
+					tag.flattenTimelineDom.find(".flattentimeline_opacifiant").css("width", "100%");
 
 				if((0 <= progress) && (progress < 1)) {
 					tag.flattenTimelineDom.slideDown();
@@ -143,7 +143,7 @@ Timeline.prototype.updateFlattenTimeline = function() {
 					tag.flattenTimelineDom.find(".flattentimeline_counter").text(ceil(-progress));
 					tag.flattenTimelineDom.find(".flattentimeline_counter").show();
 				}
-				else if(progress < -20) {
+				else if(-20 < progress) {
 					tag.flattenTimelineDom.css("opacity", 0.1);
 					tag.flattenTimelineDom.slideDown();
 					tag.flattenTimelineDom.find(".flattentimeline_counter").hide();

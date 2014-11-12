@@ -45,6 +45,17 @@ Tags.add = function(tag, strong) {
 	//Update graphique générale
 	rekall.analyse(false);
 }
+Tags.toggle = function(tag, strong) {
+	Tags.isStrong |= strong;
+	var index = $.inArray(tag, Tags.selectedTags);
+	if(index === -1)
+		Tags.selectedTags.push(tag);
+	else
+		Tags.selectedTags.splice(index, 1);
+
+	//Update graphique générale
+	rekall.analyse(false);
+}
 
 Tags.addOne = function(tag, strong) {
 	Tags.clear();

@@ -582,6 +582,10 @@ Tag.displayMetadata = function() {
 					availableTagsCount["Contextual"] = {count: 1};
 					availableTagsCount["Render"]	 = {count: 1};
 				}
+				if(metadataKey == "Rekall->Visibility") {
+					availableTagsCount["Visible on timeline"] = {count: 1};
+					availableTagsCount["Hidden on timeline"]  = {count: 1};
+				}
 				for (var keySource in rekall.project.sources) {
 					for (var keyDocument in rekall.project.sources[keySource].documents) {
 						for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {

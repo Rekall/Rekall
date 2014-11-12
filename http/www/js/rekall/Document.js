@@ -26,6 +26,8 @@ function Document() {
 	this.metadatas		   = new Array();
 	this.currentVersion    = 0;
 	this.goodVersion       = 0;
+	this.setMetadata("Rekall->Group", "");
+	this.setMetadata("Rekall->Visibility", "");
 }
 Document.prototype.addTag = function(tag) {
 	this.tags.push(tag);

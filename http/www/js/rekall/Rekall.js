@@ -28,9 +28,10 @@ function Rekall() {
 	this.sortings["vertical"]   = new Sorting("Rekall->Date/Time|month", false, "");//Rekall->Date/Time|month
 	this.sortings["horizontal"] = new Sorting("Rekall->Author", true, "");//"Time");//File->File Size MB//EXIF->Aperture Value
 	this.sortings["highlight"]  = new Sorting("Rekall->Type", false, "");//"Rekall->Extension", false, "max");
-	this.sortings["search"]     = new Sorting("", false, "");
 	this.sortings["authors"]    = new Sorting("Rekall->Author");
 	this.sortings["types"]      = new Sorting("Rekall->Type");
+
+	this.sortings["search"]     = new Sorting("", false, "");	
 	this.sortings["corpus"]     = new Sorting("Rekall->Folder");
 	this.sortings["hashes"]   	= new Sorting("File->Hash");
 	this.sortings["keywords"]   = new Sorting();
@@ -384,26 +385,48 @@ Rekall.prototype.start = function() {
 	//Marqueurs
 	$(document).keyup(function(e) {
 		if((e.keyCode == 8) || (e.keyCode == 46)) {
-			var markers = [];
-			for (var index in Tags.selectedTags)
-				if(Tags.selectedTags[index].isMarker())
-					markers.push(Tags.selectedTags[index].document)
-			
-			if(markers.length) {
-				var phrase = "Are-you sure to remove this marker?";
-				if(Tags.count() > 1)
-					phrase = "Are-you sure to remove theses " + markers.length + " markers?";
-				var sur = confirm(phrase);
-				if(sur == true) {
-					var projectChangedXml = "";
-					for (var markerIndex in markers) {
-						for (var tagIndex in markers[markerIndex].tags)
-							markers[markerIndex].tags[tagIndex].visuel.rect.remove();
-						projectChangedXml += "<document key=\"" + markers[markerIndex].key + "\" remove=\"true\" />\n";
-						delete rekall.project.sources["Files"].documents[markers[markerIndex].key];
+			if(rekall.sortings["horizontal"].metadataKey == "Time") {
+				if(Tags.count()) {
+					var phrase = "Are-you sure to remove this document from timeline view?";
+					if(Tags.count() > 1)
+						phrase = "Are-you sure to remove theses " + Tags.count() + " documents from timeline view?";
+					var sur = confirm(phrase);
+					if(sur == true) {
+						var projectChangedXml = "";
+						for (var index in Tags.selectedTags) {
+							var tag = Tags.selectedTags[index];
+							var metadataKey   = "Rekall->Visibility"
+							var metadataValue = "Hidden on timeline";
+							tag.setMetadata(metadataKey, metadataValue);
+							projectChangedXml += "<edition key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" metadataKey=\"" + Utils.escapeHtml(metadataKey) + "\" metadataValue=\"" + Utils.escapeHtml(metadataValue.trim()) + "\" />\n";
+						}
+						rekall.projectChanged(projectChangedXml);
+						rekall.analyse();
 					}
-					rekall.projectChanged(projectChangedXml);
-					rekall.analyse();
+				}
+			}
+			else {
+				var markers = [];
+				for (var index in Tags.selectedTags)
+					if(Tags.selectedTags[index].isMarker())
+						markers.push(Tags.selectedTags[index].document)
+
+				if(markers.length) {
+					var phrase = "Are-you sure to remove this marker?";
+					if(Tags.count() > 1)
+						phrase = "Are-you sure to remove theses " + markers.length + " markers?";
+					var sur = confirm(phrase);
+					if(sur == true) {
+						var projectChangedXml = "";
+						for (var markerIndex in markers) {
+							for (var tagIndex in markers[markerIndex].tags)
+								markers[markerIndex].tags[tagIndex].visuel.rect.remove();
+							projectChangedXml += "<document key=\"" + markers[markerIndex].key + "\" remove=\"true\" />\n";
+							delete rekall.project.sources["Files"].documents[markers[markerIndex].key];
+						}
+						rekall.projectChanged(projectChangedXml);
+						rekall.analyse();
+					}
 				}
 			}
 		}
@@ -647,14 +670,14 @@ Rekall.prototype.start = function() {
 			if(rekall.doNotChangeSelection != true) {
 				if((!event.shiftKey) && (!event.ctrlKey))
 					Tags.clear();
-				if((Tags.hoveredTag != undefined) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0))
-					Tags.add(Tags.hoveredTag, true);
+				if((Tags.hoveredTag != undefined) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0)) 
+					Tags.toggle(Tags.hoveredTag, true);
 				else if(rekall.timeline.selectionLayer.path.polygon.points.length > 0) {
 					for (var keySource in rekall.project.sources)
 						for (var keyDocument in rekall.project.sources[keySource].documents)
 							for (var key in rekall.project.sources[keySource].documents[keyDocument].tags)
 								if((rekall.project.sources[keySource].documents[keyDocument].tags[key].isVisible()) && (rekall.project.sources[keySource].documents[keyDocument].tags[key].isSelectable) && (rekall.timeline.selectionLayer.path.polygon.contains(rekall.project.sources[keySource].documents[keyDocument].tags[key].rect.getPosition()))) 
-									Tags.add(rekall.project.sources[keySource].documents[keyDocument].tags[key], true);
+									Tags.toggle(rekall.project.sources[keySource].documents[keyDocument].tags[key], true);
 				}
 			}
 			else {

@@ -80,10 +80,11 @@ Metadatas Global::getMetadatas(QFileInfo file, ProjectInterface *project, bool d
     file.refresh();
     if(file.exists()) {
         //Champs par défault
-        retour["Rekall->Author"]   = "";
-        retour["Rekall->Comments"] = "";
-        retour["Rekall->Keywords"] = "";
-        retour["Rekall->Group"]    = "";
+        retour["Rekall->Author"]     = "";
+        retour["Rekall->Comments"]   = "";
+        retour["Rekall->Keywords"]   = "";
+        retour["Rekall->Group"]      = "";
+        retour["Rekall->Visibility"] = "";
         qreal duration = 0;
         QStringList keywords;
 
