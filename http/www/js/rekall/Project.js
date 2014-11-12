@@ -72,6 +72,8 @@ Project.prototype.loadXML = function(xml) {
 			rekallDoc.setMetadata(rekallDocMeta);
 			counts.metadatas++;
 		});
+		if($(this).attr("key") != undefined)
+			rekallDoc.key = $(this).attr("key");
 		thiss.addDocument("Files", rekallDoc);
 	});
 	xml.find('edition').each(function() {
@@ -84,11 +86,11 @@ Project.prototype.loadXML = function(xml) {
 	xml.find('tag').each(function() {
 		var key       = $(this).attr('key');
 		var version   = $(this).attr('version');
-		var timeStart = $(this).attr('timeStart') + 0.;
-		var timeEnd   = $(this).attr('timeEnd')   + 0.;
+		var timeStart = parseFloat($(this).attr('timeStart')) + 0.;
+		var timeEnd   = parseFloat($(this).attr('timeEnd'))   + 0.;
 		for (var index in thiss.sources["Files"].documents[key].tags) {
-			thiss.sources["Files"].documents[key].tags[index].setTimeStart(parseFloat(timeStart));
-			thiss.sources["Files"].documents[key].tags[index].setTimeEnd(parseFloat(timeEnd));
+			thiss.sources["Files"].documents[key].tags[index].setTimeStart(timeStart);
+			thiss.sources["Files"].documents[key].tags[index].setTimeEnd(timeEnd);
 		}
 	});
 	/*
@@ -591,8 +593,9 @@ Project.prototype.analyse = function(full) {
 						
 					//Analyse GPS
 					var gpsPosition = {latitude: NaN, longitude: NaN, tag: undefined};
-					for (var key in tag.getMetadatas()) {
-						var meta = tag.getMetadatas()[key];
+					var metadatas = tag.getMetadatas();
+					for (var key in metadatas) {
+						var meta = metadatas[key];
 						if((key.toLowerCase().indexOf("gps") > -1) && (meta.indexOf(",") > -1)) {
 							var metaPos = meta.split(",");
 							gpsPosition.latitude  = parseFloat(metaPos[0]);

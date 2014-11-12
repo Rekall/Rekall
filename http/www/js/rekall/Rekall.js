@@ -386,36 +386,47 @@ Rekall.prototype.start = function() {
 		if(e.keyCode == 77) {
 			var currentDate = moment().format("YYYY:MM:DD HH:mm:ss");
 
-			window.document.title = rekall.timeline.bar.timeCurrent + " @ " + currentDate;
-			
-			var marker = new Document();
-			var tag = new Tag(marker);
-			tag.setTimeStart(rekall.timeline.bar.timeCurrent);
-			tag.setTimeEnd  (rekall.timeline.bar.timeCurrent + 4);
-			tag.setMetadata("Rekall->Comments",    "");
-			tag.setMetadata("Rekall->Date/Time",   currentDate);
-			tag.setMetadata("Rekall->Flag",        "Marker");
-			tag.setMetadata("Rekall->Group",       "");
-			tag.setMetadata("Rekall->Import Date", currentDate);
-			tag.setMetadata("Rekall->Keywords",    "");
-			tag.setMetadata("Rekall->Name",        "Markeur");
-			tag.setMetadata("Rekall->Type",        "rekall/marker");
+			var state = rekall.timeline.bar.state;
+			if(state)
+				rekall.timeline.bar.stop();
+			var friendlyName = prompt("Marker name", "Marker");
+			if(friendlyName != "") {
+				var marker = new Document();
+				var tag = new Tag(marker);
+				tag.setTimeStart(rekall.timeline.bar.timeCurrent);
+				tag.setTimeEnd  (rekall.timeline.bar.timeCurrent + 4);
+				tag.setMetadata("Rekall->Comments",    "");
+				tag.setMetadata("Rekall->Date/Time",   currentDate);
+				tag.setMetadata("Rekall->Flag",        "Marker");
+				tag.setMetadata("Rekall->Group",       "");
+				tag.setMetadata("Rekall->Import Date", currentDate);
+				tag.setMetadata("Rekall->Keywords",    "");
+				tag.setMetadata("Rekall->Name",        friendlyName);
+				tag.setMetadata("Rekall->Type",        "rekall/marker");
 
-			if(rekall_common.owner != undefined) {
-				tag.setMetadata("Rekall->Author",      			    rekall_common.owner.author);
-				tag.setMetadata("Rekall User Infos->User Name",     rekall_common.owner.author);
-				tag.setMetadata("Rekall User Infos->Location Name", rekall_common.owner.locationName);
+				if(rekall_common.owner != undefined) {
+					tag.setMetadata("Rekall->Author",      			    rekall_common.owner.author);
+					tag.setMetadata("Rekall User Infos->User Name",     rekall_common.owner.author);
+					tag.setMetadata("Rekall User Infos->Location Name", rekall_common.owner.locationName);
+				}
+				marker.addTag(tag);
+
+				rekall.project.addDocument("Files", marker);
+
+				var xmlChanged = "<document key=\"" + marker.key + "\">\n";
+				var metadatas = marker.tags[0].getMetadatas();
+				for (var key in metadatas) {
+					var meta = metadatas[key];
+					xmlChanged += "<meta cnt=\"" + Utils.escapeHtml(meta) + "\" ctg=\"" + Utils.escapeHtml(key) + "\" />\n";
+				}
+				xmlChanged += "</document>\n";
+				xmlChanged += "<tag key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>\n";
+				rekall.projectChanged(xmlChanged);
+
+				rekall.analyse();
 			}
-			marker.addTag(tag);
-
-/*
-			var xmlChanged = "";
-			xmlChanged += "<document key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>";
-			xmlChanged += "<tag key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>");
-*/
-			rekall.projectChanged(xmlChanged);
-			rekall.project.addDocument("Files", marker);
-			rekall.analyse();	
+			if(state)
+				rekall.timeline.bar.play();
 		}
 		else if(e.keyCode == 82) {
 			for (var keySource in rekall.project.sources) {

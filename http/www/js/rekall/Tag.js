@@ -214,7 +214,7 @@ Tag.prototype.isSelected = function() {
 Tag.metadataSorting        = new Sorting();
 Tag.metadataSortingVisible = {"Rekall":{'visible': true}};
 Tag.metadataCancel 		   = false;
-Tag.metadataEditionKey     = ["Rekall->Comments"];
+Tag.metadataEditionKey     = [];//"Rekall->Comments"
 Tag.displayMetadataEditing = "";
 Tag.prototype.displayMetadata = function() {
 	if((!Tags.isStrong) && (this.isSelectable)) {

@@ -27,19 +27,20 @@ function Source(hash) {
 }
 
 Source.prototype.addDocument = function(document) {
-	var key = this.mapPath(Utils.getLocalFilePath(document, "", true));
-	if(key == "")
-		key = "marker-" + CryptoJS.SHA1(moment() + random() + "").toString();
+	if(document.key == undefined) {
+		document.key = this.mapPath(Utils.getLocalFilePath(document, "", true));;
+		if(document.key == "")
+			document.key = "marker-" + CryptoJS.SHA1(moment() + random() + "").toString();
+	}
 
-	if(this.documents[key] == undefined) {
+	if(this.documents[document.key] == undefined) {
 		if(document.tags.length == 0) {
 			var tag = new Tag(document);
 			document.addTag(tag);
 		}
 		document.metadatas[-1] = document.cloneMetadatas();
 		
-		this.documents[key] = document;
-		document.key = key;
+		this.documents[document.key] = document;
 		if(document.getMetadata("Rekall->Media Function") == "Render")
 			rekall.captationVideoPlayers.show(document);
 	}

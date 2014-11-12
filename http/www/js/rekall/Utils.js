@@ -75,13 +75,18 @@ Utils.closePath = function(pt) {
 }
 
 
+/*
+"<": "&lt;",
+">": "&gt;",
+"/": '&#x2F;'
+*/
 var entityMap = {
-   "&": "&amp;",
-   "<": "&lt;",
-   ">": "&gt;",
-   '"': '&quot;',
-   "'": '&#39;',
-   "/": '&#x2F;'
+	"&": "&amp;",
+	'"': '&quot;',
+	"'": '&#39;',
+	"<": "<",
+	">": ">",
+	"/": '/'
 };
 Utils.escapeHtml = function(string) {
 	return String(string).replace(/[&<>"'\/]/g, function (s) {
