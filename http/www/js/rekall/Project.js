@@ -836,6 +836,7 @@ Project.prototype.analyse = function(full) {
 		$.each(Tags.byTime, function(key, tag) {
 			$('#flattentimeline_items').append(function() {
 				var styleColor = "background-color: " + tag.color + ";";
+				var textColor = "color: " + tag.color + ";";
 				
 				/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
 				var styleColor2 = styleColor;//"background-color: #3EA8B1;";
@@ -846,14 +847,15 @@ Project.prototype.analyse = function(full) {
 				} else styleImage = "background-color: rgba(0,0,0,.9)";
 				
 				var icnType = "";
-				if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("application/msword")>=0) icnType = "background-image:url(../../css/images/icn-word.png);";
-				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("application/pdf")>=0) icnType = "background-image:url(../../css/images/icn-pdf.png);";
-				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("application/")>=0) icnType = "background-image:url(../../css/images/icn-document.png);";
-				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("audio/")>=0) icnType = "background-image:url(../../css/images/icn-music.png);";
-				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("image/")>=0) icnType = "background-image:url(../../css/images/icn-image.png);";
-				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("text/x-vcard")>=0) icnType = "background-image:url(../../css/images/icn-user.png);";
-				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("text/")>=0) icnType = "background-image:url(../../css/images/icn-document.png);";
-				else if(tag.getMetadata(rekall.sortings["colors"].metadataKey).indexOf("video/")>=0) icnType = "background-image:url(../../css/images/icn-video.png);";
+				var tmpType = tag.getMetadata("Rekall->Type");
+				if(tmpType.indexOf("application/msword")>=0) icnType = "background-image:url(../../css/images/icn-word.png);";
+				else if(tmpType.indexOf("application/pdf")>=0) icnType = "background-image:url(../../css/images/icn-pdf.png);";
+				else if(tmpType.indexOf("application/")>=0) icnType = "background-image:url(../../css/images/icn-document.png);";
+				else if(tmpType.indexOf("audio/")>=0) icnType = "background-image:url(../../css/images/icn-music.png);";
+				else if(tmpType.indexOf("image/")>=0) icnType = "background-image:url(../../css/images/icn-image.png);";
+				else if(tmpType.indexOf("text/x-vcard")>=0) icnType = "background-image:url(../../css/images/icn-user.png);";
+				else if(tmpType.indexOf("text/")>=0) icnType = "background-image:url(../../css/images/icn-document.png);";
+				else if(tmpType.indexOf("video/")>=0) icnType = "background-image:url(../../css/images/icn-video.png);";
 				
 				//alert(icnType);
 				
@@ -861,12 +863,14 @@ Project.prototype.analyse = function(full) {
 				html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";
 				/*html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "'></div>";*/
 				
-				html 	+= "<div class='flattentimeline_bar'        style=''></div>";
+				/*html 	+= "<div class='flattentimeline_bar'        style=''></div>";*/
 				
 				html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";
 				
 				/*html 	+= "<div class='flattentimeline_counter'      style='" + styleColor2 + "'></div>";*/
-				html 	+= "<div class='flattentimeline_type'		style='" + icnType + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";
+				
+				html 	+= "<div class='flattentimeline_type'		style='" + icnType +"' title='" + tmpType + "'></div>";
+				html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";
 			/*	html 	+= "<div class='flattentimeline_type'		style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";*/
 				html 	+= "<div class='flattentimeline_counter' ></div>";
 				html 	+= "<div class='flattentimeline_title'>" + tag.getMetadata("Rekall->Name") + "</div>";
