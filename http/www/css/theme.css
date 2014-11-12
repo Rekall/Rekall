@@ -1012,6 +1012,9 @@ input[type="text"], textarea {
 	cursor:					pointer;
 	background:#26292B;
 }
+.flattentimeline_item:hover {
+	background:#1D2021;
+}
 .flattentimeline_image {
 	border-radius: 0;
 }
