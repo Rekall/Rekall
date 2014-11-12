@@ -31,9 +31,9 @@ function Rekall() {
 	this.sortings["search"]     = new Sorting("", false, "");
 	this.sortings["authors"]    = new Sorting("Rekall->Author");
 	this.sortings["types"]      = new Sorting("Rekall->Type");
-	this.sortings["corpus"]     = new Sorting();
-	this.sortings["keywords"]   = new Sorting();
+	this.sortings["corpus"]     = new Sorting("Rekall->Folder");
 	this.sortings["hashes"]   	= new Sorting("File->Hash");
+	this.sortings["keywords"]   = new Sorting();
 	
 	this.sortings["corpus"].analyse = false;
 	

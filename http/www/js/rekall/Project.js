@@ -165,10 +165,17 @@ Project.prototype.analyse = function(full) {
 
 						isOk &= rekall.sortings["authors"] .analyseAdd(tag);
 						isOk &= rekall.sortings["types"]   .analyseAdd(tag);
+						/*
 						if((tag.getMetadata("Rekall->Folder") != undefined) && (tag.getMetadata("File->File Name") != undefined))
 							isOk &= rekall.sortings["corpus"]  .analyseAdd(tag, tag.getMetadata("Rekall->Folder") + tag.getMetadata("File->File Name"));
 						else if(tag.getMetadata("Rekall->File Name") != undefined)
 							isOk &= rekall.sortings["corpus"]  .analyseAdd(tag, tag.getMetadata("File->File Name"));
+							*/
+						var folder = tag.getMetadata("Rekall->Folder");
+						if(tag.getMetadata("Rekall->Folder") == undefined)
+							folder = tag.getMetadata("Rekall->Type") + " ";
+						folder = folder.substr(0, folder.length-1);
+						isOk &= rekall.sortings["corpus"].analyseAdd(tag, folder);
 
 						if(isOk)	isOk &= rekall.sortings["horizontal"].analyseAdd(tag);
 						if(isOk)	isOk &= rekall.sortings["groups"]    .analyseAdd(tag);
@@ -305,7 +312,10 @@ Project.prototype.analyse = function(full) {
 							percentageDiv = "<div class='tab_list_item_percentage' style='color:rgba(255, 255, 255, " + map(percentage, 0, 1, 0.1, 1) + ")'>-</div>";
 
 						if(value == Sorting.prefix) {
-							valueDisplayed = "Not specified";
+							if(sorting == rekall.sortings["corpus"])
+								valueDisplayed = "/";
+							else
+								valueDisplayed = "Not specified";
 							postHtml += "<div class='tab_list_item " + ((!category.visible)?("invisible'"):("visible")) + "'><label><input class='tab_list_item_check' type='checkbox'" + ((category.checked)?("checked"):("")) + "/><span></span>" + valueDisplayed + "</label>" + percentageDiv + "<div class='tab_list_item_category invisible'>" + value + "</div></div>";
 						}
 						else {
