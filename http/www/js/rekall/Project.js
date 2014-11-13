@@ -948,7 +948,7 @@ Project.prototype.analyse = function(full) {
 					html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";
 				/*	html 	+= "<div class='flattentimeline_type'		style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";*/
 					html 	+= "<div class='flattentimeline_counter' ></div>";
-					html 	+= "<div class='flattentimeline_title'>" + tag.getMetadata("Rekall->Name") + "</div>";
+					html 	+= "<div class='flattentimeline_title' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";
 					/*html 	+= "<div class='flattentimeline_subtitle'>" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "</div>";*/
 					html    += "</div>";
 				

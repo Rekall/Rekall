@@ -655,6 +655,10 @@ u {
 	width:			40%;
 	float: 			left;	
 	text-transform: uppercase;
+
+	text-overflow: 	ellipsis;
+	white-space: 	nowrap; 
+	overflow: 		hidden;
 }
 .metadatas_table_element_value {
 	color:			#F5F8EE;
@@ -1079,6 +1083,11 @@ input[type="text"], textarea {
 	line-height:			50px;
 	height:					50px;
 	color:rgba(255,255,255,.5);
+
+	width:			55%;
+	text-overflow: 	ellipsis;
+	white-space: 	nowrap; 
+	overflow: 		hidden;
 }
 .flattentimeline_subtitle {
 	font-family:			"open_sanslight";
