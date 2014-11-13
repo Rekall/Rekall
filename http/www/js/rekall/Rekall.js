@@ -52,6 +52,7 @@ function Rekall() {
 	//Other events
 	this.mousePressed = false;
 	this.mousePressedPos = {x: 0, y: 0};
+	this.isScrolling = false;
 }
 
 Rekall.prototype.start = function() {
@@ -240,10 +241,10 @@ Rekall.prototype.start = function() {
 	this.timeline.tagLayer.scrollbars.layer.add(this.timeline.tagLayer.scrollbars.aeras);
 	this.timeline.tagLayer.scrollbars.layer.add(this.timeline.tagLayer.scrollbars);
 	this.timeline.add(this.timeline.tagLayer.scrollbars.layer);
-	this.timeline.tagLayer.scrollbars.hscroll.on('dragmove', function() { rekall.redraw(); });
-	this.timeline.tagLayer.scrollbars.vscroll.on('dragmove', function() { rekall.redraw(); });
-	this.timeline.tagLayer.scrollbars.hscroll.on('dragend',  function() { rekall.redraw(); });
-	this.timeline.tagLayer.scrollbars.vscroll.on('dragend',  function() { rekall.redraw(); });
+	this.timeline.tagLayer.scrollbars.hscroll.on('dragmove', function() { rekall.isScrolling = true; rekall.mousePressed = false; rekall.redraw(); });
+	this.timeline.tagLayer.scrollbars.vscroll.on('dragmove', function() { rekall.isScrolling = true; rekall.mousePressed = false; rekall.redraw(); });
+	this.timeline.tagLayer.scrollbars.hscroll.on('dragend',  function() { rekall.isScrolling = false; rekall.mousePressed = false; rekall.redraw(); });
+	this.timeline.tagLayer.scrollbars.vscroll.on('dragend',  function() { rekall.isScrolling = false; rekall.mousePressed = false; rekall.redraw(); });
 
 	this.resize();
 
@@ -558,110 +559,115 @@ Rekall.prototype.start = function() {
 
 	//Survols et sélections
 	$("#timeline").mousedown(function(event){
-		//Déplacement
-		rekall.mousePressedPos  = rekall.timeline.getPointerPosition();
-		rekall.mousePressedTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.mousePressedPos.x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
+		if(rekall.isScrolling != true) {
+			//Déplacement
+			rekall.mousePressedPos  = rekall.timeline.getPointerPosition();
+			rekall.mousePressedTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.mousePressedPos.x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
 		
-		for (var index in Tags.selectedTags) {
-			var tag = Tags.selectedTags[index];
-			tag.timeStartMouse = tag.timeStart;
-			tag.timeEndMouse   = tag.timeEnd;
-		}
+			for (var index in Tags.selectedTags) {
+				var tag = Tags.selectedTags[index];
+				tag.timeStartMouse = tag.timeStart;
+				tag.timeEndMouse   = tag.timeEnd;
+			}
 
-		rekall.mousePressedMode = "";
-		if(Tags.count())
-			rekall.mousePressedMode = "move";
-		for (var index in Tags.selectedTags) {
-			var tag = Tags.selectedTags[index];
-			var tagCenter = tag.getTimeStart() + (tag.getTimeEnd() - tag.getTimeStart())/2;
-			var tagDurationTolerence = max((tag.getTimeEnd() - tag.getTimeStart()) * 0.15, 0.2);
-			if(((tagCenter - tagDurationTolerence/2) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tagCenter + tagDurationTolerence/2)))
+			rekall.mousePressedMode = "";
+			if(Tags.count())
 				rekall.mousePressedMode = "move";
+			for (var index in Tags.selectedTags) {
+				var tag = Tags.selectedTags[index];
+				var tagCenter = tag.getTimeStart() + (tag.getTimeEnd() - tag.getTimeStart())/2;
+				var tagDurationTolerence = max((tag.getTimeEnd() - tag.getTimeStart()) * 0.15, 0.2);
+				if(((tagCenter - tagDurationTolerence/2) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tagCenter + tagDurationTolerence/2)))
+					rekall.mousePressedMode = "move";
 				
-			else if (((tag.getTimeStart() - tagDurationTolerence) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tag.getTimeStart() + tagDurationTolerence)))
-				rekall.mousePressedMode = "resizeL";
-			else if(((tag.getTimeEnd()   - tagDurationTolerence) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tag.getTimeEnd()   + tagDurationTolerence)))
-				rekall.mousePressedMode = "resizeR";
-		}
+				else if (((tag.getTimeStart() - tagDurationTolerence) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tag.getTimeStart() + tagDurationTolerence)))
+					rekall.mousePressedMode = "resizeL";
+				else if(((tag.getTimeEnd()   - tagDurationTolerence) <= rekall.mousePressedTime) && (rekall.mousePressedTime <= (tag.getTimeEnd()   + tagDurationTolerence)))
+					rekall.mousePressedMode = "resizeR";
+			}
 
-		rekall.mousePressed = true;
+			rekall.mousePressed = true;
 		
-		rekall.timeline.selectionLayer.path.polygon.clear();
-		if(Tags.hoveredTag == undefined)
-			drawSelection(event);
+			rekall.timeline.selectionLayer.path.polygon.clear();
+			if(Tags.hoveredTag == undefined)
+				drawSelection(event);
+		}
 	});
 	$("#timeline").mouseup(function(event){
-		mouseRelease(event);
+		if(rekall.isScrolling != true)
+			mouseRelease(event);
 	});
 	$("#timeline").mousemove(function(event){
-		//Position
-		var pos = {
-			x: event.pageX - $(this).offset().left - rekall.timeline.tagLayer.x() - rekall.timeline.tagLayer.group.x(),
-			y: event.pageY - $(this).offset().top  - rekall.timeline.tagLayer.y() - rekall.timeline.tagLayer.group.y(),
-		};
+		if(rekall.isScrolling != true) {
+			//Position
+			var pos = {
+				x: event.pageX - $(this).offset().left - rekall.timeline.tagLayer.x() - rekall.timeline.tagLayer.group.x(),
+				y: event.pageY - $(this).offset().top  - rekall.timeline.tagLayer.y() - rekall.timeline.tagLayer.group.y(),
+			};
 
-		//Survol
-		var hoveredTagOld = Tags.hoveredTag;
-		Tags.hoveredTag = undefined;
-		if((rekall.project) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0)) {
-			for (var keySource in rekall.project.sources) {
-				if(Tags.hoveredTag == undefined) {
-					for (var keyDocument in rekall.project.sources[keySource].documents) {
-						if(Tags.hoveredTag == undefined) {
-							for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
-								if((Tags.hoveredTag == undefined) && (rekall.project.sources[keySource].documents[keyDocument].tags[key].isVisible()) && (rekall.project.sources[keySource].documents[keyDocument].tags[key].rect.contains(pos))) {
-									Tags.hoveredTag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
-									break;
+			//Survol
+			var hoveredTagOld = Tags.hoveredTag;
+			Tags.hoveredTag = undefined;
+			if((rekall.project) && (rekall.timeline.selectionLayer.path.polygon.points.length == 0)) {
+				for (var keySource in rekall.project.sources) {
+					if(Tags.hoveredTag == undefined) {
+						for (var keyDocument in rekall.project.sources[keySource].documents) {
+							if(Tags.hoveredTag == undefined) {
+								for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
+									if((Tags.hoveredTag == undefined) && (rekall.project.sources[keySource].documents[keyDocument].tags[key].isVisible()) && (rekall.project.sources[keySource].documents[keyDocument].tags[key].rect.contains(pos))) {
+										Tags.hoveredTag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
+										break;
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-		}
 		
-		if((rekall.mousePressed) && (Tags.count()) && (rekall.sortings["horizontal"].metadataKey == "Time")) {
-			//Déplacement
-			rekall.mouseMoveTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.timeline.getPointerPosition().x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
+			if((rekall.mousePressed) && (Tags.count()) && (rekall.sortings["horizontal"].metadataKey == "Time")) {
+				//Déplacement
+				rekall.mouseMoveTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.timeline.getPointerPosition().x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
 
-			for (var index in Tags.selectedTags) {
-				var tag = Tags.selectedTags[index];
-				if     (rekall.mousePressedMode == "resizeL")
-					tag.setTimeStart(constrain(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime), tag.timeEnd));
-				else if(rekall.mousePressedMode == "resizeR")
-					tag.setTimeEnd(max(tag.timeStart, tag.timeEndMouse + (rekall.mouseMoveTime - rekall.mousePressedTime)));
-				else if(rekall.mousePressedMode == "move") {
-					var duration = tag.timeEndMouse - tag.timeStartMouse;
-					tag.setTimeStart(max(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime)));
-					tag.setTimeEnd  (tag.timeStart + duration);
+				for (var index in Tags.selectedTags) {
+					var tag = Tags.selectedTags[index];
+					if     (rekall.mousePressedMode == "resizeL")
+						tag.setTimeStart(constrain(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime), tag.timeEnd));
+					else if(rekall.mousePressedMode == "resizeR")
+						tag.setTimeEnd(max(tag.timeStart, tag.timeEndMouse + (rekall.mouseMoveTime - rekall.mousePressedTime)));
+					else if(rekall.mousePressedMode == "move") {
+						var duration = tag.timeEndMouse - tag.timeStartMouse;
+						tag.setTimeStart(max(0, tag.timeStartMouse + (rekall.mouseMoveTime - rekall.mousePressedTime)));
+						tag.setTimeEnd  (tag.timeStart + duration);
+					}
+					rekall.doNotChangeSelection = true;
+
+					//Update
+					tag.projectChangedXml = "<tag key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>";
 				}
-				rekall.doNotChangeSelection = true;
-
-				//Update
-				tag.projectChangedXml = "<tag key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>";
+				rekall.analyse(false);
+				rekall.timeline.tagLayer.draw();
 			}
-			rekall.analyse(false);
-			rekall.timeline.tagLayer.draw();
-		}
-		else if((rekall.mousePressed) && (Tags.hoveredTag == undefined)) {
-			rekall.timeline.selectionLayer.path.polygon.addPoint(pos);
-			drawSelection(event);
-		}
-		else if(Tags.hoveredTag != undefined) {
-			if(hoveredTagOld != Tags.hoveredTag)
-				Tags.hoveredTag.displayMetadata();
-		}
+			else if((rekall.mousePressed) && (Tags.hoveredTag == undefined)) {
+				rekall.timeline.selectionLayer.path.polygon.addPoint(pos);
+				drawSelection(event);
+			}
+			else if(Tags.hoveredTag != undefined) {
+				if(hoveredTagOld != Tags.hoveredTag)
+					Tags.hoveredTag.displayMetadata();
+			}
 			
-		/*if(((rekall.mousePressed) || (Tags.hoveredTag != undefined)) && (rekall.mousePressedMode == "move"))
-			window.document.body.style.cursor = 'move';
-		else if(((rekall.mousePressed) || (Tags.hoveredTag != undefined)) && (rekall.mousePressedMode.startsWith("resize")))
-			window.document.body.style.cursor = 'col-resize';
-		else*/if((rekall.mousePressed) && (Tags.hoveredTag == undefined))
-			window.document.body.style.cursor = 'crosshair';
-		else if(Tags.hoveredTag != undefined)
-			window.document.body.style.cursor = 'pointer';
-		else
-			window.document.body.style.cursor = 'default';		
+			/*if(((rekall.mousePressed) || (Tags.hoveredTag != undefined)) && (rekall.mousePressedMode == "move"))
+				window.document.body.style.cursor = 'move';
+			else if(((rekall.mousePressed) || (Tags.hoveredTag != undefined)) && (rekall.mousePressedMode.startsWith("resize")))
+				window.document.body.style.cursor = 'col-resize';
+			else*/if((rekall.mousePressed) && (Tags.hoveredTag == undefined))
+				window.document.body.style.cursor = 'crosshair';
+			else if(Tags.hoveredTag != undefined)
+				window.document.body.style.cursor = 'pointer';
+			else
+				window.document.body.style.cursor = 'default';
+		}
 	});
 	function mouseRelease(event) {
 		if(rekall.mousePressed){
