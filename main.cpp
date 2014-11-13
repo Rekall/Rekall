@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
     Global::pathDocuments   = QFileInfo(QStandardPaths::DocumentsLocation + "");
 #endif
     Global::pathApplication = QFileInfo(pathApplicationDir.absolutePath());
-    if(Global::pathApplication.absoluteFilePath().contains("/Rekall/release"))
+    if(Global::pathApplication.absoluteFilePath().contains("/Rekall-build/release"))
         Global::pathApplication = QFileInfo(Global::pathApplication.absoluteFilePath().remove("/release"));
     if(Global::pathApplication.absoluteFilePath().contains("/Rekall-build"))
         Global::pathApplication = QFileInfo(Global::pathApplication.absoluteFilePath().remove("-build"));
