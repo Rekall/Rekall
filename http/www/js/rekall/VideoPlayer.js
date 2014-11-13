@@ -57,6 +57,8 @@ VideoPlayer.prototype.loadLocal = function(tagOrDoc, play) {
 			this.show();
 		}
 	}
+	else if(this.autoplay)
+		this.play();
 }
 
 VideoPlayer.prototype.activate = function() {
