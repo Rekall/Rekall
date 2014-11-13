@@ -45,7 +45,7 @@ Source.prototype.addDocument = function(document) {
 			rekall.captationVideoPlayers.show(document);
 	}
 	else
-		this.documents[key].addVersion(document);
+		this.documents[document.key].addVersion(document);
 }
 Source.prototype.getDocument = function(path) {
 	var retour = undefined;

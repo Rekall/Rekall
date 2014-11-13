@@ -24,7 +24,7 @@
 function Tags() {
 }
 
-Tags.byTime = new Array();
+Tags.flattenTimelineTags = new Array();
 Tags.selectedTags = new Array();
 Tags.hoveredTag = undefined;
 Tags.isStrong = false;

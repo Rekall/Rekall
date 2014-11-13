@@ -197,8 +197,16 @@ Sorting.prototype.analyseEnd = function(minTagCount) {
 			this.categories[key].shoudBeRemoved = true;
 		if(this.categories[key].shoudBeRemoved)
 			delete this.categories[key];
-		else
+		else {
 			this.categoriesIndex++;
+			this.categories[key].tags.sort(function(a, b) {
+				var aM = a.getMetadata("Rekall->Name");
+				var bM = b.getMetadata("Rekall->Name");
+				if(aM < bM) return -1;
+				if(aM > bM) return 1;
+				return 0;
+			});
+		}
     }
 
 	//Echelle Linéaire

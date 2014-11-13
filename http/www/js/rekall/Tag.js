@@ -640,7 +640,7 @@ Tag.displayMetadata = function() {
 			var editor = "";
 
 			if(metadataKey == "Rekall->Comments")
-				editor = "<textarea class='" + valueClass + "'>" + value + "</textarea>";
+				editor = "<textarea class='" + valueClass + "'>" + value + "</textarea><p style='clear: left;'>Press Enter to validate</p>";
 			else {
 				editor = "<div class='metadatas_table_element_value_editor_bubbles'>";
 				
@@ -678,7 +678,7 @@ Tag.displayMetadata = function() {
 				editor += "			<input type='text' class='" + valueClass + "' placeholder='" + ((count)?("or type a new value"):("Type a value")) + "'/>";
 				if(valueClass != "one_selection")
 					editor += "		<span class='metadatas_table_element_value_editor_bubbles_ok " + valueClass + "'>Save&nbsp;changes</span>";
-				editor += "</div>";
+				editor += "</div><p style='clear: left;'>&nbsp;</p>";
 			}
 				
 			//HTML
