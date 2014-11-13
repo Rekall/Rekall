@@ -122,12 +122,16 @@ Timeline.prototype.updateFlattenTimeline = function() {
 				var progress = 0;
 				var timeEndExtended = tag.timeStart + max(2, tag.timeEnd - tag.timeStart);
 
-				if(this.timeCurrent <= tag.timeStart)
-					progress = this.timeCurrent - tag.timeStart;
-				else if((tag.timeStart < this.timeCurrent) && (this.timeCurrent < timeEndExtended))
-					progress = (this.timeCurrent - tag.timeStart) / (timeEndExtended - tag.timeStart);
+				if(rekall.sortings["horizontal"].metadataKey == "Time") {
+					if(this.timeCurrent <= tag.timeStart)
+						progress = this.timeCurrent - tag.timeStart;
+					else if((tag.timeStart < this.timeCurrent) && (this.timeCurrent < timeEndExtended))
+						progress = (this.timeCurrent - tag.timeStart) / (timeEndExtended - tag.timeStart);
+					else
+						progress = undefined;
+				}
 				else
-					progress = undefined;
+					timeEndExtended = tag.timeEnd;
 
 				if(progress == undefined) {
 					tag.flattenTimelineDom.slideUp();
@@ -150,7 +154,7 @@ Timeline.prototype.updateFlattenTimeline = function() {
 						tag.flattenTimelineDom.find(".flattentimeline_counter").text(ceil(-progress));
 						tag.flattenTimelineDom.find(".flattentimeline_counter").show();
 					}
-					else if(-20 < progress) {
+					else if(-9999999 < progress) {
 						tag.flattenTimelineDom.css("opacity", 0.1);
 						tag.flattenTimelineDom.slideDown();
 						tag.flattenTimelineDom.find(".flattentimeline_counter").hide();

@@ -458,26 +458,28 @@ Project.prototype.analyse = function(full) {
 		
 		//Action sur la recherche
 		$("#navigateur .tab_search input").keyup(function(event) {
-			event.stopPropagation();
-			var searchText = $(this).val().toLowerCase();
-			var sorting    = $(this).parent().parent().parent().attr("id").replace("Tab", "");
-			if((sorting == "search") || (sorting == "highlight"))
-				rekall.sortings[sorting].setCriterias(rekall.sortings[sorting].metadataConfigStr, rekall.sortings[sorting].valCanBeFloats, searchText, false);
-			else {
-				sorting = rekall.sortings[sorting];
-				$(this).parent().parent().parent().find('.tab_list_item').each(function(index) {
-					var category = $(this).find(".tab_list_item_category").text();
-					if((searchText == "") || ($(this).text().toLowerCase().indexOf(searchText) > -1)) {
-						sorting.categories[category].visible = true;
-						$(this).show();
-					}
-					else {
-						sorting.categories[category].visible = false;
-						$(this).hide();
-					}
-				});
+		    if(event.keyCode == 13) {
+				event.stopPropagation();
+				var searchText = $(this).val().toLowerCase();
+				var sorting    = $(this).parent().parent().parent().attr("id").replace("Tab", "");
+				if((sorting == "search") || (sorting == "highlight"))
+					rekall.sortings[sorting].setCriterias(rekall.sortings[sorting].metadataConfigStr, rekall.sortings[sorting].valCanBeFloats, searchText, false);
+				else {
+					sorting = rekall.sortings[sorting];
+					$(this).parent().parent().parent().find('.tab_list_item').each(function(index) {
+						var category = $(this).find(".tab_list_item_category").text();
+						if((searchText == "") || ($(this).text().toLowerCase().indexOf(searchText) > -1)) {
+							sorting.categories[category].visible = true;
+							$(this).show();
+						}
+						else {
+							sorting.categories[category].visible = false;
+							$(this).hide();
+						}
+					});
+				}
+				rekall.analyse();
 			}
-			rekall.analyse();
 		});
 
 
