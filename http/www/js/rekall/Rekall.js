@@ -296,15 +296,36 @@ Rekall.prototype.start = function() {
 		rekall.captationVideoPlayers.resize(false);
 		rekall.analyse(false);
 	});
+/*	
 	$("#navigateurTabNav").click(function() {
 		$("#navigateur").parent().toggle();
 		if($("#navigateur").parent().is(":visible"))	$("#navigateurTabNav").html("&times;");
-		else											$("#navigateurTabNav").html("Filters");
+		else											$("#navigateurTabNav").html("Menu");
 		rekall.map.resize();
 		rekall.panner.resize();
 		rekall.captationVideoPlayers.resize();
 		rekall.resize();
 		rekall.analyse(true);
+	});
+*/
+	$("#navigateurTabNav").click(function() {
+		var tmpWidth = $("#left_menu_item_open").width();
+		if(tmpWidth>0) {
+			$("#left_menu_item_open").attr("tool","").width(0);//hide();
+			$(".left_menu_item_checklist").hide();
+			$(".left_menu_item_tab_search").hide();
+			$("#navigateurTabNav").css("backgroundColor","#559299");
+			$(".left_menu_item").removeClass("selected");
+		} else {
+			$("#left_menu").parent().toggle();
+			if($("#left_menu").parent().is(":visible"))	$("#navigateurTabNav").html("&times;");
+			else											$("#navigateurTabNav").html("Menu");
+			rekall.map.resize();
+			rekall.panner.resize();
+			rekall.captationVideoPlayers.resize();
+			rekall.resize();
+			rekall.analyse(true);
+		}
 	});
 	$("#inspecteurTabNav").click(function() {
 		$("#inspecteur").parent().toggle();

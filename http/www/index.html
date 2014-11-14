@@ -32,6 +32,7 @@
 		<script language="javascript" type='text/javascript' src='js/libs/sha1.js'></script>
 		<script language="javascript" type='text/javascript' src='js/libs/moment-with-langs.min.js'></script>
 		<script language="javascript" type='text/javascript' src='js/libs/kinetic-v5.1.0.min.js'></script> 
+		<script language="javascript" type='text/javascript' src='js/libs/jquery.dotdotdot.min.js'></script> 
 
 		<script language="javascript" type='text/javascript' src='js/iannix.js'></script>
 		<script language="javascript" type='text/javascript' src='js/script.js'></script>
@@ -76,11 +77,142 @@
 	<body class='unselectable'>
 		<div id='ruban'></div>
 		<div class='layout_table'>
-			<div class='layout_cell' style='width: 200px;'>
+			<div class="layout_cell" style='width: 80px;'>
+				<div id="left_menu">
+					<div class="left_menu_item dropable" id="left_menu_item_presets" title="Presets">
+						<div class="left_menu_item_icn" id="left_menu_item_icn_presets"></div>
+						<div class="left_menu_item_title">Presets</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+					<div class="left_menu_item dropable" id="left_menu_item_horizontal">
+						<div class="left_menu_item_icn" id="left_menu_item_icn_horizontal"></div>
+						<div class="left_menu_item_title">Horizontal</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+					<div class="left_menu_item dropable" id="left_menu_item_vertical">
+						<div class="left_menu_item_icn" id="left_menu_item_icn_vertical"></div>
+						<div class="left_menu_item_title">Vertical</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+					<div class="left_menu_item dropable" id="left_menu_item_groups">
+						<div class="left_menu_item_icn" id="left_menu_item_icn_groups"></div>
+						<div class="left_menu_item_title">Groups</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+					<div class="break"></div>
+					<div class="left_menu_item dropable" id="left_menu_item_colors">
+						<div class="left_menu_item_icn" id="left_menu_item_icn_colors"></div>
+						<div class="left_menu_item_title">Color</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+					<div class="left_menu_item dropable" id="left_menu_item_authors">
+						<div class="left_menu_item_icn" id="left_menu_item_icn_filter"></div>
+						<div class="left_menu_item_title">Filter 1</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+					<div class="left_menu_item dropable" id="left_menu_item_types">
+						<div class="left_menu_item_icn" id="left_menu_item_icn_filter"></div>
+						<div class="left_menu_item_title">Filter 2</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+					<div class="left_menu_item dropable" id="left_menu_item_highlight">
+						<div class="left_menu_item_icn" id="left_menu_item_icn_highlight"></div>
+						<div class="left_menu_item_title">Highlight</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+					<div class="left_menu_item dropable" id="left_menu_item_keywords">
+						<div class="left_menu_item_icn" id="left_menu_item_icn_keywords"></div>
+						<div class="left_menu_item_title">Keywords</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+					<div class="break"></div>
+					<div class="left_menu_item dropable" id="left_menu_item_search">
+						<div class="left_menu_item_icn" id="left_menu_item_icn_search"></div>
+						<div class="left_menu_item_title">Search</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+				</div>
+			</div>
+			<div class="layout_cell" id="left_menu_item_open" style="width:0px;">
+				
+				<div class="left_menu_item_open_cat" id='left_menu_item_open_presets'>
+					<div class="left_menu_item_open_title">Presets</div>
+					<div class="left_menu_item_open_instructions">Manage your presets to switch easily from one workspace to another</div>
+					<ul id='tag_workspaces_menu'>
+						<li action='horizontal=Rekall->Author ; vertical=Rekall->Date/Time|month ; groups=Rekall->Date/Time|year'>Authors</li>
+						<li action='horizontal=Time ; vertical=Rekall->Date/Time|month ; groups=Rekall->Date/Time|year'>Timeline</li>
+						<li action='horizontal=Rekall->Author ; vertical=Rekall->Import Date|hour_only ; groups=Rekall->Import Date|day'>Imports</li>
+						<li action='horizontal=Rekall->Author ; vertical=Rekall->Type ; groups='>Types &times; Authors</li>
+					</ul>
+					<div>
+						<span id='tag_workspaces_save'>Save this workspace</span>
+					</div>
+				</div>
+				<div class="left_menu_item_open_cat" id='left_menu_item_open_horizontal'>
+					<div class="left_menu_item_open_title">Horizontal axis</div>
+					<div class="left_menu_item_open_instructions">Select the type of data you want do display on the horizontal axis</div>
+				</div>
+				<div class="left_menu_item_open_cat" id='left_menu_item_open_vertical'>
+					<div class="left_menu_item_open_title">Vertical axis</div>
+					<div class="left_menu_item_open_instructions">Select the type of data you want do display on the vertical axis</div>
+				</div>
+				<div class="left_menu_item_open_cat" id='left_menu_item_open_groups'>
+					<div class="left_menu_item_open_title">V. axis groups</div>
+					<div class="left_menu_item_open_instructions">You have the possibility to set groups on the vertical axis.<br>Select the type of data you want do group your documents by.</div>
+				</div>
+				<div class="left_menu_item_open_cat" id='left_menu_item_open_colors'>
+					<div class="left_menu_item_open_title">Colors</div>
+					<div class="left_menu_item_open_instructions">Select the type of data you want your documents to be colored by.</div>
+				</div>
+				<div class="left_menu_item_open_cat" id='left_menu_item_open_authors'>
+					<div class="left_menu_item_open_title">Filter 1</div>
+					<div class="left_menu_item_open_instructions">Set a filter to hide all the documents you don't need to see right now.</div>
+				</div>
+				<div class="left_menu_item_open_cat" id='left_menu_item_open_types'>
+					<div class="left_menu_item_open_title">Filter 2</div>
+					<div class="left_menu_item_open_instructions">Set a filter to hide all the documents you don't need to see right now.</div>
+				</div>
+				<div class="left_menu_item_open_cat" id='left_menu_item_open_highlight'>
+					<div class="left_menu_item_open_title">Highlight</div>
+					<div class="left_menu_item_open_instructions">Set a filter to hide all the documents you don't need to see right now.</div>
+				</div>
+				<div class="left_menu_item_open_cat" id='left_menu_item_open_keywords'>
+					<div class="left_menu_item_open_title">Keywords</div>
+					<div class="left_menu_item_open_instructions">Set a filter to hide all the documents you don't need to see right now.</div>
+				</div>
+				<div class="left_menu_item_open_cat" id='left_menu_item_open_search'>
+					<div class="left_menu_item_open_title">Search</div>
+					<div class="left_menu_item_open_instructions">Set a filter to hide all the documents you don't need to see right now.</div>
+				</div>
+				
+				<div class="left_menu_item_open_cat" id="left_menu_item_open_select">
+				</div>
+				<div class="left_menu_item_open_cat" id="left_menu_item_open_search">
+					<div class='tab_content'>
+						<div class='tab_search'><input type='text' placeholder="Search in project…"></div>
+					</div>
+				</div>
+				
+				<div class='left_menu_item_tab_search' id="left_menu_item_tab_search_highlight"><input type='text' placeholder="Filter…"></div>
+				<div class='left_menu_item_tab_search' id="left_menu_item_tab_search_search"><input type='text' placeholder="Search in project…"></div>
+				
+				<div class="left_menu_item_checklist" id="groupsChecklist"></div>
+				<div class="left_menu_item_checklist" id="colorsChecklist"></div>
+				<div class="left_menu_item_checklist" id="highlightChecklist"></div>
+				<div class="left_menu_item_checklist" id="keywordsChecklist"></div>
+				<div class="left_menu_item_checklist" id="authorsChecklist"></div>
+				<div class="left_menu_item_checklist" id="typesChecklist"></div>
+				<div class="left_menu_item_checklist" id="searchChecklist"></div>
+				
+				<div class='left_menu_item_tab_search' id="left_menu_item_tab_search_colors"><input type='text' placeholder="Highlight only…"></div>
+				<div class='left_menu_item_tab_search' id="left_menu_item_tab_search_groups"><input type='text' placeholder="Display only…"></div>
+				<div class='left_menu_item_tab_search' id="left_menu_item_tab_search_keywords"><input type='text' placeholder="Display only…"></div>
+				
+			</div>
+<!--			<div class='layout_cell' style='width: 200px;'>
 				<div id='navigateur'>
 					<div id="navigateur_main_title">Tools</div>
 					<div id='searchTab'>
-						<!--<div class='tab_title'>Global search</div>-->
 						<div class='tab_content'>
 							<div class='tab_search'><input type='text' placeholder="Search in project…"></div>
 							<div class='tab_list'></div>
@@ -181,7 +313,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div>-->
 			<div class='layout_cell'>
 				<div id='central'>
 					<ul>

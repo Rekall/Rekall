@@ -345,8 +345,8 @@ Tag.displayMetadata = function() {
 	else if(Tags.count() > 1) {
 		$("#metadatas_title")   .text("MULTIPLE SELECTION");
 		$("#metadatas_subtitle").text("");
-		$("#inspecteur")      .css("background-color", "#869092");
-		$("#inspecteurTabNav").css("background-color", "#869092");
+		$("#inspecteur")      .css("background-color", "#2C3032");
+		$("#inspecteurTabNav").css("background-color", "#2C3032");
 	}
 	if(Tags.count() != 1) {
 		$("#metadatas_version").slider();
@@ -358,7 +358,7 @@ Tag.displayMetadata = function() {
 		$("#previewVideo").hide();
 		$("#preview_menu_bar").hide();
 		$("#inspecteur")      .css("background-color", "#2C3032");
-		$("#inspecteurTabNav").css("background-color", "#57A5AF");
+		$("#inspecteurTabNav").css("background-color", "#EC8960");
 		rekall.previewVideoPlayer.hide();
 	}
 	

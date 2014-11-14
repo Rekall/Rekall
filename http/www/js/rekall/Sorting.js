@@ -85,7 +85,7 @@ Sorting.prototype.setCriterias = function(metadataConfigStr, valCanBeFloats, met
 		valCanBeFloats = false;
 	this.valCanBeFloats = valCanBeFloats;
 	if(analyse != false)
-		rekall.analyse();
+		rekall.analyse(analyse);
 }
 
 
