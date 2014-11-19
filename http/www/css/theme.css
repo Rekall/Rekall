@@ -893,16 +893,20 @@ input[type="text"], textarea {
 	margin: 8px 5px;
 	cursor: pointer;
 	width:24px;
-	height:24px;
+	height:21px;
 	display:inline-block;
 	background-color:rgba(255,255,255,.1);
-	border-radius:20px;
+	background-position:center center;
+	background-repeat:no-repeat;
+	border-radius:2px;
+	border-top:1px solid rgba(255,255,255,.05);
+	border-bottom:1px solid rgba(0,0,0,.6);
 }
 .middlebar_btn:hover {
 	background-color:rgba(255,255,255,.05);
 }
 .middlebar_label {
-	color:#444;
+	color:rgba(255,255,255,.15);
 	margin: 0px 5px;
 	width:100px;
 	height:40px;
@@ -984,7 +988,7 @@ input[type="text"], textarea {
 	width:100%;
 	height:100%;
 	overflow:scroll;
-	background-color:#1B1D1E;
+	background-color:#1B1D1E; /*191716;*/
 }
 .reload_btn, .settings_btn {
 	background-position:	center center;
@@ -1013,10 +1017,10 @@ input[type="text"], textarea {
 	color:			  		white;
 	margin:					0px 0px;
 	cursor:					pointer;
-	background:#26292B;
+	background:#26292B;/*231F1E;*/
 }
 .flattentimeline_item:hover {
-	background:#1D2021;
+	background:#1D2021;/*191716;*/
 }
 .flattentimeline_image {
 	border-radius: 0;
@@ -1049,6 +1053,7 @@ input[type="text"], textarea {
 .flattentimeline_image {
 	width:50px; height:50px;
 	margin:0px;
+	border-radius:2px;
 	position:absolute;
 	background-position:	center center;
 	background-repeat:		no-repeat; 
@@ -1127,8 +1132,9 @@ input[type="text"], textarea {
 	width:					40px;
 	height:					40px;
 	line-height:			38px;
+	border-radius:			2px;
 	
-	background-color:				rgba(0,0,0,1);
+	background-color:		#000;
 	
 	font-size:				18px;
 	text-align: 			center;
@@ -1232,8 +1238,9 @@ input[type="text"], textarea {
 }
 
 .left_menu_item_open_label {
+	font-family:	"open_sansitalic";
 	font-size:11px;
-	color:rgba(255,255,255,.5);
+	color:rgba(255,255,255,.3);
 	line-height:1.4em;
 	margin:5px 20px 5px 20px;
 	width:180px;
