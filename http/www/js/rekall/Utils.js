@@ -100,6 +100,16 @@ Utils.elide = function(text, length) {
 		return text;
 	else
 		return text.substr(0, length) + "…";
+}     
+
+Utils.elide2lines = function(text, length) {
+	if(text.length <= length)
+		return text;
+	else if(text.length < length*2)  
+		if(text.split(" ").length>1) return text;//.substr(0, length)+"<br>"+text.substr(length,text.length);  
+		else return text.substr(0, length)+"–<br>"+text.substr(length,length); 
+	else 
+		return text.substr(0, length)+"…<br>…"+text.substr(text.length - length,length);
 }
 
 Utils.getPreviewPath = function(tagOrDoc) {

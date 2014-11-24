@@ -25,7 +25,11 @@ function Panner() {
 	this.filtredTags = new Array();
 	this.visible     = false; 
 	this.recreateGallery = true;
-	$("#panner .gallery").click(function(event) {
+   /* $("#panner .gallery").click(function(event) {
+		event.stopPropagation();
+		Tags.clear(true);
+	});*/  
+	$("#panner").click(function(event) {
 		event.stopPropagation();
 		Tags.clear(true);
 	});
@@ -144,7 +148,9 @@ Panner.prototype.show = function(filter, bounds) {
 				target          = gallery2;
 				categoryVerbose = "Not specified";
 			}
-			target.append("<h1 style='color: " + contents.category.color + "'>" + categoryVerbose + "</h1>");
+			//target.append("<h1 style='color: " + contents.category.color + "'>" + categoryVerbose + "</h1>");
+			//target.append("<h1><div class='thumbnailPastille' style='background-color:"+contents.category.color+";'></div>" + categoryVerbose + "</h1>"); 
+			target.append("<h1 style='border-color:"+contents.category.color+";'>" + categoryVerbose + "</h1>"); 
 		}
 		
 		/*for (var index in contents.thumbnails) {
@@ -153,8 +159,10 @@ Panner.prototype.show = function(filter, bounds) {
 			if(recreateGallery) {
 				thiss.filtredTags.push(thumbnail.tag);		
 				target.append(function() {
-					if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><br/>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
-					else							thumbnail.dom = $("<div draggable=true class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");
+					//if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><div class='thumbnailTxt'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");
+					if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><div class='thumbnailImage' style='background-image:url("+thumbnail.url +");'></div><div class='thumbnailTxt' style='background-color:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");
+					//else							thumbnail.dom = $("<div draggable=true class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");      
+					else							thumbnail.dom = $("<div draggable=true class='nothumbnail'><div class='thumbnailImage'></div><div class='thumbnailTxt' style='background-color:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");      
 
 					thumbnail.dom.mouseenter(function(event) {
 						if(!Tags.isStrong) {
@@ -190,10 +198,12 @@ Panner.prototype.show = function(filter, bounds) {
 						add = false;
 				}
 				else {
-					opacity = 0.8;
+					opacity = 0.5;
 					border = 'dotted';
 				}
-				if(add)	thumbnail.dom.show().css("opacity", opacity);
+			
+				
+				if(add)	thumbnail.dom.css("opacity", opacity).css("display", "inline-block");
 				else	thumbnail.dom.hide().css("opacity", opacity);
 			}
 		});

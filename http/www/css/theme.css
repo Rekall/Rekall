@@ -248,6 +248,31 @@ u {
 	overflow:	hidden;
 	overflow-y:	scroll;
 	background: black;
+	/*background-image: -webkit-linear-gradient(bottom, #1D2021 0%, #000 100%);*/  
+	background-image: -webkit-linear-gradient(bottom, #2C3032 0%, #1D2021 100%);       
+	/*
+	darker
+	#161A1A
+
+	dark
+	#1B1D1E
+
+	middle
+	#1D2021
+
+	light
+	#26292B
+
+	lighter
+	#2C3032
+	#2C3033
+
+	#727A7F
+
+	#959FA5
+	*/
+	    
+
 }
 #timeline {
 	border-right:1px solid #000;
@@ -489,27 +514,78 @@ u {
 	overflow-y:	scroll;
     position:	relative;
 }
-#panner .gallery {
+/*#panner */.gallery {
 	color:		white;
-	padding:	15px 5px 5px 5px;
+	padding:	0px 10px 20px 10px;/* 5px 5px 5px;*/
+	text-align:center;  
+	max-width:1200px;
+	margin:auto;
 }
-#panner .gallery div.thumbnail {
-	float:			left;
+/*#panner .gallery div*/.thumbnail, .nothumbnail {
+	display:			inline-block;
+	width:120px;
+	margin: 10px;
+}
+
+#panner .gallery .thumbnailTxt {
 	color:			white;
-	padding:	    15px 5px 5px 5px;
+	border-radius:0 0 2px 2px;
+	width:100px;
+	height:25px;
+	background:#444;
+	text-align:center;
+	font-size:11px;
+	padding:0 10px 5px 10px;
+	display:inline-block;
+	display:table-cell;
+	vertical-align:middle;
+	overflow:hidden;           
 }
+
+
+
 #panner .gallery div.thumbnail {
 	/*color: 			red;*/
 }
 #panner .gallery div.nothumbnail {
 	/*color: 			blue;*/
 }
-#panner .gallery h1 {
-	font-size:	14px;
-	clear:		left;
+#panner .gallery h1 {  
+	text-align:center; 
+	/*width:100%;   */    
+	width:350px;
+	font-size:	14px;   
+	color:#FFF;
+	font-family: 		"open_sanslight"; 
+	font-weight:normal;  
+	/*margin:20px 0 10px 0;  */
+	margin:45px auto 15px auto;
+	padding-bottom:15px;
+	border-bottom:1px solid rgba(255,255,255,.2);
+}     
+.thumbnailPastille {
+	width:10px; height:10px;
+	display:inline-block;
+	margin:0 5px 0 0;
+	border-radius:5px;   
+}
+
+.thumbnailImage {
+	cursor:		pointer;
+	width:120px; height:120px;
+	border-radius:2px 2px 0 0;  
+	background-color:#000;  
+	background-position:center center;
+	-webkit-background-size:cover;
+    -moz-background-size: 	cover;
+    -o-background-size: 	cover;
+    background-size: 		cover;
 }
 #panner .gallery img {
 	cursor:		pointer;
+	width:120px;
+	background:red;
+	border-radius:2px 2px 0 0;
 }
 
 #panner .panzoom-parent {
@@ -886,7 +962,8 @@ input[type="text"], textarea {
 	border-left:1px solid #000;
 	height:40px;
 	/*background-color:#26292B;*/
-	background-color:#161A1A;
+	background-color:#161A1A;    
+	/*background-color:#101111;    */
 }
 .middlebar_btn {
 	color: white;
@@ -906,7 +983,7 @@ input[type="text"], textarea {
 	background-color:rgba(255,255,255,.05);
 }
 .middlebar_label {
-	color:rgba(255,255,255,.15);
+	color:rgba(255,255,255,.25);
 	margin: 0px 5px;
 	width:100px;
 	height:40px;
