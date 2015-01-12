@@ -1,6 +1,6 @@
 /*
     This file is part of Rekall.
-    Copyright (C) 2013-2014
+    Copyright (C) 2013-2015
 
     Project Manager: Clarisse Bardiot
     Development & interactive design: Guillaume Jacquemin & Guillaume Marais (http://www.buzzinglight.com)
