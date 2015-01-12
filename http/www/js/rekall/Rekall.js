@@ -452,7 +452,7 @@ Rekall.prototype.start = function() {
 				}
 			}
 		}
-		else if(e.keyCode == 77) {
+	   /* else if(e.keyCode == 77) {
 			var currentDate = moment().format("YYYY:MM:DD HH:mm:ss");
 
 			var state = rekall.timeline.bar.state;
@@ -508,7 +508,7 @@ Rekall.prototype.start = function() {
 			    }
 			}
 			rekall.analyse(true);
-		}
+		}     */
 	});
 	
 	

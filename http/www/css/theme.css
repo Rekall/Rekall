@@ -531,7 +531,7 @@ u {
 	color:			white;
 	border-radius:0 0 2px 2px;
 	width:100px;
-	height:25px;
+	height:30px;
 	background:#444;
 	text-align:center;
 	font-size:11px;
@@ -554,7 +554,7 @@ u {
 	text-align:center; 
 	/*width:100%;   */    
 	width:350px;
-	font-size:	14px;   
+	font-size:	12px;   
 	color:#FFF;
 	font-family: 		"open_sanslight"; 
 	font-weight:normal;  
@@ -657,7 +657,7 @@ u {
 
 #metadatas {
 	white-space: 	nowrap;
-	display:		none;
+	display:		none;   
 }
 #metadatas_title {
 	font-size: 		12px;
@@ -708,7 +708,12 @@ u {
 
 #metadatas_table {
 	background-color:	rgba(0, 0, 0, 0.2);
-	padding:			5px 0px 15px 0px;
+	padding:			5px 0px 100px 0px;  
+	width:250px;
+	height:80%;                    
+	position:absolute;   
+	overflow-y:scroll;   
+	overflow-x:hidden;    
 }
 .metadatas_table_category {
 }
@@ -716,10 +721,10 @@ u {
 	cursor: 	 	pointer;
 	padding:		10px 0px 5px 10px;
 	text-transform: uppercase;
-	color:			#F5F8EE;
+	color:			#F5F8EE;     
 }
 .metadatas_table_element {
-	padding:		5px 0px 5px 30px;
+	padding:		5px 0px 5px 15px;
 	clear: 			left;
 	float: 			none;
 	color:			rgba(245, 248, 238, 0.6);
@@ -731,9 +736,9 @@ u {
 	font-style:		italic;
 }
 .metadatas_table_element_key {
-	width:			40%;
+	width:			35%;
 	float: 			left;	
-	text-transform: uppercase;
+	/*text-transform: uppercase;*/
 
 	text-overflow: 	ellipsis;
 	white-space: 	nowrap; 
@@ -746,48 +751,49 @@ u {
 .metadatas_table_element_value_editor_bubbles div, .metadatas_table_element_value_editor_bubbles_ok, .metadatas_table_element_value_editor input[type="text"], .metadatas_table_element_value_editor textarea {
 	cursor: 				pointer;
 	float: 					left;
-	-webkit-border-radius: 	5px;
-  	-moz-border-radius: 	5px;
-  	border-radius: 			5px;
-	margin:					1px 0px 1px 1px;
-	padding: 				3px;
+	-webkit-border-radius: 	2px;
+  	-moz-border-radius: 	2px;
+  	border-radius: 			2px;
+	margin:					0px 0px 3px 3px;
+	padding: 				4px 5px 3px 5px;
 	color:					#F5F8EE;
 }
 .metadatas_table_element_value_editor_bubbles div {
 	padding: 				4px 3px 4px 3px;
-	border:					1px solid #F5F8EE;
+	/*border:					1px solid #F5F8EE;  */
 }
 .metadatas_table_element_value_editor_bubbles div.values {
 	font-style:				italic;
 	color:					black;
 	background-color:		#F5F8EE;
-	border:					1px solid #F5F8EE;
+	/*border:					1px solid #F5F8EE;  */
 }
 .metadatas_table_element_value_editor_bubbles div.single {
 	font-style:				normal;
 }
 
 .metadatas_table_element_value_editor_bubbles div.autocompleteValues {
-	font-style:				normal;
-	border:					1px solid #F5F8EE;
-}
+	font-style:				normal;        
+	background-color:		rgba(255,255,255,.2);   
+  /*  border:					1px solid #F5F8EE; */
+} 
 .metadatas_table_element_value_editor_bubbles div.originalValues {
 	font-style:				normal;
 	color:					#2DCAE1;
-	border:					1px solid #2DCAE1;
+	/*border:					1px solid #2DCAE1; */
 }
 
 .metadatas_table_element_value_editor_bubbles div.selected, .metadatas_table_element_value_editor_bubbles div.added {
 	font-style:				normal;
 	background-color:		#2DCAE1;
 	color:					black;
-	border:					1px solid #2DCAE1;
+   /* border:					1px solid #2DCAE1;    */
 }
 .metadatas_table_element_value_editor_bubbles div.removed {
 	font-style:				normal;
 	background-color:		#E20000;
 	color:					#F5F8EE;
-	border:					1px solid #E20000;
+  /*  border:					1px solid #E20000;  */
 }
 .metadatas_table_element_value_editor_bubbles_ok {
 	font-size: 		9px;
@@ -805,7 +811,7 @@ u {
 	cursor: 				text;
 	float: 					left;
 	width: 					45%;
-	border:					1px solid #F5F8EE;
+	/*border:					1px solid #F5F8EE;   */
 }
 .metadatas_table_element_value_editor textarea {
 	height: 				100px;
