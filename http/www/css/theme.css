@@ -709,11 +709,11 @@ u {
 #metadatas_table {
 	background-color:	rgba(0, 0, 0, 0.2);
 	padding:			5px 0px 100px 0px;  
-	width:250px;
+	/*width:250px;
 	height:80%;                    
 	position:absolute;   
 	overflow-y:scroll;   
-	overflow-x:hidden;    
+	overflow-x:hidden;*/    
 }
 .metadatas_table_category {
 }
