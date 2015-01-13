@@ -28,7 +28,7 @@
 #include <QThread>
 #include <QQueue>
 #include <QCoreApplication>
-#include "global.h"
+#include "../global.h"
 
 class AnalyseProcess;
 class Analyse : public QThread, public AnalyseInterface {

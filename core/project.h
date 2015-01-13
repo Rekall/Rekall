@@ -30,8 +30,8 @@
 #include <QTextDocument>
 #include <QTimer>
 #include <QAction>
-#include "http/filecontroller.h"
-#include "global.h"
+#include "../http/filecontroller.h"
+#include "../global.h"
 #include "watcherlocal.h"
 
 

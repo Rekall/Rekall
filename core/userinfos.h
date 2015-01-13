@@ -30,7 +30,7 @@
 #include <QNetworkAccessManager>
 #include <QTimer>
 #include <QDomDocument>
-#include "global.h"
+#include "../global.h"
 
 class UserInfos : public QObject, public UserInfosInterface {
     Q_OBJECT

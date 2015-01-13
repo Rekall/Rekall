@@ -25,8 +25,8 @@
 #define WATCHERLOCAL_H
 
 #include <QCoreApplication>
-#include "global.h"
-#include "watcher/folderwatcher.h"
+#include "../global.h"
+#include "../watcher/folderwatcher.h"
 
 class WatcherLocal : public WatcherInterface {
     Q_OBJECT

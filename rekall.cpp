@@ -159,6 +159,7 @@ void Rekall::checkForUpdatesFinished(QNetworkReply *reply) {
         QString info = reply->readAll().trimmed();
         if((info.length() > 0) || (forceUpdate))
             newVersionOfRekall = true;
+        //qDebug("Update status : %d", newVersionOfRekall);
     }
 }
 

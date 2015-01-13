@@ -30,15 +30,15 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include "global.h"
+#include "../global.h"
 #include "templatecache.h"
 #include "httpsessionstore.h"
 #include "httplistener.h"
 #include "dualfilelogger.h"
 #include "httplistener.h"
-#include "http/filecontroller.h"
-#include "http/requestmapper.h"
-#include "http/static.h"
+#include "../http/filecontroller.h"
+#include "../http/requestmapper.h"
+#include "../http/static.h"
 
 
 class Http : public HttpInterface {

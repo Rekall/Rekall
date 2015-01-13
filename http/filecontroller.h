@@ -24,7 +24,7 @@
 #ifndef FILECONTROLLER_H
 #define FILECONTROLLER_H
 
-#include "global.h"
+#include "../global.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QFileInfo>

@@ -25,13 +25,13 @@
 #define REQUESTMAPPER_H
 
 #include "httprequesthandler.h"
-#include "http/lib/dumpcontroller.h"
-#include "http/lib/templatecontroller.h"
-#include "http/lib/formcontroller.h"
-#include "http/lib/fileuploadcontroller.h"
-#include "http/lib/sessioncontroller.h"
-#include "http/static.h"
-#include "global.h"
+#include "../http/lib/dumpcontroller.h"
+#include "../http/lib/templatecontroller.h"
+#include "../http/lib/formcontroller.h"
+#include "../http/lib/fileuploadcontroller.h"
+#include "../http/lib/sessioncontroller.h"
+#include "../http/static.h"
+#include "../global.h"
 #include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QBuffer>
