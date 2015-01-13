@@ -407,7 +407,7 @@ Tag.displayMetadata = function() {
 	Tag.metadataSorting.analyseEnd();
 
 	//Sortie HTML
-	var html = "";
+	var html = "<div id='metadatas_table_smalltitle'>— Metadata —</div>";
 	var htmls = new Object();
 	$("#metadatas_table").html(html);
 	for (var key in Tag.metadataSorting.categories) {
