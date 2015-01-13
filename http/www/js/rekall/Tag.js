@@ -225,11 +225,13 @@ Tag.prototype.displayMetadata = function() {
 Tag.displayMetadata = function() {	
 	//Restaure un truc propre
 	if(Tags.count() == 0) {
-		$("#metadatas").hide();
+		$("#metadatas").hide();  
+		$("#metadatas_tools").hide();  
 		$("#flattentimeline").show();
 	}
 	else {
-		$("#metadatas").show();
+		$("#metadatas").show(); 
+		$("#metadatas_tools").show(); 
 		$("#flattentimeline").hide();
 	}
 

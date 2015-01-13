@@ -657,6 +657,11 @@ u {
 
 
 
+#metadatas_tools { 
+	display:		none; 
+	background-color:	rgba(0, 0, 0, 0.1);  
+	padding:0 10px;    
+}
 #metadatas { 
 	display:		none;
 	height:100%;  
@@ -728,7 +733,7 @@ u {
 
 #metadatas_table {
 	/*background-color:	rgba(0, 0, 0, 0.1); */
-	padding:			0px 0px 150px 0px;    
+	padding:			0px 0px 10px 0px;    
 	height:100%;
 	overflow-y:scroll;      
 	/*width:250px;
