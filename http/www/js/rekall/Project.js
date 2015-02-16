@@ -1129,7 +1129,6 @@ Project.prototype.analyse = function(full) {
 		var categories = rekall.sortings["horizontal"].categories;
 		if(rekall.sortings["horizontal"].metadataKey == "Time")
 			categories = {time: {tags: Tags.flattenTimelineTags}};
-		console.log(categories);
 			
 		for (var key in categories) {
 			$.each(categories[key].tags, function(index, tag) {

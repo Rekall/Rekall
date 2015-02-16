@@ -119,7 +119,7 @@ Panner.prototype.resize = function(visible, bounds) {
 }
 Panner.prototype.show = function(filter, bounds) {
 	var recreateGallery = this.recreateGallery;
-	this.recreateGallery = true;
+	this.recreateGallery = false;
 	
 	//TODO
 	//return;
@@ -156,9 +156,9 @@ Panner.prototype.show = function(filter, bounds) {
 			target.append("<h1 style='border-color:"+contents.category.color+";' title='"+categoryVerboseTable[0]+"'>" + categoryVerboseTitle + "</h1>"); 
 		}
 		
-		/*for (var index in contents.thumbnails) {
-			var thumbnail = contents.thumbnails[index];*/
-		$.each(contents.thumbnails, function(index, thumbnail) {
+		for (var index in contents.thumbnails) {
+			var thumbnail = contents.thumbnails[index];
+		//$.each(contents.thumbnails, function(index, thumbnail) {
 			if(recreateGallery) {
 				thiss.filtredTags.push(thumbnail.tag);		
 				target.append(function() {
@@ -209,7 +209,7 @@ Panner.prototype.show = function(filter, bounds) {
 				if(add)	thumbnail.dom.css("opacity", opacity).css("display", "inline-block");
 				else	thumbnail.dom.hide().css("opacity", opacity);
 			}
-		});
+		}
 	}
 	if(recreateGallery) {
 		parent1.prepend(gallery1);

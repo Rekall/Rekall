@@ -150,7 +150,10 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
                 bytesRange.second = 1;
             }
             */
-            if ((file.size() <= maxCachedFileSize) && (bytesRange.first == -1) && (bytesRange.second == -1)) {
+            if(file.size() > (100*1000000)) {
+                qWarning("File too large %lld", file.size());
+            }
+            else if ((file.size() <= maxCachedFileSize) && (bytesRange.first == -1) && (bytesRange.second == -1)) {
                 // Return the file content and store it also in the cache
                 entry = new CacheEntry();
                 while(!file.atEnd() && !file.error()) {

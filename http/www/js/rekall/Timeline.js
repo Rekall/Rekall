@@ -134,7 +134,9 @@ Timeline.prototype.updateFlattenTimeline = function() {
 					timeEndExtended = tag.timeEnd;
 
 				if(progress == undefined) {
-					tag.flattenTimelineDom.slideUp();
+					fastdom.write(function() {
+						tag.flattenTimelineDom.slideUp();
+					});
 					tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 				}
 				else {
@@ -143,26 +145,31 @@ Timeline.prototype.updateFlattenTimeline = function() {
 					else
 						tag.flattenTimelineDom.find(".flattentimeline_opacifiant").css("width", "100%");
 
+					var tagCounter = tag.flattenTimelineDom.find(".flattentimeline_counter");
 					if((0 <= progress) && (progress < 1)) {
-						tag.flattenTimelineDom.slideDown();
-						tag.flattenTimelineDom.css("opacity", 1.0);
-						tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
+						fastdom.write(function() {
+							tag.flattenTimelineDom.css("opacity", 1.0).slideDown();
+						});
+						tagCounter.hide();
 					}
 					else if((-5 <= progress) && (progress <= 0)) {
-						tag.flattenTimelineDom.slideDown();
-						tag.flattenTimelineDom.css("opacity", 0.5);
-						tag.flattenTimelineDom.find(".flattentimeline_counter").text(ceil(-progress));
-						tag.flattenTimelineDom.find(".flattentimeline_counter").show();
+						fastdom.write(function() {
+							tag.flattenTimelineDom.css("opacity", 0.5).slideDown();
+						});
+						tagCounter.text(ceil(-progress));
+						tagCounter.show();
 					}
 					else if(-9999999 < progress) {
-						tag.flattenTimelineDom.css("opacity", 0.1);
-						tag.flattenTimelineDom.slideDown();
-						tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
+						fastdom.write(function() {
+							tag.flattenTimelineDom.css("opacity", 0.1).slideDown();
+						});
+						tagCounter.hide();
 					}
 					else {
-						tag.flattenTimelineDom.css("opacity", 0.1);
-						tag.flattenTimelineDom.hide();
-						tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
+						fastdom.write(function() {
+							tag.flattenTimelineDom.css("opacity", 0.1).hide();
+						});
+						tagCounter.hide();
 					}
 				}
 			}
