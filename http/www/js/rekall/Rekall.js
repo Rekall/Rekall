@@ -38,8 +38,9 @@ function Rekall() {
 	
 	this.sortings["corpus"].analyse = false;
 	
-	this.shouldAnalyse		       = true;
-	this.shouldAnalyseFull         = true;
+	this.shouldAnalyse		         = true;
+	this.shouldAnalyseFull           = true;
+	this.shouldUpdateFlattenTimeline = true;
 	this.selectionId = 0;
 	
 	//Map
@@ -256,20 +257,28 @@ Rekall.prototype.start = function() {
 				rekall.timeline.barLayer.draw();
 			
 			if((rekall.timeline.shouldRedraw) && (rekall.timeline != undefined)) {
+				var shouldRedrawFull = rekall.timeline.shouldRedrawFull;
+				rekall.timeline.shouldRedraw     = false;
+				rekall.timeline.shouldRedrawFull = false;
 				rekall.timeline.tagLayer.draw();
 				rekall.timeline.gridLayer.draw();
-				if(rekall.timeline.shouldRedrawFull != false) {
+				if(shouldRedrawFull != false) {
 					rekall.timeline.timeLayer.draw();
 					rekall.timeline.barLayer.draw();
 					rekall.timeline.tagLayer.scrollbars.layer.draw();
 				}
-				rekall.timeline.shouldRedraw = false;
 			}
 			
 			if((rekall.shouldAnalyse) && (rekall.project != undefined)) {
-				rekall.project.analyse(rekall.shouldAnalyseFull);
-				rekall.shouldAnalyse = false;
+				var shouldAnalyseFull = rekall.shouldAnalyseFull;
+				rekall.shouldAnalyse     = false;
 				rekall.shouldAnalyseFull = false;
+				rekall.project.analyse(shouldAnalyseFull);
+			}
+			
+			if(rekall.shouldUpdateFlattenTimeline) {
+				rekall.shouldUpdateFlattenTimeline = false;
+				rekall.timeline.bar.updateFlattenTimeline();
 			}
 		}
 		//setTimeout(refresh, 50);
@@ -786,6 +795,9 @@ Rekall.prototype.analyse = function(full) {
 	this.shouldAnalyse     = true;
 	if(this.shouldAnalyseFull == false)
 		this.shouldAnalyseFull = full;
+}
+Rekall.prototype.updateFlattenTimeline = function() {
+	this.shouldUpdateFlattenTimeline = true;
 }
 
 Rekall.prototype.resize = function() {

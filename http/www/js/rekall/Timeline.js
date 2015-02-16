@@ -47,14 +47,14 @@ Timeline.prototype.play = function(timeCurrentOffset) {
 	this.timeStart         = moment();
 	this.state = 1;
 	rekall.captationVideoPlayers.play(timeCurrentOffset);
-	this.updateFlattenTimeline();
+	rekall.updateFlattenTimeline();
 	$("#timeline-play").hide();
 	$("#timeline-pause").show();
 }
 Timeline.prototype.stop = function() {
 	this.state = 0;
 	rekall.captationVideoPlayers.pause();
-	this.updateFlattenTimeline();
+	rekall.updateFlattenTimeline();
 	$("#timeline-play").show();
 	$("#timeline-pause").hide();
 }
@@ -65,7 +65,7 @@ Timeline.prototype.rewind = function(timeCurrentOffset) {
 	this.timeCurrentOffset = timeCurrentOffset;
 	this.state = 2;
 	rekall.captationVideoPlayers.rewind(timeCurrentOffset);
-	this.updateFlattenTimeline();
+	rekall.updateFlattenTimeline();
 	$("#timeline-play").show();
 	$("#timeline-pause").hide();
 }
@@ -95,7 +95,7 @@ Timeline.prototype.update = function() {
 			this.text.setText((this.timeCurrent+"").toHHMMSSmmm());
 			this.text.setX(timeBarPoints[0] + 3);
 			
-			this.updateFlattenTimeline();			
+			rekall.updateFlattenTimeline();			
 			return true;
 		}
 	}
@@ -133,10 +133,9 @@ Timeline.prototype.updateFlattenTimeline = function() {
 				else
 					timeEndExtended = tag.timeEnd;
 
+				var dom = tag.flattenTimelineDom;
 				if(progress == undefined) {
-					fastdom.write(function() {
-						tag.flattenTimelineDom.slideUp();
-					});
+					dom.slideUp();
 					tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
 				}
 				else {
@@ -147,28 +146,20 @@ Timeline.prototype.updateFlattenTimeline = function() {
 
 					var tagCounter = tag.flattenTimelineDom.find(".flattentimeline_counter");
 					if((0 <= progress) && (progress < 1)) {
-						fastdom.write(function() {
-							tag.flattenTimelineDom.css("opacity", 1.0).slideDown();
-						});
+						dom.css("opacity", 1.0).slideDown();
 						tagCounter.hide();
 					}
 					else if((-5 <= progress) && (progress <= 0)) {
-						fastdom.write(function() {
-							tag.flattenTimelineDom.css("opacity", 0.5).slideDown();
-						});
+						dom.css("opacity", 0.5).slideDown();
 						tagCounter.text(ceil(-progress));
 						tagCounter.show();
 					}
 					else if(-9999999 < progress) {
-						fastdom.write(function() {
-							tag.flattenTimelineDom.css("opacity", 0.1).slideDown();
-						});
+						dom.css("opacity", 0.1).slideDown();
 						tagCounter.hide();
 					}
 					else {
-						fastdom.write(function() {
-							tag.flattenTimelineDom.css("opacity", 0.1).hide();
-						});
+						dom.css("opacity", 0.1).hide();
 						tagCounter.hide();
 					}
 				}

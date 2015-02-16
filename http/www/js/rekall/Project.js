@@ -980,8 +980,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		for (var key in categories) {
 			$.each(categories[key].tags, function(index, tag) {
 				//var tag = rekall.sortings["horizontal"].categories[key].tags[index];
-		
-				$('#flattentimeline_items').append(function() {
+				var test = function() {
 					var styleColor = "background-color: " + tag.color + ";";
 					var textColor = "color: " + tag.color + ";";
 				
@@ -1036,6 +1035,9 @@ Project.prototype.analyse = function(full, isCheckbox) {
 						}
 					});
 					return tag.flattenTimelineDom;
+				};
+				fastdom.write(function() {
+					$('#flattentimeline_items').append(test);
 				});
 			});
 		}
@@ -1052,7 +1054,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 	}
 	
 	
-	rekall.timeline.bar.updateFlattenTimeline();
+	rekall.updateFlattenTimeline();
 	rekall.redraw(full);
 	this.firstAnalysis = false;
 }
