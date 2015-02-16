@@ -126,6 +126,7 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
                     path = pathTmp;
             }
         }
+
         QFile file(path);
         qDebug("FileController: Open file %s", qPrintable(file.fileName()));
         if (file.open(QIODevice::ReadOnly)) {
@@ -149,11 +150,10 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
                 bytesRange.second = 1;
             }
             */
-
             if ((file.size() <= maxCachedFileSize) && (bytesRange.first == -1) && (bytesRange.second == -1)) {
                 // Return the file content and store it also in the cache
                 entry = new CacheEntry();
-                while (!file.atEnd() && !file.error()) {
+                while(!file.atEnd() && !file.error()) {
                     QByteArray buffer=file.read(65536);
                     response.write(buffer);
                     entry->document.append(buffer);

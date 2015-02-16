@@ -50,6 +50,27 @@ macx {
     LIBS              += -framework Cocoa -framework CoreLocation
 }
 
+#VLC
+false {
+    DEFINES  += VLC_INSTALLED
+    HEADERS  += video/vlc.h
+    SOURCES  += video/vlc.cpp
+
+    macx {
+        INCLUDEPATH       +=   /Applications/VLC.app/Contents/MacOS/include
+        LIBS              += -L/Applications/VLC.app/Contents/MacOS/lib -lvlc
+        BUNDLE_RES.files   =   /Applications/VLC.app/Contents/MacOS/plugins
+        BUNDLE_RES.path    = Contents/MacOS
+        QMAKE_BUNDLE_DATA += BUNDLE_RES
+        BUNDLE_RES2.files  =   /Applications/VLC.app/Contents/MacOS/lib
+        BUNDLE_RES2.path   = Contents/MacOS
+        QMAKE_BUNDLE_DATA += BUNDLE_RES2
+    }
+    win32 {
+        INCLUDEPATH += "C:/Program Files (x86)/VideoLAN/VLC/sdk/include"
+        LIBS        += -L"C:/Program Files (x86)/VideoLAN/VLC/sdk/lib" -llibvlc
+    }
+}
 
 #Bundle Mac OS X
 RESOURCES             += icons/Rekall.qrc
@@ -68,7 +89,6 @@ win32 {
     RC_FILE            = icon.rc
     DEFINES           += WINVER=0x0501 # needed for mingw to pull in appropriate dbt business...probably a better way to do this
 }
-
 
 
 linux {
