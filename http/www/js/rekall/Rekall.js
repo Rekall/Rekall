@@ -253,33 +253,35 @@ Rekall.prototype.start = function() {
 	var globalTime = 0;
 	function refresh() {
 		if(rekall != undefined) {
-			if(rekall.timeline.bar.update())
-				rekall.timeline.barLayer.draw();
-			
-			if((rekall.timeline.shouldRedraw) && (rekall.timeline != undefined)) {
-				var shouldRedrawFull = rekall.timeline.shouldRedrawFull;
-				rekall.timeline.shouldRedraw     = false;
-				rekall.timeline.shouldRedrawFull = false;
-				rekall.timeline.tagLayer.draw();
-				rekall.timeline.gridLayer.draw();
-				if(shouldRedrawFull != false) {
-					rekall.timeline.timeLayer.draw();
+			fastdom.write(function() {
+				if(rekall.timeline.bar.update())
 					rekall.timeline.barLayer.draw();
-					rekall.timeline.tagLayer.scrollbars.layer.draw();
+			
+				if((rekall.timeline.shouldRedraw) && (rekall.timeline != undefined)) {
+					var shouldRedrawFull = rekall.timeline.shouldRedrawFull;
+					rekall.timeline.shouldRedraw     = false;
+					rekall.timeline.shouldRedrawFull = false;
+					rekall.timeline.tagLayer.draw();
+					rekall.timeline.gridLayer.draw();
+					if(shouldRedrawFull != false) {
+						rekall.timeline.timeLayer.draw();
+						rekall.timeline.barLayer.draw();
+						rekall.timeline.tagLayer.scrollbars.layer.draw();
+					}
 				}
-			}
 			
-			if((rekall.shouldAnalyse) && (rekall.project != undefined)) {
-				var shouldAnalyseFull = rekall.shouldAnalyseFull;
-				rekall.shouldAnalyse     = false;
-				rekall.shouldAnalyseFull = false;
-				rekall.project.analyse(shouldAnalyseFull);
-			}
+				if((rekall.shouldAnalyse) && (rekall.project != undefined)) {
+					var shouldAnalyseFull = rekall.shouldAnalyseFull;
+					rekall.shouldAnalyse     = false;
+					rekall.shouldAnalyseFull = false;
+					rekall.project.analyse(shouldAnalyseFull);
+				}
 			
-			if(rekall.shouldUpdateFlattenTimeline) {
-				rekall.shouldUpdateFlattenTimeline = false;
-				rekall.timeline.bar.updateFlattenTimeline();
-			}
+				if(rekall.shouldUpdateFlattenTimeline) {
+					rekall.shouldUpdateFlattenTimeline = false;
+					rekall.timeline.bar.updateFlattenTimeline();
+				}
+			});
 		}
 		//setTimeout(refresh, 50);
 	}

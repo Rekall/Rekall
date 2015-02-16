@@ -28,16 +28,16 @@ function Timeline() {
 	this.timeCurrent       = 0;
 	
 	var thiss = this;
-	$(document).keyup(function(e) {
+	/*$(document).keyup(function(e) {
 	    if(e.keyCode == 32)
 			thiss.toggle();
-//	    if(e.keyCode == 70)
-//			thiss.rewind();
-//		if(e.keyCode == 83)
-//			thiss.rewind(120);
-//		if(e.keyCode == 68)
-//			thiss.play(60);
-	}); 
+	    if(e.keyCode == 70)
+			thiss.rewind();
+		if(e.keyCode == 83)
+			thiss.rewind(120);
+		if(e.keyCode == 68)
+			thiss.play(60);
+	}); */
 }
 
 Timeline.prototype.play = function(timeCurrentOffset) {
