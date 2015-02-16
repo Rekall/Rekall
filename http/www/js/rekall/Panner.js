@@ -151,9 +151,14 @@ Panner.prototype.show = function(filter, bounds) {
 			//target.append("<h1 style='color: " + contents.category.color + "'>" + categoryVerbose + "</h1>");
 			//target.append("<h1><div class='thumbnailPastille' style='background-color:"+contents.category.color+";'></div>" + categoryVerbose + "</h1>");        
 			var categoryVerboseTable = categoryVerbose.split("/");
-			//var categoryVerboseTitle = ""+categoryVerboseTable[1].toUpperCase()+"<br/><span style='color:#BBB; font-size:11px'>("+categoryVerboseTable[0]+")</span>";
-			var categoryVerboseTitle = categoryVerboseTable[1].toUpperCase();
-			target.append("<h1 style='border-color:"+contents.category.color+";' title='"+categoryVerboseTable[0]+"'>" + categoryVerboseTitle + "</h1>"); 
+			//var categoryVerboseTitle = ""+categoryVerboseTable[1].toUpperCase()+"<br/><span style='color:#BBB; font-size:11px'>("+categoryVerboseTable[0]+")</span>"; 
+			//alert(categoryVerboseTable.length);
+			var categoryVerboseTitle = categoryVerboseTable[categoryVerboseTable.length-1];  
+			if((!categoryVerboseTitle)&&(categoryVerboseTable.length>=2)) categoryVerboseTitle = categoryVerboseTable[categoryVerboseTable.length-2];  
+			if(!categoryVerboseTitle) categoryVerboseTitle = categoryVerbose;
+			//if(categoryVerboseTable.length>1) categoryVerboseTitle = categoryVerboseTable[1].toUpperCase();
+			target.append("<h1 style='border-color:"+contents.category.color+";' title='"+categoryVerbose+"'>" + categoryVerboseTitle.toUpperCase() + "</h1>");   
+			
 		}
 		
 		for (var index in contents.thumbnails) {

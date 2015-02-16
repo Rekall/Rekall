@@ -497,7 +497,7 @@ Rekall.prototype.start = function() {
 			if(state)
 				rekall.timeline.bar.play();
 		}
-		else if(e.keyCode == 82) {
+		else*/ if(e.keyCode == 82) {
 			for (var keySource in rekall.project.sources) {
 				for (var keyDocument in rekall.project.sources[keySource].documents) {
 					for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
@@ -508,7 +508,7 @@ Rekall.prototype.start = function() {
 			    }
 			}
 			rekall.analyse(true);
-		}     */
+		}     
 	});
 	
 	
