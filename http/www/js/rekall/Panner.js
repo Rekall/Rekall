@@ -192,17 +192,11 @@ Panner.prototype.show = function(filter, bounds) {
 		$.each(contents.thumbnails, function(index, thumbnail) {
 			if(recreateGallery) {
 				thiss.filtredTags.push(thumbnail.tag);		
-<<<<<<< Updated upstream
-				target.append(function() {
-					if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><div class='thumbnailImage' style='background-image:url("+thumbnail.url +");'></div><div class='thumbnailTxt' style='background-color:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");
-					else							thumbnail.dom = $("<div draggable=true class='nothumbnail'><div class='thumbnailImage'></div><div class='thumbnailTxt' style='background-color:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");      
-=======
+
 				target.children().last().append(function() {
-					//if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><div class='thumbnailTxt'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");
 					if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><div class='thumbnailImage' style='background-image:url("+thumbnail.url +");'></div><div class='thumbnailTxt' style='backgrouncolor:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");
-					//else							thumbnail.dom = $("<div draggable=true class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");      
 					else							thumbnail.dom = $("<div draggable=true class='nothumbnail'><div class='thumbnailImage'></div><div class='thumbnailTxt' style='backgrouncolor:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");      
->>>>>>> Stashed changes
+
 
 				   /* thumbnail.dom.mouseenter(function(event) {
 						if(!Tags.isStrong) {
