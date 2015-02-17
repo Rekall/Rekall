@@ -117,7 +117,7 @@ Project.prototype.loadXML = function(xml) {
 
 
 
-Project.prototype.analyse = function(full) {
+Project.prototype.analyse = function(full, isCheckbox) {
 	if(full != false)	console.log("Analyse complète des fichiers…");
 	else 				console.log("Analyse partielle des fichiers…");
 	
@@ -288,7 +288,7 @@ Project.prototype.analyse = function(full) {
 		*/
 
 		//création de l'élément liste de métas		
-		if(full != "checkbox") {
+		if(isCheckbox != true) {
 			var gm_availableMetadatasHtml_caregories = "";
 			var gm_availableMetadatasHtml_metas = "";
 			gm_availableMetadatasHtml_caregories+= "<div class='left_menu_item_open_label' id='left_menu_item_open_label_category'>Category of metadata</div><select id='left_menu_select_category'>";
@@ -324,7 +324,7 @@ Project.prototype.analyse = function(full) {
 				metadataConfigFormated = metadataConfigFormated.replace("|",  "&nbsp;&#x25B9;&nbsp;");
 			}
 		
-			if(full != "checkbox") {			
+			if(isCheckbox != true) {			
 				$("#left_menu_item_open").attr("tool","").width(0);//hide();
 				$(".left_menu_item_checklist").hide();
 				$(".left_menu_item_tab_search").hide();
@@ -631,7 +631,7 @@ Project.prototype.analyse = function(full) {
 			}
 			else		
 				sorting.categories[category].checked = value;
-			rekall.analyse("checkbox");
+			rekall.analyse(true, true);
 		});
 
 		/*
@@ -702,7 +702,7 @@ Project.prototype.analyse = function(full) {
 						}
 					});
 				}
-				rekall.analyse("checkbox");
+				rekall.analyse(true, true);
 			}
 		});
 

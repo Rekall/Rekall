@@ -1270,7 +1270,8 @@ input[type="text"], textarea {
 	background-color:		#000;
 	
 	font-size:				18px;
-	text-align: 			center;
+	text-align: 			center; 
+	display:none;
 }
 .flattentimeline_bar {
 	/*width: 			  0%;*/

@@ -119,7 +119,7 @@ Panner.prototype.resize = function(visible, bounds) {
 }
 Panner.prototype.show = function(filter, bounds) {
 	var recreateGallery = this.recreateGallery;
-	this.recreateGallery = false;
+	this.recreateGallery = true;
 	
 	//TODO
 	//return;
@@ -147,7 +147,7 @@ Panner.prototype.show = function(filter, bounds) {
 			if(contents.category.category == Sorting.prefix) {
 				target          = gallery2;
 				categoryVerbose = "Not specified";
-			}
+			}                
 			//target.append("<h1 style='color: " + contents.category.color + "'>" + categoryVerbose + "</h1>");
 			//target.append("<h1><div class='thumbnailPastille' style='background-color:"+contents.category.color+";'></div>" + categoryVerbose + "</h1>");        
 			var categoryVerboseTable = categoryVerbose.split("/");
