@@ -127,6 +127,7 @@ Panner.prototype.show = function(filter, bounds) {
 	var thiss = this;
 	var gallery1 = $("#panner-gallery1");
 	var gallery2 = $("#panner-gallery2");
+	var legende  = $("#thumbLgd");
 	
 	if(recreateGallery) {
 		this.filtredTags = new Array();
@@ -138,7 +139,8 @@ Panner.prototype.show = function(filter, bounds) {
 		gallery2.html("");
 		this.markers = new Array();
 	}
-	var scrollTo = undefined;
+	var scrollTo = undefined;  
+	var countCat = 0;
 	for (var category in this.thumbnails) {
 		var contents = this.thumbnails[category];
 		if((recreateGallery) && (contents.thumbnails.length)) {
@@ -157,26 +159,58 @@ Panner.prototype.show = function(filter, bounds) {
 			if((!categoryVerboseTitle)&&(categoryVerboseTable.length>=2)) categoryVerboseTitle = categoryVerboseTable[categoryVerboseTable.length-2];  
 			if(!categoryVerboseTitle) categoryVerboseTitle = categoryVerbose;
 			//if(categoryVerboseTable.length>1) categoryVerboseTitle = categoryVerboseTable[1].toUpperCase();
-			target.append("<h1 style='border-color:"+contents.category.color+";' title='"+categoryVerbose+"'>" + categoryVerboseTitle.toUpperCase() + "</h1>");   
-			
-		}
+  //  		target.append("<h1 style='border-color:"+contents.category.color+";' title='"+categoryVerbose+"'>" + categoryVerboseTitle.toUpperCase() + "</h1>");       
+			var rgb = contents.category.color.toString(); 
+			rgb = rgb.split('(');  
+			if(rgb.length>1) {
+				rgb = rgb[1].split(')');
+				if(rgb.length>1) { 
+				    rgb = rgb[0];
+				}
+			}            
+			var rgbtmp = rgb.split(',');
+			if(rgbtmp.length>3) {
+				//rgb = rgbtmp[0]+","+rgbtmp[1]+","+rgbtmp[2];    
+				target.append("<div class='panner-gallery-group' style='background-color: rgba("+rgb+");' title='"+categoryVerbose+"'><h1 style=''>" + categoryVerboseTitle.toUpperCase() + "</h1></div>");
+			}                        
+			else target.append("<div class='panner-gallery-group' style='background-color: rgba("+rgb+",.75);' title='"+categoryVerbose+"'><h1 style=''>" + categoryVerboseTitle.toUpperCase() + "</h1></div>");  
+			if(countCat==0) {
+				legende.html(""); 
+				var tmpHeight = legende.parent().parent().css("height");   
+				tmpHeight = tmpHeight.substr(0,tmpHeight.length-2)-70;
+				legende.css("maxHeight",tmpHeight+"px");
+				//alert(tmpHeight);   
+			}
+			legende.append("<div class='panner-gallery-lgd' style='background-color: rgb("+rgb+");' title='"+categoryVerbose+"'></div>"); 
+		    countCat++;   
+
+		}           
+		//if(countCat>15) legende.html(""); 
 		
 		//for (var index in contents.thumbnails) {
 		//	var thumbnail = contents.thumbnails[index];
 		$.each(contents.thumbnails, function(index, thumbnail) {
 			if(recreateGallery) {
 				thiss.filtredTags.push(thumbnail.tag);		
+<<<<<<< Updated upstream
 				target.append(function() {
 					if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><div class='thumbnailImage' style='background-image:url("+thumbnail.url +");'></div><div class='thumbnailTxt' style='background-color:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");
 					else							thumbnail.dom = $("<div draggable=true class='nothumbnail'><div class='thumbnailImage'></div><div class='thumbnailTxt' style='background-color:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");      
+=======
+				target.children().last().append(function() {
+					//if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><div class='thumbnailTxt'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");
+					if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><div class='thumbnailImage' style='background-image:url("+thumbnail.url +");'></div><div class='thumbnailTxt' style='backgrouncolor:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");
+					//else							thumbnail.dom = $("<div draggable=true class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");      
+					else							thumbnail.dom = $("<div draggable=true class='nothumbnail'><div class='thumbnailImage'></div><div class='thumbnailTxt' style='backgrouncolor:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");      
+>>>>>>> Stashed changes
 
-					thumbnail.dom.mouseenter(function(event) {
+				   /* thumbnail.dom.mouseenter(function(event) {
 						if(!Tags.isStrong) {
 							thiss.recreateGallery = false;
 							Tags.addOne(thumbnail.tag, false);
 							Tag.displayMetadata();
 						}
-					});
+					});  */
 					thumbnail.dom.click(function(event) {
 						thiss.recreateGallery = false;
 						event.stopPropagation();
@@ -214,9 +248,10 @@ Panner.prototype.show = function(filter, bounds) {
 			}
 		});
 	}
-	if(recreateGallery) {
-		parent1.prepend(gallery1);
+	if(recreateGallery) {          
 		parent2.prepend(gallery2);
+		parent1.prepend(gallery1);  
+		parent1.prepend(legende);
 	}
 	
 	
