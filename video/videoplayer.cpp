@@ -15,18 +15,21 @@ VideoPlayer::~VideoPlayer() {
     delete ui;
 }
 
-void VideoPlayer::open(const QUrl &url, const QString &title) {
-    if(currentUrl.toString() != url.toString()) {
-        currentUrl = url;
-        Global::userInfos->setDockIcon(true);
-
-        if(title.isEmpty())
-            setWindowTitle(tr("Rekall — ") + currentUrl.fileName());
-        else
-            setWindowTitle(title);
-        player->setMedia(currentUrl);
+void VideoPlayer::setUrl(const QUrl &url, bool askClose, const QString &title) {
+    if((askClose) && (currentUrl.toString() == url.toString())) {
+        close();
     }
-    show();
+    else if(!askClose) {
+        if(currentUrl.toString() != url.toString()) {
+            currentUrl = url;
+            Global::userInfos->setDockIcon(true);
+            player->setMedia(currentUrl);
+        }
+
+        if(title.isEmpty()) setWindowTitle(tr("Rekall — ") + currentUrl.fileName());
+        else                setWindowTitle(title);
+        show();
+    }
 }
 
 void VideoPlayer::seek(qint64 timecode) {

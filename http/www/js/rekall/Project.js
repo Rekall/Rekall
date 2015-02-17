@@ -108,10 +108,6 @@ Project.prototype.loadXML = function(xml) {
 		}
 	});
 	
-	for (var keySource in this.sources)
-		for (var keyDocument in this.sources[keySource].documents)
-			this.sources[keySource].documents[keyDocument].checkRender();
-	
 	/*
 	xml.find('event').each(function() {
 	});
@@ -139,6 +135,8 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		rekall.sortings["vertical"].analyseStart();
 		for (var keySource in this.sources) {
 			for (var keyDocument in this.sources[keySource].documents) {
+				this.sources[keySource].documents[keyDocument].checkRender();
+				
 				for (var key in this.sources[keySource].documents[keyDocument].tags) {
 					var tag = this.sources[keySource].documents[keyDocument].tags[key];
 					

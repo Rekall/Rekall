@@ -69,8 +69,11 @@ VideoPlayer.prototype.loadLocal = function(tagOrDoc, play) {
 			this.play();
 	}
 	else {
-		this.url = Utils.getLocalFilePath(tagOrDoc, "video/load");
-		$.ajax(this.url);
+		if(this.tagOrDoc != tagOrDoc) {
+			this.tagOrDoc = tagOrDoc;
+			this.url = Utils.getLocalFilePath(this.tagOrDoc);
+			this.show();
+		}
 	}
 }
 
@@ -132,6 +135,9 @@ VideoPlayer.prototype.show = function() {
 	if(this.webbasedPlayer) {
 		this.dom.find("#" + this.uniqueName).parent().show();
 	}
+	else if(this.tagOrDoc != undefined) {
+		$.ajax(Utils.getLocalFilePath(this.tagOrDoc, "video/show") + "?friendlyName=" + this.tagOrDoc.getMetadata("Rekall->Name"));
+	}
 }
 VideoPlayer.prototype.hide = function() {
 	if(this.webbasedPlayer) {
@@ -139,6 +145,9 @@ VideoPlayer.prototype.hide = function() {
 		this.tagOrDoc = undefined;
 		this.player.pause();
 		this.autoplay = false;
+	}
+	else if(this.tagOrDoc != undefined) {
+		$.ajax(Utils.getLocalFilePath(this.tagOrDoc, "video/hide"));
 	}
 }
 
@@ -215,7 +224,6 @@ function VideoPlayers() {
 	this.audiosCount = 0;
 	this.players = new Object();
 }
-
 
 VideoPlayers.prototype.isVisible = function() {
 	return this.visible;
@@ -304,14 +312,11 @@ VideoPlayers.prototype.show = function(document, visibility) {
 		}
 	}
 	else if((this.players[playerId] != undefined) && (!visibility)) {
-		if(document.isAudio()) {
-			this.audios[playerId] = undefined;
-			this.audiosCount--;
-		}
-		else {
-			this.videos[playerId] = undefined;
-			this.videosCount--;
-		}
+		this.players[playerId].hide();
+		if(document.isAudio())
+			this.audios[playerId] = this.players[playerId] = undefined;
+		else
+			this.videos[playerId] = this.players[playerId] = undefined;
 	}
 	if(dom != undefined)
 		this.resize();
@@ -319,11 +324,11 @@ VideoPlayers.prototype.show = function(document, visibility) {
 
 
 VideoPlayers.prototype.play = function(timeCurrentOffset) {
-	$.each(this.players, function(playerId, player) {	player.play(timeCurrentOffset);	});
+	$.each(this.players, function(playerId, player) {	if(player != undefined)	player.play(timeCurrentOffset);	});
 }
 VideoPlayers.prototype.pause = function() {
-	$.each(this.players, function(playerId, player) {	player.pause();					});
+	$.each(this.players, function(playerId, player) {	if(player != undefined)	player.pause();					});
 }
 VideoPlayers.prototype.rewind = function(timeCurrentOffset) {
-	$.each(this.players, function(playerId, player) {	player.rewind(timeCurrentOffset);	});
+	$.each(this.players, function(playerId, player) {	if(player != undefined)	player.rewind(timeCurrentOffset);	});
 }

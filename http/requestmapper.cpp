@@ -126,9 +126,14 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
                 project->videosRewind(request.getParameter("timecode").toLongLong());
                 return;
             }
-            else if (path.startsWith("/" + project->name + "/video/load")) {
-                QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/video/load"));
-                Global::rekall->askCreateVideoPlayer.append(qMakePair(project, filename.absoluteFilePath()));
+            else if (path.startsWith("/" + project->name + "/video/show")) {
+                QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/video/show"));
+                Global::rekall->askVideoPlayer.append(VideoPlayerAsk(project, QUrl::fromLocalFile(filename.absoluteFilePath()), false, request.getParameter("friendlyName")));
+                return;
+            }
+            else if (path.startsWith("/" + project->name + "/video/hide")) {
+                QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/video/hide"));
+                Global::rekall->askVideoPlayer.append(VideoPlayerAsk(project, QUrl::fromLocalFile(filename.absoluteFilePath()), true));
                 return;
             }
             else {

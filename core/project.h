@@ -62,7 +62,7 @@ public slots:
     void videosRewind(qint64 timecode = 0);
     void videosPlay(qint64 timecode = -1);
     void videosPause();
-    void updateVideo(const QUrl &url, qint64 timecode = 0);
+    void updateVideo(const QUrl &url, bool askClose = false, const QString &title = "", qint64 timecode = 0);
     void fileChanged(SyncEntry *file);
     void projectChanged(SyncEntry *file, bool firstChange);
     void projectChanged(const QString &strChanges);

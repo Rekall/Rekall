@@ -77,7 +77,7 @@ class VideoPlayerInterface {
 public:
     QUrl currentUrl;
 public:
-    virtual void open(const QUrl &url, const QString &title = "") = 0;
+    virtual void setUrl(const QUrl &url, bool askClose = false, const QString &title = "") = 0;
     virtual void seek(qint64 timecode) = 0;
     virtual void play(qint64 timecode = -1) = 0;
     virtual void pause() = 0;
@@ -123,6 +123,22 @@ public:
 };
 
 
+class VideoPlayerAsk {
+public:
+    explicit VideoPlayerAsk() { askClose = false; }
+    explicit VideoPlayerAsk(ProjectInterface *_project, const QUrl &_url, bool _askClose = false, const QString &_title = "") {
+        project  = _project;
+        url      = _url;
+        askClose = _askClose;
+        title    = _title;
+    }
+public:
+    ProjectInterface *project;
+    QUrl url;
+    bool askClose;
+    QString title;
+};
+
 class RekallInterface {
 public:
     bool trayIconWorking, newVersionOfRekall, firstTimeOpened;
@@ -136,7 +152,7 @@ protected:
     virtual void takeScreenshot() = 0;
 
 public:
-    QList< QPair<ProjectInterface*, QString> > askCreateVideoPlayer;
+    QList<VideoPlayerAsk> askVideoPlayer;
 
 public:
     qint8 askAddProject;
@@ -283,7 +299,7 @@ public:
     }
 
 public slots:
-    virtual void updateVideo(const QUrl &url, qint64 timecode = 0) = 0;
+    virtual void updateVideo(const QUrl &url, bool askClose = false, const QString &title = "", qint64 timecode = 0) = 0;
     virtual void videosRewind(qint64 timecode = 0) = 0;
     virtual void videosPlay(qint64 timecode = -1) = 0;
     virtual void videosPause() = 0;

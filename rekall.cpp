@@ -292,9 +292,9 @@ void Rekall::timerEvent(QTimerEvent *) {
         addProject();
         askAddProject = 0;
     }
-    while(askCreateVideoPlayer.count()) {
-        askCreateVideoPlayer.first().first->updateVideo(QUrl::fromLocalFile(askCreateVideoPlayer.first().second));
-        askCreateVideoPlayer.removeFirst();
+    while(askVideoPlayer.count()) {
+        askVideoPlayer.first().project->updateVideo(askVideoPlayer.first().url, askVideoPlayer.first().askClose, askVideoPlayer.first().title);
+        askVideoPlayer.removeFirst();
     }
 }
 

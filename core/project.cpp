@@ -132,7 +132,7 @@ void Project::videosPlay(qint64 timecode) {
 void Project::videosPause() {
     emit videoPause();
 }
-void Project::updateVideo(const QUrl &url, qint64 timecode) {
+void Project::updateVideo(const QUrl &url, bool askClose, const QString &title, qint64 timecode) {
     VideoPlayerInterface *player = 0;
     foreach(VideoPlayerInterface *videoPlayer, videoPlayers) {
         if(videoPlayer->currentUrl.toString() == url.toString())
@@ -140,7 +140,7 @@ void Project::updateVideo(const QUrl &url, qint64 timecode) {
     }
 
     //Création si manquant
-    if(!player) {
+    if((!askClose) && (!player)) {
         VideoPlayer *playerP = new VideoPlayer();
         videoPlayers << playerP;
         connect(this, SIGNAL(videoPause ()      ), playerP, SLOT(pause()));
@@ -149,10 +149,12 @@ void Project::updateVideo(const QUrl &url, qint64 timecode) {
         connect(this, SIGNAL(videoSeek  (qint64)), playerP, SLOT(seek(qint64)));
         player = playerP;
     }
-    player->open(url);
+    player->setUrl(url, askClose, title);
 
-    //Timecode
-    if(timecode >= 0)
+    if((askClose) && (player)) {
+        videoPlayers.removeOne(player);
+    }
+    else if(timecode >= 0)
         player->seek(timecode);
 }
 

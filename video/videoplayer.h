@@ -23,7 +23,7 @@ protected:
     void closeEvent(QCloseEvent *);
 
 public slots:
-    void open(const QUrl &url, const QString &title = "");
+    void setUrl(const QUrl &url, bool askClose = false, const QString &title = "");
     void seek(qint64 timecode);
     void play(qint64 timecode = -1);
     void pause();
