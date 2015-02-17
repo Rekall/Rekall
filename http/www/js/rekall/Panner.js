@@ -161,15 +161,13 @@ Panner.prototype.show = function(filter, bounds) {
 			
 		}
 		
-		for (var index in contents.thumbnails) {
-			var thumbnail = contents.thumbnails[index];
-		//$.each(contents.thumbnails, function(index, thumbnail) {
+		//for (var index in contents.thumbnails) {
+		//	var thumbnail = contents.thumbnails[index];
+		$.each(contents.thumbnails, function(index, thumbnail) {
 			if(recreateGallery) {
 				thiss.filtredTags.push(thumbnail.tag);		
 				target.append(function() {
-					//if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><img src='" + thumbnail.url + "' style='border-color: " + thumbnail.tag.color + ";'/><div class='thumbnailTxt'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");
 					if(thumbnail.url != undefined)	thumbnail.dom = $("<div draggable=true class='thumbnail'><div class='thumbnailImage' style='background-image:url("+thumbnail.url +");'></div><div class='thumbnailTxt' style='background-color:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");
-					//else							thumbnail.dom = $("<div draggable=true class='nothumbnail'>" + Utils.elide(thumbnail.tag.getMetadata("Rekall->Name"), 20) + "</div>'");      
 					else							thumbnail.dom = $("<div draggable=true class='nothumbnail'><div class='thumbnailImage'></div><div class='thumbnailTxt' style='background-color:"+thumbnail.tag.color+";'>" + Utils.elide2lines(thumbnail.tag.getMetadata("Rekall->Name"), 13) + "</div></div>'");      
 
 					thumbnail.dom.mouseenter(function(event) {
@@ -214,7 +212,7 @@ Panner.prototype.show = function(filter, bounds) {
 				if(add)	thumbnail.dom.css("opacity", opacity).css("display", "inline-block");
 				else	thumbnail.dom.hide().css("opacity", opacity);
 			}
-		}
+		});
 	}
 	if(recreateGallery) {
 		parent1.prepend(gallery1);
