@@ -56,7 +56,7 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     trayTimer.start();
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
 
-    //
+    //Interfaces
     Global::userInfos = new UserInfos(this);
     Global::http      = new Http(this);
     Analyse *analyse  = new Analyse(this);
@@ -64,6 +64,9 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     connect(analyse, SIGNAL(trayChanged(QString,bool)), SLOT(analyseTrayChanged(QString,bool)));
     connect(analyse, SIGNAL(trayIconToOff()), SLOT(trayIconToOff()));
     connect(analyse, SIGNAL(trayIconToOn(qint16)), SLOT(trayIconToOn(qint16)));
+    //Wrapper web
+    Global::webWrapper = new WebWrapper();
+    Global::userInfos->setDockIcon(false);
 
     trayMenu = new QMenu(this);
     trayMenu->setSeparatorsCollapsible(true);
@@ -251,7 +254,7 @@ void Rekall::openWebPage() {
     QString param;
     if(firstTimeOpened)
         param += "/intro.html";
-    QDesktopServices::openUrl(QUrl(QString("http://%1:%2%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(param)));
+    Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(param)));
 }
 void Rekall::closeRekall() {
     Global::analyse->stop();

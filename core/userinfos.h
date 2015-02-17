@@ -41,6 +41,8 @@ public:
     const QString getGPS_mac();
 private:
     void *locationManager;
+public:
+    void setDockIcon(bool toggle) const;
 #endif
 
 public:

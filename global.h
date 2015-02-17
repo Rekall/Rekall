@@ -69,6 +69,11 @@ public:
     }
 };
 
+class WebWrapperInterface {
+public:
+    virtual void openWebPage(const QUrl &url, const QString &title = "") = 0;
+};
+
 class UserInfosInterface;
 class ProjectInterface;
 class HttpInterface;
@@ -102,7 +107,11 @@ public:
     static void qSleep(int ms);
     static const QString dateToString(const QDateTime &date, bool addExactTime = false);
     static const QString plurial(qint16 value, const QString &text);
+
+public:
+    static WebWrapperInterface *webWrapper;
 };
+
 
 class RekallInterface {
 public:
@@ -146,6 +155,7 @@ public:
     virtual const QDateTime getDateTime()     const { return QDateTime::currentDateTime(); }
     virtual const QString   getLocationGPS()  const { return QString();                    }
     virtual const QString   getLocationName() const { return QString();                    }
+    virtual void setDockIcon(bool) const            {   }
 };
 
 

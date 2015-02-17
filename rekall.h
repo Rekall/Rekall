@@ -31,6 +31,7 @@
 #include <QSystemTrayIcon>
 #include <QWebView>
 #include <QFileDialog>
+#include "webwrapper.h"
 #include "http/http.h"
 #include "core/analyse.h"
 #include "core/userinfos.h"

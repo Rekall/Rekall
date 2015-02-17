@@ -38,6 +38,7 @@ AnalyseInterface* Global::analyse = 0;
 QList<ProjectInterface*> Global::projects;
 UserInfosInterface* Global::userInfos = 0;
 HttpInterface* Global::http = 0;
+WebWrapperInterface* Global::webWrapper = 0;
 
 QPair<QString,QString> Global::seperateMetadata(const QString &metaline, const QString &separator) {
     QPair<QString,QString> retour;
@@ -345,7 +346,7 @@ void Global::revealInFinder(const QFileInfo &filename) {
 #endif
 }
 void Global::openFile(const QFileInfo &filename) {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(filename.absoluteFilePath()));
+    Global::webWrapper->openWebPage(QUrl::fromLocalFile(filename.absoluteFilePath()));
 }
 void Global::quickLook(const QFileInfo &file) {
 #ifdef Q_OS_MAC

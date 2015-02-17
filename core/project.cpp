@@ -109,7 +109,7 @@ void Project::save() {
 
 
 void Project::openWebPage() {
-    QDesktopServices::openUrl(QUrl(QString("http://%1:%2/%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(name)));
+    Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2/%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(name)), friendlyName);
 }
 void Project::openFolder() {
     Global::revealInFinder(path);
