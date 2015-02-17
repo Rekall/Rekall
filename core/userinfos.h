@@ -41,9 +41,14 @@ public:
     const QString getGPS_mac();
 private:
     void *locationManager;
-public:
-    void setDockIcon(bool toggle) const;
 #endif
+#ifdef Q_OS_MAC
+    void setDockIcon_mac(bool toggle) const;
+#endif
+private:
+    QList<QWidget*> activeWindows;
+public:
+    void setDockIcon(QWidget *asker, bool toggle);
 
 public:
     explicit UserInfos(QObject *parent = 0);

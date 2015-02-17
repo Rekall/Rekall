@@ -184,7 +184,7 @@ public:
     virtual const QDateTime getDateTime()     const { return QDateTime::currentDateTime(); }
     virtual const QString   getLocationGPS()  const { return QString();                    }
     virtual const QString   getLocationName() const { return QString();                    }
-    virtual void setDockIcon(bool) const            {   }
+    virtual void setDockIcon(QWidget*, bool)        {   }
 };
 
 

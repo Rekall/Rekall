@@ -43,7 +43,7 @@ const QString UserInfos::getGPS_mac() {
         return QString();
 }
 
-void UserInfos::setDockIcon(bool toggle) const {
+void UserInfos::setDockIcon_mac(bool toggle) const {
     ProcessSerialNumber psn = { 0, kCurrentProcess };
     if(toggle)
         TransformProcessType(&psn, kProcessTransformToForegroundApplication);

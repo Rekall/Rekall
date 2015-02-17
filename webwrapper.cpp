@@ -19,7 +19,7 @@ WebWrapper::~WebWrapper() {
 void WebWrapper::openWebPage(const QUrl &url, const QString &title) {
     //QDesktopServices::openUrl(url);
 
-    Global::userInfos->setDockIcon(true);
+    Global::userInfos->setDockIcon(this, true);
     ui->webView->setUrl(url);
     if(title.isEmpty())
         setWindowTitle(tr("Rekall"));
@@ -31,5 +31,5 @@ void WebWrapper::openWebPage(const QUrl &url, const QString &title) {
 }
 
 void WebWrapper::closeEvent(QCloseEvent *) {
-    //Global::userInfos->setDockIcon(false);
+    Global::userInfos->setDockIcon(this, false);
 }

@@ -65,7 +65,7 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     connect(analyse, SIGNAL(trayIconToOff()), SLOT(trayIconToOff()));
     connect(analyse, SIGNAL(trayIconToOn(qint16)), SLOT(trayIconToOn(qint16)));
     //Wrapper web
-    Global::userInfos->setDockIcon(false);
+    Global::userInfos->setDockIcon(this, false);
     Global::webWrapper = new WebWrapper();
 
     /*

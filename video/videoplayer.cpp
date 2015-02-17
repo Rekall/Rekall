@@ -22,7 +22,7 @@ void VideoPlayer::setUrl(const QUrl &url, bool askClose, const QString &title) {
     else if(!askClose) {
         if(currentUrl.toString() != url.toString()) {
             currentUrl = url;
-            Global::userInfos->setDockIcon(true);
+            Global::userInfos->setDockIcon(this, true);
             player->setMedia(currentUrl);
         }
 
@@ -49,5 +49,5 @@ void VideoPlayer::rewind(qint64 timecode) {
 }
 
 void VideoPlayer::closeEvent(QCloseEvent *) {
-    //Global::userInfos->setDockIcon(false);
+    Global::userInfos->setDockIcon(this, false);
 }

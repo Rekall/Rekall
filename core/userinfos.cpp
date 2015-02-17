@@ -36,6 +36,22 @@ UserInfos::UserInfos(QObject *parent)
     update();
 }
 
+void UserInfos::setDockIcon(QWidget *asker, bool toggle) {
+    bool action = true;
+    if((toggle) && (!activeWindows.contains(asker)))
+        activeWindows.append(asker);
+    else if(!toggle) {
+        activeWindows.removeAll(asker);
+        if(activeWindows.count())
+            action = false;
+    }
+    if(action) {
+#ifdef Q_OS_MAC
+        setDockIcon_mac(toggle);
+#endif
+    }
+}
+
 void UserInfos::update() {
     //Infos
     getPlateformInfos();
