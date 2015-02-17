@@ -29,9 +29,12 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QSystemTrayIcon>
+#include <QMenuBar>
 #include <QWebView>
 #include <QFileDialog>
+#include <QMenuBar>
 #include "webwrapper.h"
+#include "video/videoplayer.h"
 #include "http/http.h"
 #include "core/analyse.h"
 #include "core/userinfos.h"

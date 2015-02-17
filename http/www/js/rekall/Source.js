@@ -39,10 +39,8 @@ Source.prototype.addDocument = function(document) {
 			document.addTag(tag);
 		}
 		document.metadatas[-1] = document.cloneMetadatas();
-		
+
 		this.documents[document.key] = document;
-		if(document.getMetadata("Rekall->Media Function") == "Render")
-			rekall.captationVideoPlayers.show(document);
 	}
 	else
 		this.documents[document.key].addVersion(document);

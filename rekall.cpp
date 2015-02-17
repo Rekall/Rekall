@@ -65,8 +65,14 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     connect(analyse, SIGNAL(trayIconToOff()), SLOT(trayIconToOff()));
     connect(analyse, SIGNAL(trayIconToOn(qint16)), SLOT(trayIconToOn(qint16)));
     //Wrapper web
-    Global::webWrapper = new WebWrapper();
     Global::userInfos->setDockIcon(false);
+    Global::webWrapper = new WebWrapper();
+
+    /*
+    VideoPlayer *player = new VideoPlayer();
+    player->open(QUrl::fromLocalFile("/Users/guillaume/Documents/Rekall/Walden/Captations/captation WALDEN_TPV.mov"));
+    player->seek(4000);
+    */
 
     trayMenu = new QMenu(this);
     trayMenu->setSeparatorsCollapsible(true);
@@ -254,7 +260,7 @@ void Rekall::openWebPage() {
     QString param;
     if(firstTimeOpened)
         param += "/intro.html";
-    Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(param)));
+    Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(param)), tr("Opening Rekall menu…"));
 }
 void Rekall::closeRekall() {
     Global::analyse->stop();
@@ -285,6 +291,10 @@ void Rekall::timerEvent(QTimerEvent *) {
         askAddProject = 2;
         addProject();
         askAddProject = 0;
+    }
+    while(askCreateVideoPlayer.count()) {
+        askCreateVideoPlayer.first().first->updateVideo(QUrl::fromLocalFile(askCreateVideoPlayer.first().second));
+        askCreateVideoPlayer.removeFirst();
     }
 }
 

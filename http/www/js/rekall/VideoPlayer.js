@@ -22,148 +22,182 @@
 */
 
 function VideoPlayer(dom, uniqueName, render) {
+	this.webbasedPlayer = true;
+	if(dom == undefined)
+		this.webbasedPlayer = false;
 	this.render		  = render;
-	this.dom          = dom;
 	this.uniqueName   = uniqueName;
 	this.thumbPath    = "";
-	this.dom.append("<div class='videoItem invisible'><video width='100%' preload='metadata' id='" + this.uniqueName + "' class='video-js vjs-default-skin' controls></video></div>");
+	this.poster       = "";
+	this.dom          = dom;
+	if(this.webbasedPlayer)
+		this.dom.append("<div class='videoItem invisible'><video width='100%' preload='metadata' id='" + this.uniqueName + "' class='video-js vjs-default-skin' controls></video></div>");
 	this.activate();
 	this.hide();
-	this.autoplay = false;
+	this.autoplay    = false;
 }
 VideoPlayer.audioHeight = 40;
+VideoPlayer.renderControlBarItems = ["vjs-play-control", "vjs-time-divider", "vjs-duration", "vjs-current-time", "vjs-volume-control", "vjs-fullscreen-control", "vjs-mute-control"]
+VideoPlayer.previewControlBarItems = ["vjs-volume-control", "vjs-fullscreen-control", "vjs-mute-control"]
 VideoPlayer.prototype.loadLocal = function(tagOrDoc, play) {
-	if(play == undefined)
-		play = false;
-	this.autoplay = play;
-	if(this.tagOrDoc != tagOrDoc) {
-		this.tagOrDoc = tagOrDoc;
-		if(tagOrDoc != undefined) {
-			if(tagOrDoc.isAudio())	$("#" + this.uniqueName).height(VideoPlayer.audioHeight);
-			else					$("#" + this.uniqueName).height(220);
-	
-			$("#" + this.uniqueName).find(".vjs-custom").text(tagOrDoc.getMetadata("Rekall->Name"));
-			this.url = Utils.getLocalFilePath(tagOrDoc);
-			if(tagOrDoc.isVideo()) {
-				this.thumbPath    = Utils.getPreviewPath(tagOrDoc);
-				this.poster	      = this.thumbPath + "_1.jpg";
+	if(this.webbasedPlayer) {
+		if(play == undefined)
+			play = false;
+		this.autoplay = play;
+		if(this.tagOrDoc != tagOrDoc) {
+			this.tagOrDoc = tagOrDoc;
+			if(tagOrDoc != undefined) {
+				if(tagOrDoc.isAudio())	$("#" + this.uniqueName).height(VideoPlayer.audioHeight);
+				else					$("#" + this.uniqueName).height(220);
+
+				$("#" + this.uniqueName).find(".vjs-custom").text(tagOrDoc.getMetadata("Rekall->Name"));
+				this.url = Utils.getLocalFilePath(tagOrDoc);
+				if(tagOrDoc.isVideo()) {
+					this.thumbPath    = Utils.getPreviewPath(tagOrDoc);
+					this.poster	      = this.thumbPath + "_1.jpg";
+				}
+				else {
+					this.thumbPath = "";
+					this.poster    = "";
+				}
+				this.player.poster(this.poster);
+				this.player.src(this.url);
+				this.show();
 			}
-			else {
-				this.thumbPath = "";
-				this.poster    = "";
-			}
-			this.player.poster(this.poster);
-			this.player.src(this.url);
-			this.show();
 		}
+		else if(this.autoplay)
+			this.play();
 	}
-	else if(this.autoplay)
-		this.play();
+	else {
+		this.url = Utils.getLocalFilePath(tagOrDoc, "video/load");
+		$.ajax(this.url);
+	}
 }
 
 VideoPlayer.prototype.activate = function() {
-	var thiss = this;
-	this.video = videojs(this.uniqueName);
-	this.video.ready(function() {
-		thiss.player = this;
-		$("#" + thiss.uniqueName).find(".vjs-control-bar").append("<div class='vjs-time-controls vjs-control vjs-custom'></div>");
-		thiss.semihide($("#" + thiss.uniqueName));
-		
-		thiss.player.on('seeking', function(e) {
-		});
-		
-		thiss.player.on("loadedmetadata", function() {
-			thiss.player.play();
-			if(!thiss.autoplay)
-				thiss.player.pause();
+	if(this.webbasedPlayer) {
+		var thiss = this;
+		this.video = videojs(this.uniqueName);
+		this.video.ready(function() {
+			thiss.player = this;
+			$("#" + thiss.uniqueName).find(".vjs-control-bar").append("<div class='vjs-time-controls vjs-control vjs-custom'></div>");
 			thiss.semihide($("#" + thiss.uniqueName));
-			thiss.player.userActive(true);
+		
+			thiss.player.on('seeking', function(e) {
+			});
+		
+			thiss.player.on("loadedmetadata", function() {
+				thiss.player.play();
+				if(!thiss.autoplay)
+					thiss.player.pause();
+				thiss.semihide($("#" + thiss.uniqueName));
+				thiss.player.userActive(true);
 			
-			thiss.video.thumbnails([]);
-			if((thiss.thumbPath != undefined) && (thiss.thumbPath != "")) {
-				$.ajax({
-					url: 	thiss.poster,
-					type: 	'HEAD',
-					error: function() {
-					},
-					success: function() {
-						var duration = thiss.player.duration();
-						var thumbnails = new Object();
-						var thumbEach = 5;
-						for(var thumbIndex = 0 ; thumbIndex < ceil(duration / thumbEach) ; thumbIndex++) {
-							thumbnails[thumbEach*thumbIndex] = new Object();
-							thumbnails[thumbEach*thumbIndex].src = thiss.thumbPath + "_" + (thumbIndex+1) + ".jpg";
+				thiss.video.thumbnails([]);
+				if((thiss.thumbPath != undefined) && (thiss.thumbPath != "")) {
+					$.ajax({
+						url: 	thiss.poster,
+						type: 	'HEAD',
+						error: function() {
+						},
+						success: function() {
+							var duration = thiss.player.duration();
+							var thumbnails = new Object();
+							var thumbEach = 5;
+							for(var thumbIndex = 0 ; thumbIndex < ceil(duration / thumbEach) ; thumbIndex++) {
+								thumbnails[thumbEach*thumbIndex] = new Object();
+								thumbnails[thumbEach*thumbIndex].src = thiss.thumbPath + "_" + (thumbIndex+1) + ".jpg";
+							}
+							thiss.video.thumbnails(thumbnails);
 						}
-						thiss.video.thumbnails(thumbnails);
-					}
-				});
-			}
+					});
+				}
+			});
 		});
-	});
 	
-	$("#" + thiss.uniqueName).mouseover(function() {
-		thiss.semishow($(this));
-	});
-	$("#" + thiss.uniqueName).mouseleave(function() {
-		thiss.semihide($(this));
-	});
-	$("#" + thiss.uniqueName).click(function() {
-	});
-	$("#" + thiss.uniqueName).removeAttr("tabIndex");
-	$("#" + thiss.uniqueName).find("*").removeAttr("tabIndex");
+		$("#" + thiss.uniqueName).mouseover(function() {
+			thiss.semishow($(this));
+		});
+		$("#" + thiss.uniqueName).mouseleave(function() {
+			thiss.semihide($(this));
+		});
+		$("#" + thiss.uniqueName).click(function() {
+		});
+		$("#" + thiss.uniqueName).removeAttr("tabIndex");
+		$("#" + thiss.uniqueName).find("*").removeAttr("tabIndex");
+	}
 }
 
 VideoPlayer.prototype.show = function() {
-	this.dom.find("#" + this.uniqueName).parent().show();
+	if(this.webbasedPlayer) {
+		this.dom.find("#" + this.uniqueName).parent().show();
+	}
 }
 VideoPlayer.prototype.hide = function() {
-	this.dom.find("#" + this.uniqueName).parent().hide();
-	this.tagOrDoc = undefined;
-	this.player.pause();
-	this.autoplay = false;
+	if(this.webbasedPlayer) {
+		this.dom.find("#" + this.uniqueName).parent().hide();
+		this.tagOrDoc = undefined;
+		this.player.pause();
+		this.autoplay = false;
+	}
 }
 
 VideoPlayer.prototype.play = function(timeCurrentOffset) {
-	if(this.player.paused())
-		this.player.play();
-	this.player.currentTime(timeCurrentOffset);
-}
-VideoPlayer.prototype.pause = function() {
-	if(!this.player.paused())
-		this.player.pause();
-	this.autoplay = false;
-}
-VideoPlayer.prototype.rewind = function(timeCurrentOffset) {
-	this.player.currentTime(timeCurrentOffset);
-	this.pause();
-	this.autoplay = false;
-}
-
-
-VideoPlayer.renderControlBarItems = ["vjs-play-control", "vjs-time-divider", "vjs-duration", "vjs-current-time", "vjs-volume-control", "vjs-fullscreen-control", "vjs-mute-control"]
-VideoPlayer.previewControlBarItems = ["vjs-volume-control", "vjs-fullscreen-control", "vjs-mute-control"]
-VideoPlayer.prototype.semishow = function(obj) {
-	if(this.render) {
-		$.each(VideoPlayer.renderControlBarItems, function(index, controlBarItem) {
-			obj.find("." + controlBarItem).fadeTo(100, 1.);
-		});
+	if(this.webbasedPlayer) {
+		if(this.player.paused())
+			this.player.play();
+		this.player.currentTime(timeCurrentOffset);
 	}
 	else {
-		$.each(VideoPlayer.previewControlBarItems, function(index, controlBarItem) {
-			obj.find("." + controlBarItem).fadeTo(100, 1.);
-		});
+		$.ajax(rekall.project.url + "video/play?timecode=" + round(timeCurrentOffset*1000));
+	}
+}
+VideoPlayer.prototype.pause = function() {
+	if(this.webbasedPlayer) {
+		if(!this.player.paused())
+			this.player.pause();
+		this.autoplay = false;
+	}
+	else {
+		$.ajax(rekall.project.url + "video/pause");
+	}
+}
+VideoPlayer.prototype.rewind = function(timeCurrentOffset) {
+	if(this.webbasedPlayer) {
+		this.player.currentTime(timeCurrentOffset);
+		this.pause();
+		this.autoplay = false;
+	}
+	else {
+		$.ajax(rekall.project.url + "video/rewind?timecode=" + round(timeCurrentOffset*1000));
+	}
+}
+VideoPlayer.prototype.semishow = function(obj) {
+	if(this.webbasedPlayer) {	
+		if(this.render) {
+			$.each(VideoPlayer.renderControlBarItems, function(index, controlBarItem) {
+				obj.find("." + controlBarItem).fadeTo(100, 1.);
+			});
+		}
+		else {
+			$.each(VideoPlayer.previewControlBarItems, function(index, controlBarItem) {
+				obj.find("." + controlBarItem).fadeTo(100, 1.);
+			});
+		}
 	}
 }
 VideoPlayer.prototype.semihide = function(obj) {
-	if(this.render) {
-		$.each(VideoPlayer.renderControlBarItems, function(index, controlBarItem) {
-			obj.find("." + controlBarItem).fadeTo(100, 0.);
-		});
-	}
-	else {
-		$.each(VideoPlayer.previewControlBarItems, function(index, controlBarItem) {
-			obj.find("." + controlBarItem).fadeTo(100, 0.);
-		});
+	if(this.webbasedPlayer) {	
+		if(this.render) {
+			$.each(VideoPlayer.renderControlBarItems, function(index, controlBarItem) {
+				obj.find("." + controlBarItem).fadeTo(100, 0.);
+			});
+		}
+		else {
+			$.each(VideoPlayer.previewControlBarItems, function(index, controlBarItem) {
+				obj.find("." + controlBarItem).fadeTo(100, 0.);
+			});
+		}
 	}
 }
 
@@ -248,24 +282,41 @@ VideoPlayers.prototype.resize = function(visible) {
 		});
 	}
 }
-VideoPlayers.prototype.show = function(document) {
+VideoPlayers.prototype.show = function(document, visibility) {
+	var dom = $("#renders");
+	//Local usage of video
+	dom = undefined;
 	var playerId = document.getMetadata("File->Hash");
-	if(document.isAudio()) {
-		this.audios[playerId] = new VideoPlayer($("#renders"), playerId, true);
-		this.players[playerId] = this.audios[playerId];
-		this.players[playerId].loadLocal(document);
-		this.players[playerId].index = this.audiosCount;
-		this.audiosCount++;
+	if((this.players[playerId] == undefined) && (visibility)) {
+		if(document.isAudio()) {
+			this.audios[playerId] = new VideoPlayer(dom, playerId, true);
+			this.players[playerId] = this.audios[playerId];
+			this.players[playerId].loadLocal(document);
+			this.players[playerId].index = this.audiosCount;
+			this.audiosCount++;
+		}
+		else {
+			this.videos[playerId] = new VideoPlayer(dom, playerId, true);
+			this.players[playerId] = this.videos[playerId];
+			this.players[playerId].loadLocal(document);
+			this.players[playerId].index = this.videosCount;
+			this.videosCount++;
+		}
 	}
-	else {
-		this.videos[playerId] = new VideoPlayer($("#renders"), playerId, true);
-		this.players[playerId] = this.videos[playerId];
-		this.players[playerId].loadLocal(document);
-		this.players[playerId].index = this.videosCount;
-		this.videosCount++;
+	else if((this.players[playerId] != undefined) && (!visibility)) {
+		if(document.isAudio()) {
+			this.audios[playerId] = undefined;
+			this.audiosCount--;
+		}
+		else {
+			this.videos[playerId] = undefined;
+			this.videosCount--;
+		}
 	}
-	this.resize();
+	if(dom != undefined)
+		this.resize();
 }
+
 
 VideoPlayers.prototype.play = function(timeCurrentOffset) {
 	$.each(this.players, function(playerId, player) {	player.play(timeCurrentOffset);	});

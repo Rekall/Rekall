@@ -107,6 +107,11 @@ Project.prototype.loadXML = function(xml) {
 			}
 		}
 	});
+	
+	for (var keySource in this.sources)
+		for (var keyDocument in this.sources[keySource].documents)
+			this.sources[keySource].documents[keyDocument].checkRender();
+	
 	/*
 	xml.find('event').each(function() {
 	});

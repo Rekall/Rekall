@@ -234,11 +234,11 @@ void AnalyseProcess::getThumbnails() {
                 QImage(thumbPathNumbered).scaled(QSize(maxCote, maxCote), Qt::KeepAspectRatio, Qt::SmoothTransformation).save(thumbPathNumbered);
                 thumbPathNumbered = QString(thumbPath + "_%1.jpg").arg(++thumbIndex);
             }
+            if((file->metadatas.contains("Rekall->Media Duration    (s.)")) && (file->metadatas["Rekall->Media Duration (s.)"].toDouble() > 600))
+                file->metadatas["Rekall->Media Function"] = "Render";
+            else
+                file->metadatas["Rekall->Media Function"] = "Contextual";
         }
-        if((file->metadatas.contains("Rekall->Media Duration (s.)")) && (file->metadatas["Rekall->Media Duration (s.)"].toDouble() > 600))
-            file->metadatas["Rekall->Media Function"] = "Render";
-        else
-            file->metadatas["Rekall->Media Function"] = "Contextual";
         thumbExists = true;
     }
 

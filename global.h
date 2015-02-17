@@ -73,6 +73,16 @@ class WebWrapperInterface {
 public:
     virtual void openWebPage(const QUrl &url, const QString &title = "") = 0;
 };
+class VideoPlayerInterface {
+public:
+    QUrl currentUrl;
+public:
+    virtual void open(const QUrl &url, const QString &title = "") = 0;
+    virtual void seek(qint64 timecode) = 0;
+    virtual void play(qint64 timecode = -1) = 0;
+    virtual void pause() = 0;
+    virtual void rewind(qint64 timecode = 0) = 0;
+};
 
 class UserInfosInterface;
 class ProjectInterface;
@@ -124,6 +134,9 @@ public:
     qint8 askScreenshot;
 protected:
     virtual void takeScreenshot() = 0;
+
+public:
+    QList< QPair<ProjectInterface*, QString> > askCreateVideoPlayer;
 
 public:
     qint8 askAddProject;
@@ -244,6 +257,7 @@ public:
     QAction *trayMenuTitle, *trayMenuWeb, *trayMenuFolder, *trayMenuSeparator;
     QMenu *trayMenuEvents;
     QList<SyncEntryEvent*> events;
+    QList<VideoPlayerInterface*> videoPlayers;
 
 public:
     explicit ProjectInterface(QObject *parent = 0) : QObject(parent) {
@@ -269,6 +283,10 @@ public:
     }
 
 public slots:
+    virtual void updateVideo(const QUrl &url, qint64 timecode = 0) = 0;
+    virtual void videosRewind(qint64 timecode = 0) = 0;
+    virtual void videosPlay(qint64 timecode = -1) = 0;
+    virtual void videosPause() = 0;
     virtual void load() = 0;
     virtual void save() = 0;
     virtual void updateGUI() = 0;

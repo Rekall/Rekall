@@ -55,6 +55,8 @@ Project::Project(const QString &_name, const QString &_friendlyName, bool _isPub
 
     connect(&saveTimer, SIGNAL(timeout()), SLOT(save()));
     saveTimer.setInterval(1000);
+
+    connect(this, SIGNAL(projectChangedLoopback()), SLOT(projectChanged()));
 }
 
 void Project::load() {
@@ -109,7 +111,7 @@ void Project::save() {
 
 
 void Project::openWebPage() {
-    Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2/%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(name)), friendlyName);
+    Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2/%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(name)), tr("Opening project %1…").arg(friendlyName));
 }
 void Project::openFolder() {
     Global::revealInFinder(path);
@@ -119,6 +121,39 @@ void Project::updateGUI() {
     foreach(SyncEntryEvent *event, events)
         event->updateGUI();
     trayMenuEvents->setEnabled((trayMenuEvents->actions().count() > 0));
+}
+
+void Project::videosRewind(qint64 timecode) {
+    emit videoRewind(timecode);
+}
+void Project::videosPlay(qint64 timecode) {
+    emit videoPlay(timecode);
+}
+void Project::videosPause() {
+    emit videoPause();
+}
+void Project::updateVideo(const QUrl &url, qint64 timecode) {
+    VideoPlayerInterface *player = 0;
+    foreach(VideoPlayerInterface *videoPlayer, videoPlayers) {
+        if(videoPlayer->currentUrl.toString() == url.toString())
+            player = videoPlayer;
+    }
+
+    //Création si manquant
+    if(!player) {
+        VideoPlayer *playerP = new VideoPlayer();
+        videoPlayers << playerP;
+        connect(this, SIGNAL(videoPause ()      ), playerP, SLOT(pause()));
+        connect(this, SIGNAL(videoPlay  (qint64)), playerP, SLOT(play(qint64)));
+        connect(this, SIGNAL(videoRewind(qint64)), playerP, SLOT(rewind(qint64)));
+        connect(this, SIGNAL(videoSeek  (qint64)), playerP, SLOT(seek(qint64)));
+        player = playerP;
+    }
+    player->open(url);
+
+    //Timecode
+    if(timecode >= 0)
+        player->seek(timecode);
 }
 
 void Project::fileChanged(SyncEntry *file) {
@@ -154,7 +189,7 @@ void Project::projectChanged(const QString &strChanges) {
         xmlProject.appendChild(xmlDoc.importNode(xmlElement, true));
         xmlNode = xmlNode.nextSibling();
     }
-    projectChanged();
+    emit projectChangedLoopback();
 }
 void Project::projectChanged() {
     hasChanged = true;

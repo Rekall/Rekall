@@ -330,7 +330,7 @@ Rekall.prototype.start = function() {
 		} else {
 			$("#left_menu").parent().toggle();
 			if($("#left_menu").parent().is(":visible"))	$("#navigateurTabNav").html("&times;");
-			else											$("#navigateurTabNav").html("Menu");
+			else										$("#navigateurTabNav").html("Menu");
 			rekall.map.resize();
 			rekall.panner.resize();
 			rekall.captationVideoPlayers.resize();

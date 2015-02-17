@@ -114,6 +114,23 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
                     project->setFriendlyName(request.getParameter("friendlyName"));
                 return;
             }
+            else if (path.startsWith("/" + project->name + "/video/play")) {
+                project->videosPlay(request.getParameter("timecode").toLongLong());
+                return;
+            }
+            else if (path.startsWith("/" + project->name + "/video/pause")) {
+                project->videosPause();
+                return;
+            }
+            else if (path.startsWith("/" + project->name + "/video/rewind")) {
+                project->videosRewind(request.getParameter("timecode").toLongLong());
+                return;
+            }
+            else if (path.startsWith("/" + project->name + "/video/load")) {
+                QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/video/load"));
+                Global::rekall->askCreateVideoPlayer.append(qMakePair(project, filename.absoluteFilePath()));
+                return;
+            }
             else {
                 if(request.path == ("/" + project->name))
                     request.path = request.path + "/";

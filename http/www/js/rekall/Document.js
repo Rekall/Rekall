@@ -153,6 +153,9 @@ Document.prototype.addVersion = function(document) {
 	}
 }
 
+Document.prototype.checkRender = function() {
+	rekall.captationVideoPlayers.show(this, (this.getMetadata("Rekall->Media Function") == "Render"));
+}
 
 
 Document.prototype.openFile = function() {

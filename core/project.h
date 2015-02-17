@@ -33,6 +33,7 @@
 #include "../http/filecontroller.h"
 #include "../global.h"
 #include "watcherlocal.h"
+#include "video/videoplayer.h"
 
 
 class Project : public ProjectInterface {
@@ -58,10 +59,20 @@ public slots:
     void openWebPage();
     void openFolder();
     void updateGUI();
+    void videosRewind(qint64 timecode = 0);
+    void videosPlay(qint64 timecode = -1);
+    void videosPause();
+    void updateVideo(const QUrl &url, qint64 timecode = 0);
     void fileChanged(SyncEntry *file);
     void projectChanged(SyncEntry *file, bool firstChange);
     void projectChanged(const QString &strChanges);
     void projectChanged();
+signals:
+    void videoSeek(qint64);
+    void videoRewind(qint64);
+    void videoPlay(qint64);
+    void videoPause();
+    void projectChangedLoopback();
 };
 
 #endif // PROJECT_H
