@@ -327,10 +327,11 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				metadataConfigFormated = metadataConfigFormated.replace("|",  "&nbsp;&#x25B9;&nbsp;");
 			}
 		
+		
 			if(isCheckbox != true) {			
-				$("#left_menu_item_open").attr("tool","").width(0);//hide();
-				$(".left_menu_item_checklist").hide();
-				$(".left_menu_item_tab_search").hide();
+				//$("#left_menu_item_open").attr("tool","").width(0);//hide();
+				//$(".left_menu_item_checklist").hide();
+				//$(".left_menu_item_tab_search").hide();
 				$("#left_menu_item_open_select").html(gm_availableMetadatasHtml_caregories+gm_availableMetadatasHtml_metas);
 				$("#navigateurTabNav").css("backgroundColor","#559299");
 			}
@@ -692,14 +693,17 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				if((sorting == "search") || (sorting == "highlight"))
 					rekall.sortings[sorting].setCriterias(rekall.sortings[sorting].metadataConfigStr, rekall.sortings[sorting].valCanBeFloats, searchText, false);
 				else {
+					var sortingId = sorting + "Checklist";
 					sorting = rekall.sortings[sorting];
-					$(this).parent().parent().parent().find('.tab_list_item').each(function(index) {
+					$(this).parent().parent().find("#" + sortingId).find('.tab_list_item').each(function(index) {
 						var category = $(this).find(".tab_list_item_category").text();
 						if((searchText == "") || ($(this).text().toLowerCase().indexOf(searchText) > -1)) {
 							sorting.categories[category].visible = true;
 							$(this).show();
 						}
 						else {
+							console.log(sorting.categories);
+							console.log(category);
 							sorting.categories[category].visible = false;
 							$(this).hide();
 						}
@@ -718,7 +722,6 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		Tags.flattenTimelineTags = [];
 		rekall.map.gpsPositions = new Array();
 	}
-	
 	
 	//Re-génération des étiquettes / grilles
 	var alternate = 0;
