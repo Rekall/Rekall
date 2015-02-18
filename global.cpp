@@ -417,23 +417,23 @@ const QString Global::dateToString(const QDateTime &date, bool addExactTime) {
     quint16 monthsTo = daysTo / 30;
 
     if(addExactTime) {
-        if(monthsTo > 12)     return QString("on %1").arg(date.toString("dddd dd MM yyyy, hh:mm"));
-        else if(monthsTo > 1) return QString("%1 ago, on %2").arg(plurial(monthsTo, "month" )).arg(date.toString("dddd dd MM hh:mm"));
-        else if(weeksTo > 1)  return QString("%1 ago, on %2").arg(plurial(weeksTo,  "week"  )).arg(date.toString("dddd dd MM hh:mm"));
-        else if(daysTo > 1)   return QString("%1 ago, on %2").arg(plurial(daysTo,   "day"   )).arg(date.toString("dddd, hh:mm"));
-        else if(hoursTo > 1)  return QString("%1 ago, on %2").arg(plurial(hoursTo,  "hour"  )).arg(date.toString("hh:mm"));
-        else if(minsTo  > 1)  return QString("%1 ago, on %2").arg(plurial(minsTo,   "minute")).arg(date.toString("hh:mm"));
-        else if(secsTo  > 10) return QString("%1 ago, on %2").arg(plurial(secsTo,   "second")).arg(date.toString("hh:mm:ss"));
+        if(monthsTo >= 12)     return QString("on %1").arg(date.toString("dddd dd MM yyyy, hh:mm"));
+        else if(monthsTo >= 1) return QString("%1 ago, on %2").arg(plurial(monthsTo, "month" )).arg(date.toString("dddd dd MM hh:mm"));
+        else if(weeksTo >= 1)  return QString("%1 ago, on %2").arg(plurial(weeksTo,  "week"  )).arg(date.toString("dddd dd MM hh:mm"));
+        else if(daysTo >= 1)   return QString("%1 ago, on %2").arg(plurial(daysTo,   "day"   )).arg(date.toString("dddd, hh:mm"));
+        else if(hoursTo >= 1)  return QString("%1 ago, on %2").arg(plurial(hoursTo,  "hour"  )).arg(date.toString("hh:mm"));
+        else if(minsTo  >= 1)  return QString("%1 ago, on %2").arg(plurial(minsTo,   "minute")).arg(date.toString("hh:mm"));
+        else if(secsTo  >= 10) return QString("%1 ago, on %2").arg(plurial(secsTo,   "second")).arg(date.toString("hh:mm:ss"));
         else                  return QString("A few seconds ago, on %1").arg(date.toString("hh:mm:ss"));
     }
     else {
-        if(monthsTo > 12)     return QString("on %1").arg(date.toString("dddd dd MM yyyy, hh:mm"));
-        else if(monthsTo > 1) return QString("%1 ago").arg(plurial(monthsTo, "month" ));
-        else if(weeksTo > 1)  return QString("%1 ago").arg(plurial(weeksTo,  "week"  ));
-        else if(daysTo > 1)   return QString("%1 ago").arg(plurial(daysTo,   "day"   ));
-        else if(hoursTo > 1)  return QString("%1 ago").arg(plurial(hoursTo,  "hour"  ));
-        else if(minsTo  > 1)  return QString("%1 ago").arg(plurial(minsTo,   "minute"));
-        else if(secsTo  > 10) return QString("%1 ago").arg(plurial(secsTo,   "second"));
+        if(monthsTo >= 12)     return QString("on %1").arg(date.toString("dddd dd MM yyyy, hh:mm"));
+        else if(monthsTo >= 1) return QString("%1 ago").arg(plurial(monthsTo, "month" ));
+        else if(weeksTo >= 1)  return QString("%1 ago").arg(plurial(weeksTo,  "week"  ));
+        else if(daysTo >= 1)   return QString("%1 ago").arg(plurial(daysTo,   "day"   ));
+        else if(hoursTo >= 1)  return QString("%1 ago").arg(plurial(hoursTo,  "hour"  ));
+        else if(minsTo  >= 1)  return QString("%1 ago").arg(plurial(minsTo,   "minute"));
+        else if(secsTo  >= 10) return QString("%1 ago").arg(plurial(secsTo,   "second"));
         else                  return QString("A few seconds ago");
     }
 }

@@ -45,6 +45,7 @@ public:
     void run();
 
 private:
+    QDateTime lastAnalyse;
     QQueue<AnalyseProcess*> metadataQueue, thumbnailQueue;
     bool okThread;
     quint16 thumbnailThreadsCount;

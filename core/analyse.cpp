@@ -28,6 +28,7 @@ Analyse::Analyse(QObject *parent) :
     okThread = true;
     thumbnailThreadsCount = 0;
     paused = false;
+    lastAnalyse = QDateTime::currentDateTime();
     start();
 }
 Analyse::~Analyse() {
@@ -62,6 +63,7 @@ void Analyse::run() {
                 if(analyseProcess->process())   thumbnailQueue.append(analyseProcess);
                 else                            analyseProcess->deleteLater();
             }
+            lastAnalyse = QDateTime::currentDateTime();
             //QCoreApplication::processEvents();
             //msleep(5);
         }
@@ -77,6 +79,7 @@ void Analyse::run() {
                 thumbnailThreadsCount++;
                 trayIconToOn(10000);
                 analyseProcess->start();
+                lastAnalyse = QDateTime::currentDateTime();
             }
         }
 
@@ -91,11 +94,11 @@ void Analyse::run() {
                 text += tr("Generating thumbnails… (%1 remaining)").arg(metadataQueue.count() + thumbnailThreadsCount+thumbnailQueue.count());
             if(paused)
                 text += " [paused]";
-            qDebug("%s", qPrintable(text));
         }
         else {
             trayEnable = false;
-            text += tr("Rekall projects are up to date!");
+            text += tr("Rekall projects are up to date, ") + Global::dateToString(lastAnalyse);
+
             emit trayIconToOff();
         }
         emit(trayChanged(text, trayEnable));
