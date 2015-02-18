@@ -30,6 +30,7 @@ Project::Project(const QString &_name, const QString &_friendlyName, bool _isPub
     name = _name;
     friendlyName = _friendlyName;
     path = _path;
+    isLoaded = false;
     isPublic = _isPublic;
     hasChanged = false;
 
@@ -57,45 +58,61 @@ Project::Project(const QString &_name, const QString &_friendlyName, bool _isPub
     saveTimer.setInterval(1000);
 
     connect(this, SIGNAL(projectChangedLoopback()), SLOT(projectChanged()));
+    timerLoadId = -1;
 }
 
-void Project::load() {
-    xmlDoc = QDomDocument("rekall");
-    QFile projectFile(path.absoluteFilePath() + "/rekall_cache/project.xml");
-    if((projectFile.exists()) && (QFileInfo(projectFile.fileName()).size() > 0) && (projectFile.open(QFile::ReadOnly))) {
-        xmlDoc.setContent(&projectFile);
-        projectFile.close();
-
-        xmlProject = xmlDoc.documentElement();
-        QDomNode documentNode = xmlProject.firstChild();
-        while(!documentNode.isNull()) {
-            QDomElement documentElement = documentNode.toElement();
-            QCoreApplication::processEvents();
-            if((!documentElement.isNull()) && (documentElement.nodeName().toLower() == "document")) {
-                Metadatas metadatas;
-                metadatas.deserialize(documentElement);
-                if((metadatas.contains("Rekall->Folder")) && (metadatas.contains("File->File Name"))) {
-                    SyncEntry *file = new SyncEntry(path.absoluteFilePath() + "/" + metadatas["Rekall->Folder"] + "/" + metadatas["File->File Name"]);
-                    file->metadatas = metadatas;
-                    sync->folders[file->absolutePath()][file->absoluteFilePath()] = file;
-                    qDebug("Loading metadatas for %s (%d)", qPrintable(file->absoluteFilePath()), file->metadatas.count());
-                }
-            }
-            else if((!documentElement.isNull()) && (documentElement.nodeName().toLower() == "event")) {
-                SyncEntryEvent *event = new SyncEntryEvent(documentElement, this);
-                addEvent(event);
-                qDebug("Loading event for %s", qPrintable(event->file.absoluteFilePath()));
-            }
-            documentNode = documentNode.nextSibling();
-        }
+void Project::load(bool existing) {
+    if(existing) {
+        timerLoadId = startTimer(1000);
     }
     else {
+        xmlDoc = QDomDocument("rekall");
         xmlProject = xmlDoc.createElement("project");
         xmlDoc.appendChild(xmlProject);
+        sync->start();
     }
-
     updateGUI();
-    sync->start();
+}
+void Project::timerEvent(QTimerEvent *e) {
+    if(e->timerId() == timerLoadId) {
+        if(!isLoaded) {
+            QFile projectFile(path.absoluteFilePath() + "/rekall_cache/project.xml");
+            qDebug("%s = %d", qPrintable(projectFile.fileName()), projectFile.exists());
+            if((projectFile.exists()) && (QFileInfo(projectFile.fileName()).size() > 0) && (projectFile.open(QFile::ReadOnly))) {
+                isLoaded = true;
+
+                xmlDoc = QDomDocument("rekall");
+                xmlDoc.setContent(&projectFile);
+                projectFile.close();
+
+                xmlProject = xmlDoc.documentElement();
+                QDomNode documentNode = xmlProject.firstChild();
+                while(!documentNode.isNull()) {
+                    QDomElement documentElement = documentNode.toElement();
+                    QCoreApplication::processEvents();
+                    if((!documentElement.isNull()) && (documentElement.nodeName().toLower() == "document")) {
+                        Metadatas metadatas;
+                        metadatas.deserialize(documentElement);
+                        if((metadatas.contains("Reksall->Folder")) && (metadatas.contains("File->File Name"))) {
+                            SyncEntry *file = new SyncEntry(path.absoluteFilePath() + "/" + metadatas["Rekall->Folder"] + "/" + metadatas["File->File Name"]);
+                            file->metadatas = metadatas;
+                            sync->folders[file->absolutePath()][file->absoluteFilePath()] = file;
+                            qDebug("Loading metadatas for %s (%d)", qPrintable(file->absoluteFilePath()), file->metadatas.count());
+                        }
+                    }
+                    else if((!documentElement.isNull()) && (documentElement.nodeName().toLower() == "event")) {
+                        SyncEntryEvent *event = new SyncEntryEvent(documentElement, this);
+                        addEvent(event);
+                        qDebug("Loading event for %s", qPrintable(event->file.absoluteFilePath()));
+                    }
+                    documentNode = documentNode.nextSibling();
+                }
+
+                updateGUI();
+                sync->start();
+            }
+        }
+    }
 }
 void Project::save() {
     saveTimer.stop();
@@ -117,7 +134,11 @@ void Project::openFolder() {
     Global::revealInFinder(path);
 }
 void Project::updateGUI() {
-    trayMenuTitle->setText(friendlyName);
+    if(isLoaded)
+        trayMenuTitle->setText(friendlyName);
+    else
+        trayMenuTitle->setText(tr("Waiting for %1").arg(friendlyName));
+
     foreach(SyncEntryEvent *event, events)
         event->updateGUI();
     trayMenuEvents->setEnabled((trayMenuEvents->actions().count() > 0));

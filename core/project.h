@@ -44,7 +44,7 @@ public:
 
 private:
     QDomElement xmlProject;
-    bool hasChanged;
+    bool hasChanged, isLoaded;
     QTimer saveTimer;
 public:
     static bool sortEventFunction(SyncEntryEvent *a, SyncEntryEvent *b);
@@ -52,9 +52,13 @@ public:
 private:
     QAction* addEvent(SyncEntryEvent *event);
     void addItemToMenu(QAction *action);
+protected:
+    void timerEvent(QTimerEvent *);
 
+private:
+    int timerLoadId;
 public slots:
-    void load();
+    void load(bool existing);
     void save();
     void openWebPage();
     void openFolder();

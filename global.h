@@ -158,7 +158,7 @@ public:
 public:
     qint8 askAddProject;
     virtual void addProject() = 0;
-    virtual void addProject(ProjectInterface *project) = 0;
+    virtual void addProject(ProjectInterface *project, bool existing = true) = 0;
     virtual void removeProject(ProjectInterface *project) = 0;
     virtual void updateGUI() = 0;
     virtual void syncSettings() = 0;
@@ -306,7 +306,7 @@ public slots:
     virtual void videosRewind(qint64 timecode = 0) = 0;
     virtual void videosPlay(qint64 timecode = -1) = 0;
     virtual void videosPause() = 0;
-    virtual void load() = 0;
+    virtual void load(bool existing = true) = 0;
     virtual void save() = 0;
     virtual void updateGUI() = 0;
     virtual void fileChanged(SyncEntry *file) = 0;

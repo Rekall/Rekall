@@ -773,11 +773,19 @@ Rekall.prototype.loadXMLFile = function() {
 		type: "GET",
 		dataType: "xml",
 		success: function(xml) {
-			$(xml).find('project').each(function() {
-				if(rekall.project == undefined)
-					rekall.project = new Project(url);
-				rekall.project.loadXML($(this));
-			});
+			if((xml == null) || (xml == undefined))
+				showInRuban("Your project is unreachable. Did you move the folder to an other location? Did you plug your external hard drive or your network drive?", 60);
+			else {
+				$(xml).find('project').each(function() {
+					if($(this).find('document').length == 0)
+						showInRuban("Your project is empty. Rekall is probably analysing all your files for the first time (it can take a while).", 60);
+					else {
+						if(rekall.project == undefined)
+							rekall.project = new Project(url);
+						rekall.project.loadXML($(this));
+					}
+				});
+			}
 		}
 	});
 }

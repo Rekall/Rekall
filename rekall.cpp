@@ -194,12 +194,12 @@ void Rekall::syncSettings() {
 void Rekall::addProject() {
     QFileInfo dirToOpen(QFileDialog::getExistingDirectory(0, tr("Select a folder where you store the files of your creative project"), Global::pathDocuments.absoluteFilePath()));
     if(dirToOpen.exists()) {
-        addProject(new Project(dirToOpen.baseName(), dirToOpen.baseName(), true, dirToOpen, this));
+        addProject(new Project(dirToOpen.baseName(), dirToOpen.baseName(), true, dirToOpen, this), false);
         syncSettings();
         showMessage(tr("Rekall is analysing your project %1…").arg(dirToOpen.baseName()));
     }
 }
-void Rekall::addProject(ProjectInterface *project) {
+void Rekall::addProject(ProjectInterface *project, bool existing) {
     trayMenu->insertAction(trayMenuProjects, project->trayMenuTitle);
     trayMenu->insertMenu  (trayMenuProjects, project->trayMenuEvents);
     trayMenu->insertAction(trayMenuProjects, project->trayMenuFolder);
@@ -207,7 +207,7 @@ void Rekall::addProject(ProjectInterface *project) {
     project->trayMenuSeparator = trayMenu->insertSeparator(trayMenuProjects);
     Global::projects.append(project);
     updateGUI();
-    project->load();
+    project->load(existing);
 }
 void Rekall::removeProject(ProjectInterface *project) {
     trayMenu->removeAction(project->trayMenuEvents->menuAction());

@@ -98,7 +98,7 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
         //qDebug(FileController: Cache miss for %s",path.data());
         // Forbid access to files outside the docroot directory
         if (path.contains("/..")) {
-            qWarning("FileController: detected forbidden characters in path %s",path.data());
+            //qWarning("FileController: detected forbidden characters in path %s",path.data());
             response.setStatus(403,"forbidden");
             response.write("403 forbidden",true);
             return;
@@ -192,11 +192,11 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
             }
             if(file.isOpen())
                 file.close();
-            qWarning("FileController: File %s sent", qPrintable(file.fileName()));
+            //qWarning("FileController: File %s sent", qPrintable(file.fileName()));
         }
         else {
             if (file.exists()) {
-                qWarning("FileController: Cannot open existing file %s for reading",qPrintable(file.fileName()));
+                //qWarning("FileController: Cannot open existing file %s for reading",qPrintable(file.fileName()));
                 response.setStatus(403,"forbidden");
                 response.write("403 forbidden",true);
             }

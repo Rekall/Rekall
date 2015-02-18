@@ -63,7 +63,7 @@ public:
 
 public:
     void syncSettings();
-    void addProject(ProjectInterface *project);
+    void addProject(ProjectInterface *project, bool existing = true);
     void removeProject(ProjectInterface *project);
 
 private:

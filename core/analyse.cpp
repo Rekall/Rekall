@@ -97,7 +97,7 @@ void Analyse::run() {
         }
         else {
             trayEnable = false;
-            text += tr("Rekall projects are up to date, ") + Global::dateToString(lastAnalyse);
+            text += tr("Rekall projects are up to date, ") + Global::dateToString(lastAnalyse).toLower();
 
             emit trayIconToOff();
         }
