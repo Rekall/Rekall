@@ -32,8 +32,8 @@
 #include <QAction>
 #include "../http/filecontroller.h"
 #include "../global.h"
+#include "../video/videoplayer.h"
 #include "watcherlocal.h"
-#include "video/videoplayer.h"
 
 
 class Project : public ProjectInterface {

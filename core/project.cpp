@@ -62,14 +62,15 @@ Project::Project(const QString &_name, const QString &_friendlyName, bool _isPub
 }
 
 void Project::load(bool existing) {
-    if(existing) {
-        timerLoadId = startTimer(1000);
-    }
-    else {
+    if((!existing) || ((QFileInfo(path.absoluteFilePath()).exists()) && (!QFileInfo(path.absoluteFilePath() + "/rekall_cache/project.xml").exists()))) {
+        isLoaded = true;
         xmlDoc = QDomDocument("rekall");
         xmlProject = xmlDoc.createElement("project");
         xmlDoc.appendChild(xmlProject);
         sync->start();
+    }
+    else {
+        timerLoadId = startTimer(1000);
     }
     updateGUI();
 }
@@ -92,7 +93,7 @@ void Project::timerEvent(QTimerEvent *e) {
                     if((!documentElement.isNull()) && (documentElement.nodeName().toLower() == "document")) {
                         Metadatas metadatas;
                         metadatas.deserialize(documentElement);
-                        if((metadatas.contains("Reksall->Folder")) && (metadatas.contains("File->File Name"))) {
+                        if((metadatas.contains("Rekall->Folder")) && (metadatas.contains("File->File Name"))) {
                             SyncEntry *file = new SyncEntry(path.absoluteFilePath() + "/" + metadatas["Rekall->Folder"] + "/" + metadatas["File->File Name"]);
                             file->metadatas = metadatas;
                             sync->folders[file->absolutePath()][file->absoluteFilePath()] = file;
@@ -133,14 +134,20 @@ void Project::openFolder() {
     Global::revealInFinder(path);
 }
 void Project::updateGUI() {
-    if(isLoaded)
+    if(isLoaded) {
         trayMenuTitle->setText(friendlyName);
-    else
+        foreach(SyncEntryEvent *event, events)
+            event->updateGUI();
+        trayMenuEvents->setEnabled((trayMenuEvents->actions().count() > 0));
+        trayMenuWeb->setEnabled(true);
+        trayMenuFolder->setEnabled(true);
+    }
+    else {
         trayMenuTitle->setText(tr("Waiting for %1").arg(friendlyName));
-
-    foreach(SyncEntryEvent *event, events)
-        event->updateGUI();
-    trayMenuEvents->setEnabled((trayMenuEvents->actions().count() > 0));
+        trayMenuEvents->setEnabled(false);
+        trayMenuWeb->setEnabled(false);
+        trayMenuFolder->setEnabled(false);
+    }
 }
 
 void Project::videosRewind(qint64 timecode) {

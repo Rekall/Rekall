@@ -29,6 +29,7 @@ Analyse::Analyse(QObject *parent) :
     thumbnailThreadsCount = 0;
     paused = false;
     lastAnalyse = QDateTime::currentDateTime();
+    lastFileAnalyzed = 0;
     start();
 }
 Analyse::~Analyse() {
@@ -60,6 +61,9 @@ void Analyse::run() {
             if(!analyseProcess->project->isRemoved) {
                 trayIconToOn(10000);
 
+                if(lastFileAnalyzed < 0)
+                    lastFileAnalyzed = 0;
+                lastFileAnalyzed++;
                 if(analyseProcess->process())   thumbnailQueue.append(analyseProcess);
                 else                            analyseProcess->deleteLater();
             }
@@ -94,10 +98,13 @@ void Analyse::run() {
                 text += tr("Generating thumbnails… (%1 remaining)").arg(metadataQueue.count() + thumbnailThreadsCount+thumbnailQueue.count());
             if(paused)
                 text += " [paused]";
+            qDebug("%s", qPrintable(text));
         }
         else {
+            if(lastFileAnalyzed > 0)
+                lastFileAnalyzed = -lastFileAnalyzed;
             trayEnable = false;
-            text += tr("Rekall projects are up to date, ") + Global::dateToString(lastAnalyse).toLower();
+            text += tr("Rekall projects are up to date (%1 files analyzed), %2").arg(abs(lastFileAnalyzed)).arg(Global::dateToString(lastAnalyse).toLower());
 
             emit trayIconToOff();
         }

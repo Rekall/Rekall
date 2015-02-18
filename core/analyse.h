@@ -46,6 +46,7 @@ public:
 
 private:
     QDateTime lastAnalyse;
+    qint64 lastFileAnalyzed;
     QQueue<AnalyseProcess*> metadataQueue, thumbnailQueue;
     bool okThread;
     quint16 thumbnailThreadsCount;

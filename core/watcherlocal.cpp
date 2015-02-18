@@ -72,8 +72,9 @@ const QFileInfoList WatcherLocal::scanFolder(SyncEntry *path, bool returnsOnly) 
                 }
 #endif
             }
+            /*
             else
-                qDebug("%s\t%d", qPrintable(fileEntry->absoluteFilePath()), fileEntry->isIntoBundle());
+                qDebug("%s\t%d", qPrintable(fileEntry->absoluteFilePath()), fileEntry->isIntoBundle());*/
 
             if(fileEntry->isDirPure())
                 scanFolder(fileEntry, returnsOnly);

@@ -31,116 +31,119 @@ RequestMapper::RequestMapper(QObject *parent)
 void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
     QString path = QString(request.getPath());//.normalized(QString::NormalizationForm_D);
     request.path = qPrintable(path);
+    QStringList requestParts = path.split("/", QString::SkipEmptyParts);
     //qDebug("RequestMapper: path=%s", qPrintable(path));
-    foreach(ProjectInterface *project, Global::projects) {
-        if(path.startsWith("/" + project->name)) {
-            if(path.startsWith("/" + project->name + "/file")) {
-                request.path = request.path.replace("/" + project->name + "/file/", "/");
-                project->fileController->service(request, response);
-                return;
-            }
-            else if(path.startsWith("/" + project->name + "/download")) {
-                request.path = request.path.replace("/" + project->name + "/download/", "/");
-                project->fileController->service(request, response, "application/force-download");
-                return;
-            }
-            else if(path.startsWith("/" + project->name + "/finder")) {
-                QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/finder"));
-                qDebug("RequestMapper: reveal in finder %s", qPrintable(filename.absoluteFilePath()));
-                Global::revealInFinder(filename);
-                if(filename.exists())   response.setStatus(200, "OK");
-                else                    response.setStatus(404, "not found");
-                return;
-            }
-            else if(path.startsWith("/" + project->name + "/quicklook")) {
-                QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/quicklook"));
-                qDebug("RequestMapper: quicklook %s", qPrintable(filename.absoluteFilePath()));
-                Global::quickLook(filename);
-                if(filename.exists())   response.setStatus(200, "OK");
-                else                    response.setStatus(404, "not found");
-                return;
-            }
-            else if(path.startsWith("/" + project->name + "/open")) {
-                QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/open"));
-                Global::openFile(filename);
-                qDebug("RequestMapper: open %s", qPrintable(filename.absoluteFilePath()));
-                if(filename.exists())   response.setStatus(200, "OK");
-                else                    response.setStatus(404, "not found");
-                return;
-            }
-            else if (path.startsWith("/" + project->name + "/project")) {
-                QString json;
-                json += "{";
-                json += "\"name\": \"" + project->name + "\",";
-                json += "\"friendlyName\": \"" + project->friendlyName + "\",";
-                json += "\"path\": \"" + project->path.absoluteFilePath() + "\",";
-                json += "\"events\": [ ";
-                for(quint16 eventIndex = 0 ; eventIndex < qMin(project->events.count(), 5) ; eventIndex++) {
-                    SyncEntryEvent *event = project->events.at(eventIndex);
-                    json += "{\"author\": \"" + event->author + "\",";
-                    if(event->file.exists())
-                        json += "\"file\": \"" + event->file.absoluteFilePath() + "\",";
-                    json += "\"name\": \"" + event->file.baseName() + "\",";
-                    json += "\"action\": \"" + QString::number(event->action) + "\",";
-                    json += "\"date\": \""   + event->dateTime.toString("yyyy:MM:dd hh:mm:ss") + "\",";
-                    json += "\"locationName\": \"" + event->locationName + "\",";
-                    json += "\"locationGPS\": \""  + event->locationGPS + "\"},";
+    if(requestParts.count()) {
+        foreach(ProjectInterface *project, Global::projects) {
+            if(requestParts.first() == project->name) {
+                if(path.startsWith("/" + project->name + "/file")) {
+                    request.path = request.path.replace("/" + project->name + "/file/", "/");
+                    project->fileController->service(request, response);
+                    return;
                 }
-                json.chop(1);
-                json += "]";
-                json += "}";
-                response.setHeader("Content-Type", "application/json");
-                response.write(json.toUtf8(), true);
-                return;
-            }
-            else if(path.startsWith("/" + project->name + "/xml")) {
-                if(request.getParameterMap().contains("change")) {
-                    project->projectChanged(request.getParameter("change"));
+                else if(path.startsWith("/" + project->name + "/download")) {
+                    request.path = request.path.replace("/" + project->name + "/download/", "/");
+                    project->fileController->service(request, response, "application/force-download");
+                    return;
+                }
+                else if(path.startsWith("/" + project->name + "/finder")) {
+                    QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/finder"));
+                    qDebug("RequestMapper: reveal in finder %s", qPrintable(filename.absoluteFilePath()));
+                    Global::revealInFinder(filename);
+                    if(filename.exists())   response.setStatus(200, "OK");
+                    else                    response.setStatus(404, "not found");
+                    return;
+                }
+                else if(path.startsWith("/" + project->name + "/quicklook")) {
+                    QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/quicklook"));
+                    qDebug("RequestMapper: quicklook %s", qPrintable(filename.absoluteFilePath()));
+                    Global::quickLook(filename);
+                    if(filename.exists())   response.setStatus(200, "OK");
+                    else                    response.setStatus(404, "not found");
+                    return;
+                }
+                else if(path.startsWith("/" + project->name + "/open")) {
+                    QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/open"));
+                    Global::openFile(filename);
+                    qDebug("RequestMapper: open %s", qPrintable(filename.absoluteFilePath()));
+                    if(filename.exists())   response.setStatus(200, "OK");
+                    else                    response.setStatus(404, "not found");
+                    return;
+                }
+                else if (path.startsWith("/" + project->name + "/project")) {
+                    QString json;
+                    json += "{";
+                    json += "\"name\": \"" + project->name + "\",";
+                    json += "\"friendlyName\": \"" + project->friendlyName + "\",";
+                    json += "\"path\": \"" + project->path.absoluteFilePath() + "\",";
+                    json += "\"events\": [ ";
+                    for(quint16 eventIndex = 0 ; eventIndex < qMin(project->events.count(), 5) ; eventIndex++) {
+                        SyncEntryEvent *event = project->events.at(eventIndex);
+                        json += "{\"author\": \"" + event->author + "\",";
+                        if(event->file.exists())
+                            json += "\"file\": \"" + event->file.absoluteFilePath() + "\",";
+                        json += "\"name\": \"" + event->file.baseName() + "\",";
+                        json += "\"action\": \"" + QString::number(event->action) + "\",";
+                        json += "\"date\": \""   + event->dateTime.toString("yyyy:MM:dd hh:mm:ss") + "\",";
+                        json += "\"locationName\": \"" + event->locationName + "\",";
+                        json += "\"locationGPS\": \""  + event->locationGPS + "\"},";
+                    }
+                    json.chop(1);
+                    json += "]";
+                    json += "}";
+                    response.setHeader("Content-Type", "application/json");
+                    response.write(json.toUtf8(), true);
+                    return;
+                }
+                else if(path.startsWith("/" + project->name + "/xml")) {
+                    if(request.getParameterMap().contains("change")) {
+                        project->projectChanged(request.getParameter("change"));
+                    }
+                    else {
+                        //request.path = "/rekall_cache/project.xml";
+                        //project->fileController->service(request, response);
+                        response.setHeader("Content-Type", "application/xml");
+                        response.write(project->xmlDoc.toString().toUtf8(), true);
+                    }
+                    return;
+                }
+                else if(path.startsWith("/" + project->name + "/remove")) {
+                    Global::rekall->removeProject(project);
+                    return;
+                }
+                else if(path.startsWith("/" + project->name + "/rename")) {
+                    if(!request.getParameter("friendlyName").isEmpty())
+                        project->setFriendlyName(request.getParameter("friendlyName"));
+                    return;
+                }
+                else if (path.startsWith("/" + project->name + "/video/play")) {
+                    project->videosPlay(request.getParameter("timecode").toLongLong());
+                    return;
+                }
+                else if (path.startsWith("/" + project->name + "/video/pause")) {
+                    project->videosPause();
+                    return;
+                }
+                else if (path.startsWith("/" + project->name + "/video/rewind")) {
+                    project->videosRewind(request.getParameter("timecode").toLongLong());
+                    return;
+                }
+                else if (path.startsWith("/" + project->name + "/video/show")) {
+                    QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/video/show"));
+                    Global::rekall->askVideoPlayer.append(VideoPlayerAsk(project, QUrl::fromLocalFile(filename.absoluteFilePath()), false, request.getParameter("friendlyName")));
+                    return;
+                }
+                else if (path.startsWith("/" + project->name + "/video/hide")) {
+                    QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/video/hide"));
+                    Global::rekall->askVideoPlayer.append(VideoPlayerAsk(project, QUrl::fromLocalFile(filename.absoluteFilePath()), true));
+                    return;
                 }
                 else {
-                    //request.path = "/rekall_cache/project.xml";
-                    //project->fileController->service(request, response);
-                    response.setHeader("Content-Type", "application/xml");
-                    response.write(project->xmlDoc.toString().toUtf8(), true);
+                    if(request.path == ("/" + project->name))
+                        request.path = request.path + "/";
+                    request.path = request.path.replace("/" + project->name, "/www");
+                    //qDebug("RequestMapper: routing to %s", request.path.data());
                 }
-                return;
-            }
-            else if(path.startsWith("/" + project->name + "/remove")) {
-                Global::rekall->removeProject(project);
-                return;
-            }
-            else if(path.startsWith("/" + project->name + "/rename")) {
-                if(!request.getParameter("friendlyName").isEmpty())
-                    project->setFriendlyName(request.getParameter("friendlyName"));
-                return;
-            }
-            else if (path.startsWith("/" + project->name + "/video/play")) {
-                project->videosPlay(request.getParameter("timecode").toLongLong());
-                return;
-            }
-            else if (path.startsWith("/" + project->name + "/video/pause")) {
-                project->videosPause();
-                return;
-            }
-            else if (path.startsWith("/" + project->name + "/video/rewind")) {
-                project->videosRewind(request.getParameter("timecode").toLongLong());
-                return;
-            }
-            else if (path.startsWith("/" + project->name + "/video/show")) {
-                QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/video/show"));
-                Global::rekall->askVideoPlayer.append(VideoPlayerAsk(project, QUrl::fromLocalFile(filename.absoluteFilePath()), false, request.getParameter("friendlyName")));
-                return;
-            }
-            else if (path.startsWith("/" + project->name + "/video/hide")) {
-                QFileInfo filename(project->path.absoluteFilePath() + path.remove("/" + project->name + "/video/hide"));
-                Global::rekall->askVideoPlayer.append(VideoPlayerAsk(project, QUrl::fromLocalFile(filename.absoluteFilePath()), true));
-                return;
-            }
-            else {
-                if(request.path == ("/" + project->name))
-                    request.path = request.path + "/";
-                request.path = request.path.replace("/" + project->name, "/www");
-                qDebug("RequestMapper: routing to %s", request.path.data());
             }
         }
     }

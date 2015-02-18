@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QMediaPlayer>
 #include <QVideoWidget>
-#include "global.h"
+#include "../global.h"
 
 namespace Ui {
 class VideoPlayer;

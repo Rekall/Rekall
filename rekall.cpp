@@ -249,7 +249,7 @@ void Rekall::analyseTrayChanged(QString text, bool enable) {
 
 void Rekall::trayIconToOnPrivate() {
     if(trayIconWorking) {
-        if(trayIconIndexOld != trayIconIndex)
+        //if(trayIconIndexOld != trayIconIndex)
             trayIcon->setIcon(trayIcons.at(trayIconIndex));
         trayIconIndexOld = trayIconIndex;
         trayIconIndex = (trayIconIndex+1) % (trayIcons.length());
@@ -258,7 +258,7 @@ void Rekall::trayIconToOnPrivate() {
 void Rekall::trayIconToOffPrivate() {
     trayIconWorking = false;
     trayIconIndex = 4;
-    if(trayIconIndexOld != trayIconIndex)
+    //if(trayIconIndexOld != trayIconIndex)
         trayIcon->setIcon(trayIcons.at(trayIconIndex));
     trayIconIndexOld = trayIconIndex;
 }
