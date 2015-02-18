@@ -1,7 +1,7 @@
 #ifndef WEBWRAPPER_H
 #define WEBWRAPPER_H
 
-#include <QWidget>
+#include <QMainWindow>
 #include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QUrl>
@@ -11,7 +11,7 @@ namespace Ui {
 class WebWrapper;
 }
 
-class WebWrapper : public QWidget, public WebWrapperInterface {
+class WebWrapper : public QMainWindow, public WebWrapperInterface {
     Q_OBJECT
 
 public:

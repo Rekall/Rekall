@@ -2,15 +2,18 @@
 #include "ui_webwrapper.h"
 
 WebWrapper::WebWrapper(QWidget *parent) :
-    QWidget(parent),
+    QMainWindow(parent),
     ui(new Ui::WebWrapper) {
     ui->setupUi(this);
 
     QRect screen = QApplication::desktop()->screenGeometry();
     move(screen.center() - QPoint(width(), height())/2);
 
+    connect(ui->actionCloseWindow, SIGNAL(triggered()), SLOT(close()));
+
     connect(ui->webView, SIGNAL(titleChanged(QString)), SLOT(setWindowTitle(QString)));
     restoreGeometry(QSettings().value("WebWrapperGeometry").toByteArray());
+    restoreState(QSettings().value("WebWrapperState").toByteArray());
 }
 
 WebWrapper::~WebWrapper() {
@@ -38,4 +41,5 @@ void WebWrapper::closeEvent(QCloseEvent *) {
 
     Global::userInfos->setDockIcon(this, false);
     QSettings().setValue("WebWrapperGeometry", saveGeometry());
+    QSettings().setValue("WebWrapperState", saveState());
 }

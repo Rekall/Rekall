@@ -77,7 +77,6 @@ void Project::timerEvent(QTimerEvent *e) {
     if(e->timerId() == timerLoadId) {
         if(!isLoaded) {
             QFile projectFile(path.absoluteFilePath() + "/rekall_cache/project.xml");
-            qDebug("%s = %d", qPrintable(projectFile.fileName()), projectFile.exists());
             if((projectFile.exists()) && (QFileInfo(projectFile.fileName()).size() > 0) && (projectFile.open(QFile::ReadOnly))) {
                 isLoaded = true;
 

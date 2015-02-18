@@ -30,9 +30,7 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     trayIconIndexOld = 9999;
     Global::rekall = this;
 
-#ifdef QT5
     qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
 
     //Update
     updateManager = 0;

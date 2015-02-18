@@ -248,10 +248,8 @@ void AnalyseProcess::getThumbnails() {
     }
 
 
-    if((QFileInfo(thumbPath + ".jpg").exists()) || (thumbExists)) {
+    if((QFileInfo(thumbPath + ".jpg").exists()) || (thumbExists))
         file->metadatas["File->Thumbnail"] = thumbFile;
-        //qDebug("%s", qPrintable(thumbPath));
-    }
 }
 void AnalyseProcess::run() {
     QDateTime s = QDateTime::currentDateTime();
