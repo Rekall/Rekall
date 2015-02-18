@@ -21,14 +21,12 @@
 
 QT_VERSION = $$[QT_VERSION]
 message($$[QT_VERSION])
-contains(QT_VERSION, "^4.*") {
-    message("Rekall For QT4 — not fully compatible, please upgrade")
-    DEFINES += QT4
-    QT      += core gui network xml webkit
-} else {
+contains(QT_VERSION, "^5.*") {
     message("Rekall For QT5")
     DEFINES += QT5
     QT      += widgets core gui network xml webkitwidgets multimedia multimediawidgets
+} else {
+    message("Rekall For QT4 — not compatible, please upgrade")
 }
 
 TARGET   = Rekall

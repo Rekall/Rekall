@@ -32,12 +32,6 @@
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-#ifdef QT4
-    QTextCodec::setCodecForTr      (QTextCodec::codecForName("UTF-8"));
-    QTextCodec::setCodecForLocale  (QTextCodec::codecForName("UTF-8"));
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-#endif
-
     QString locale = QLocale::system().name();
     //QTranslator translator;
     //translator.load("Translation_" + locale, "Tools");
@@ -91,11 +85,7 @@ int main(int argc, char *argv[]) {
         pathApplicationDir.cd("Resources");
     }
 #endif
-#ifdef QT4
-    Global::pathDocuments   = QFileInfo(QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + "");
-#else
     Global::pathDocuments   = QFileInfo(QStandardPaths::DocumentsLocation + "");
-#endif
     Global::pathApplication = QFileInfo(pathApplicationDir.absolutePath());
     if(Global::pathApplication.absoluteFilePath().contains("/Rekall-build/release"))
         Global::pathApplication = QFileInfo(Global::pathApplication.absoluteFilePath().remove("/release"));

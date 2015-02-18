@@ -312,9 +312,7 @@ void Rekall::takeScreenshot() {
     screenRect.size.width  = screenSize.width();
     screenRect.size.height = screenSize.height();
     CGImageRef screenshotMac = CGWindowListCreateImage(screenRect, kCGWindowListOptionOnScreenOnly, kCGNullWindowID, kCGWindowImageDefault);
-#ifdef QT4
-    screenshot = QPixmap::fromMacCGImageRef(screenshotMac).toImage();
-#endif
+    //TODO screenshot = QPixmap::fromMacCGImageRef(screenshotMac).toImage();
     CGImageRelease(screenshotMac);
 #else
     screenshot = QPixmap::grabWindow(QApplication::desktop()->winId(), screenSize.x(), screenSize.y(), screenSize.width(), screenSize.height()).toImage();
