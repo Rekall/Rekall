@@ -367,7 +367,19 @@ Rekall.prototype.start = function() {
 	});
 	$("#maximizeTabNav").trigger("click");
 	$("#pannerTabNav").trigger("click");
-	
+	                  
+	var nowWidth = $("#central").width(); 
+	//var nowWidth = $("#central").width(); 
+	//alert(nowWidth);
+	$("#central").resizable({ 
+		  /*alsoResize: "#thumbLgd", */
+		  handles: "s", 
+		  maxHeight: "90%",
+	      maxWidth: nowWidth,
+	      minHeight: "10%",
+	      minWidth: nowWidth
+	});
+	//$("#timeline").resizable();  
 	//$(".layout_cell").resizable();
 	
 	//Déploiement d'une section à gauche
