@@ -244,7 +244,8 @@ u {
 	font-size:18px;
 	border-bottom:2px solid #000;
 }         
-#central {    
+#central {               
+	height:50%;
 	overflow:	hidden;
 	/*overflow-y:	auto;*/
 	background: black;                                                              

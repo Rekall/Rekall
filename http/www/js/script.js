@@ -280,17 +280,15 @@ function documentReadyIntro() {
 var rubanTimeout = 0;
 var rubanMessage = "";
 var rubanTimeoutTime = 0;
-function showInRuban(message, duration) {
-	if(typeof window.orientation !== 'undefined')
-		return;
-
-	if(message == undefined) {
+function showInRuban(message, duration) {    
+    
+	if(message == undefined) {     
 		clearInterval(rubanTimeout);
 		$("#ruban").slideUp(function() {
 			$("#ruban").html("");
 		});
 	}
-	else if($("#ruban").text().length == 0) {
+	else if($("#ruban").text().length == 0) {   
 		showInRuban();
 		messageWithClose = message;
 		if(duration == undefined)

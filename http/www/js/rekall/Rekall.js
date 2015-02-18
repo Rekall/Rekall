@@ -346,26 +346,17 @@ Rekall.prototype.start = function() {
 		rekall.panner.resize();
 		rekall.captationVideoPlayers.resize();
 		rekall.resize();
-		rekall.analyse(true);
-	});
-	$("#maximizeTabNav").click(function() {
-		if((rekall.isMaximized == true) || (rekall.isMaximized == undefined)) {
-			rekall.isMaximized = false;
-			$("#central").css("height", $(window).height() * 0.50);	
-			$("#maximizeTabNav").html("&#9634;");		
-		}
-		else {
-			rekall.isMaximized = true;
-			$("#central").css("height", $(window).height() * 0.90);
-			$("#maximizeTabNav").html("_");		
-		}
-		rekall.map.resize();
-		rekall.panner.resize();
-		rekall.captationVideoPlayers.resize();
-		rekall.resize();
-		rekall.analyse(true);
-	});
-	$("#maximizeTabNav").trigger("click");
+		rekall.analyse(true);                        
+	});                                                      
+	  
+	$("#central").css("height", $(window).height() * 0.50);
+	
+	rekall.map.resize();
+	rekall.panner.resize();
+	rekall.captationVideoPlayers.resize();
+	rekall.resize();
+	rekall.analyse(true);                       
+	
 	$("#pannerTabNav").trigger("click");
 	                  
 	var nowWidth = $("#central").width(); 
