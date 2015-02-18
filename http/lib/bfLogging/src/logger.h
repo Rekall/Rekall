@@ -35,7 +35,7 @@
   Each thread has it's own buffer.
   <p>
   The logger can be registered to handle messages from
-  the static global functions qDebug(), qWarning(), qCritical() and qFatal().
+  the static global functions //qDebug(), qWarning(), qCritical() and qFatal().
 
   @see set() describes how to set logger variables
   @see LogMessage for a description of the message decoration.
@@ -84,7 +84,7 @@ public:
 
     /**
       Installs this logger as the default message handler, so it
-      can be used through the global static logging functions (e.g. qDebug()).
+      can be used through the global static logging functions (e.g. //qDebug()).
     */
     void installMsgHandler();
 
@@ -132,7 +132,7 @@ private:
     static Logger* defaultLogger;
 
     /**
-      Message Handler for the global static logging functions (e.g. qDebug()).
+      Message Handler for the global static logging functions (e.g. //qDebug()).
       Forward calls to the default logger.
       <p>
       In case of a fatal message, the program will abort.

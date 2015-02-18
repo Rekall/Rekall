@@ -76,7 +76,11 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
 
     trayMenu = new QMenu(this);
     trayMenu->setSeparatorsCollapsible(true);
-    trayAnalyse = trayMenu->addAction(tr("File analysis…"));
+    trayAnalyse      = trayMenu->addAction(tr("File analysis…"));
+    trayAnalysePause = trayMenu->addAction(tr("Pause analysis"));
+    trayAnalysePause->setCheckable(true);
+    connect(trayAnalysePause, SIGNAL(toggled(bool)), SLOT(trayAnalysePaused()));
+    trayMenu->addSeparator();
     trayMenu->addAction(tr("Open welcome page"), this, SLOT(openWebPage()));
     //trayMenu->addAction(tr("Create a new project"), this, SLOT(addProject()));
     trayMenu->addSeparator();
@@ -230,12 +234,18 @@ void Rekall::trayIconToOn(qint16 duration) {
     }
 }
 void Rekall::trayIconToOff() {
-    trayTimerOff.stop();
-    trayTimerOff.start(10);
+    if(trayIconWorking) {
+        trayTimerOff.stop();
+        trayTimerOff.start(10);
+    }
 }
 void Rekall::analyseTrayChanged(QString text, bool enable) {
-    trayAnalyse->setText(text);
-    trayAnalyse->setEnabled(enable);
+    if(trayAnalyse->text() != text)
+        trayAnalyse->setText(text);
+    if(trayAnalyse->isEnabled() != enable) {
+        trayAnalyse->setEnabled(enable);
+        trayAnalysePause->setVisible(enable);
+    }
 }
 
 
@@ -255,12 +265,14 @@ void Rekall::trayIconToOffPrivate() {
     trayIconIndexOld = trayIconIndex;
 }
 
-
+void Rekall::trayAnalysePaused() {
+    Global::analyse->paused = trayAnalysePause->isChecked();
+}
 void Rekall::openWebPage() {
     QString param;
     if(firstTimeOpened)
         param += "/intro.html";
-    Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(param)), tr("Opening Rekall menu…"));
+    Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(param)), tr("Opening welcome page…"));
 }
 void Rekall::closeRekall() {
     Global::analyse->stop();

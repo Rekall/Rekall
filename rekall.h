@@ -46,7 +46,7 @@ class Rekall : public QDialog, public RekallInterface {
 private:
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
-    QAction *trayMenuProjects, *trayAnalyse;
+    QAction *trayMenuProjects, *trayAnalyse, *trayAnalysePause;
     QList<QIcon> trayIcons;
     quint16 trayIconIndex, trayIconIndexOld;
 
@@ -77,6 +77,7 @@ public slots:
     void analyseTrayChanged(QString,bool);
 
 public slots:
+    void trayAnalysePaused();
     void openWebPage();
     void closeRekall();
 

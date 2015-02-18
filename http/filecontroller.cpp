@@ -39,11 +39,11 @@ FileController::FileController(QSettings* settings, const QByteArray &_docroot, 
         QFileInfo configFile(settings->fileName());
         docroot = QFileInfo(configFile.absolutePath(), docroot).absoluteFilePath().toUtf8();
     }
-    qDebug("FileController: docroot=%s, encoding=%s, maxAge=%i", qPrintable(docroot), qPrintable(encoding),maxAge);
+    //qDebug(FileController: docroot=%s, encoding=%s, maxAge=%i", qPrintable(docroot), qPrintable(encoding),maxAge);
     maxCachedFileSize=settings->value("maxCachedFileSize","65536").toInt();
     cache    .setMaxCost(settings->value("cacheSize","1000000").toInt());
     cacheTimeout=settings->value("cacheTime","60000").toInt();
-    qDebug("FileController: cache timeout=%i, size=%i",cacheTimeout,cache.maxCost());
+    //qDebug(FileController: cache timeout=%i, size=%i",cacheTimeout,cache.maxCost());
 }
 
 
@@ -52,28 +52,28 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
     bool debug = false;
 
     if(debug) {
-        qDebug("\n\nREQUEST PATH %s", qPrintable(QString(path)));
-        qDebug("\nHEADERS");
+        //qDebug(\n\nREQUEST PATH %s", qPrintable(QString(path)));
+        //qDebug(\nHEADERS");
         QMapIterator<QByteArray,QByteArray> i(request.getHeaderMap());
         while (i.hasNext()) {
             i.next();
-            qDebug("%s = %s", i.key().data(), i.value().data());
+            //qDebug(%s = %s", i.key().data(), i.value().data());
         }
 
-        qDebug("\nPARAM");
+        //qDebug(\nPARAM");
         i=QMapIterator<QByteArray,QByteArray>(request.getParameterMap());
         while (i.hasNext()) {
             i.next();
-            qDebug("%s = %s", i.key().data(), i.value().data());
+            //qDebug(%s = %s", i.key().data(), i.value().data());
         }
 
-        qDebug("\nCOOKIES");
+        //qDebug(\nCOOKIES");
         i=QMapIterator<QByteArray,QByteArray>(request.getCookieMap());
         while (i.hasNext()) {
             i.next();
-            qDebug("%s = %s", i.key().data(), i.value().data());
+            //qDebug(%s = %s", i.key().data(), i.value().data());
         }
-        qDebug("\n\n");
+        //qDebug(\n\n");
     }
 
     //Header
@@ -87,7 +87,7 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
         QByteArray document=entry->document; //copy the cached document, because other threads may destroy the cached entry immediately after mutex unlock.
         QByteArray filename=entry->filename;
         mutex.unlock();
-        qDebug("FileController: Cache hit for %s",path.data());
+        //qDebug(FileController: Cache hit for %s",path.data());
         setContentType(filename, response, contentType);
         response.setHeader("Cache-Control","max-age="+QByteArray::number(maxAge/1000));
         response.write(document);
@@ -95,7 +95,7 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
     else {
         mutex.unlock();
         // The file is not in cache.
-        qDebug("FileController: Cache miss for %s",path.data());
+        //qDebug(FileController: Cache miss for %s",path.data());
         // Forbid access to files outside the docroot directory
         if (path.contains("/..")) {
             qWarning("FileController: detected forbidden characters in path %s",path.data());
@@ -128,7 +128,7 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
         }
 
         QFile file(path);
-        qDebug("FileController: Open file %s", qPrintable(file.fileName()));
+        //qDebug(FileController: Open file %s", qPrintable(file.fileName()));
         if (file.open(QIODevice::ReadOnly)) {
             setContentType(path, response, contentType);
             response.setHeader("Cache-Control", "max-age="+QByteArray::number(maxAge/1000));
@@ -207,12 +207,12 @@ void FileController::service(HttpRequest& request, HttpResponse& response, const
         }
 
         if(debug) {
-            qDebug("\n\nRESPONSE PATH %s", qPrintable(file.fileName()));
-            qDebug("\nHEADERS");
+            //qDebug(\n\nRESPONSE PATH %s", qPrintable(file.fileName()));
+            //qDebug(\nHEADERS");
             QMapIterator<QByteArray,QByteArray> i(response.getHeaders());
             while (i.hasNext()) {
                 i.next();
-                qDebug("%s = %s", i.key().data(), i.value().data());
+                //qDebug(%s = %s", i.key().data(), i.value().data());
             }
         }
 
@@ -245,7 +245,7 @@ void FileController::setContentType(QString filename, HttpResponse& response, co
             MimeCacheEntry entry;
             if (mimeCache.contains(filename)) {
                 entry = mimeCache.value(filename);
-                qDebug("FileController: Metadatas from cache");
+                //qDebug(FileController: Metadatas from cache");
             }
             else {
                 entry.mimeType = "";
@@ -273,12 +273,12 @@ void FileController::setContentType(QString filename, HttpResponse& response, co
             }
             if(!entry.mimeType.isEmpty()) {
                 response.setHeader("Content-Type", qPrintable(entry.mimeType));
-                qDebug("FileController: Content-Type = %s for %s", qPrintable(entry.mimeType), qPrintable(filename));
+                //qDebug(FileController: Content-Type = %s for %s", qPrintable(entry.mimeType), qPrintable(filename));
             }
             if(entry.duration > 0) {
                 response.setHeader("X-Content-Duration", entry.duration);
                 response.setHeader("Content-Duration", entry.duration);
-                qDebug("FileController: Content-Duration = %d for %s", entry.duration, qPrintable(filename));
+                //qDebug(FileController: Content-Duration = %d for %s", entry.duration, qPrintable(filename));
             }
         }
     }

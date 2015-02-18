@@ -233,6 +233,7 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
             json += "{";
             json += "\"name\": \""  + project->name                   + "\",";
             json += "\"state\": \"" + QString::number(project->state) + "\"";
+            qDebug("--> %s = %d", qPrintable(project->name), project->state);
             json += "},";
             chop = true;
         }

@@ -346,7 +346,7 @@ void Global::revealInFinder(const QFileInfo &filename) {
 #endif
 }
 void Global::openFile(const QFileInfo &filename) {
-    Global::webWrapper->openWebPage(QUrl::fromLocalFile(filename.absoluteFilePath()), QString("Opening file %1…").arg(filename.fileName()));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filename.absoluteFilePath()));
 }
 void Global::quickLook(const QFileInfo &file) {
 #ifdef Q_OS_MAC

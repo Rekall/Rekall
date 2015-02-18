@@ -26,7 +26,7 @@
   - {line}      Line number where the message was generated #
   - {xxx}       For any user-defined logger variable
 
-  # The macros qDebug()...qFatal() dont fill these variable in case of QT versions before 5.0.
+  # The macros //qDebug()...qFatal() dont fill these variable in case of QT versions before 5.0.
 */
 
 class LogMessage

@@ -27,6 +27,7 @@ Analyse::Analyse(QObject *parent) :
     QThread(parent) {
     okThread = true;
     thumbnailThreadsCount = 0;
+    paused = false;
     start();
 }
 Analyse::~Analyse() {
@@ -53,7 +54,7 @@ void Analyse::stop() {
 
 void Analyse::run() {
     while(okThread) {
-        if(metadataQueue.count()) {
+        if((metadataQueue.count()) && (!paused)) {
             AnalyseProcess *analyseProcess = metadataQueue.dequeue();
             if(!analyseProcess->project->isRemoved) {
                 trayIconToOn(10000);
@@ -68,10 +69,9 @@ void Analyse::run() {
             //trayMenu->setTitle(tr("Recent activity"));
             //trayIconToOff();
             QCoreApplication::processEvents();
-            msleep(100);
+            msleep(200);
         }
-
-        if((thumbnailQueue.count()) && (thumbnailThreadsCount < 5)) {
+        if((thumbnailQueue.count()) && (thumbnailThreadsCount < 5) && (!paused)) {
             AnalyseProcess *analyseProcess = thumbnailQueue.dequeue();
             if(!analyseProcess->project->isRemoved) {
                 thumbnailThreadsCount++;
@@ -89,12 +89,14 @@ void Analyse::run() {
                 text += tr("Analysing metadatas… (%1 remaining)").arg(metadataQueue.count() + thumbnailThreadsCount+thumbnailQueue.count());
             else if(thumbnailThreadsCount+thumbnailQueue.count())
                 text += tr("Generating thumbnails… (%1 remaining)").arg(metadataQueue.count() + thumbnailThreadsCount+thumbnailQueue.count());
-            qDebug("Analyse différée de %d fichiers (reste %d)", thumbnailThreadsCount, thumbnailQueue.count());
+            if(paused)
+                text += " [paused]";
+            qDebug("%s", qPrintable(text));
         }
         else {
             trayEnable = false;
             text += tr("Rekall projects are up to date!");
-            trayIconToOff();
+            emit trayIconToOff();
         }
         emit(trayChanged(text, trayEnable));
     }

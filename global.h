@@ -168,6 +168,8 @@ public:
 class SyncEntry;
 class AnalyseInterface {
 public:
+    bool paused;
+public:
     virtual void addToQueue(SyncEntry *file, ProjectInterface *project) = 0;
     virtual void stop() = 0;
 };

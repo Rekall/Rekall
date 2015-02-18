@@ -28,7 +28,7 @@ Http::Http(QObject *parent)
     Global::configFileName = QFileInfo(Global::pathApplication.absoluteFilePath() + "/http/webapp.ini").absoluteFilePath();
     if((Global::pathApplication.absoluteFilePath().contains("buzzinglight/Projets/Rekall")) || (Global::pathApplication.absoluteFilePath().contains("guillaumemarais/Desktop/Dropbox")))
         Global::configFileName = QFileInfo(Global::pathApplication.absoluteFilePath() + "/http/webappDev.ini").absoluteFilePath();
-    qDebug("Config file: %s", qPrintable(Global::configFileName));
+    //qDebug(Config file: %s", qPrintable(Global::configFileName));
 
     externalHost.type = "wan";
     externalHost.name = "Externe";
@@ -41,7 +41,7 @@ Http::Http(QObject *parent)
     Logger* logger = new FileLogger(logSettings,10000);
     logger->installMsgHandler();
     if (logSettings->value("bufferSize",0).toInt()>0 && logSettings->value("minLevel",0).toInt()>0)
-        qDebug("You see these debug messages because the logging buffer is enabled");
+        //qDebug(You see these debug messages because the logging buffer is enabled");
     */
 
     // Configure template loader and cache
@@ -60,12 +60,12 @@ Http::Http(QObject *parent)
     Static::fileController = new FileController(fileSettings, QFileInfo(Global::pathApplication.absoluteFilePath() + "/http/www").absoluteFilePath().toUtf8(), 0, this);
 
     // Configure and start the TCP listener
-    qDebug("ServiceHelper: Starting webserver");
+    //qDebug(ServiceHelper: Starting webserver");
     QSettings* listenerSettings = new QSettings(Global::configFileName,  QSettings::IniFormat);
     listenerSettings->beginGroup("listener");
     RequestMapper *requestMapper = new RequestMapper(this);
     listener = new HttpListener(listenerSettings, requestMapper);
-    qDebug("ServiceHelper: Service has started");
+    //qDebug(ServiceHelper: Service has started");
 
     //Résout l'IP locale
     ipResolver = new QNetworkAccessManager(this);
