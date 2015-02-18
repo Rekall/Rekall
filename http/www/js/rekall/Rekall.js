@@ -366,7 +366,7 @@ Rekall.prototype.start = function() {
 		rekall.analyse(true);
 	});
 	$("#maximizeTabNav").trigger("click");
-	$("#rendersTabNav").trigger("click");
+	$("#pannerTabNav").trigger("click");
 	
 	//$(".layout_cell").resizable();
 	
