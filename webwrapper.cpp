@@ -32,6 +32,10 @@ void WebWrapper::openWebPage(const QUrl &url, const QString &title) {
 }
 
 void WebWrapper::closeEvent(QCloseEvent *) {
+    foreach(ProjectInterface *project, Global::projects)
+        foreach(VideoPlayerInterface *videoPlayers, project->videoPlayers)
+            videoPlayers->forceClose();
+
     Global::userInfos->setDockIcon(this, false);
     QSettings().setValue("WebWrapperGeometry", saveGeometry());
 }

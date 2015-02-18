@@ -82,6 +82,7 @@ public:
     virtual void play(qint64 timecode = -1) = 0;
     virtual void pause() = 0;
     virtual void rewind(qint64 timecode = 0) = 0;
+    virtual void forceClose() = 0;
 };
 
 class UserInfosInterface;

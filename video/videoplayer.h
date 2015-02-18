@@ -28,6 +28,7 @@ public slots:
     void play(qint64 timecode = -1);
     void pause();
     void rewind(qint64 timecode = 0);
+    void forceClose();
 
 private:
     Ui::VideoPlayer *ui;

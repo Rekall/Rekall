@@ -50,6 +50,10 @@ void VideoPlayer::rewind(qint64 timecode) {
     seek(timecode);
 }
 
+void VideoPlayer::forceClose() {
+    close();
+}
+
 void VideoPlayer::closeEvent(QCloseEvent *) {
     Global::userInfos->setDockIcon(this, false);
     QSettings().setValue("VideoPlayerGeometry" + currentUrl.toString(), saveGeometry());
