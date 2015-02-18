@@ -686,7 +686,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		
 		//Action sur la recherche
 		$("#left_menu_item_open .left_menu_item_tab_search input").keyup(function(event) {
-		    if(event.keyCode == 13) {
+		    if((event.keyCode == 13) || ($(this).val() == "")) {
 				event.stopPropagation();
 				var searchText = $(this).val().toLowerCase();
 				var sorting    = $(this).parent().attr("id").replace("left_menu_item_tab_search_", "");
