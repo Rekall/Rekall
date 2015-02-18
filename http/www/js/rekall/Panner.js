@@ -28,8 +28,12 @@ function Panner() {
    /* $("#panner .gallery").click(function(event) {
 		event.stopPropagation();
 		Tags.clear(true);
-	});*/  
-	$("#panner").click(function(event) {
+	});*/                       
+	
+	$(".panzoom").click(function(event) {
+		event.stopPropagation(); 
+	});
+	$(".panzoom-parent").click(function(event) {
 		event.stopPropagation();
 		Tags.clear(true);
 	});
@@ -37,63 +41,76 @@ function Panner() {
 		event.stopPropagation();
 		Tags.clear(true);
 	});
-	$("#panner .panzoom").panzoom({
+    $("#panner .panzoom").panzoom({
 		$zoomRange: 	$("#panner .zoom-range"),
         startTransform: 'scale(1)',
         increment: 		0.1,
-        minScale: 		0.1,
-        maxScale: 		10,
-        contain: 		'invert'
-	});
+        minScale: 		0.5,
+        maxScale: 		4
+	});  
 	$("#panner .panzoom").mousewheel(function(event) {
 		event.preventDefault();
 		$("#panner .panzoom").panzoom("pan", -event.deltaX, event.deltaY, { relative: true });
 	});
 	$("#panner #panzoom-slider").slider({
-		min: 	0,
+		min: 	0.5,
 		max: 	4,
-		step: 	0.01,
-		slide: function(event, ui) {
-			var pt = {clientX: $("#panner").width()*0.66, clientY: $("#panner").height()*0.66};
+		step: 	0.1,
+		slide: function(event, ui) { 
+			var focusX = $("#panner .panzoom").width()*0.5;
+			var focusY = $("#panner .panzoom").height()*0.5;                  
+			var pt = {clientX: focusX, clientY: focusY}; 
+  //  		alert(ui.value+" / "+focusX+" / "+focusY);
 			$("#panner .panzoom").panzoom('zoom', ui.value, {focal: pt});
 		}
 	});
 	$("#panner .panzoom").load(function(event) {
 		$(this).css({"width": "auto", "height": "auto"});
 		var maxWidth = $(this).parent().width();
-		var maxHeight = $(this).parent().height();
+		var maxHeight = $(this).parent().height();  
 		var ratio = 0;
 		var width  = $(this).width();
 		var height = $(this).height();
-
-		if(false) {
-			// Check if the current width is larger than the max
-			if(width > maxWidth){
-				ratio = maxWidth / width;
-				$(this).css({"width": maxWidth, "height": height * ratio});
-				height = height * ratio;
-				width = width * ratio;
-			}
-
+        var top = 0;
+		if(true) {   
+			                              
+			
 			// Check if current height is larger than max
 			if(height > maxHeight) {
-				ratio = maxHeight / height;
-				$(this).css({"height": maxHeight, "width": width * ratio});
+				ratio = maxHeight / height;   
 				width = width * ratio;
+				height = height * ratio;        
+		  //  	top = (maxHeight-height)/2;
+				//$(this).css({"height": height, "width": width}); 
+	   // 		alert("2 - width = "+width+" / maxWidth = "+maxWidth+" / height = "+height+" / maxHeight = "+maxHeight);  
+			}             
+			// Check if the current width is larger than the max
+			if(width > maxWidth){
+				ratio = maxWidth / width;        
 				height = height * ratio;
+				width = width * ratio;                    
+		  //  	top = (maxHeight-height)/2;
+				//$(this).css({"width": width, "height": height});   
+	 //   		alert("1 - width = "+width+" / maxWidth = "+maxWidth+" / height = "+height+" / maxHeight = "+maxHeight); 
 			}
+			   
+			top = (maxHeight-height)/2;   
+			$(this).css({"height": height, "width": width, "marginTop": top});                          
 		}
 		else if(false) {
 			var ratio = Math.max(maxWidth / width, maxHeight / height);
-			$(this).css({"width": width*ratio, "height": height*ratio});
-		}
-		$("#panner .panzoom").show();
-		$("#panner .panzoom").panzoom('resetDimensions');
-		$("#panner .panzoom").panzoom('resetPan');
-		$("#panner .panzoom").panzoom('resetZoom');
-		var zoom = Math.max(maxWidth / width, maxHeight / height);
+			$(this).css({"width": width*ratio, "height": height*ratio});     
+		}                                 
+	    $("#panner .panzoom").show();
+	    $("#panner .panzoom").panzoom('resetDimensions');    
+	    $("#panner .panzoom").panzoom('resetPan');
+	    $("#panner .panzoom").panzoom('resetZoom');        
+		                        
+   // 	alert("3 - width = "+width+" / maxWidth = "+maxWidth+" / height = "+height+" / maxHeight = "+maxHeight);
+		var zoom = 1;//Math.floor(maxWidth / width);
+		//alert(zoom);
 		$("#panner #panzoom-slider").slider({value: zoom});
-		$("#panner .panzoom").panzoom('zoom', zoom);
+		//$("#panner .panzoom").panzoom('zoom', zoom);   
 	});
 }
 
@@ -245,7 +262,7 @@ Panner.prototype.show = function(filter, bounds) {
 	if(recreateGallery) {          
 		parent2.prepend(gallery2);
 		parent1.prepend(gallery1);  
-		parent1.prepend(legende);
+//		parent1.prepend(legende);
 	}
 	
 	

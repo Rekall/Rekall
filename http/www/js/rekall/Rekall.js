@@ -368,7 +368,8 @@ Rekall.prototype.start = function() {
 		  maxHeight: "90%",
 	      maxWidth: nowWidth,
 	      minHeight: "10%",
-	      minWidth: nowWidth
+	      minWidth: nowWidth,
+		  stop: function( event, ui ) { rekall.panner.resize(); }
 	});
 	//$("#timeline").resizable();  
 	//$(".layout_cell").resizable();
