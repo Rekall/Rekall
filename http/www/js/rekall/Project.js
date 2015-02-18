@@ -312,6 +312,14 @@ Project.prototype.analyse = function(full, isCheckbox) {
 			gm_availableMetadatasHtml_caregories += "</select><div class='left_menu_item_open_label' id='left_menu_item_open_label_meta'>Metadata</div>";
 		}
 		
+		if(isCheckbox != true) {			
+			//$("#left_menu_item_open").attr("tool","").width(0);//hide();
+			//$(".left_menu_item_checklist").hide();
+			//$(".left_menu_item_tab_search").hide();
+			$("#left_menu_item_open_select").html(gm_availableMetadatasHtml_caregories+gm_availableMetadatasHtml_metas);
+			$("#navigateurTabNav").css("backgroundColor","#559299");
+		}
+	
 		for (var keyword in rekall.sortings) {
 			var sorting = rekall.sortings[keyword];
 			var extraChoice = "";
@@ -326,16 +334,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				metadataConfigFormated = metadataConfigFormated.replace("->", "&nbsp;&#x25B8;&nbsp;");
 				metadataConfigFormated = metadataConfigFormated.replace("|",  "&nbsp;&#x25B9;&nbsp;");
 			}
-		
-		
-			if(isCheckbox != true) {			
-				//$("#left_menu_item_open").attr("tool","").width(0);//hide();
-				//$(".left_menu_item_checklist").hide();
-				//$(".left_menu_item_tab_search").hide();
-				$("#left_menu_item_open_select").html(gm_availableMetadatasHtml_caregories+gm_availableMetadatasHtml_metas);
-				$("#navigateurTabNav").css("backgroundColor","#559299");
-			}
-			
+					
 			//Création des tab_choice_toggle (gris) + tout le menu qui va avec
 			//$("#" + keyword + "Tab .tab_choice").html("<div metadataKey='" + sorting.metadataConfigStr + "' class='tab_choice_toggle'>" + metadataConfigFormated + " <span class='invisible'>(change)</span></div><ul class='tag_metadatas_menu invisible' id='" + keyword + "Menu' sorting='" + keyword + "'>" + extraChoice + availableMetadatasHtml + "</ul>");
 			sortingVerbose = keyword;
@@ -552,7 +551,6 @@ Project.prototype.analyse = function(full, isCheckbox) {
 						if(tool=="keywords"){
 				
 						} else {
-				
 							//$("#left_menu_item_open_label_category").html("Category of metadata");
 							//$("#left_menu_item_open_label_meta").html("Metadata");
 							//$("#left_menu_item_open_label_checklist").html("Show/hide types of metadata");
@@ -702,8 +700,6 @@ Project.prototype.analyse = function(full, isCheckbox) {
 							$(this).show();
 						}
 						else {
-							console.log(sorting.categories);
-							console.log(category);
 							sorting.categories[category].visible = false;
 							$(this).hide();
 						}

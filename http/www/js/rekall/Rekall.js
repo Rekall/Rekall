@@ -40,6 +40,7 @@ function Rekall() {
 	
 	this.shouldAnalyse		         = true;
 	this.shouldAnalyseFull           = true;
+	this.shouldAnalyseIsCheckbox     = false;
 	this.shouldUpdateFlattenTimeline = true;
 	this.selectionId = 0;
 	
@@ -271,10 +272,12 @@ Rekall.prototype.start = function() {
 				}
 			
 				if((rekall.shouldAnalyse) && (rekall.project != undefined)) {
-					var shouldAnalyseFull = rekall.shouldAnalyseFull;
+					var shouldAnalyseFull       = rekall.shouldAnalyseFull;
+					var shouldAnalyseIsCheckbox = rekall.shouldAnalyseIsCheckbox;
 					rekall.shouldAnalyse     = false;
 					rekall.shouldAnalyseFull = false;
-					rekall.project.analyse(shouldAnalyseFull);
+					rekall.shouldAnalyseIsCheckbox = false;
+					rekall.project.analyse(shouldAnalyseFull, shouldAnalyseIsCheckbox);
 				}
 			
 				if(rekall.shouldUpdateFlattenTimeline) {
@@ -805,10 +808,12 @@ Rekall.prototype.projectChanged = function(xml) {
 }
 
 
-Rekall.prototype.analyse = function(full) {
-	this.shouldAnalyse     = true;
+Rekall.prototype.analyse = function(full, isCheckbox) {
+	this.shouldAnalyse = true;
 	if(this.shouldAnalyseFull == false)
 		this.shouldAnalyseFull = full;
+	if(this.shouldAnalyseIsCheckbox == false)
+		this.shouldAnalyseIsCheckbox = isCheckbox;
 }
 Rekall.prototype.updateFlattenTimeline = function() {
 	this.shouldUpdateFlattenTimeline = true;
