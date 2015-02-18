@@ -10,6 +10,7 @@ WebWrapper::WebWrapper(QWidget *parent) :
     move(screen.center() - QPoint(width(), height())/2);
 
     connect(ui->webView, SIGNAL(titleChanged(QString)), SLOT(setWindowTitle(QString)));
+    restoreGeometry(QSettings().value("WebWrapperGeometry").toByteArray());
 }
 
 WebWrapper::~WebWrapper() {
@@ -32,4 +33,5 @@ void WebWrapper::openWebPage(const QUrl &url, const QString &title) {
 
 void WebWrapper::closeEvent(QCloseEvent *) {
     Global::userInfos->setDockIcon(this, false);
+    QSettings().setValue("WebWrapperGeometry", saveGeometry());
 }
