@@ -14,6 +14,10 @@ WebWrapper::WebWrapper(QWidget *parent) :
     connect(ui->webView, SIGNAL(titleChanged(QString)), SLOT(setWindowTitle(QString)));
     restoreGeometry(QSettings().value("WebWrapperGeometry").toByteArray());
     restoreState(QSettings().value("WebWrapperState").toByteArray());
+
+#ifdef Q_OS_WIN
+    ui->menubar->setVisible(false);
+#endif
 }
 
 WebWrapper::~WebWrapper() {

@@ -58,7 +58,7 @@ protected:
 private:
     int timerLoadId;
 public slots:
-    void load(bool existing);
+    void load();
     void save();
     void openWebPage();
     void openFolder();

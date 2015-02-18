@@ -61,8 +61,8 @@ Project::Project(const QString &_name, const QString &_friendlyName, bool _isPub
     timerLoadId = -1;
 }
 
-void Project::load(bool existing) {
-    if((!existing) || ((QFileInfo(path.absoluteFilePath()).exists()) && (!QFileInfo(path.absoluteFilePath() + "/rekall_cache/project.xml").exists()))) {
+void Project::load() {
+    if((QFileInfo(path.absoluteFilePath()).exists()) && (!QFileInfo(path.absoluteFilePath() + "/rekall_cache/project.xml").exists())) {
         isLoaded = true;
         xmlDoc = QDomDocument("rekall");
         xmlProject = xmlDoc.createElement("project");
