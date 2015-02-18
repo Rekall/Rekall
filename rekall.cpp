@@ -40,7 +40,6 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
         forceUpdate = true;
 
     //Tray icon
-    trayIconWorking = true;
     trayTimer.setInterval(500);
     connect(&trayTimer,    SIGNAL(timeout()), SLOT(trayIconToOnPrivate()));
     connect(&trayTimerOff, SIGNAL(timeout()), SLOT(trayIconToOffPrivate()));
@@ -51,6 +50,7 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     for(quint16 i = 0 ; i <= 17 ; i++)
         trayIcons << QIcon(QString(":/icons/rekall-menubar-%1-%2.png").arg(prefix).arg(i, 2, 10, QChar('0')));
     trayIcon = new QSystemTrayIcon(this);
+    trayIconToOffPrivate();
     trayTimer.start();
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
 
