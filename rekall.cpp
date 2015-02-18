@@ -40,6 +40,7 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
         forceUpdate = true;
 
     //Tray icon
+    trayIconWorking = true;
     trayTimer.setInterval(500);
     connect(&trayTimer,    SIGNAL(timeout()), SLOT(trayIconToOnPrivate()));
     connect(&trayTimerOff, SIGNAL(timeout()), SLOT(trayIconToOffPrivate()));
@@ -49,7 +50,6 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
 #endif
     for(quint16 i = 0 ; i <= 17 ; i++)
         trayIcons << QIcon(QString(":/icons/rekall-menubar-%1-%2.png").arg(prefix).arg(i, 2, 10, QChar('0')));
-    //rekall-menubar-mini-00
     trayIcon = new QSystemTrayIcon(this);
     trayTimer.start();
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
@@ -249,8 +249,10 @@ void Rekall::analyseTrayChanged(QString text, bool enable) {
 
 void Rekall::trayIconToOnPrivate() {
     if(trayIconWorking) {
-        if(trayIconIndexOld != trayIconIndex)
+        if(trayIconIndexOld != trayIconIndex) {
+            qDebug("==> %d", trayIconIndex);
             trayIcon->setIcon(trayIcons.at(trayIconIndex));
+        }
         trayIconIndexOld = trayIconIndex;
         trayIconIndex = (trayIconIndex+1) % (trayIcons.length());
     }
@@ -258,8 +260,10 @@ void Rekall::trayIconToOnPrivate() {
 void Rekall::trayIconToOffPrivate() {
     trayIconWorking = false;
     trayIconIndex = 4;
-    if(trayIconIndexOld != trayIconIndex)
+    if(trayIconIndexOld != trayIconIndex) {
+        qDebug("==> %d", trayIconIndex);
         trayIcon->setIcon(trayIcons.at(trayIconIndex));
+    }
     trayIconIndexOld = trayIconIndex;
 }
 
