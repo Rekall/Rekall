@@ -239,7 +239,7 @@ Tag.displayMetadata = function() {
 	//Titre
 	if(Tags.count() == 1) {
 		//Preview
-		if(Tags.unique().isVideoOrAudio()) {
+		if(Tags.unique().isAudio()) {
 			rekall.previewVideoPlayer.loadLocal(Tags.unique(), $("#inspecteur").is(":visible") && (Tags.isStrong));
 			$("#previewImage").hide();
 			$("#previewVideo").show();
