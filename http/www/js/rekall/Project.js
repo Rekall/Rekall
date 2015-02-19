@@ -1162,6 +1162,9 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		showInRuban("To see documents in Timeline mode, you have to set their visibility in the metadata “Rekall&nbsp;&#x25B8;&nbsp;Visibility”.");
 	}
 	
+	if((full != false) && (rekall.sortings["horizontal"].metadataKey == "Time") && (rekall.sortings["colors"].categoriesIndex == 0)) {
+		showInRuban("Your timeline view is empty! Add documents by changing their metadata <i>Visibility</i>&nbsp;&nbsp;to <i>Show in Timeline</i>.")
+	}
 	
 	rekall.updateFlattenTimeline();
 	rekall.redraw(full);
