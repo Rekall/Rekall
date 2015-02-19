@@ -78,7 +78,8 @@ public slots:
 
 public slots:
     void trayAnalysePaused();
-    void openWebPage();
+    void openWebPage(bool inBrowser = false);
+    void openWebPageInBrowser();
     void closeRekall();
 
 public slots:

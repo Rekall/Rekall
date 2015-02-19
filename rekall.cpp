@@ -80,6 +80,7 @@ Rekall::Rekall(const QStringList &arguments, QWidget *parent) :
     connect(trayAnalysePause, SIGNAL(toggled(bool)), SLOT(trayAnalysePaused()));
     trayMenu->addSeparator();
     trayMenu->addAction(tr("Open welcome page"), this, SLOT(openWebPage()));
+    trayMenu->addAction(tr("Open welcome page in webrowser"), this, SLOT(openWebPageInBrowser()));
     //trayMenu->addAction(tr("Create a new project"), this, SLOT(addProject()));
     trayMenu->addSeparator();
     trayMenuProjects = trayMenu->addAction(tr("Quit Rekall"), this, SLOT(closeRekall()));
@@ -266,12 +267,16 @@ void Rekall::trayIconToOffPrivate() {
 void Rekall::trayAnalysePaused() {
     Global::analyse->paused = trayAnalysePause->isChecked();
 }
-void Rekall::openWebPage() {
+void Rekall::openWebPage(bool inBrowser) {
     QString param;
     if(firstTimeOpened)
         param += "/intro.html";
-    Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(param)), tr("Opening welcome page…"));
+    Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(param)), tr("Opening welcome page…"), inBrowser);
 }
+void Rekall::openWebPageInBrowser() {
+    openWebPage(true);
+}
+
 void Rekall::closeRekall() {
     Global::analyse->stop();
     syncSettings();

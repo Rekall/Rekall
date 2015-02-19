@@ -71,7 +71,7 @@ public:
 
 class WebWrapperInterface {
 public:
-    virtual void openWebPage(const QUrl &url, const QString &title = "") = 0;
+    virtual void openWebPage(const QUrl &url, const QString &title = "", bool inBrowser = false) = 0;
 };
 class VideoPlayerInterface {
 public:

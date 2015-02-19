@@ -24,11 +24,13 @@ WebWrapper::~WebWrapper() {
     delete ui;
 }
 
-void WebWrapper::openWebPage(const QUrl &url, const QString &title) {
-    //QDesktopServices::openUrl(url);
-
+void WebWrapper::openWebPage(const QUrl &url, const QString &title, bool inBrowser) {
     Global::userInfos->setDockIcon(this, true);
-    ui->webView->setUrl(url);
+    if(inBrowser)
+        QDesktopServices::openUrl(url);
+    else
+        ui->webView->setUrl(url);
+
     if(title.isEmpty())
         setWindowTitle(tr("Rekall"));
     else

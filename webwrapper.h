@@ -19,7 +19,7 @@ public:
     ~WebWrapper();
 
 public slots:
-    void openWebPage(const QUrl &url, const QString &title = "");
+    void openWebPage(const QUrl &url, const QString &title = "", bool inBrowser = false);
 
 public:
     void closeEvent(QCloseEvent *);
