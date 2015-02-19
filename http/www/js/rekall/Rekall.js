@@ -323,7 +323,7 @@ Rekall.prototype.start = function() {
 	});
 */
 	$("#navigateurTabNav").click(function() {
-		var tmpWidth = $("#left_menu_item_open").width();
+	    var tmpWidth = $("#left_menu_item_open").width();
 		if(tmpWidth>0) {
 			$("#left_menu_item_open").attr("tool","").width(0);//hide();
 			$(".left_menu_item_checklist").hide();
@@ -339,7 +339,7 @@ Rekall.prototype.start = function() {
 			rekall.captationVideoPlayers.resize();
 			rekall.resize();
 			rekall.analyse(true);
-		}
+		}    
 	});
 	$("#inspecteurTabNav").click(function() {
 		$("#inspecteur").parent().toggle();
@@ -370,7 +370,7 @@ Rekall.prototype.start = function() {
 		  handles: "s", 
 		  maxHeight: "90%",
 	      maxWidth: nowWidth,
-	      minHeight: "10%",
+	      minHeight: "50",
 	      minWidth: nowWidth,
 		  stop: function( event, ui ) { rekall.panner.resize(); }
 	});

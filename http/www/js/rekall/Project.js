@@ -291,7 +291,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		*/
 
 		//création de l'élément liste de métas		
-		if(isCheckbox != true) {
+    	if(isCheckbox != true) {         
 			var gm_availableMetadatasHtml_caregories = "";
 			var gm_availableMetadatasHtml_metas = "";
 			gm_availableMetadatasHtml_caregories+= "<div class='left_menu_item_open_label' id='left_menu_item_open_label_category'>Category of metadata</div><select id='left_menu_select_category'>";
@@ -310,7 +310,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				gm_availableMetadatasHtml_metas += "</select>";
 			}
 			gm_availableMetadatasHtml_caregories += "</select><div class='left_menu_item_open_label' id='left_menu_item_open_label_meta'>Metadata</div>";
-		}
+		}       
 		
 		if(isCheckbox != true) {			
 			//$("#left_menu_item_open").attr("tool","").width(0);//hide();
@@ -635,52 +635,6 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				sorting.categories[category].checked = value;
 			rekall.analyse(true, true);
 		});
-
-		/*
-		//Actions sur le cochage
-		$("#navigateur .tab_list_item input").click(function(event) {
-			var sorting  = $(this).parent().parent().parent().parent().parent().attr("id").replace("Tab", "");
-			sorting = rekall.sortings[sorting]
-			var category = $(this).parent().parent().find(".tab_list_item_category").text();
-			var value = $(this).prop('checked'), valueBefore = !value;
-			if(event.shiftKey) {
-				for (var key in sorting.categories) {
-					var sortingCategory = sorting.categories[key];
-					if(sortingCategory.category == category)	sortingCategory.checked = value;
-					else										sortingCategory.checked = !value;
-				}
-			}
-			else		
-				sorting.categories[category].checked = value;
-			rekall.analyse();
-		});
-		
-		//Action sur la recherche
-		$("#navigateur .tab_search input").keyup(function(event) {
-		    if(event.keyCode == 13) {
-				event.stopPropagation();
-				var searchText = $(this).val().toLowerCase();
-				var sorting    = $(this).parent().parent().parent().attr("id").replace("Tab", "");
-				if((sorting == "search") || (sorting == "highlight"))
-					rekall.sortings[sorting].setCriterias(rekall.sortings[sorting].metadataConfigStr, rekall.sortings[sorting].valCanBeFloats, searchText, false);
-				else {
-					sorting = rekall.sortings[sorting];
-					$(this).parent().parent().parent().find('.tab_list_item').each(function(index) {
-						var category = $(this).find(".tab_list_item_category").text();
-						if((searchText == "") || ($(this).text().toLowerCase().indexOf(searchText) > -1)) {
-							sorting.categories[category].visible = true;
-							$(this).show();
-						}
-						else {
-							sorting.categories[category].visible = false;
-							$(this).hide();
-						}
-					});
-				}
-				rekall.analyse();
-			}
-		});
-		*/
 		
 		//Action sur la recherche
 		$("#left_menu_item_open .left_menu_item_tab_search input").keyup(function(event) {
