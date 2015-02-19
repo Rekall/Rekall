@@ -310,18 +310,7 @@ Rekall.prototype.start = function() {
 		rekall.captationVideoPlayers.resize(false);
 		rekall.analyse(false);
 	});
-/*	
-	$("#navigateurTabNav").click(function() {
-		$("#navigateur").parent().toggle();
-		if($("#navigateur").parent().is(":visible"))	$("#navigateurTabNav").html("&times;");
-		else											$("#navigateurTabNav").html("Menu");
-		rekall.map.resize();
-		rekall.panner.resize();
-		rekall.captationVideoPlayers.resize();
-		rekall.resize();
-		rekall.analyse(true);
-	});
-*/
+
 	$("#navigateurTabNav").click(function() {
 	    var tmpWidth = $("#left_menu_item_open").width();
 		if(tmpWidth>0) {

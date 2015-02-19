@@ -120,8 +120,8 @@ Project.prototype.loadXML = function(xml) {
 
 Project.prototype.analyse = function(full, isCheckbox) {
 	if(full != false)	console.log("Analyse complète des fichiers…");
-	else 				console.log("Analyse partielle des fichiers…");
-	
+	else 				console.log("Analyse partielle des fichiers…");  
+	                                                                      
 	//Filtrage des tags
 	if(full != false) {
 		var filtredTags = new Array();
@@ -291,7 +291,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		*/
 
 		//création de l'élément liste de métas		
-    	if(isCheckbox != true) {         
+    	if(isCheckbox != true) {        
 			var gm_availableMetadatasHtml_caregories = "";
 			var gm_availableMetadatasHtml_metas = "";
 			gm_availableMetadatasHtml_caregories+= "<div class='left_menu_item_open_label' id='left_menu_item_open_label_category'>Category of metadata</div><select id='left_menu_select_category'>";
@@ -420,8 +420,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				$("#left_menu_select_"+category).show();
 				var metadataKey = category+"->"+meta;
 				if((metadataKey != undefined) && (metadataKey != "") && (tool != undefined))
-					if((tool=="authors")||(tool=="types")) rekall.sortings[tool].setCriterias(metadataKey, rekall.sortings[tool].valCanBeFloats, undefined, "checkbox");
-					else rekall.sortings[tool].setCriterias(metadataKey, rekall.sortings[tool].valCanBeFloats, undefined, true);
+					rekall.sortings[tool].setCriterias(metadataKey, rekall.sortings[tool].valCanBeFloats, undefined, true);
 			}
 		});
 
@@ -454,65 +453,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				$("#left_menu .dropable").removeClass("dragOver");
 			}
 		});
-
-		/*	
-		//Création de l'élément menu jqueryUI 
-		$("#navigateur .tag_metadatas_menu").menu();
-		//Ouverture/fermeture du menu jqueryUI de sélection de meta (gris)
-		$("#navigateur .tab_choice_toggle").click(function() {
-			$(this).next().toggle();
-			if($(this).attr("metadataKey")) {
-				var dom = $(this).next().find("li[metadataKey='" + $(this).attr("metadataKey") + "']");
-				dom.parent().parent().trigger("click");
-				dom.parent().find("li").removeClass("ui-state-focus");
-				dom.addClass("ui-state-focus");
-			}
-			
-		});
-		
-		//Drag/drop pour setter les tools
-		$('#navigateur .tab_choice.dropable').on({
-			dragenter: function(event) {
-				$(this).addClass("dragEnter");
-				event.preventDefault();
-			},
-			dragleave: function(event) {
-				$(this).removeClass("dragEnter");
-				event.preventDefault();
-			},
-			dragover: function(event) {
-				$(this).addClass("dragEnter");
-				event.preventDefault();
-			},
-			drop: function(event) {
-				if(event.dataTransfer.getData("metadataKey") != undefined) {
-					var metadataKey = event.dataTransfer.getData("metadataKey");
-					var sorting = $(this).find(".tag_metadatas_menu").attr("sorting");
-					if((metadataKey != undefined) && (metadataKey != "") && (sorting != undefined))
-						rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);					
-					event.preventDefault();
-				}
-				$("#navigateur .navigateur_tab .dropable").removeClass("dragStart");
-				$("#navigateur .navigateur_tab .dropable").removeClass("dragEnter");
-				$("#navigateur .navigateur_tab .dropable").removeClass("dragOver");
-			}
-		});
-		
-		//Sélection d'une méta dans le menu		
-		$("#navigateur .tag_metadatas_menu li.ui-menu-item").click(function(e) {
-			var metadataKey = $(this).attr("metadataKey");
-			if(metadataKey != "Time") {
-				var sorting = $(this).parent().parent().parent().attr("sorting");
-				if((metadataKey != undefined) && (metadataKey != "") && (sorting != undefined))
-					rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);
-			}
-			else {
-				var sorting = $(this).parent().attr("sorting");
-				rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);
-			}
-			e.stopPropagation();
-		});
-		*/		
+  
 		
 		//Seulement initialisé au démarrage		
 		if(this.firstAnalysis) {	
