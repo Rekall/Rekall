@@ -26,7 +26,7 @@
 Http::Http(QObject *parent)
     : HttpInterface(parent) {
     Global::configFileName = QFileInfo(Global::pathApplication.absoluteFilePath() + "/http/webapp.ini").absoluteFilePath();
-    if((Global::pathApplication.absoluteFilePath().contains("buzzinglight/Projets/Rekall")) || (Global::pathApplication.absoluteFilePath().contains("guillaumemarais/Desktop/Dropbox")))
+    if((Global::pathApplication.absoluteFilePath().contains("/Users/guillaume/Dropbox/Rekall")) || (Global::pathApplication.absoluteFilePath().contains("guillaumemarais/Desktop/Dropbox")))
         Global::configFileName = QFileInfo(Global::pathApplication.absoluteFilePath() + "/http/webappDev.ini").absoluteFilePath();
     //qDebug(Config file: %s", qPrintable(Global::configFileName));
 
