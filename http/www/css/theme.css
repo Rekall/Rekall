@@ -346,7 +346,8 @@ u {
 	z-index:	10000;
 	background:	transparent;
 	margin:		0px;
-	padding: 	0px;
+	padding: 	0px;   
+	text-align:center;
 }
 #central_container {
 	width:		100%;
@@ -355,18 +356,44 @@ u {
 #central li {
 	cursor:		pointer;
 	padding: 	4px 10px 4px 10px;
-	margin:		0px 4px 0px 0px;
-	background:	#FCC376;
+	margin:		0;
+	/*background:	#FCC376; 
+	background:	#D6D8D0; */      
+	/*background:	#EC4255;*/
 	color: 		#2C3032;
-	float:		left;
+	/*float:		center; */
+	display:inline-block;
 }
 #central li.tab_middle {
-	-webkit-border-bottom-left-radius: 	2px;
-	-moz-border-bottom-left-radius: 	2px;
-	border-bottom-left-radius: 			2px;
-	-webkit-border-bottom-right-radius:	2px;
-	-moz-border-bottom-right-radius: 	2px;
-	border-bottom-right-radius: 		2px;
+	-webkit-border-radius: 	2px;
+	-moz-border-radius: 	2px;
+	border-radius: 			2px;     
+	margin:		10px 0 0 0;   
+	/*border:1px solid #F5F8EE; 
+	color: 		#F5F8EE;
+	background:#1D2021;*/
+	background:#F5F8EE; 
+	color:#1D2021;  
+	opacity:1.0;   
+	box-shadow:0 2px 2px rgba(0,0,0,.5); 
+	text-transform:uppercase;
+	font-size:10px;
+	line-height:15px;    
+	font-family: 	"open_sanssemibold"; 
+	/*background-image: -webkit-linear-gradient(bottom, #2C3032 0%, #1D2021 100%);*/ 
+}  
+#central li.tab_middle:hover { 
+	opacity:0.75;
+}     
+#central li.tab_midLeft {   
+	-webkit-border-radius: 	2px 0px 0px 2px;
+	-moz-border-radius: 	2px 0px 0px 2px;
+	border-radius: 			2px 0px 0px 2px;
+} 
+#central li.tab_midRight {   
+	-webkit-border-radius: 	0px 2px 2px 0px;
+	-moz-border-radius: 	0px 2px 2px 0px;
+	border-radius: 			0px 2px 2px 0px;
 }
 #central li.tab_left {
 	/*-webkit-border-top-right-radius:	5px;
@@ -374,7 +401,8 @@ u {
 	border-top-right-radius: 			5px;*/
 	-webkit-border-bottom-right-radius:	2px;
 	-moz-border-bottom-right-radius: 	2px;
-	border-bottom-right-radius: 		2px;
+	border-bottom-right-radius: 		2px; 
+	float:left;
 }
 #central li.tab_right {
 	margin:	0px 0px 0px 4px;
@@ -387,12 +415,12 @@ u {
 	border-bottom-left-radius: 			2px;
 }
 #central li.active {
-	background:	#F87439;
-	color: 		#F5F8EE;
-}
-#central li.active {
-	background:	#F87439;
-	color: 		#F5F8EE;
+	/*background:	#F87439; */  
+	/*background:#43494C;*/  
+	/*border:1px solid #F5F8EE; 
+	color: 		#F5F8EE;    */
+	opacity:.75;
+	cursor:default;
 }
 #central li#navigateurTabNav {
 	/*background: #5AA98E;*/

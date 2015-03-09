@@ -412,110 +412,114 @@ Rekall.prototype.start = function() {
 	});
 	
 	//Marqueurs
-	$(document).keyup(function(e) {
-		if((e.keyCode == 8) || (e.keyCode == 46)) {
-			if(rekall.sortings["horizontal"].metadataKey == "Time") {
-				if(Tags.count()) {
-					var phrase = "Are-you sure to remove this document from timeline view?";
-					if(Tags.count() > 1)
-						phrase = "Are-you sure to remove theses " + Tags.count() + " documents from timeline view?";
-					var sur = confirm(phrase);
-					if(sur == true) {
-						var projectChangedXml = "";
-						for (var index in Tags.selectedTags) {
-							var tag = Tags.selectedTags[index];
-							var metadataKey   = "Rekall->Visibility"
-							var metadataValue = "Hidden on timeline";
-							tag.setMetadata(metadataKey, metadataValue);
-							projectChangedXml += "<edition key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" metadataKey=\"" + Utils.escapeHtml(metadataKey) + "\" metadataValue=\"" + Utils.escapeHtml(metadataValue.trim()) + "\" />\n";
+	$(document).keyup(function(e) { 
+		//if((e.keyCode == 77) alert(e.keyCode); 
+		//if(e.altKey && e.keyCode == 77) alert("Alt+m");   
+		if( !$(document.activeElement).is('input') ) {
+			if((e.keyCode == 8) || (e.keyCode == 46)) {
+				if(rekall.sortings["horizontal"].metadataKey == "Time") {
+					if(Tags.count()) {
+						var phrase = "Are-you sure to remove this document from timeline view?";
+						if(Tags.count() > 1)
+							phrase = "Are-you sure to remove theses " + Tags.count() + " documents from timeline view?";
+						var sur = confirm(phrase);
+						if(sur == true) {
+							var projectChangedXml = "";
+							for (var index in Tags.selectedTags) {
+								var tag = Tags.selectedTags[index];
+								var metadataKey   = "Rekall->Visibility"
+								var metadataValue = "Hidden on timeline";
+								tag.setMetadata(metadataKey, metadataValue);
+								projectChangedXml += "<edition key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" metadataKey=\"" + Utils.escapeHtml(metadataKey) + "\" metadataValue=\"" + Utils.escapeHtml(metadataValue.trim()) + "\" />\n";
+							}
+							rekall.projectChanged(projectChangedXml);
+							rekall.analyse();
 						}
-						rekall.projectChanged(projectChangedXml);
-						rekall.analyse();
 					}
 				}
-			}
-			else {
-				var markers = [];
-				for (var index in Tags.selectedTags)
-					if(Tags.selectedTags[index].isMarker())
-						markers.push(Tags.selectedTags[index].document)
+				else {
+					var markers = [];
+					for (var index in Tags.selectedTags)
+						if(Tags.selectedTags[index].isMarker())
+							markers.push(Tags.selectedTags[index].document)
 
-				if(markers.length) {
-					var phrase = "Are-you sure to remove this marker?";
-					if(Tags.count() > 1)
-						phrase = "Are-you sure to remove theses " + markers.length + " markers?";
-					var sur = confirm(phrase);
-					if(sur == true) {
-						var projectChangedXml = "";
-						for (var markerIndex in markers) {
-							for (var tagIndex in markers[markerIndex].tags)
-								markers[markerIndex].tags[tagIndex].visuel.rect.remove();
-							projectChangedXml += "<document key=\"" + markers[markerIndex].key + "\" remove=\"true\" />\n";
-							delete rekall.project.sources["Files"].documents[markers[markerIndex].key];
+					if(markers.length) {
+						var phrase = "Are-you sure to remove this marker?";
+						if(Tags.count() > 1)
+							phrase = "Are-you sure to remove theses " + markers.length + " markers?";
+						var sur = confirm(phrase);
+						if(sur == true) {
+							var projectChangedXml = "";
+							for (var markerIndex in markers) {
+								for (var tagIndex in markers[markerIndex].tags)
+									markers[markerIndex].tags[tagIndex].visuel.rect.remove();
+								projectChangedXml += "<document key=\"" + markers[markerIndex].key + "\" remove=\"true\" />\n";
+								delete rekall.project.sources["Files"].documents[markers[markerIndex].key];
+							}
+							rekall.projectChanged(projectChangedXml);
+							rekall.analyse();
 						}
-						rekall.projectChanged(projectChangedXml);
-						rekall.analyse();
 					}
 				}
 			}
-		}
-	   /* else if(e.keyCode == 77) {
-			var currentDate = moment().format("YYYY:MM:DD HH:mm:ss");
+		    else if(e.keyCode == 77) {
+				var currentDate = moment().format("YYYY:MM:DD HH:mm:ss");
 
-			var state = rekall.timeline.bar.state;
-			if(state)
-				rekall.timeline.bar.stop();
-			var friendlyName = prompt("Marker name", "Marker");
-			if(friendlyName != "") {
-				var marker = new Document();
-				var tag = new Tag(marker);
-				tag.setTimeStart(rekall.timeline.bar.timeCurrent);
-				tag.setTimeEnd  (rekall.timeline.bar.timeCurrent + 4);
-				tag.setMetadata("Rekall->Comments",    "");
-				tag.setMetadata("Rekall->Date/Time",   currentDate);
-				tag.setMetadata("Rekall->Flag",        "Marker");
-				tag.setMetadata("Rekall->Group",       "");
-				tag.setMetadata("Rekall->Import Date", currentDate);
-				tag.setMetadata("Rekall->Keywords",    "");
-				tag.setMetadata("Rekall->Name",        friendlyName);
-				tag.setMetadata("Rekall->Type",        "rekall/marker");
+				var state = rekall.timeline.bar.state;
+				if(state)
+					rekall.timeline.bar.stop();
+				var friendlyName = prompt("Marker name", "Marker");
+				if(friendlyName != "") {
+					var marker = new Document();
+					var tag = new Tag(marker);
+					tag.setTimeStart(rekall.timeline.bar.timeCurrent);
+					tag.setTimeEnd  (rekall.timeline.bar.timeCurrent + 4);
+					tag.setMetadata("Rekall->Comments",    "");
+					tag.setMetadata("Rekall->Date/Time",   currentDate);
+					tag.setMetadata("Rekall->Flag",        "Marker");
+					tag.setMetadata("Rekall->Group",       "");
+					tag.setMetadata("Rekall->Import Date", currentDate);
+					tag.setMetadata("Rekall->Keywords",    "");
+					tag.setMetadata("Rekall->Name",        friendlyName);
+					tag.setMetadata("Rekall->Type",        "rekall/marker");
 
-				if(rekall_common.owner != undefined) {
-					tag.setMetadata("Rekall->Author",      			    rekall_common.owner.author);
-					tag.setMetadata("Rekall User Infos->User Name",     rekall_common.owner.author);
-					tag.setMetadata("Rekall User Infos->Location Name", rekall_common.owner.locationName);
-				}
-				marker.addTag(tag);
-
-				rekall.project.addDocument("Files", marker);
-
-				var projectChangedXml = "<document key=\"" + marker.key + "\">\n";
-				var metadatas = marker.tags[0].getMetadatas();
-				for (var key in metadatas) {
-					var meta = metadatas[key];
-					projectChangedXml += "<meta cnt=\"" + Utils.escapeHtml(meta) + "\" ctg=\"" + Utils.escapeHtml(key) + "\" />\n";
-				}
-				projectChangedXml += "</document>\n";
-				projectChangedXml += "<tag key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>\n";
-				rekall.projectChanged(projectChangedXml);
-
-				rekall.analyse();
-			}
-			if(state)
-				rekall.timeline.bar.play();
-		}
-		else*/ if(e.keyCode == 82) {
-			for (var keySource in rekall.project.sources) {
-				for (var keyDocument in rekall.project.sources[keySource].documents) {
-					for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
-						var tag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
-						tag.timeStart = random(0, 100);
-						tag.timeEnd   = tag.timeStart + random(0, 20);
+					if(rekall_common.owner != undefined) {
+						tag.setMetadata("Rekall->Author",      			    rekall_common.owner.author);
+						tag.setMetadata("Rekall User Infos->User Name",     rekall_common.owner.author);
+						tag.setMetadata("Rekall User Infos->Location Name", rekall_common.owner.locationName);
 					}
-			    }
+					marker.addTag(tag);
+
+					rekall.project.addDocument("Files", marker);
+
+					var projectChangedXml = "<document key=\"" + marker.key + "\">\n";
+					var metadatas = marker.tags[0].getMetadatas();
+					for (var key in metadatas) {
+						var meta = metadatas[key];
+						projectChangedXml += "<meta cnt=\"" + Utils.escapeHtml(meta) + "\" ctg=\"" + Utils.escapeHtml(key) + "\" />\n";
+					}
+					projectChangedXml += "</document>\n";
+					projectChangedXml += "<tag key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" timeStart=\"" + tag.timeStart + "\" timeEnd=\"" + tag.timeEnd + "\"/>\n";
+					rekall.projectChanged(projectChangedXml);
+
+					rekall.analyse();
+				}
+				if(state)
+					rekall.timeline.bar.play();
 			}
-			rekall.analyse(true);
-		}     
+			else if(e.keyCode == 82) {
+				for (var keySource in rekall.project.sources) {
+					for (var keyDocument in rekall.project.sources[keySource].documents) {
+						for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
+							var tag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
+							tag.timeStart = random(0, 100);
+							tag.timeEnd   = tag.timeStart + random(0, 20);
+						}
+				    }
+				}
+				rekall.analyse(true);
+			}  
+		}   
 	});
 	
 	
