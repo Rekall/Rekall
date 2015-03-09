@@ -39,7 +39,8 @@ Sorting.prototype.setCriterias = function(metadataConfigStr, valCanBeFloats, met
 		this.metadataKey = metadataConfigs[0].trim();
 		if(metadataConfigs.length > 1) {
 			var metadataKeyPortionFormula = metadataConfigs[1].trim().toLowerCase();
-			this.metadataFormat = metadataKeyPortionFormula;
+			this.metadataFormat = metadataKeyPortionFormula;    
+			
 			/*
 			if     (this.metadataFormat == "year")			metadataKeyPortionFormula = "0,4";
 			else if(this.metadataFormat == "month")			metadataKeyPortionFormula = "0,6";
@@ -53,7 +54,7 @@ Sorting.prototype.setCriterias = function(metadataConfigStr, valCanBeFloats, met
 			else if(this.metadataFormat == "hour_only")		metadataKeyPortionFormula = "9,2";
 			else if(this.metadataFormat == "minute_only")	metadataKeyPortionFormula = "11,2";
 			else if(this.metadataFormat == "second_only")	metadataKeyPortionFormula = "13,2";
-			*/	
+			*/	                                                  
 			if     (this.metadataFormat == "year")			metadataKeyPortionFormula = "-1,-1,YYYY,YYYY";
 			else if(this.metadataFormat == "month")			metadataKeyPortionFormula = "-1,-1,YYYY:MM,MMMM YYYY";
 			else if(this.metadataFormat == "day")			metadataKeyPortionFormula = "-1,-1,YYYY:MM:DD,ddd LL";
@@ -80,7 +81,10 @@ Sorting.prototype.setCriterias = function(metadataConfigStr, valCanBeFloats, met
 			if(isNaN(this.metadataKeyPortion.left))		this.metadataKeyPortion.left   = -1;
 			if(isNaN(this.metadataKeyPortion.length))	this.metadataKeyPortion.length = -1;
 		}
-	}
+	}           
+	
+//	alert(this.metadataKey+" / "+this.metadataFormat+" / "+analyse);
+	
 	if(valCanBeFloats == undefined)
 		valCanBeFloats = false;
 	this.valCanBeFloats = valCanBeFloats;
@@ -115,9 +119,9 @@ Sorting.prototype.analyseStart = function(tags) {
 	this.valMin       = 999999;
 	this.valMax       = 0;
 	this.valAreFloats = true;
-	this.valAreDates  = true;
-	if(this.metadataKey == "Time")
-		this.valMin = 0;
+	this.valAreDates  = true;  
+	if(this.metadataKey == "Time") 
+		this.valMin = 0;     
 	else {
 		this.categoriesIndex = 0;
 		for (var key in this.categories) {

@@ -133,12 +133,13 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		rekall.sortings["corpus"]    .analyseStart();
 		rekall.sortings["horizontal"].analyseStart();
 		rekall.sortings["vertical"].analyseStart();
-		for (var keySource in this.sources) {
+		for (var keySource in this.sources) {      
 			for (var keyDocument in this.sources[keySource].documents) {
 				this.sources[keySource].documents[keyDocument].checkRender();
-				
+				                                                               
 				for (var key in this.sources[keySource].documents[keyDocument].tags) {
-					var tag = this.sources[keySource].documents[keyDocument].tags[key];
+					var tag = this.sources[keySource].documents[keyDocument].tags[key];  
+					
 					
 					//Filtrage
 					var isOk = true;
@@ -234,20 +235,6 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		rekall.sortings["highlight"].analyseEnd();
 		rekall.sortings["hashes"]   .analyseEnd(1);
 
-
-		//Cases à cocher à changer
-		/*
-		var availableMetadatas = new Array();
-		for (var i in Document.availableMetadataKeys)
-			availableMetadatas.push(i);
-		availableMetadatas.sort(function(a, b) {
-			if (Document.availableMetadataKeys[a].count > Document.availableMetadataKeys[b].count)	return -1;
-			if (Document.availableMetadataKeys[a].count < Document.availableMetadataKeys[b].count)	return 1;
-	  		return 0;
-		});
-		//availableMetadatas = availableMetadatas.slice(0, 30);
-		console.log(availableMetadatas);
-		*/
 		
 		var availableMetadatas = new Array();
 		for (var i in Document.availableMetadataKeys)
@@ -272,62 +259,50 @@ Project.prototype.analyse = function(full, isCheckbox) {
 			availableMetadatasSorted[metadataSplit[0]].push(metadataSplit[1]);
 		}
 
-		/*
-		var availableMetadatasHtml = "";
-		for (var category in availableMetadatasSorted) {
-			var metadatas = availableMetadatasSorted[category];
-			if(category == "Rekall")
-				availableMetadatasHtml += "<li><b>" + category + "</b>";
-			else
-				availableMetadatasHtml += "<li>" + category + "s";
-			availableMetadatasHtml += "<ul>";
-			for (var index in metadatas) {
-				var metadataKey = category + "->" + metadatas[index];
-				availableMetadatasHtml += "<li metadataKey='" + metadataKey + "'>" + metadatas[index] + "</li>";
-			}
-			availableMetadatasHtml += "</ul>";
-			availableMetadatasHtml += "</li>";
-		}
-		*/
 
 		//création de l'élément liste de métas		
     	if(isCheckbox != true) {        
 			var gm_availableMetadatasHtml_caregories = "";
 			var gm_availableMetadatasHtml_metas = "";
 			gm_availableMetadatasHtml_caregories+= "<div class='left_menu_item_open_label' id='left_menu_item_open_label_category'>Category of metadata</div><select id='left_menu_select_category'>";
-			for (var category in availableMetadatasSorted) {
-
-
+			for (var category in availableMetadatasSorted) {    
 				var metadatas = availableMetadatasSorted[category];
 
 				gm_availableMetadatasHtml_caregories += "<option value='" + category + "' >" + category + "</option>";
-
+                                            
+				category = category.replace(" ","_").replace(" ","_");    
+			
 				gm_availableMetadatasHtml_metas += "<select class='left_menu_select_meta' id='left_menu_select_" + category + "' category='" + category + "' tool=''><option value='instructions' >- Select a field</option>";
-				for (var index in metadatas) {
-					var metadataKey = category + "->" + metadatas[index];
-					gm_availableMetadatasHtml_metas += "<option metadataKey='" + metadataKey + "'>" + metadatas[index] + "</option>";
+				for (var index in metadatas) {    
+					if(metadatas[index]=="Date/Time"){
+						var dateType = ["year","month","day","hour","minute","second","year_only","month_only","day_only","hour_only","minute_only","second_only","quarter","dayofyear","dayofweek","weekofyear"];   
+						for(var d in dateType){
+							var metadataKey = metadatas[index] + "|" + dateType[d];
+							gm_availableMetadatasHtml_metas += "<option value='" + metadataKey + "' metadataKey='" + metadataKey + "'>" + metadatas[index] +" (" + dateType[d] + ")</option>";
+						} 
+					} else {
+						var metadataKey = category + "->" + metadatas[index];
+						gm_availableMetadatasHtml_metas += "<option metadataKey='" + metadataKey + "'>" + metadatas[index] + "</option>";
+					}       
 				}
-				gm_availableMetadatasHtml_metas += "</select>";
+				gm_availableMetadatasHtml_metas += "</select>";        
+
 			}
 			gm_availableMetadatasHtml_caregories += "</select><div class='left_menu_item_open_label' id='left_menu_item_open_label_meta'>Metadata</div>";
 		}       
 		
-		if(isCheckbox != true) {			
-			//$("#left_menu_item_open").attr("tool","").width(0);//hide();
-			//$(".left_menu_item_checklist").hide();
-			//$(".left_menu_item_tab_search").hide();
+		if(isCheckbox != true) {			                 
 			$("#left_menu_item_open_select").html(gm_availableMetadatasHtml_caregories+gm_availableMetadatasHtml_metas);
 			$("#navigateurTabNav").css("backgroundColor","#559299");
 		}
 	
 		for (var keyword in rekall.sortings) {
 			var sorting = rekall.sortings[keyword];
-			var extraChoice = "";
+			var extraChoice = "";  
 			if(keyword == "horizontal")
 				extraChoice = "<li metadataKey='Time'>Time</li>";
 				
 			//Définition de l'endroit du DOM où mettre les cases à cocher				
-			//htmlDom  = $("#" + keyword + "Tab .tab_list");
 			gm_htmlDom  = $("#" + keyword + "Checklist");
 			var metadataConfigFormated = sorting.metadataConfigStr;
 			if(metadataConfigFormated != undefined) {
@@ -336,7 +311,6 @@ Project.prototype.analyse = function(full, isCheckbox) {
 			}
 					
 			//Création des tab_choice_toggle (gris) + tout le menu qui va avec
-			//$("#" + keyword + "Tab .tab_choice").html("<div metadataKey='" + sorting.metadataConfigStr + "' class='tab_choice_toggle'>" + metadataConfigFormated + " <span class='invisible'>(change)</span></div><ul class='tag_metadatas_menu invisible' id='" + keyword + "Menu' sorting='" + keyword + "'>" + extraChoice + availableMetadatasHtml + "</ul>");
 			sortingVerbose = keyword;
 			if(gm_htmlDom.get(0)) {
 				var html = "", postHtml = "";
@@ -370,7 +344,6 @@ Project.prototype.analyse = function(full, isCheckbox) {
 						}
 						else {
 							if(sorting == rekall.sortings["colors"]){
-								/*valueDisplayed = "<span><span style='background-color: " + category.color + ";'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;" + valueVerbose + "</span>";*/
 								valueDisplayed = valueVerbose;
 								colorCheckbox = "background-color: " + category.color + ";";
 							}
@@ -378,14 +351,9 @@ Project.prototype.analyse = function(full, isCheckbox) {
 								var values = valueVerbose.split("/");
 								valueDisplayed = "";
 								if(sorting == rekall.sortings["corpus"])
-									percentageDiv = "";
-									/*
-								if(values.length == 0)
-									valueDisplayed += "<span>" + values[valuesIndex] + "</span>";
-									*/
+									percentageDiv = "";        
 								for(var valuesIndex = 0 ; valuesIndex < values.length ; valuesIndex++) {
-									if(valuesIndex == values.length-1)
-									//valueDisplayed += "<span>" + values[valuesIndex] + "</span>";
+									if(valuesIndex == values.length-1)                               
 										valueDisplayed += values[valuesIndex];
 									else
 										valueDisplayed += values[valuesIndex] + "/";
@@ -396,31 +364,33 @@ Project.prototype.analyse = function(full, isCheckbox) {
 							html += "<div class='tab_list_item " + ((!category.visible)?("invisible'"):("visible")) + "'><label><input class='tab_list_item_check' type='checkbox'" + ((category.checked)?("checked"):("")) + "/><span style='"+colorCheckbox+"' ></span>" + valueDisplayed + "</label>" + percentageDiv + "<div class='tab_list_item_category invisible'>" + value + "</div></div>";
 						}
 					}
-				}
-				//htmlDom.html(html + postHtml);
-				/*var selectall = "<div class='selectallBtn' tool='"+keyword+"'>Select all</div>";
-				var unselectall = "<div class='unselectallBtn' tool='"+keyword+"'>Unelect all</div>";*/
+				}                                                                                        
 				gm_htmlDom.html(html + postHtml);	
 			}
 		}
-
+                               
+        $( "#left_menu_select_category" ).unbind(); 
 		$( "#left_menu_select_category" ).change(function() {
 			var category = $(this).val();
 			var tool = $(this).attr("tool");
 			$(".left_menu_select_meta").hide();
-			$("#left_menu_select_"+category).show();
+			category = category.replace(" ","_").replace(" ","_");
+			$("#left_menu_select_"+category).show();   
 		});
-
+                         
+		$( ".left_menu_select_meta" ).unbind();
 		$( ".left_menu_select_meta" ).change(function() {
-			var meta = $(this).val();
+			var meta = $(this).val();     
+			//alert(meta);                              
 			if(meta!="instructions"){
-				var category = $(this).attr("category");
+				var category = $(this).attr("category");               
 				var tool = $(this).attr("tool");
 				$(".left_menu_select_meta").hide();
-				$("#left_menu_select_"+category).show();
+				$("#left_menu_select_"+category).show();              
+				category = category.replace("_"," ").replace("_"," ");
 				var metadataKey = category+"->"+meta;
 				if((metadataKey != undefined) && (metadataKey != "") && (tool != undefined))
-					rekall.sortings[tool].setCriterias(metadataKey, rekall.sortings[tool].valCanBeFloats, undefined, true);
+					rekall.sortings[tool].setCriterias(metadataKey, rekall.sortings[tool].valCanBeFloats, undefined, true);        
 			}
 		});
 
@@ -456,7 +426,8 @@ Project.prototype.analyse = function(full, isCheckbox) {
   
 		
 		//Seulement initialisé au démarrage		
-		if(this.firstAnalysis) {	
+		if(this.firstAnalysis) {   
+			$(".left_menu_item").unbind(); 
 			$(".left_menu_item").click(function() {
 				var tool = $(this).attr("id").substring(15,$(this).attr("id").length);
 				$(".left_menu_item").removeClass("selected");
@@ -504,13 +475,16 @@ Project.prototype.analyse = function(full, isCheckbox) {
 							if(metadataConfigFormated != undefined) {
 								var tmp = metadataConfigFormated.split("->");
 								category = tmp[0];
-
+                                                    
 								$("#left_menu_select_category").val(category);
 								$(".left_menu_select_meta").attr("tool",tool);
 
-								if(tmp.length>1) {
-									tmp = tmp[1].split("|");
-									meta = tmp[0];
+								if(tmp.length>1) {  
+									meta = tmp[1]; 
+									/*tmp = tmp[1].split("|");
+									if(tmp.length>1) 
+									meta = tmp[0];     */   
+								   // alert(tmp.length+" / "+meta); 
 									$(".left_menu_select_meta").hide();
 									$("#left_menu_select_"+category).val(meta).show();
 								}
@@ -520,7 +494,8 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				}
 			});
 		
-			//Sauvegarde du preset			
+			//Sauvegarde du preset		
+			$("#tag_workspaces_save").unbind();   	
 			$("#tag_workspaces_save").click(function() {
 				var friendlyName = prompt("Please type a name for this preset", "My preset");
 				if((friendlyName != null) && (friendlyName != "")) {
@@ -532,7 +507,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 			$("#tag_workspaces_menu li").first().trigger("click");
 		}
 		
-		$("#tag_workspaces_menu li").unbind("click");
+		$("#tag_workspaces_menu li").unbind();
 		$("#tag_workspaces_menu li").click(function() {
 			var actions = $(this).attr("action");
 			$("#tag_workspaces_menu").find("li").removeClass("selected");
@@ -544,13 +519,12 @@ Project.prototype.analyse = function(full, isCheckbox) {
 					var actionList = action.split("=");
 					if(action.length > 1) {
 						var sorting = actionList[0].trim();
-						var metadataKey = actionList[1].trim();
+						var metadataKey = actionList[1].trim(); 
 						rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);
 					}
 				}
 			}
-		});
-		$("#tag_workspaces_menu li").unbind("dblclick");
+		});                                                
 		$("#tag_workspaces_menu li").dblclick(function() {
 			var friendlyName = prompt("Please type a name for this preset", $(this).text());
 			if((friendlyName != null) && (friendlyName != "")) {
@@ -559,7 +533,8 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		});
 
 
-		//Actions sur le cochage
+		//Actions sur le cochage      
+		$(".left_menu_item_checklist .tab_list_item input").unbind();
 		$(".left_menu_item_checklist .tab_list_item input").change(function(event) {
 			var sorting  = $(this).parent().parent().parent().attr("id").replace("Checklist", "");
 			sorting = rekall.sortings[sorting]
@@ -578,6 +553,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		});
 		
 		//Action sur la recherche
+		$("#left_menu_item_open .left_menu_item_tab_search input").unbind();
 		$("#left_menu_item_open .left_menu_item_tab_search input").keyup(function(event) {
 		    if((event.keyCode == 13) || ($(this).val() == "")) {
 				event.stopPropagation();
@@ -617,7 +593,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 	//Re-génération des étiquettes / grilles
 	var alternate = 0;
 
-	for (var key in rekall.sortings["horizontal"].categories) {
+	for (var key in rekall.sortings["horizontal"].categories) {  
 		var horizontalSortingCategory    = rekall.sortings["horizontal"].categories[key];
 		var horizontalSortingCategoryPos = rekall.sortings["horizontal"].positionFor(undefined, horizontalSortingCategory.index);
 		if(horizontalSortingCategory.rectAlternate == undefined) {

@@ -144,7 +144,7 @@ Panner.prototype.show = function(filter, bounds) {
 	var thiss = this;
 	var gallery1 = $("#panner-gallery1");
 	var gallery2 = $("#panner-gallery2");
-	var legende  = $("#thumbLgd");
+	/*var legende  = $("#thumbLgd"); */
 	
 	if(recreateGallery) {
 		this.filtredTags = new Array();
@@ -169,14 +169,11 @@ Panner.prototype.show = function(filter, bounds) {
 			}                
 			//target.append("<h1 style='color: " + contents.category.color + "'>" + categoryVerbose + "</h1>");
 			//target.append("<h1><div class='thumbnailPastille' style='background-color:"+contents.category.color+";'></div>" + categoryVerbose + "</h1>");        
-			var categoryVerboseTable = categoryVerbose.split("/");
-			//var categoryVerboseTitle = ""+categoryVerboseTable[1].toUpperCase()+"<br/><span style='color:#BBB; font-size:11px'>("+categoryVerboseTable[0]+")</span>"; 
-			//alert(categoryVerboseTable.length);
+			var categoryVerboseTable = categoryVerbose.split("/");                                                                                                        
 			var categoryVerboseTitle = categoryVerboseTable[categoryVerboseTable.length-1];  
 			if((!categoryVerboseTitle)&&(categoryVerboseTable.length>=2)) categoryVerboseTitle = categoryVerboseTable[categoryVerboseTable.length-2];  
-			if(!categoryVerboseTitle) categoryVerboseTitle = categoryVerbose;
-			//if(categoryVerboseTable.length>1) categoryVerboseTitle = categoryVerboseTable[1].toUpperCase();
-  //  		target.append("<h1 style='border-color:"+contents.category.color+";' title='"+categoryVerbose+"'>" + categoryVerboseTitle.toUpperCase() + "</h1>");       
+			if(!categoryVerboseTitle) categoryVerboseTitle = categoryVerbose;                                                                                    
+			     
 			var rgb = contents.category.color.toString(); 
 			rgb = rgb.split('(');  
 			if(rgb.length>1) {
@@ -193,14 +190,14 @@ Panner.prototype.show = function(filter, bounds) {
 			}                        
 			//else target.append("<div class='panner-gallery-group' style='background-color: rgba("+rgb+",.25); border:2px solid rgba("+rgb+",.75);' title='"+categoryVerbose+"'><h1 style='color: rgb("+rgb+");'>" + categoryVerboseTitle.toUpperCase() + "</h1></div>");  
 			else target.append("<div class='panner-gallery-group' style='background-image: -webkit-linear-gradient(bottom right, rgba("+rgb+",.7) 0%, rgba("+rgb+",.4) 100%);   ' title='"+categoryVerbose+"'><h1 style='color: rgb("+rgb+");'>" + categoryVerboseTitle.toUpperCase() + "</h1></div>");  
-			if(countCat==0) {
-				legende.html(""); 
+/*			if(countCat==0) {
+			    legende.html(""); 
 				var tmpHeight = legende.parent().parent().css("height");   
 				tmpHeight = tmpHeight.substr(0,tmpHeight.length-2)-70;
 				legende.css("maxHeight",tmpHeight+"px");
 				//alert(tmpHeight);   
 			}
-			legende.append("<div class='panner-gallery-lgd' style='background-color: rgb("+rgb+");' title='"+categoryVerbose+"'></div>"); 
+			legende.append("<div class='panner-gallery-lgd' style='background-color: rgb("+rgb+");' title='"+categoryVerbose+"'></div>");      */
 		    countCat++;   
 
 		}           
