@@ -224,15 +224,21 @@ Tag.prototype.displayMetadata = function() {
 }
 Tag.displayMetadata = function() {	
 	//Restaure un truc propre
-	if(Tags.count() == 0) {
-		$("#metadatas").hide();  
-		$("#metadatas_tools").hide();  
-		$("#flattentimeline").show();
+	if(Tags.count() == 0) {                   
+		$("#visibleontimeline_switch_button").hide(); 
+		$("#metadata_main_title").parent().hide();     
+		$("#metadatas").parent().hide();  
+		$("#metadatas_tools").parent().hide();        
+		$("#metadata_menu_bar_block").parent().hide();
+		$("#flattentimeline").parent().show();
 	}
-	else {
-		$("#metadatas").show(); 
-		$("#metadatas_tools").show(); 
-		$("#flattentimeline").hide();
+	else {                 
+		$("#visibleontimeline_switch_button").show();   
+		$("#metadata_main_title").parent().show();
+		$("#metadatas").parent().show(); 
+		$("#metadatas_tools").parent().show(); 
+		$("#metadata_menu_bar_block").parent().show();   
+		$("#flattentimeline").parent().hide();
 	}
 
 		
@@ -248,7 +254,16 @@ Tag.displayMetadata = function() {
 		else {
 			if((Tags.unique().thumbnail != undefined) && (Tags.unique().thumbnail.url != undefined)) {
 				if(($("#previewImage img").attr("src") != Tags.unique().thumbnail.url) && (Tags.unique().thumbnail.url != undefined))
-					$("#previewImage").html("<img src=\"" + Tags.unique().thumbnail.url + "\">");
+					$("#previewImage").html("<img src=\"" + Tags.unique().thumbnail.url + "\">");    
+				
+// GM - Affichage de la pastille Visible on Timeline 	    
+				//alert(Tags.unique().document.metadatas[0]["Rekall->Visibility"]); 
+
+				if(Tags.unique().document.metadatas[0]["Rekall->Visibility"] == "Visible on timeline") $("#visibleontimeline_switch_button").addClass("visible");
+				else $("#visibleontimeline_switch_button").removeClass("visible");
+					
+				console.log(Tags.unique());  
+				$("#previewVideo").hide();
 				$("#previewImage").show();
 				//$("#preview_menu_bar").show();
 				$("#preview_menu_bar").hide();
@@ -450,7 +465,15 @@ Tag.displayMetadata = function() {
 
 		//Préparation de l'affichage
 		if(value == "")			value = "&nbsp;";
-		if(elementClass != "")	value = "Multiple values";
+		if(elementClass != "")	value = "Multiple values";  
+// GM Affichage comments raccourci		  
+    	if(metadataKey == "Rekall->Comments") {
+//			alert(" keyTip : "+keyTip+" \n metadataKey : "+metadataKey+" \n value : "+value+" \n value replace : "+value.replace(/'/g, "\\'"));   
+
+			if(value=="&nbsp;") $("#metadatas_comments").val("Comments").addClass("emptyField").off("focus");
+			else $("#metadatas_comments").val(value).removeClass("emptyField").off("focus");
+		}               
+		
 		if(value != undefined) {
 			htmls[metadataKeys[0]] += "				<div draggable=true class='metadatas_table_element selectable " + elementClass + "'>";
 			htmls[metadataKeys[0]] += "					<div class='metadatas_table_element_category invisible'>" + metadataKey + "</div>";
@@ -477,12 +500,13 @@ Tag.displayMetadata = function() {
 	});
 	
 	
-	//Fonction temporaire de validation de l'édition d'un élément
-	function changeValueTo(obj, metadataKey, metadataValue) {
+    //Fonction temporaire de validation de l'édition d'un élément
+	function changeValueTo(obj, metadataKey, metadataValue) {    
 		var projectChangedXml = "";
 		if((obj != undefined) && (!Tag.metadataCancel)) {
 			var changed = false;
-			var reopen  = false;
+			var reopen  = false;        
+//			alert(obj.attr("class"));
 			if(obj.hasClass("one_selection")) {
 				if(metadataValue == undefined)
 					metadataValue = obj.parent().find(".selected").text();
@@ -492,8 +516,7 @@ Tag.displayMetadata = function() {
 					var metadataValueTmp = moment(metadataValue);
 					if(metadataValueTmp.isValid())
 						metadataValue = metadataValueTmp.format("YYYY:MM:DD HH:mm:ss");
-				}
-				
+				} 		
 				for (var index in Tags.selectedTags) {
 					var tag = Tags.selectedTags[index];
 					var hasChanged = tag.setMetadata(metadataKey, metadataValue.trim());
@@ -541,7 +564,7 @@ Tag.displayMetadata = function() {
 						projectChangedXml += "<edition key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" metadataKey=\"" + Utils.escapeHtml(metadataKey) + "\" metadataValue=\"" + Utils.escapeHtml(Utils.joinKeywords(keywords)) + "\" />\n";
 				}
 			}
-		}
+		}    
 
 		//Ferme tous les éditeurs
 		$("#metadatas_table").find(".metadatas_table_element_value")       .show();
@@ -553,10 +576,138 @@ Tag.displayMetadata = function() {
 		if(changed) {
 			rekall.analyse();
 			rekall.projectChanged(projectChangedXml);
+		}       
+		
+	}  		
+		
+		// GM GM GM	 
+	
+		//Fonction temporaire de validation de l'édition d'un élément
+		function GMchangeValueTo(obj, metadataKey, metadataValue) {
+			var projectChangedXml = "";
+			if((obj != undefined) && (!Tag.metadataCancel)) {
+				var changed = false;
+				var reopen  = false;  
+				           
+				// mic-mac pour retrouver de quel doc on parle ?
+				
+				//if(obj.hasClass("one_selection")) {
+					if(metadataValue == undefined)
+						metadataValue = obj.parent().find(".selected").text();
+					if(metadataValue == "—")
+						metadataValue = "";
+				   /* if(metadataKey.toLowerCase().indexOf("date/time") !== -1) {
+						var metadataValueTmp = moment(metadataValue);
+						if(metadataValueTmp.isValid())
+							metadataValue = metadataValueTmp.format("YYYY:MM:DD HH:mm:ss");
+					}   		*/
+					for (var index in Tags.selectedTags) {
+						var tag = Tags.selectedTags[index];
+						var hasChanged = tag.setMetadata(metadataKey, metadataValue.trim());
+						changed |= hasChanged;
+						if(hasChanged)
+							projectChangedXml += "<edition key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" metadataKey=\"" + Utils.escapeHtml(metadataKey) + "\" metadataValue=\"" + Utils.escapeHtml(metadataValue.trim()) + "\" />\n";
+					}
+				/*}
+				else { 
+					if(metadataValue)
+						reopen = true;
+
+					//Parsing des valeurs à ajouter et à virer
+					var keywordsToAdd = new Object(), keywordsToRemove = new Object();
+					if(!metadataValue)
+						metadataValue = obj.parent().find("input, textarea").val();
+					var splits = Utils.splitKeywords(metadataValue);
+					for (var index in splits)
+						keywordsToAdd[splits[index]] = true;
+					obj.parent().find(".added").each(function() {
+						keywordsToAdd[$(this).text().trim()] = true;
+					});
+					obj.parent().find(".selected").each(function() {
+						keywordsToAdd[$(this).text().trim()] = true;
+					});
+					obj.parent().find(".removed").each(function() {
+						keywordsToRemove[$(this).text().trim()] = true;
+					});
+
+					//Applique les changements
+					for (var index in Tags.selectedTags) {
+						var tag = Tags.selectedTags[index];
+						var keywords = Utils.splitKeywords(tag.getMetadata(metadataKey));
+						for (var keyword in keywordsToAdd) {
+							if($.inArray(keyword, keywords) === -1)
+								keywords.push(keyword);
+						}
+						for (var keyword in keywordsToRemove) {
+							if($.inArray(keyword, keywords) !== -1)
+								keywords.splice(keywords.indexOf(keyword), 1);
+						}
+						var hasChanged = tag.setMetadata(metadataKey, Utils.joinKeywords(keywords));
+						changed |= hasChanged;
+						if(hasChanged)
+							projectChangedXml += "<edition key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" metadataKey=\"" + Utils.escapeHtml(metadataKey) + "\" metadataValue=\"" + Utils.escapeHtml(Utils.joinKeywords(keywords)) + "\" />\n";
+					}  */
+			  //  }
+			} 
+
+		//Ferme tous les éditeurs
+		$("#metadatas_table").find(".metadatas_table_element_value")       .show();
+		$("#metadatas_table").find(".metadatas_table_element_value_editor").hide();
+		$("#metadatas_table").find(".metadatas_table_element_value_editor").html("");
+
+		if(!reopen)
+			Tag.metadataEditionKey = [/*"Rekall->Comments"*/ ];
+		if(changed) {
+			rekall.analyse();
+			rekall.projectChanged(projectChangedXml);
 		}
+		      
 	}
+               
 
+// GM                                        
+	$("#metadatas_comments").click(function(event) {   
+		
+		if($(this).hasClass("emptyField")) $(this).val("").removeClass("emptyField"); 
+		
+		function inputBlur(obj) {      
+			//alert(obj.val());
+			GMchangeValueTo(obj, "Rekall->Comments", obj.val());
+		}
+   // 	$(this).find("input, textarea").focus();
+   // 	$(this).find("input, textarea").select();
+		$(this).keyup(function(event) {
+			event.stopPropagation();
+		  	event.preventDefault();
+		    if(event.keyCode == 13){
+				$(this).off("focus");
+				inputBlur($(this));   
+			}
+			else if(event.keyCode == 27) {
+				Tag.metadataCancel = true;
+				inputBlur($(this));
+			}
+		});
+		
+	});   
 
+// GM 
+	$("#visibleontimeline_switch_button").unbind("click");
+	$("#visibleontimeline_switch_button").click(function(event) {                        
+
+		function inputBlur(obj, visibility) {      
+			//alert(visibility);  //                   "Visible on timeline"  / "Hidden on timeline"
+			GMchangeValueTo(obj, "Rekall->Visibility", visibility);
+		}                        
+		                     
+		$(this).toggleClass("visible");
+		
+		if($(this).hasClass("visible")) inputBlur($(this), "Visible on timeline" ); 
+		else inputBlur($(this), "Hidden on timeline" ); 
+		
+
+	});
+                 
 	//Affichage de l'éditeur
 	$("#metadatas .metadatas_table_element").click(function(event) {
 		event.stopPropagation();

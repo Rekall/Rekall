@@ -83,7 +83,7 @@
 				<div id="left_menu">
 					<div class="left_menu_item dropable" id="left_menu_item_presets" title="Presets">
 						<div class="left_menu_item_icn" id="left_menu_item_icn_presets"></div>
-						<div class="left_menu_item_title">Presets</div>
+						<div class="left_menu_item_title">Workspaces</div>
 						<div class="left_menu_item_value"></div>
 					</div>
 					<div class="left_menu_item dropable" id="left_menu_item_horizontal">
@@ -124,7 +124,7 @@
 					</div>
 					<div class="left_menu_item dropable" id="left_menu_item_keywords">
 						<div class="left_menu_item_icn" id="left_menu_item_icn_keywords"></div>
-						<div class="left_menu_item_title">Keywords</div>
+						<div class="left_menu_item_title">Tags</div>
 						<div class="left_menu_item_value"></div>
 					</div>
 					<div class="break"></div>
@@ -138,11 +138,16 @@
 			<div class="layout_cell" id="left_menu_item_open" style="width:0px;">
 				
 				<div class="left_menu_item_open_cat" id='left_menu_item_open_presets'>
-					<div class="left_menu_item_open_title">Presets</div>
-					<div class="left_menu_item_open_instructions">Manage your presets to switch easily from one workspace to another</div>
-					<ul id='tag_workspaces_menu'>
-						<li action='horizontal=Rekall->Author ; vertical=Rekall->Date/Time|month ; groups=Rekall->Date/Time|year'>Authors</li>
-						<li action='horizontal=Time ; vertical=Rekall->Date/Time|month ; groups=Rekall->Date/Time|year'>Timeline</li>
+					<div class="left_menu_item_open_title">Workspaces</div>
+					<div class="left_menu_item_open_instructions">Manage your presets to switch easily from one workspace to another</div>   
+					<div class="break"></div>
+					<div class="left_menu_item_open_instructions_small">Annotate videos and organize documents on the timeline</div>  
+					<ul id='tag_workspaces_menu'>                                                             
+						<li action='horizontal=Time ; vertical=Rekall->Date/Time|month ; groups=Rekall->Date/Time|year'>Timeline</li>  
+					</ul>  
+					<div class="left_menu_item_open_instructions_small">Sort and analyse documents through the grid view</div> 
+					<ul id='tag_workspaces_menu'>        
+						<li action='horizontal=Rekall->Author ; vertical=Rekall->Date/Time|month ; groups=Rekall->Date/Time|year'>Authors</li>  
 						<li action='horizontal=Rekall->Author ; vertical=Rekall->Import Date|hour_only ; groups=Rekall->Import Date|day'>Imports</li>
 						<li action='horizontal=Rekall->Author ; vertical=Rekall->Type ; groups='>Types &times; Authors</li>
 					</ul>
@@ -179,8 +184,8 @@
 					<div class="left_menu_item_open_instructions">Select a type of metadata and write which one you want to highlight.</div>
 				</div>
 				<div class="left_menu_item_open_cat" id='left_menu_item_open_keywords'>
-					<div class="left_menu_item_open_title">Keywords</div>
-					<div class="left_menu_item_open_instructions">Show/hide documents depending on keywords.</div>
+					<div class="left_menu_item_open_title">Tags</div>
+					<div class="left_menu_item_open_instructions">Show/hide documents depending on tags.</div>
 				</div>
 				<div class="left_menu_item_open_cat" id='left_menu_item_open_search'>
 					<div class="left_menu_item_open_title">Search</div>
@@ -370,8 +375,17 @@
 				<div id='timeline'>.</div>
 			</div>
 			<div class='layout_cell' style='width: 270px;'>
-				<table id='inspecteur'>
-					<tr><td id='preview'>
+				<table id='inspecteur'>   
+				  <!--  <tr>
+						<td id="metadata_main_title">Metadata</td>
+					</tr>  -->        
+					<tr><td id='preview'>   
+						<div id="visibleontimeline_switch_button" title="Visible on timeline ?"></div>
+						<!--<img src="/css/images/icn-meta-fct-0.png" style="display:inline-block"/>  
+						<img src="/css/images/icn-meta-fct-1.png" style="display:inline-block"/> 
+						<img src="/css/images/icn-meta-fct-2.png" style="display:inline-block"/>  
+						<img src="/css/images/icn-meta-visibility-0.png" style="display:inline-block"/>  
+						<img src="/css/images/icn-meta-visibility-1.png" style="display:inline-block"/> -->
 						<div id='previewImage'></div>
 						<div id='preview_menu_bar'>
 							<span id='preview_menu_bar_snapshot'>Take a snapshot</span>
@@ -382,22 +396,29 @@
 					<tr><td id='metadatas_tools'>
 						<div id='metadatas_title' class='selectable'></div>
 						<div id='metadatas_version'></div>
-						<div id='metadatas_subtitle' class='selectable'></div>
+						<div id='metadatas_subtitle' class='selectable'></div>    
 						<div id='metadatas_menu_bar'>
-							<span id='metadatas_menu_bar_open'>Open</span>
-							<span id='metadatas_menu_bar_finder'>Reveal in Finder</span>
-							<span id='metadatas_menu_bar_quicklook'>Quicklook</span>
+							<span id='metadatas_menu_bar_open'>Open File</span>
+							<span id='metadatas_menu_bar_finder'>Open Folder</span>
+							<!--<span id='metadatas_menu_bar_quicklook'>Quicklook</span>-->
 							<span id='metadatas_menu_bar_open_browser'><a href='#' target='_blank'>Open in a tab</a></span>
 							<span id='metadatas_menu_bar_download'><a href='#'>Download</a></span>
-							<span id='metadatas_menu_bar_map'>Show on a map</span>
-							<span id='metadatas_menu_bar_zoom'>Enlarge</span>
-						</div>   
+							<span id='metadatas_menu_bar_map'>Map</span>
+							<span id='metadatas_menu_bar_zoom'>Zoom</span>
+						</div>         
+						
+						<textarea id="metadatas_comments" >Commentaires</textarea>            
+						<!--<div id='metadatas_switch_bar'>                                  
+							<span id='metadatas_switch_bar_timeline'>Visible on timeline</span> 
+							<span id='metadatas_switch_bar_captation'>Render</span> 
+						</div>    -->
 					</td></tr>
-					<tr><td id='metadatas'> 
+					<tr><td id='metadatas'>   
+						<div id="metadatas_table_title">Metadata</div>
 						<div id='metadatas_table'></div>
 					</td></tr> 
 					<tr><td id='flattentimeline'>
-						<div id="flattentimeline_main_title"><div class="settings_btn" id="settings_cues" title="Filter documents"></div>Documents List<div class="reload_btn" id="reload_cues"></div></div>
+						<div id="flattentimeline_main_title"><div class="settings_btn" id="settings_cues" title="Filter documents"></div>Events<div class="reload_btn" id="reload_cues"></div></div>
 						<div id="flattentimeline_settings"></div>
 						<div id='flattentimeline_items'></div>
 					</td></tr>

@@ -24,11 +24,12 @@
 function Panner() {
 	this.filtredTags = new Array();
 	this.visible     = false; 
-	this.recreateGallery = true;
-   /* $("#panner .gallery").click(function(event) {
+	this.recreateGallery = true;     
+	
+    $("#panner .gallery").click(function(event) {
 		event.stopPropagation();
 		Tags.clear(true);
-	});*/                       
+	});                  
 	
 	$(".panzoom").click(function(event) {
 		event.stopPropagation(); 
