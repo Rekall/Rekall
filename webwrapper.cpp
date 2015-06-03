@@ -10,6 +10,7 @@ WebWrapper::WebWrapper(QWidget *parent) :
     move(screen.center() - QPoint(width(), height())/2);
 
     connect(ui->actionCloseWindow, SIGNAL(triggered()), SLOT(close()));
+    connect(ui->actionQuit,        SIGNAL(triggered()), SLOT(close()));
 
     connect(ui->webView, SIGNAL(titleChanged(QString)), SLOT(setWindowTitle(QString)));
     restoreGeometry(QSettings().value("WebWrapperGeometry").toByteArray());
@@ -42,8 +43,7 @@ void WebWrapper::openWebPage(const QUrl &url, const QString &title, bool inBrows
 
 void WebWrapper::closeEvent(QCloseEvent *) {
     foreach(ProjectInterface *project, Global::projects)
-        foreach(VideoPlayerInterface *videoPlayers, project->videoPlayers->players)
-            videoPlayers->forceClose();
+        project->videoPlayers->forceClose();
 
     Global::userInfos->setDockIcon(this, false);
     QSettings().setValue("WebWrapperGeometry", saveGeometry());

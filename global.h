@@ -77,22 +77,17 @@ public:
 class VideoPlayerInterface {
 public:
     QUrl currentUrl;
-public:
-    virtual void setUrl(const QUrl &url, bool askClose = false, const QString &title = "") = 0;
-    virtual void seek(qint64 timecode) = 0;
-    virtual void play(qint64 timecode = -1) = 0;
-    virtual void pause() = 0;
-    virtual void rewind(qint64 timecode = 0) = 0;
-    virtual void forceClose() = 0;
 };
 class VideoPlayersInterface {
 public:
     QList<VideoPlayerInterface*> players;
 public:
     virtual void update(const QUrl &url, bool askClose = false, const QString &title = "", qint64 timecode = 0) = 0;
-    virtual void rewind(qint64 timecode = 0) = 0;
+    virtual void seek(qint64 timecode) = 0;
     virtual void play(qint64 timecode = -1) = 0;
     virtual void pause() = 0;
+    virtual void rewind(qint64 timecode = 0) = 0;
+    virtual void forceClose() = 0;
 };
 
 

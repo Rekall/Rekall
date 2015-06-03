@@ -24,8 +24,6 @@ void VideoPlayer::setUrl(const QUrl &url, bool askClose, const QString &title) {
             currentUrl = url;
             Global::userInfos->setDockIcon(this, true);
             player->setMedia(currentUrl);
-
-            restoreGeometry(QSettings().value("VideoPlayerGeometry" + currentUrl.toString()).toByteArray());
         }
 
         if(title.isEmpty()) setWindowTitle(tr("Rekall — ") + currentUrl.fileName());
@@ -48,13 +46,4 @@ void VideoPlayer::pause() {
 void VideoPlayer::rewind(qint64 timecode) {
     player->pause();
     seek(timecode);
-}
-
-void VideoPlayer::forceClose() {
-    close();
-}
-
-void VideoPlayer::closeEvent(QCloseEvent *) {
-    Global::userInfos->setDockIcon(this, false);
-    QSettings().setValue("VideoPlayerGeometry" + currentUrl.toString(), saveGeometry());
 }

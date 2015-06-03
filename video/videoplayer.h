@@ -19,8 +19,6 @@ public:
 
 private:
     QMediaPlayer *player;
-protected:
-    void closeEvent(QCloseEvent *);
 
 public slots:
     void setUrl(const QUrl &url, bool askClose = false, const QString &title = "");
@@ -28,7 +26,6 @@ public slots:
     void play(qint64 timecode = -1);
     void pause();
     void rewind(qint64 timecode = 0);
-    void forceClose();
 
 private:
     Ui::VideoPlayer *ui;

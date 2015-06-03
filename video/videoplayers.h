@@ -16,12 +16,19 @@ public:
     explicit VideoPlayers(QWidget *parent = 0);
     ~VideoPlayers();
 
+private:
+    bool firstOpening;
+
+protected:
+    void closeEvent(QCloseEvent *);
+
 public:
     void update(const QUrl &url, bool askClose = false, const QString &title = "", qint64 timecode = 0);
     void rewind(qint64 timecode = 0);
     void play(qint64 timecode = -1);
+    void seek(qint64 timecode);
     void pause();
-
+    void forceClose();
 signals:
     void videoSeek(qint64);
     void videoRewind(qint64);
