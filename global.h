@@ -73,6 +73,7 @@ class WebWrapperInterface {
 public:
     virtual void openWebPage(const QUrl &url, const QString &title = "", bool inBrowser = false) = 0;
 };
+
 class VideoPlayerInterface {
 public:
     QUrl currentUrl;
@@ -84,6 +85,16 @@ public:
     virtual void rewind(qint64 timecode = 0) = 0;
     virtual void forceClose() = 0;
 };
+class VideoPlayersInterface {
+public:
+    QList<VideoPlayerInterface*> players;
+public:
+    virtual void update(const QUrl &url, bool askClose = false, const QString &title = "", qint64 timecode = 0) = 0;
+    virtual void rewind(qint64 timecode = 0) = 0;
+    virtual void play(qint64 timecode = -1) = 0;
+    virtual void pause() = 0;
+};
+
 
 class UserInfosInterface;
 class ProjectInterface;
@@ -276,12 +287,13 @@ public:
     QAction *trayMenuTitle, *trayMenuWeb, *trayMenuFolder, *trayMenuSeparator;
     QMenu *trayMenuEvents;
     QList<SyncEntryEvent*> events;
-    QList<VideoPlayerInterface*> videoPlayers;
+    VideoPlayersInterface *videoPlayers;
 
 public:
     explicit ProjectInterface(QObject *parent = 0) : QObject(parent) {
         sync = 0;
         state = 0;
+        videoPlayers = 0;
         isPublic  = true;
         isRemoved = false;
     }
@@ -302,10 +314,6 @@ public:
     }
 
 public slots:
-    virtual void updateVideo(const QUrl &url, bool askClose = false, const QString &title = "", qint64 timecode = 0) = 0;
-    virtual void videosRewind(qint64 timecode = 0) = 0;
-    virtual void videosPlay(qint64 timecode = -1) = 0;
-    virtual void videosPause() = 0;
     virtual void load() = 0;
     virtual void save() = 0;
     virtual void updateGUI() = 0;

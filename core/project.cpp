@@ -59,6 +59,8 @@ Project::Project(const QString &_name, const QString &_friendlyName, bool _isPub
 
     connect(this, SIGNAL(projectChangedLoopback()), SLOT(projectChanged()));
     timerLoadId = -1;
+
+    videoPlayers = new VideoPlayers();
 }
 
 void Project::load() {
@@ -148,41 +150,6 @@ void Project::updateGUI() {
         trayMenuWeb->setEnabled(false);
         trayMenuFolder->setEnabled(false);
     }
-}
-
-void Project::videosRewind(qint64 timecode) {
-    emit videoRewind(timecode);
-}
-void Project::videosPlay(qint64 timecode) {
-    emit videoPlay(timecode);
-}
-void Project::videosPause() {
-    emit videoPause();
-}
-void Project::updateVideo(const QUrl &url, bool askClose, const QString &title, qint64 timecode) {
-    VideoPlayerInterface *player = 0;
-    foreach(VideoPlayerInterface *videoPlayer, videoPlayers) {
-        if(videoPlayer->currentUrl.toString() == url.toString())
-            player = videoPlayer;
-    }
-
-    //Création si manquant
-    if((!askClose) && (!player)) {
-        VideoPlayer *playerP = new VideoPlayer();
-        videoPlayers << playerP;
-        connect(this, SIGNAL(videoPause ()      ), playerP, SLOT(pause()));
-        connect(this, SIGNAL(videoPlay  (qint64)), playerP, SLOT(play(qint64)));
-        connect(this, SIGNAL(videoRewind(qint64)), playerP, SLOT(rewind(qint64)));
-        connect(this, SIGNAL(videoSeek  (qint64)), playerP, SLOT(seek(qint64)));
-        player = playerP;
-    }
-    player->setUrl(url, askClose, title);
-
-    if((askClose) && (player)) {
-        videoPlayers.removeOne(player);
-    }
-    else if(timecode >= 0)
-        player->seek(timecode);
 }
 
 void Project::fileChanged(SyncEntry *file) {

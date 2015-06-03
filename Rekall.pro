@@ -32,14 +32,17 @@ contains(QT_VERSION, "^5.*") {
 TARGET   = Rekall
 TEMPLATE = app
 
-SOURCES  += main.cpp
+SOURCES  += main.cpp \
+    video/videoplayers.cpp
 
 SOURCES  += rekall.cpp global.cpp core/project.cpp  core/analyse.cpp
-HEADERS  += rekall.h   global.h   core/project.h    core/analyse.h
+HEADERS  += rekall.h   global.h   core/project.h    core/analyse.h \
+    video/videoplayers.h
 
 SOURCES  += video/videoplayer.cpp webwrapper.cpp
 HEADERS  += video/videoplayer.h   webwrapper.h
-FORMS    += video/videoplayer.ui  webwrapper.ui
+FORMS    += video/videoplayer.ui  webwrapper.ui \
+    video/videoplayers.ui
 
 
 #Location

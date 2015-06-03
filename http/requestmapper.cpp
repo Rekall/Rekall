@@ -117,15 +117,15 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
                     return;
                 }
                 else if (path.startsWith("/" + project->name + "/video/play")) {
-                    project->videosPlay(request.getParameter("timecode").toLongLong());
+                    project->videoPlayers->play(request.getParameter("timecode").toLongLong());
                     return;
                 }
                 else if (path.startsWith("/" + project->name + "/video/pause")) {
-                    project->videosPause();
+                    project->videoPlayers->pause();
                     return;
                 }
                 else if (path.startsWith("/" + project->name + "/video/rewind")) {
-                    project->videosRewind(request.getParameter("timecode").toLongLong());
+                    project->videoPlayers->rewind(request.getParameter("timecode").toLongLong());
                     return;
                 }
                 else if (path.startsWith("/" + project->name + "/video/show")) {

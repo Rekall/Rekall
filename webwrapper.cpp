@@ -42,7 +42,7 @@ void WebWrapper::openWebPage(const QUrl &url, const QString &title, bool inBrows
 
 void WebWrapper::closeEvent(QCloseEvent *) {
     foreach(ProjectInterface *project, Global::projects)
-        foreach(VideoPlayerInterface *videoPlayers, project->videoPlayers)
+        foreach(VideoPlayerInterface *videoPlayers, project->videoPlayers->players)
             videoPlayers->forceClose();
 
     Global::userInfos->setDockIcon(this, false);
