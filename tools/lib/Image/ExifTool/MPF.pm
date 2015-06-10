@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 sub ProcessMPImageList($$$);
 
@@ -154,7 +154,7 @@ sub ProcessMPImageList($$$);
 
 # extract MP Images as composite tags
 %Image::ExifTool::MPF::Composite = (
-    GROUPS => { 2 => 'Image' },
+    GROUPS => { 2 => 'Preview' },
     MPImage => {
         Require => {
             0 => 'MPImageStart',
@@ -208,7 +208,7 @@ sub ExtractMPImages($)
             unless ($Image::ExifTool::Extra{$tag}) {
                 AddTagToTable(\%Image::ExifTool::Extra, $tag, {
                     Name => $tag,
-                    Groups => { 0 => 'Composite', 1 => 'Composite', 2 => 'Image'},
+                    Groups => { 0 => 'Composite', 1 => 'Composite', 2 => 'Preview'},
                 });
             }
             my $key = $et->FoundTag($tag, $val);
@@ -270,7 +270,7 @@ Format (MPF) information from JPEG images.
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

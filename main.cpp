@@ -28,8 +28,10 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QSharedMemory>
+#include <QTextCodec>
 
 int main(int argc, char *argv[]) {
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     QApplication a(argc, argv);
 
     QString locale = QLocale::system().name();

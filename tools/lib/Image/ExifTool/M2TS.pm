@@ -277,7 +277,7 @@ sub ParsePID($$$$$)
         printf $out "Parsing stream 0x%.4x (%s)\n", $pid, $pidName;
         my %parms = ( Out => $out );
         $parms{MaxLen} = 96 if $verbose < 4;
-        Image::ExifTool::HexDump($dataPt, undef, %parms) if $verbose > 2;
+        HexDump($dataPt, undef, %parms) if $verbose > 2;
     }
     my $more = 0;
     if ($type == 0x01 or $type == 0x02) {
@@ -400,7 +400,7 @@ sub ProcessM2TS($$)
         if ($verbose > 1) {
             print  $out "Transport packet $i:\n";
             ++$i;
-            Image::ExifTool::HexDump(\$buff, $pLen, Addr => $i * $pLen, Out => $out,
+            HexDump(\$buff, $pLen, Addr => $i * $pLen, Out => $out,
                 Start => $pos - $prePos) if $verbose > 2;
             my $str = $pidName{$pid} ? " ($pidName{$pid})" : '';
             printf $out "  Timecode:   0x%.4x\n", Get32u(\$buff, 0) if $pLen == 192;
@@ -689,7 +689,7 @@ video.
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

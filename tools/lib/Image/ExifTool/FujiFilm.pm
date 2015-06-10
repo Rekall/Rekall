@@ -26,15 +26,15 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.45';
+$VERSION = '1.50';
 
 sub ProcessFujiDir($$$);
 sub ProcessFaceRec($$$);
 
 # the following RAF version numbers have been tested for writing:
 my %testedRAF = (
-    '0100' => 'E550, E900, F770, S5600, S6000fd, S6500fd, HS10/HS11, HS30, S200EXR, X100, XF1, X-Pro1, X-S1 Ver1.00',
-    '0101' => 'X-E1',
+    '0100' => 'E550, E900, F770, S5600, S6000fd, S6500fd, HS10/HS11, HS30, S200EXR, X100, XF1, X-Pro1, X-S1, XQ2 Ver1.00',
+    '0101' => 'X-E1, X20 Ver1.01',
     '0102' => 'S100FS, X10 Ver1.02',
     '0103' => 'IS Pro Ver1.03',
     '0104' => 'S5Pro Ver1.04',
@@ -42,15 +42,16 @@ my %testedRAF = (
     '0111' => 'S5Pro Ver1.11',
     '0114' => 'S9600 Ver1.00',
     '0159' => 'S2Pro Ver1.00',
+    '0200' => 'X10 Ver2.00',
     '0212' => 'S3Pro Ver2.12',
     '0216' => 'S3Pro Ver2.16', # (NC)
     '0218' => 'S3Pro Ver2.18',
-    '0264' => 'F700  Ver2.00',
+    '0264' => 'F700 Ver2.00',
     '0266' => 'S9500 Ver1.01',
     '0269' => 'S9500 Ver1.02',
     '0271' => 'S3Pro Ver2.71', # UV/IR model?
     '0712' => 'S5000 Ver3.00',
-    '0716' => 'S5000 Ver3.00', # (yes, 2 RAF versions with the same firmware version)
+    '0716' => 'S5000 Ver3.00', # (yes, 2 RAF versions with the same Software version)
 );
 
 my %faceCategories = (
@@ -124,6 +125,7 @@ my %faceCategories = (
             0x304 => 'Living Room Warm White Fluorescent', #2/PH (S5)
             0x400 => 'Incandescent',
             0x500 => 'Flash', #4
+            0x600 => 'Underwater', #forum6109
             0xf00 => 'Custom',
             0xf01 => 'Custom2', #2
             0xf02 => 'Custom3', #2
@@ -342,6 +344,14 @@ my %faceCategories = (
             32 => 'Soft',
         },
     },
+    0x1050 => { #forum6109
+        Name => 'ShutterType',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Mechanical',
+            1 => 'Electronic',
+        },
+    },
     0x1100 => {
         Name => 'AutoBracketing',
         Writable => 'int16u',
@@ -359,6 +369,26 @@ my %faceCategories = (
     # 0x1150 - Pro Low-light - val=1; Pro Focus - val=2 (ref 7)
     # 0x1151 - Pro Low-light - val=4 (number of pictures taken?); Pro Focus - val=2,3 (ref 7)
     # 0x1152 - Pro Low-light - val=1,3,4 (stacked pictures used?); Pro Focus - val=1,2 (ref 7)
+    0x1201 => { #forum6109
+        Name => 'AdvancedFilter',
+        Writable => 'int32u',
+        PrintHex => 1,
+        PrintConv => {
+            0x10000 => 'Pop Color',
+            0x20000 => 'Hi Key',
+            0x30000 => 'Toy Camera',
+            0x40000 => 'Miniature',
+            0x50000 => 'Dynamic Tone',
+            0x60001 => 'Partial Color Red',
+            0x60002 => 'Partial Color Yellow',
+            0x60003 => 'Partial Color Green',
+            0x60004 => 'Partial Color Blue',
+            0x60005 => 'Partial Color Orange',
+            0x60006 => 'Partial Color Purple',
+            0x70000 => 'Soft Focus',
+            0x90000 => 'Low Key',
+        },
+    },
     0x1210 => { #2
         Name => 'ColorMode',
         Writable => 'int16u',
@@ -423,6 +453,7 @@ my %faceCategories = (
             0x400 => 'F4/Velvia',
             0x500 => 'Pro Neg. Std', #PH (X-Pro1)
             0x501 => 'Pro Neg. Hi', #PH (X-Pro1)
+            0x600 => 'Classic Chrome', #forum6109
         },
     },
     0x1402 => { #2
@@ -481,6 +512,12 @@ my %faceCategories = (
             1 => 'On (mode 1, continuous)',
             2 => 'On (mode 2, shooting only)',
         }],
+    },
+    0x1431 => { #forum6109
+        Name => 'Rating',
+        Groups => { 2 => 'Image' },
+        Writable => 'int32u',
+        Priority => 0,
     },
     0x1436 => { #8
         Name => 'ImageGeneration',
@@ -635,6 +672,13 @@ my %faceCategories = (
             return $val;
         },
     },
+    0x131 => { #5
+        Name => 'XTransLayout',
+        Description => 'X-Trans Layout',
+        Format => 'int8u',
+        Count => 36,
+        PrintConv => '$val =~ tr/012 /RGB/d; join " ", $val =~ /....../g',
+    },
     0x2000 => { #9
         Name => 'WB_GRGBLevelsAuto',
         Format => 'int16u',
@@ -685,6 +729,10 @@ my %faceCategories = (
         Name => 'WB_GRGBLevels',
         Format => 'int16u',
         Count => 4,
+    },
+    0x9650 => { #Frank Markesteijn
+        Name => 'RawExposureBias',
+        Format => 'rational32s',
     },
     0xc000 => {
         Name => 'RAFData',
@@ -761,7 +809,7 @@ my %faceCategories = (
     0xf00a => 'BlackLevel', #9
     # 0xf00b ?
     0xf00c => 'WB_GRBLevelsStandard', #9 (GRBXGRBX; X=17 is standard illuminant A, X=21 is D65)
-    0xf00d => 'WB_GRBLevelsDaylight', #9
+    0xf00d => 'WB_GRBLevelsAuto', #9
     0xf00e => 'WB_GRBLevels',
     # 0xf00f ?
 );
@@ -1103,7 +1151,7 @@ FujiFilm maker notes in EXIF information, and to read/write FujiFilm RAW
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

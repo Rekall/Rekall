@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.24';
+$VERSION = '1.26';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -79,7 +79,7 @@ my %oleFormat = (
 #   29 => 'VT_USERDEFINED',
     30 => 'VT_LPSTR',   # VT_LPSTR (int32u count, followed by string)
     31 => 'VT_LPWSTR',  # VT_LPWSTR (int32u word count, followed by Unicode string)
-    64 => 'VT_FILETIME',# VT_FILETIME (int64u, number of nanoseconds since Jan 1, 1601)
+    64 => 'VT_FILETIME',# VT_FILETIME (int64u, 100 ns increments since Jan 1, 1601)
     65 => 'VT_BLOB',    # VT_BLOB
 #   66 => 'VT_STREAM',
 #   67 => 'VT_STORAGE',
@@ -298,7 +298,8 @@ my %fpxFileType = (
         "file allocation table" (FAT).  No wonder this image format never became
         popular.  However, some of the structures used in FlashPix streams are part
         of the EXIF specification, and are still being used in the APP2 FPXR segment
-        of JPEG images by some digital cameras from various manufacturers.
+        of JPEG images by some digital cameras from manufacturers such as FujiFilm,
+        Hewlett-Packard, Kodak and Sanyo.
 
         ExifTool extracts FlashPix information from both FPX images and the APP2
         FPXR segment of JPEG images.  As well, FlashPix information is extracted
@@ -426,6 +427,7 @@ my %fpxFileType = (
     },
     Preview => {
         Name => 'PreviewImage',
+        Groups => { 2 => 'Preview' },
         Binary => 1,
         Notes => 'written by some FujiFilm models',
         # skip 47-byte Fuji header
@@ -481,7 +483,11 @@ my %fpxFileType = (
     0x0e => 'Pages',
     0x0f => 'Words',
     0x10 => 'Characters',
-    0x11 => { Name => 'ThumbnailClip',  Binary => 1 },
+    0x11 => {
+        Name => 'ThumbnailClip',
+        # (not a displayable format, so not in the "Preview" group)
+        Binary => 1,
+    },
     0x12 => {
         Name => 'Software',
         RawConv => '$$self{Software} = $val', # (use to determine file type)
@@ -1026,6 +1032,7 @@ my %fpxFileType = (
 %Image::ExifTool::FlashPix::Composite = (
     GROUPS => { 2 => 'Image' },
     PreviewImage => {
+        Groups => { 2 => 'Preview' },
         # extract JPEG preview from ScreenNail if possible
         Require => {
             0 => 'ScreenNail',
@@ -1693,11 +1700,11 @@ sub ProcessFPX($$)
     }
     if ($verbose) {
         print $out "  FAT [",length($fat)," bytes]:\n";
-        Image::ExifTool::HexDump(\$fat, undef, %dumpParms) if $verbose > 2;
+        HexDump(\$fat, undef, %dumpParms) if $verbose > 2;
         print $out "  Mini-FAT [",length($miniFat)," bytes]:\n";
-        Image::ExifTool::HexDump(\$miniFat, undef, %dumpParms) if $verbose > 2;
+        HexDump(\$miniFat, undef, %dumpParms) if $verbose > 2;
         print $out "  Directory [",length($dir)," bytes]:\n";
-        Image::ExifTool::HexDump(\$dir, undef, %dumpParms) if $verbose > 2;
+        HexDump(\$dir, undef, %dumpParms) if $verbose > 2;
     }
 #
 # process the directory
@@ -1899,7 +1906,7 @@ JPEG images.
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

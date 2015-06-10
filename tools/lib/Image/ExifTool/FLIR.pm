@@ -23,7 +23,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.10';
+$VERSION = '1.13';
 
 sub ProcessFLIR($$;$);
 sub ProcessFLIRText($$$);
@@ -235,6 +235,7 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     },
     16.1 => {
         Name => 'RawThermalImage',
+        Groups => { 2 => 'Preview' },
         RawConv => '\$$self{RawThermalImage}',
     },
 );
@@ -359,6 +360,7 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     },
     16.1 => {
         Name => 'EmbeddedImage',
+        Groups => { 2 => 'Preview' },
         Format => 'undef[$size-0x20]',
         Binary => 1,
     },
@@ -438,7 +440,7 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     0x1ec => { Name => 'FilterModel',       Format => 'string[16]' },
     0x1fc => { Name => 'FilterPartNumber',  Format => 'string[32]' },
     0x21c => { Name => 'FilterSerialNumber',Format => 'string[32]' },
-    0x308 => { Name => 'PlanckO',           Format => 'int16s' }, #1
+    0x308 => { Name => 'PlanckO',           Format => 'int32s' }, #1
     0x30c => { Name => 'PlanckR2',          %float8g }, #1
     0x338 => { Name => 'RawValueMedian',    Format => 'int16u', Groups => { 2 => 'Image' } },
     0x33c => { Name => 'RawValueRange',     Format => 'int16u', Groups => { 2 => 'Image' } },
@@ -928,7 +930,7 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
         },
         {
             Name => 'ThumbnailImage',
-            Groups => { 2 => 'Image' },
+            Groups => { 2 => 'Preview' },
             Condition => '$$valPt=~/^\x91\xaf\x9b\x93\x45\x9b\x44\x56\x98\xd1\x5e\x76\xea\x01\x04\xac....\xff\xd8\xff/s',
             RawConv => 'substr($val, 20)',
             Binary => 1,
@@ -1310,7 +1312,7 @@ sub ProcessMeasInfo($$$)
         my $pre = 'Meas' . $i;
         $et->VerboseDir("MeasInfo $i", undef, $recLen);
         if ($verbose > 2) {
-            Image::ExifTool::HexDump($dataPt, $recLen,
+            HexDump($dataPt, $recLen,
                 Start=>$pos, Prefix=>$$et{INDENT}, DataPos=>$dataPos);
         }
         my $coordLen = Get16u($dataPt, $pos+4);
@@ -1382,10 +1384,11 @@ sub ProcessFLIR($$;$)
 
     # determine byte ordering by validating version number
     # (in my samples FLIR APP1 is big-endian, FFF files are little-endian)
-    my $ver = Get32u(\$hdr, 0x14);
-    if ($ver != 100) {
-        $ver == 0x64000000 or $et->Warn("Unsupported FLIR $type version"), return 1;
+    for ($i=0; ; ++$i) {
+        my $ver = Get32u(\$hdr, 0x14);
+        last if $ver >= 100 and $ver < 200; # (have seen 100 and 101 - PH)
         ToggleByteOrder();
+        $i and $et->Warn("Unsupported FLIR $type version"), return 1;
     }
 
     # read the FLIR record directory
@@ -1445,7 +1448,7 @@ sub ProcessFLIR($$;$)
         } elsif ($verbose > 2) {
             my %parms = ( DataPos => $recPos, Prefix => $$et{INDENT} );
             $parms{MaxLen} = 96 if $verbose < 4;
-            Image::ExifTool::HexDump(\$rec, $recLen, %parms);
+            HexDump(\$rec, $recLen, %parms);
         }
     }
     delete $$et{SET_GROUP0};
@@ -1494,7 +1497,7 @@ Systems Inc. thermal image files (FFF, FPF and JPEG format).
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -9,6 +9,7 @@
 #               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_ricoh.htm
 #               3) Tim Gray private communication (GR)
 #               4) https://github.com/atotto/ricoh-theta-tools/
+#               5) Iliah Borg private communication (LibRaw)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Ricoh;
@@ -18,7 +19,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.28';
+$VERSION = '1.30';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -142,6 +143,7 @@ my %ricohLensIDs = (
             9 => 'Warm White Fluorescent',
             10 => 'Manual',
             11 => 'Kelvin',
+            12 => 'Shade', #5
         },
     }],
     0x1004 => { #3
@@ -447,8 +449,12 @@ my %ricohLensIDs = (
     # 0x202 - int16u: 0 (GE Macro?)
     # 0x203 - int16u: 0,3 (Kodak PictureEffect?)
     # 0x204 - rational64u: 0/10
+    # 0x205 - rational64u: 150/1
     # 0x206 - float[6]: (not really float because size should be 2 bytes)
-    # 0x207 - string[4]: zeros (GE/Kodak Model?)
+    0x207 => {
+        Name => 'RicohModel',
+        Writable => 'string',
+    },
     0x300 => {
         # brutal.  There are lots of errors in the XG-1 maker notes.  For the XG-1,
         # 0x300 has a value of "XG-1Pentax".  The "XG-1" part is likely an improperly
@@ -458,7 +464,7 @@ my %ricohLensIDs = (
         ValueConv => '$val =~ s/ *$//; $val',
     },
     # 0x306 - int16u: 1
-    # 0x500 - int16u: 0
+    # 0x500 - int16u: 0,1
     # 0x501 - int16u: 0
     # 0x502 - int16u: 0
     # 0x9c9c - int8u[6]: ?
@@ -880,6 +886,7 @@ my %ricohLensIDs = (
     },
     thum => {
         Name => 'ThumbnailImage',
+        Groups => { 2 => 'Preview' },
         Binary => 1,
     },
 );
@@ -1089,7 +1096,7 @@ interpret Ricoh maker notes EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -110,7 +110,9 @@ function documentReadyMenu() {
 		type: "GET",
 		dataType: "json",
 		success: function(infos) {
-			window.document.title = "Rekall de " + infos.owner;
+			window.document.title = "Rekall";
+			if(infos.owner != "")
+				window.document.title = window.document.title + " de " + infos.owner;
 			
 			$("#menu_shares > div").html("");
 			$.each(infos.ip, function(index, host) {
@@ -183,7 +185,7 @@ function documentReadyMenu() {
 				$("#menu_projects > div").append(html + "</div>");
 			});
 			if(infos.projects.length == 0)
-				$("#menu_projects > div").append("<p>No project found.</p><p style='font-size: 12px; line-height: 120%;'><br/><br/><i>TODO: refaire ces phrases</i><br/><br/>A project is a folder on your hard drive where you store the files needed by your creative project.<br/><br/>Rekall will not alterate your files, it will only generate one folder called <i>rekall_cache</i> to store xtra informations (photo and video thumbnails, metadatas). Rekall monitors all the file operations (creation, update…) in the project folder and allows you to sort and visualize your creative process.<br/><br/><u onClick='javascript:$(\"#menu_addproject\").trigger(\"click\");'>Start a project now by selecting a folder</u><br/>and Rekall will make the first analysis of all the files. It can take a while, so have a look<br/>at the icon next to your computer clock!</p>");
+				$("#menu_projects > div").append("<p>No project found.</p><p style='font-size: 12px; line-height: 120%;'><br/><br/>A project is a folder on your hard drive where you store the files needed by your creative project.<br/><br/>Rekall will not alterate your files, it will only generate one folder called <i>rekall_cache</i> to store xtra informations (photo and video thumbnails, metadatas). Rekall monitors all the file operations (creation, update…) in the project folder and allows you to sort and visualize your creative process.<br/><br/><u onClick='javascript:$(\"#menu_addproject\").trigger(\"click\");'>Start a project now by selecting a folder</u><br/>and Rekall will make the first analysis of all the files. It can take a while, so have a look<br/>at the icon next to your computer clock!</p>");
 
 
 			$("#menu_shares > div > input").click(function(event) {

@@ -128,10 +128,8 @@ void AnalyseProcess::getMetadatas() {
     firstAnalysis = (previousMeta.count() == 0);
 
     file->metadatas = Global::getMetadatas(*file, project);
-    if(file->isBundleForSure()) {
+    if(file->isBundleForSure())
         file->metadatas["File->File Name"] = file->fileName();
-    }
-
     file->metadatas["File->Hash"] = Global::getFileHash(*file);
 
     //Bundle

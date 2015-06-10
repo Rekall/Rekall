@@ -27,7 +27,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.38';
+$VERSION = '1.40';
 
 sub ConvertTimecode($);
 
@@ -713,7 +713,7 @@ my %riffMimeType = (
     emnt => { Name => 'MakerNotes',  Binary => 1 },
     eucm => {
         Name => 'UserComment',
-        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val,"RIFF:UserComment")',
     },
 );
 
@@ -732,7 +732,7 @@ my %riffMimeType = (
         ValueConv => 'Image::ExifTool::RIFF::ConvertRIFFDate($val)',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    ISMP => 'Timecode',
+    ISMP => 'TimeCode',
     LIST_strl => {
         Name => 'Stream',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Stream' },
@@ -1444,7 +1444,7 @@ including AVI videos, WAV audio files and WEBP images.
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -21,7 +21,7 @@ sub ProcessKodakPatch($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.93';
+$VERSION = '1.96';
 
 my $debug;          # set to 1 to enable debugging code
 
@@ -587,7 +587,8 @@ my $debug;          # set to 1 to enable debugging code
         # (X2 starts with "LEICA\0\x05\0", Make is "LEICA CAMERA AG")
         # (X VARIO starts with "LEICA\0\x04\0", Make is "LEICA CAMERA AG")
         # (T (Typ 701) starts with LEICA\0\0x6", Make is "LEICA CAMERA AG")
-        Condition => '$$valPt =~ /^LEICA\0[\x01\x04\x05\x06]\0/',
+        # (X (Typ 113) starts with LEICA\0\0x7", Make is "LEICA CAMERA AG")
+        Condition => '$$valPt =~ /^LEICA\0[\x01\x04\x05\x06\x07]\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Leica5',
             Start => '$valuePtr + 8',
@@ -599,11 +600,11 @@ my $debug;          # set to 1 to enable debugging code
         Name => 'MakerNoteLeica6', # used by the S2, M (Typ 240) and S (Typ 006)
         # (starts with "LEICA\0\x02\xff", Make is "Leica Camera AG", but test the
         # model names separately because the maker notes data may not be loaded
-        # at the time this is tested if they are in a JPEG trailer)
+        # at the time this is tested if they are in a JPEG trailer.  Also, this
+        # header is used by the M Monochrom (Type 246), with different offsets.)
         Condition => q{
-            ($$self{Make} eq 'Leica Camera AG' and ($$self{Model} eq "S2" or
-            $$self{Model} eq "LEICA M (Typ 240)" or $$self{Model} eq "LEICA S (Typ 006)")) or
-            $$valPt =~ /^LEICA\0\x02\xff/
+            ($$self{Make} eq 'Leica Camera AG' and ($$self{Model} eq 'S2' or
+            $$self{Model} eq 'LEICA M (Typ 240)' or $$self{Model} eq 'LEICA S (Typ 006)'))
         },
         DataTag => 'LeicaTrailer',  # (generates fixup name for this tag)
         LeicaTrailer => 1, # flag to special-case this tag in the Exif code
@@ -617,6 +618,19 @@ my $debug;          # set to 1 to enable debugging code
             # ExifTool may also create S2/M maker notes inside the APP1 segment when
             # copying from other files, and for this the normal EXIF offsets are used,
             # Base should not be defined!
+        },
+    },
+    {
+        Name => 'MakerNoteLeica7', # used by the M Monochrom (Typ 246)
+        # (starts with "LEICA\0\x02\xff", Make is "Leica Camera AG")
+        Condition => '$$valPt =~ /^LEICA\0\x02\xff/',
+        DataTag => 'LeicaTrailer',  # (generates fixup name for this tag)
+        LeicaTrailer => 1, # flag to special-case this tag in the Exif code
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Leica6',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'Unknown',
+            Base => '-$base',  # uses absolute file offsets
         },
     },
     {
@@ -746,7 +760,8 @@ my $debug;          # set to 1 to enable debugging code
         Condition => q{
             $$self{Make} =~ /^(PENTAX )?RICOH/ and
             $$valPt =~ /^(Ricoh|      |MM\0\x2a|II\x2a\0)/i and
-            $$valPt !~ /^(MM\0\x2a\0\0\0\x08\0.\0\0|II\x2a\0\x08\0\0\0.\0\0\0)/s
+            $$valPt !~ /^(MM\0\x2a\0\0\0\x08\0.\0\0|II\x2a\0\x08\0\0\0.\0\0\0)/s and
+            $$self{Model} ne 'RICOH WG-M1'
         },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Ricoh::Main',
@@ -761,8 +776,8 @@ my $debug;          # set to 1 to enable debugging code
         # being processed as a standard IFD.  Note that the offsets for the HZ15 are all
         # zeros, but they seem to be mostly OK for the XG-1)
         Condition => q{
-            $$self{Make} =~ /^(PENTAX )?RICOH/ and
-            $$valPt =~ /^(MM\0\x2a\0\0\0\x08\0.\0\0|II\x2a\0\x08\0\0\0.\0\0\0)/s
+            $$self{Make} =~ /^(PENTAX )?RICOH/ and ($$self{Model} eq 'RICOH WG-M1' or
+            $$valPt =~ /^(MM\0\x2a\0\0\0\x08\0.\0\0|II\x2a\0\x08\0\0\0.\0\0\0)/s)
         },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Ricoh::Type2',
@@ -863,7 +878,7 @@ my $debug;          # set to 1 to enable debugging code
         # (starts with "SONY DSC \0" or "SONY CAM \0")
         # (TF1 starts with "\0\0SONY PIC\0")
         # (Hasselblad models start with "VHAB     \0")
-        Condition => '$$valPt=~/^(SONY (DSC|CAM)|\0\0SONY PIC\0|VHAB     \0)/',
+        Condition => '$$valPt=~/^(SONY (DSC|CAM|MOBILE)|\0\0SONY PIC\0|VHAB     \0)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Main',
             Start => '$valuePtr + 12',
@@ -1003,6 +1018,8 @@ sub GetMakerNoteOffset($)
         if ($model eq 'S2') {
             # lots of empty space before first value in S2 images
             push @offsets, 4, ($$et{FILE_TYPE} eq 'JPEG' ? 286 : 274);
+        } elsif ($model eq 'LEICA M MONOCHROM (Typ 246)') {
+            push @offsets, 4, 130;
         } elsif ($model eq 'LEICA M (Typ 240)') {
             push @offsets, 4, 118;
         } elsif ($model =~ /^(R8|R9|M8)\b/) {
@@ -1673,7 +1690,7 @@ maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

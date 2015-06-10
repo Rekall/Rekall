@@ -283,7 +283,7 @@ Key:
                     $item = '' unless defined $item; # use empty string for missing items
                     $$fieldInfo{Struct} and $warn = "$tag items are not valid structures", next Key;
                     $et->Sanitize(\$item);
-                    ($copy[$i],$err) = $et->ConvInv($item,$fieldInfo,$tag,$strName,$type);
+                    ($copy[$i],$err) = $et->ConvInv($item,$fieldInfo,$tag,$strName,$type,'');
                     $err and $warn = $err, next Key;
                     $err = CheckXMP($et, $fieldInfo, \$copy[$i]);
                     $err and $warn = "$err in $strName $tag", next Key;
@@ -302,7 +302,7 @@ Key:
             $warn = "Improperly formed structure in $strName $tag";
         } else {
             $et->Sanitize(\$$struct{$key});
-            ($val,$err) = $et->ConvInv($$struct{$key},$fieldInfo,$tag,$strName,$type);
+            ($val,$err) = $et->ConvInv($$struct{$key},$fieldInfo,$tag,$strName,$type,'');
             $err and $warn = $err, next Key;
             $err = CheckXMP($et, $fieldInfo, \$val);
             $err and $warn = "$err in $strName $tag", next Key;
@@ -575,12 +575,21 @@ sub ConvertStruct($$$$;$)
         }
         return \%struct;
     } elsif (ref $value eq 'ARRAY') {
-        my (@list, $val);
-        foreach $val (@$value) {    
-            my $v = ConvertStruct($et, $tagInfo, $val, $type, $parentID);
-            push @list, $v if defined $v;
+        if (defined $$et{OPTIONS}{ListItem}) {
+            my $li = $$et{OPTIONS}{ListItem};
+            return undef unless defined $$value[$li];
+            undef $$et{OPTIONS}{ListItem};      # only do top-level list
+            my $val = ConvertStruct($et, $tagInfo, $$value[$li], $type, $parentID);
+            $$et{OPTIONS}{ListItem} = $li;
+            return $val;
+        } else {
+            my (@list, $val);
+            foreach $val (@$value) {    
+                my $v = ConvertStruct($et, $tagInfo, $val, $type, $parentID);
+                push @list, $v if defined $v;
+            }
+            return \@list;
         }
-        return \@list;
     } else {
         return $et->GetValue($tagInfo, $type, $value);
     }
@@ -614,7 +623,7 @@ sub RestoreStruct($;$)
                 # this could happen for invalid XMP containing mixed lists
                 # (or for something like this -- what should we do here?:
                 # <meta:user-defined meta:name="License">test</meta:user-defined>)
-                $et->Warn("$$strInfo{Name} is not a structure!");
+                $et->Warn("$$strInfo{Name} is not a structure!") unless $$et{NO_STRUCT_WARN};
                 next;
             }
         } else {
@@ -725,8 +734,10 @@ sub RestoreStruct($;$)
         if ($err) {
             # this may happen if we have a structural error in the XMP
             # (like an improperly contained list for example)
-            my $ns = $$tagInfo{Namespace} || $$tagInfo{Table}{NAMESPACE} || '';
-            $et->Warn("Error $err placing $ns:$$tagInfo{TagID} in structure or list", 1);
+            unless ($$et{NO_STRUCT_WARN}) {
+                my $ns = $$tagInfo{Namespace} || $$tagInfo{Table}{NAMESPACE} || '';
+                $et->Warn("Error $err placing $ns:$$tagInfo{TagID} in structure or list", 1);
+            }
             delete $structs{$strInfo} unless $oldStruct;
         } elsif ($tagInfo eq $strInfo) {
             # just a regular list tag
@@ -802,7 +813,7 @@ information.
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

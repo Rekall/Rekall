@@ -1024,7 +1024,7 @@ sub ReadPictValue($$$;$)
                     if ($verbose > 2) {
                         my %parms = ( Out => $out );
                         $parms{MaxLen} = 96 if $verbose < 4;
-                        Image::ExifTool::HexDump(\$val, undef, %parms);
+                        HexDump(\$val, undef, %parms);
                     }
                 } else {
                     print $out " = $val\n";
@@ -1054,7 +1054,7 @@ sub ReadPictValue($$$;$)
                     if ($verbose > 2) {
                         my %parms = ( Out => $out );
                         $parms{MaxLen} = 96 if $verbose < 4;
-                        Image::ExifTool::HexDump($val, undef, %parms);
+                        HexDump($val, undef, %parms);
                     }
                 }
             } elsif ($fmt =~ /(.+)\[(.+)\]/s) {
@@ -1236,7 +1236,7 @@ Verbose or the Unknown option.
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

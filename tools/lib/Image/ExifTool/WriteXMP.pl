@@ -235,13 +235,25 @@ sub SetPropertyPath($$;$$$$)
     my ($tagTablePtr, $tagID, $parentID, $structPtr, $propList, $isType) = @_;
     my $table = $structPtr || $tagTablePtr;
     my $tagInfo = $$table{$tagID};
+    my $flatInfo;
 
-    return if ref($tagInfo) ne 'HASH' or $$tagInfo{PropertyPath};
+    return if ref($tagInfo) ne 'HASH'; # (shouldn't happen)
 
-    # don't override existing main table entry if already set by a Struct
     if ($structPtr) {
+        my $flatID = $parentID . ucfirst($tagID);
+        $flatInfo = $$tagTablePtr{$flatID};
+        if ($flatInfo) {
+            return if $$flatInfo{PropertyPath};
+        } else {
+            # flattened tag doesn't exist, so create it now
+            # (could happen if we were just writing a structure)
+            $flatInfo = { Name => ucfirst($flatID), Flat => 1 };
+            AddTagToTable($tagTablePtr, $flatID, $flatInfo);
+        }
         $isType = 1 if $$structPtr{TYPE};
     } else {
+        # don't override existing main table entry if already set by a Struct
+        return if $$tagInfo{PropertyPath};
         # use property path from original tagInfo if this is an alternate-language tag
         my $srcInfo = $$tagInfo{SrcTagInfo};
         $$tagInfo{PropertyPath} = GetPropertyPath($srcInfo) if $srcInfo;
@@ -294,14 +306,7 @@ sub SetPropertyPath($$;$$$$)
     # if this was a structure field and not a normal tag,
     # we set PropertyPath in the corresponding flattened tag
     if ($structPtr) {
-        my $flatID = $parentID . ucfirst($tagID);
-        $tagInfo = $$tagTablePtr{$flatID};
-        # create flattened tag now if necessary
-        # (could happen if we were just writing a structure)
-        unless ($tagInfo) {
-            $tagInfo = { Name => ucfirst($flatID), Flat => 1 };
-            AddTagToTable($tagTablePtr, $flatID, $tagInfo);
-        }
+        $tagInfo = $flatInfo;
         # set StructType flag if any containing structure has a TYPE
         $$tagInfo{StructType} = 1 if $isType;
     }
@@ -743,11 +748,19 @@ sub WriteXMP($$;$)
 # add, delete or change information as specified
 #
     # get hash of all information we want to change
-    # (sorted by tag name so alternate languages come last)
-    my @tagInfoList = sort ByTagName $et->GetNewTagInfoList();
-    foreach $tagInfo (@tagInfoList) {
+    # (sorted by tag name so alternate languages come last, but with structures
+    # first so flattened tags may be used to override individual structure elements)
+    my @tagInfoList;
+    foreach $tagInfo (sort ByTagName $et->GetNewTagInfoList()) {
         next unless $et->GetGroup($tagInfo, 0) eq 'XMP';
         next if $$tagInfo{Name} eq 'XMP'; # (ignore full XMP block if we didn't write it already)
+        if ($$tagInfo{Struct}) {
+            unshift @tagInfoList, $tagInfo;
+        } else {
+            push @tagInfoList, $tagInfo;
+        }
+    }
+    foreach $tagInfo (@tagInfoList) {
         my $tag = $$tagInfo{TagID};
         my $path = GetPropertyPath($tagInfo);
         unless ($path) {
@@ -768,63 +781,97 @@ sub WriteXMP($$;$)
         # MicrosoftPhoto screws up the case of some tags, and some other software,
         # including Adobe software, has been known to write the wrong list type or
         # not properly enclose properties in a list, so we check for this
-        # (NOTE: we don't currently do these tests when writing structures!
-        #  --> add this to DeleteStruct() below if it turns out to be a problem)
-        unless ($cap or $isStruct) {
-            my $regex = quotemeta $path;
-            # also allow for missing structure fields in lists of structures
-            $regex =~  s/ \d+/ \\d\+/g;
-            my $ok = $regex; # regular expression to match standard property names
-            my $ok2;
-            # also check for incorrect list types which can cause problems
-            if ($regex =~ s{\\/rdf\\:(Bag|Seq|Alt)\\/}{/rdf:(Bag|Seq|Alt)/}g) {
-                # also look for missing bottom-level list
-                $regex =~ s{/rdf:\(Bag\|Seq\|Alt\)\/rdf\\:li\\ \\d\+$}{(/.*)?};
-            } else {
-                $ok2 = $regex;
-                # check for properties in lists that shouldn't be
-                # (ref http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4325.0.html)
-                $regex .= '(/rdf:(Bag|Seq|Alt)/rdf:li \d+)?';
+        until ($cap) {
+            # find and fix all incorrect property names if this is a structure or a flattened tag
+            my @fixInfo;
+            if ($isStruct or defined $$tagInfo{Flat}) {
+                # get tagInfo for all containing (possibly nested) structures
+                my @props = split '/', $path;
+                my $tbl = $$tagInfo{Table};
+                while (@props) {
+                    my $info = $$tbl{GetXMPTagID(\@props)};
+                    unshift @fixInfo, $info if ref $info eq 'HASH' and $$info{Struct} and
+                        (not @fixInfo or $fixInfo[0] ne $info);
+                    pop @props;
+                }
+                $et->WarnOnce("Error finding parent structure for $$tagInfo{Name}") unless @fixInfo;
             }
-            my @matches = sort grep m{^$regex$}i, keys %capture;
-            if (@matches) {
-                if ($matches[0] =~ /^$ok$/) {
-                    $path = $matches[0];    # use existing property path
-                    $cap = $capture{$path};
-                } else {
-                    # property list was wrong, so issue a warning and fix it
-                    my ($match, @fixed, %fixed, $err);
-                    foreach $match (@matches) {
-                        my $fixed = $path;
-                        # set list indices
-                        while ($match =~ / (\d+)/g) {
-                            my $idx = $1;
-                            # insert leading "X" so we don't replace this one again
-                            $fixed =~ s/ \d+/ X$idx/;
-                        }
-                        $fixed =~ s/ X/ /g if $fixed ne $path;  # remove "X"s
-                        $err = 1 if $capture{$fixed} or $fixed{$fixed};
-                        push @fixed, $fixed;
-                        $fixed{$fixed} = 1;
+            # fix property path for this tag (last in the @fixInfo list)
+            push @fixInfo, $tagInfo unless @fixInfo and $isStruct;
+            # start from outermost containing structure, fixing incorrect list types, etc,
+            # finally fixing the actual tag properties after all containing structures
+            my $err;
+            while (@fixInfo) {
+                my $fixInfo = shift @fixInfo;
+                my $fixPath = ConformPathToNamespace($et, GetPropertyPath($fixInfo));
+                my $regex = quotemeta($fixPath);
+                $regex =~ s/ \d+/ \\d\+/g;  # match any list index
+                my $ok = $regex;
+                my ($ok2, $match, $i, @fixed, %fixed, $fixed);
+                # check for incorrect list types
+                if ($regex =~ s{\\/rdf\\:(Bag|Seq|Alt)\\/}{/rdf:(Bag|Seq|Alt)/}g) {
+                    # also look for missing bottom-level list
+                    if ($regex =~ s{/rdf:\(Bag\|Seq\|Alt\)\/rdf\\:li\\ \\d\+$}{}) {
+                        $regex .= '(/.*)?' unless @fixInfo;
                     }
-                    my $tg = $et->GetGroup($tagInfo, 1) . ':' . $$tagInfo{Name};
-                    my $wrn = lc($path) eq lc($matches[0]) ? 'tag ID case' : 'list type';
-                    if ($err) {
-                        $et->Warn("Incorrect $wrn for existing $tg (not changed)");
-                    } else {
-                        # fix the incorrect property paths for all values of this tag
-                        foreach $match (@matches) {
-                            my $fixed = shift @fixed;
-                            $capture{$fixed} = $capture{$match};
-                            delete $capture{$match};
-                            # remove xml:lang attribute from incorrect lang-alt list if necessary
-                            delete $capture{$fixed}[1]{'xml:lang'} if $ok2 and $match !~ /^$ok2$/;
-                        }
-                        $cap = $capture{$path} || $capture{$fixed[0]};
+                } elsif (not @fixInfo) {
+                    $ok2 = $regex;
+                    # check for properties in lists that shouldn't be (ref forum4325)
+                    $regex .= '(/rdf:(Bag|Seq|Alt)/rdf:li \d+)?';
+                }
+                if (@fixInfo) {
+                    $regex .= '(/.*)?';
+                    $ok .= '(/.*)?';
+                }
+                my @matches = sort grep m{^$regex$}i, keys %capture;
+                last unless @matches;
+                if ($matches[0] =~ m{^$ok$}) {
+                    unless (@fixInfo) {
+                        $path = $matches[0];
+                        $cap = $capture{$path};
+                    }
+                    next;
+                }
+                # needs fixing...
+                my @fixProps = split '/', $fixPath;
+                foreach $match (@matches) {
+                    my @matchProps = split '/', $match;
+                    # remove superfluous list properties if necessary
+                    $#matchProps = $#fixProps if $ok2 and $#matchProps > $#fixProps;
+                    for ($i=0; $i<@fixProps; ++$i) {
+                        defined $matchProps[$i] or $matchProps[$i] = $fixProps[$i], next;
+                        next if $matchProps[$i] =~ / \d+$/ or $matchProps[$i] eq $fixProps[$i];
+                        $matchProps[$i] = $fixProps[$i];
+                    }
+                    $fixed = join '/', @matchProps;
+                    $err = 1 if $fixed{$fixed} or ($capture{$fixed} and $match ne $fixed);
+                    push @fixed, $fixed;
+                    $fixed{$fixed} = 1;
+                }
+                my $tg = $et->GetGroup($fixInfo, 1) . ':' . $$fixInfo{Name};
+                my $wrn = lc($fixed[0]) eq lc($matches[0]) ? 'tag ID case' : 'list type';
+                if ($err) {
+                    $et->Warn("Incorrect $wrn for existing $tg (not changed)");
+                } else {
+                    # fix the incorrect property paths for all values of this tag
+                    my $didFix;
+                    foreach $fixed (@fixed) {
+                        my $match = shift @matches;
+                        next if $fixed eq $match;
+                        $capture{$fixed} = $capture{$match};
+                        delete $capture{$match};
+                        # remove xml:lang attribute from incorrect lang-alt list if necessary
+                        delete $capture{$fixed}[1]{'xml:lang'} if $ok2 and $match !~ /^$ok2$/;
+                        $didFix = 1;
+                    }
+                    $cap = $capture{$path} || $capture{$fixed[0]} unless @fixInfo;
+                    if ($didFix) {
                         $et->Warn("Fixed incorrect $wrn for $tg", 1);
+                        ++$changed;
                     }
                 }
             }
+            last;
         }
         my $nvHash = $et->GetNewValueHash($tagInfo);
         my $overwrite = $et->IsOverwriting($nvHash);
@@ -1307,7 +1354,7 @@ This file contains routines to write XMP metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

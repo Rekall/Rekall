@@ -32,12 +32,13 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.80';
+$VERSION = '2.88';
 @ISA = qw(Exporter);
 
-sub NumbersFirst;
+sub NumbersFirst($$);
 
 my $numbersFirst = 1;   # set to -1 to sort numbers last, or 2 to put negative numbers last
+my $caseInsensitive;    # flag to ignore case when sorting tag names
 
 # list of all tables in plug-in modules
 my @pluginTables = ('Image::ExifTool::MWG::Composite');
@@ -132,8 +133,6 @@ my %formatOK = (
     utf8        => 1,
 );
 
-my $caseInsensitive;    # flag to ignore case when sorting tag names
-
 # Descriptions for the TagNames documentation
 # (descriptions may also be defined in tag table NOTES)
 # Note: POD headers in these descriptions start with '~' instead of '=' to keep
@@ -191,14 +190,14 @@ write these tags, the group should be specified.  A tilde (C<~>) indicates a
 tag this is writable only when the print conversion is disabled (by setting
 PrintConv to 0, using the -n option, or suffixing the tag name with a C<#>
 character).  An exclamation point (C<!>) indicates a tag that is considered
-unsafe to write under normal circumstances.  These "unsafe" tags are not set
-when calling SetNewValuesFromFile() or copied with the exiftool
--tagsFromFile option unless specified explicitly, and care should be taken
-when editing them manually since they may affect the way an image is
-rendered.  An asterisk (C<*>) indicates a "protected" tag which is not
-writable directly, but is written automatically by ExifTool (often when a
-corresponding Composite or Extra tag is written).  A colon (C<:>) indicates
-a mandatory tag which may be added automatically when writing.
+unsafe to write under normal circumstances.  These "unsafe" tags are not
+written unless specified explicitly (ie. wildcards and "all" may not be
+used), and care should be taken when editing them manually since they may
+affect the way an image is rendered.  An asterisk (C<*>) indicates a
+"protected" tag which is not writable directly, but is written automatically
+by ExifTool (often when a corresponding Composite or Extra tag is written).
+A colon (C<:>) indicates a mandatory tag which may be added automatically
+when writing.
 
 The HTML version of these tables also lists possible B<Values> for
 discrete-valued tags, as well as B<Notes> for some tags.  The B<Values> are
@@ -217,13 +216,14 @@ types of meta information.  To determine a tag name, either consult this
 documentation or run C<exiftool -s> on a file containing the information in
 question.
 
-(This documentation is the result of years of research, testing and reverse
-engineering, and is the most complete metadata tag list available anywhere
-on the internet.  It is provided not only for ExifTool users, but more
-importantly as a public service to help augment the collective knowledge,
-and is often used as a primary source of information in the development of
-other metadata software.  Please help keep this documentation as accurate
-and complete as possible, and feed back any new discoveries to the source.)
+I<(This documentation is the result of years of research, testing and
+reverse engineering, and is the most complete metadata tag list available
+anywhere on the internet.  It is provided not only for ExifTool users, but
+more importantly as a public service to help augment the collective
+knowledge, and is often used as a primary source of information in the
+development of other metadata software.  Please help keep this documentation
+as accurate and complete as possible, and feed any new discoveries back to
+ExifTool.  A big thanks to everyone who has helped with this so far!)>
 },
     EXIF => q{
 EXIF stands for "Exchangeable Image File Format".  This type of information
@@ -360,9 +360,10 @@ the B<Writable> format name.  For tags where a range of lengths is allowed,
 the minimum and maximum lengths are separated by a comma within the
 brackets.  IPTC strings are not null terminated.  When writing, ExifTool
 issues a minor warning and truncates the value if it is longer than allowed
-by the IPTC specification. Minor errors may be ignored with the
+by the IPTC specification.  Minor errors may be ignored with the
 IgnoreMinorErrors (-m) option, allowing longer values to be written, but
 beware that values like this may cause problems for some other IPTC readers.
+ExifTool will happily read IPTC values of any length.
 
 Separate IPTC date and time tags may be written with a combined date/time
 value and ExifTool automagically takes the appropriate part of the date/time
@@ -402,9 +403,10 @@ been decoded.  Use the Unknown (-u) option to extract PrintIM information.
     GeoTiff => q{
 ExifTool extracts the following tags from GeoTIFF images.  See
 L<http://www.remotesensing.org/geotiff/spec/geotiffhome.html> for the
-complete GeoTIFF specification.  These tags are not writable individually,
-but they may be copied en mass via the block tags GeoTiffDirectory,
-GeoTiffDoubleParams and GeoTiffAsciiParams.
+complete GeoTIFF specification.  Also included in the table below are
+ChartTIFF tags (see L<http://www.charttiff.com/whitepapers.shtml>). GeoTIFF
+tags are not writable individually, but they may be copied en mass via the
+block tags GeoTiffDirectory, GeoTiffDoubleParams and GeoTiffAsciiParams.
 },
     JFIF => q{
 The following information is extracted from the JPEG JFIF header.  See
@@ -448,6 +450,14 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
 CRW images also support the addition of a CanonVRD trailer, which in turn
 supports XMP.  This trailer is created automatically if necessary when
 ExifTool is used to write XMP to a CRW image.
+},
+    NikonCustom => q{
+Unfortunately, the NikonCustom settings are stored in a binary data block
+which changes from model to model.  This means that significant effort must
+be spent in decoding these for each model, usually requiring hundreds of
+test images from a dedicated Nikon owner.  For this reason, the NikonCustom
+settings have not been decoded for all models.  The tables below list the
+custom settings for the currently supported models.
 },
     Unknown => q{
 The following tags are decoded in unsupported maker notes.  Use the Unknown
@@ -540,7 +550,7 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 ~head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -652,7 +662,7 @@ sub new
 # loop through all tables, accumulating TagLookup and TagName information
 #
     my (%tagNameInfo, %id, %longID, %longName, %shortName, %tableNum,
-        %tagLookup, %tagExists, %noLookup, %tableWritable, %sepTable,
+        %tagLookup, %tagExists, %noLookup, %tableWritable, %sepTable, %case,
         %structs, %compositeModules, %isPlugin, %flattened, %structLookup);
     $self->{TAG_NAME_INFO} = \%tagNameInfo;
     $self->{ID_LOOKUP} = \%id;
@@ -757,7 +767,8 @@ sub new
         $caseInsensitive = $isXMP;
         $numbersFirst = 2;
         $numbersFirst = -1 if $$table{VARS} and $$table{VARS}{ALPHA_FIRST};
-        my @keys = sort NumbersFirst TagTableKeys($table);
+        my $sortProc = ($$table{VARS} ? $$table{VARS}{SORT_PROC} : undef) || \&NumbersFirst;
+        my @keys = sort { &$sortProc($a,$b) } TagTableKeys($table);
         $numbersFirst = 1;
         my $defFormat = $table->{FORMAT};
         # use default format for binary data tables
@@ -784,11 +795,17 @@ TagID:  foreach $tagID (@keys) {
             }
             foreach $tagInfo (@infoArray) {
                 my $name = $$tagInfo{Name};
+                unless ($$tagInfo{SubDirectory} or $$tagInfo{Struct}) {
+                    my $lc = lc $name;
+                    warn "Different case for $tableName $name $case{$lc}\n" if $case{$lc} and $case{$lc} ne $name;
+                    $case{$lc} = $name;
+                }
                 my $format = $$tagInfo{Format};
                 # validate Name (must not start with a digit or else XML output will not be valid)
-                if ($name !~ /^[-_A-Za-z][-\w]+$/ and
+                # (must not start with a dash or exiftool command line may get confused)
+                if ($name !~ /^[_A-Za-z][-\w]+$/ and
                     # single-character subdirectory names are allowed
-                    (not $$tagInfo{SubDirectory} or $name !~ /^[-_A-Za-z]$/))
+                    (not $$tagInfo{SubDirectory} or $name !~ /^[_A-Za-z]$/))
                 {
                     warn "Warning: Invalid tag name $short '$name'\n";
                 }
@@ -1046,7 +1063,7 @@ TagID:  foreach $tagID (@keys) {
                             $$printConv{PrintString} = 1 if $$tagInfo{PrintString};
                         } else {
                             $caseInsensitive = 0;
-                            my @pk = sort NumbersFirst keys %$printConv;
+                            my @pk = sort { NumbersFirst($a,$b) } keys %$printConv;
                             my $n = scalar @values;
                             my ($bits, $i);
                             foreach (@pk) {
@@ -1082,7 +1099,7 @@ TagID:  foreach $tagID (@keys) {
                                 }
                             }
                             if ($bits) {
-                                my @pk = sort NumbersFirst keys %$bits;
+                                my @pk = sort { NumbersFirst($a,$b) } keys %$bits;
                                 foreach (@pk) {
                                     push @values, "Bit $_ = " . $$bits{$_};
                                 }
@@ -1105,13 +1122,15 @@ TagID:  foreach $tagID (@keys) {
                                 my @new = splice @values, $n;
                                 my $v = '[!HTML]<table class=cols><tr>';
                                 my $rows = int((scalar(@new) + $cols - 1) / $cols);
-                                for ($n=0; $n<@new; $n+=$rows) {
+                                for ($n=0; ;) {
                                     $v .= "\n  <td>";
                                     for ($i=0; $i<$rows and $n+$i<@new; ++$i) {
                                         $v .= "\n  <br>" if $i;
                                         $v .= EscapeHTML($new[$n+$i]);
                                     }
-                                    $v .= '</td><td>&nbsp;&nbsp;</td>';
+                                    $v .= '</td>';
+                                    last if ($n += $rows) >= @new;
+                                    $v .= '<td>&nbsp;&nbsp;</td>'; # add spaces between columns
                                 }
                                 push @values, $v . "</tr></table>\n";
                             }
@@ -1127,7 +1146,7 @@ TagID:  foreach $tagID (@keys) {
                     if ($@) {
                         warn $@;
                     } else {
-                        my @pk = sort NumbersFirst keys %$bits;
+                        my @pk = sort { NumbersFirst($a,$b) } keys %$bits;
                         foreach (@pk) {
                             push @values, "Bit $_ = " . $$bits{$_};
                         }
@@ -1278,6 +1297,8 @@ TagID:  foreach $tagID (@keys) {
                 }
             } elsif ($short eq 'DICOM') {
                 ($tagIDstr = $tagID) =~ s/_/,/;
+            } elsif ($tagID =~ /^0x([0-9a-f]+)\.(\d+)$/) {  # DR4 tags like '0x20500.0'
+                $tagIDstr = $tagID;
             } else {
                 # convert non-printable characters to hex escape sequences
                 if ($tagID =~ s/([\x00-\x1f\x7f-\xff])/'\x'.unpack('H*',$1)/eg) {
@@ -1514,8 +1535,9 @@ sub WriteTagLookup($$)
 
 #------------------------------------------------------------------------------
 # sort numbers first numerically, then strings alphabetically (case insensitive)
-sub NumbersFirst
+sub NumbersFirst($$)
 {
+    my ($a, $b) = @_;
     my $rtnVal;
     my ($bNum, $bDec);
     ($bNum, $bDec) = ($1, $3) if $b =~ /^(-?[0-9]+)(\.(\d*))?$/;
@@ -1647,7 +1669,8 @@ sub GetTableOrder(@)
         my @moreTables;
         $caseInsensitive = ($$table{GROUPS} and $$table{GROUPS}{0} eq 'XMP');
         $numbersFirst = -1 if $$table{VARS} and $$table{VARS}{ALPHA_FIRST};
-        my @keys = sort NumbersFirst TagTableKeys($table);
+        my $sortProc = ($$table{VARS} ? $$table{VARS}{SORT_PROC} : undef) || \&NumbersFirst;
+        my @keys = sort { &$sortProc($a,$b) } TagTableKeys($table);
         $numbersFirst = 1;
         foreach (@keys) {
             my @infoArray = GetTagInfoList($table,$_);
@@ -1923,7 +1946,7 @@ sub WriteTagNames($$)
                 my $align = ' class=r';
                 my $wid = 0;
                 my @keys;
-                foreach (sort NumbersFirst keys %$printConv) {
+                foreach (sort { NumbersFirst($a,$b) } keys %$printConv) {
                     next if /^(Notes|PrintHex|PrintString|OTHER)$/;
                     $align = '' if $align and /[^\d]/;
                     my $w = length($_) + length($$printConv{$_});
@@ -2250,8 +2273,8 @@ sub WriteTagNames($$)
                 s/^[-=](.+)/$1/ foreach @$writable;
             }
             # add tooltip for hex conversion of Tag ID
-            if ($tagIDstr =~ /^0x[0-9a-f]+$/i) {
-                $tip = sprintf(" title='$tagIDstr = %u'",hex $tagIDstr);
+            if ($tagIDstr =~ /^(0x[0-9a-f]+)(\.\d+)?$/i) {
+                $tip = sprintf(" title='$tagIDstr = %u%s'", hex($1), $2||'');
             } elsif ($tagIDstr =~ /^(\d+)(\.\d*)?$/) {
                 $tip = sprintf(" title='%u = 0x%x'", $1, $1);
             } else {
@@ -2329,6 +2352,9 @@ sub WriteTagNames($$)
                             # assume XMP module for this struct unless otherwise specified
                             unshift @names, 'XMP' unless / /;
                             push @structs, $_;  # list this later
+                            # hack to put Area Struct in with XMP tags,
+                            # even though it is only used by the MWG module
+                            push @structs, 'Area' if $_ eq 'Dimensions';
                             $suffix = ' Struct';
                         }
                         $url = (shift @names) . '.html';
@@ -2431,7 +2457,7 @@ WriteTagNames().
 
 =head1 AUTHOR
 
-Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2015, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

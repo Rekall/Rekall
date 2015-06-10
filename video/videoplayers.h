@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "videoplayer.h"
-#include "global.h"
+#include "../global.h"
 
 namespace Ui {
 class VideoPlayers;

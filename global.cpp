@@ -102,18 +102,24 @@ Metadatas Global::getMetadatas(QFileInfo file, ProjectInterface *project, bool d
             exifToolProcess->waitForStarted();
         }
 
+#ifdef Q_OS_WIN
+        exifToolProcess->write(qPrintable(QString::fromLatin1(file.absoluteFilePath().toUtf8()) + "\n"));
+#else
         exifToolProcess->write(qPrintable(file.absoluteFilePath() + "\n"));
+#endif
         exifToolProcess->write("-G\n");
         exifToolProcess->write("-c\n%+.6f\n");
         exifToolProcess->write("-d\n%Y:%m:%d %H:%M:%S\n");
         exifToolProcess->write("-t\n");
         exifToolProcess->write("-execute\n");
         exifToolProcess->waitForBytesWritten();
+        //qDebug("%s %s", qPrintable(file.absoluteFilePath()), qPrintable(QString::fromLatin1(file.absoluteFilePath().toUtf8())));
 
         QByteArray linesString;
         while(linesString.trimmed().endsWith("{ready}") == false) {
             exifToolProcess->waitForReadyRead();
             linesString += exifToolProcess->readAllStandardOutput();
+            qDebug("//wait for ready//");
         }
 
         QStringList lines = QString(linesString).split(escape);
@@ -291,6 +297,7 @@ Metadatas Global::getMetadatas(QFileInfo file, ProjectInterface *project, bool d
         }
 
         //Autres champs
+        retour["File->File Name"] = file.fileName();
         retour["File->Basename"]  = file.baseName();
         retour["File->Owner"]     = file.owner();
         retour["File->Extension"] = file.suffix();
@@ -512,6 +519,4 @@ void SyncEntryEvent::deserialize(const QDomElement &xmlElement) {
 void SyncEntryEvent::trayMenuTriggered() {
     Global::revealInFinder(file);
 }
-
-
 
