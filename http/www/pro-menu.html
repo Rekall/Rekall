@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class='scrollable'>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+		<meta http-equiv="Content-Language" content="fr">
+		<meta name="language" content="fr">
+		<meta name="designer" content="buzzing light">  
+		<meta name="copyright" content="buzzing light">
+		<meta name="HandheldFriendly" content="true" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">    
+	
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/pro-theme.css" />
+		<link rel="stylesheet" type="text/css" href="css/jquery.Jcrop.min.css" />
+		
+		<title>Rekall</title>
+	                                                                 
+	    <script language="javascript" type='text/javascript' src='js/libs/jquery.min.js'></script>                  
+		<script language="javascript" type='text/javascript' src='js/libs/jquery.Jcrop.min.js'></script> 
+	    <script language="javascript" type='text/javascript' src='js/libs/jquery.mousewheel.min.js'></script>  
+		<script language="javascript" type='text/javascript' src='js/libs/url.min.js'></script>
+		<script language="javascript" type='text/javascript' src='js/libs/moment-with-langs.min.js'></script>
+
+		<script language="javascript" type='text/javascript' src='js/iannix.js'></script>
+		<script language="javascript" type='text/javascript' src='js/pro-script.js'></script>
+		
+		<script language="javascript" type='text/javascript'>
+			$(document).ready(function() { 
+				documentReadyMenu();
+			});	
+		</script>		
+	</head>
+
+	<body id='menu_page' class='scrollable imgBackgroundBg imgBackgroundBg1'>
+		<div id='ruban'></div>
+		<div id='menu_logo' class='menu'>
+			<img src='logos/3.png' width='100px'><br/>
+		</div>
+		<div id='menu_projects' class='menu'>
+			<h1><span style='color: transparent;'>&#x25B6;</span>&nbsp;Projects&nbsp;<span id='menu_addproject'>&nbsp;&nbsp;(&nbsp;<span title='Add a new project to Rekall'>add a new project</span>&nbsp;)</span></h1>
+			<div></div>
+		</div>
+		<div id='menu_tools' class='menu'>
+			<h1 class='cursor'><span>&#x25B6;</span>&nbsp;Tools for collaboration</h1>
+			<div class='invisible'>
+				<div onClick='javascrip:window.document.location="/clock";'>Stage clock</a></div>
+			</div>
+		</div>
+		<div id='menu_shares' class='menu'>
+			<h1 class='cursor'><span>&#x25B6;</span>&nbsp;Share on network</h1>
+			<div class='invisible'></div>
+			<p class='invisible'>
+				Network settings (computer, internet box, FAI…) can block external accesses<br/>
+				For remote accesses, please check that your computer's firewall doesn't block <span id='rekall_port'></span> port.<br/>
+			</p>
+		</div>
+		<div id='menu_help' class='menu'>
+			<h1 class='cursor'><span style='color: transparent;'>&#x25B6;</span>&nbsp;<a href='/pro-intro.html'>Help on Rekall</a></h1>
+		</div>
+	</body>
+</html>                              

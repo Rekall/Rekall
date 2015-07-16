@@ -270,7 +270,7 @@ void Rekall::trayAnalysePaused() {
 void Rekall::openWebPage(bool inBrowser) {
     QString param;
     if(firstTimeOpened)
-        param += "/intro.html";
+        param += "/pro-intro.html";
     Global::webWrapper->openWebPage(QUrl(QString("http://%1:%2%3").arg(Global::http->getLocalHost().ip).arg(Global::http->getPort()).arg(param)), tr("Opening welcome page…"), inBrowser);
 }
 void Rekall::openWebPageInBrowser() {

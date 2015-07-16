@@ -29,7 +29,6 @@ void VideoPlayers::update(const QUrl &url, bool askClose, const QString &title, 
     if((!askClose) && (!player)) {
         player = new VideoPlayer(this);
         ui->layout->addWidget(player, qFloor(players.count()/2), (players.count()%2));
-        qDebug("%d", players.count());
 
         connect(this, SIGNAL(videoPause ()      ), player, SLOT(pause()));
         connect(this, SIGNAL(videoPlay  (qint64)), player, SLOT(play(qint64)));

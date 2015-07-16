@@ -142,7 +142,6 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
                     if(request.path == ("/" + project->name))
                         request.path = request.path + "/";
                     request.path = request.path.replace("/" + project->name, "/www");
-                    //qDebug("RequestMapper: routing to %s", request.path.data());
                 }
             }
         }
@@ -347,12 +346,14 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
 
 
     else if (path == "/") {
-        request.path = "/menu.html";
+        request.path = "/pro-menu.html";
         Static::fileController->service(request, response);
         return;
     }
     else {
-        request.path = request.path.replace("/www", "");
+        qDebug("====> %s", qPrintable(QString(request.path)));
+        request.path = request.path.replace("/www/", "/pro-index.html");
+        qDebug("====> %s", qPrintable(QString(request.path)));
         Static::fileController->service(request, response);
         return;
     }
