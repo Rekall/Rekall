@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="fr">
+	<meta name="language" content="fr">
+	<meta name="designer" content="buzzing light">  
+	<meta name="copyright" content="buzzing light">
+	<meta name="HandheldFriendly" content="true" />
+	<meta name="viewport" content="width=device-width, user-scalable=no"><!--, minimum-scale=1.0, maximum-scale=1.0-->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+	<link rel="apple-touch-icon" href="favicon.png" />
+	<link rel="stylesheet" type="text/css" href="css/reset.css" />
+	<link rel="stylesheet" type="text/css" href="js/libs/video-js/video-js.css" />
+	<link rel="stylesheet" type="text/css" href="css/online-theme.css" />
+
+	<title>Rekall Online</title>
+	
+    <script language="javascript" type='text/javascript' src='js/libs/jquery.min.js'></script>                  
+	<script language="javascript" type='text/javascript' src='js/libs/url.min.js'></script>
+	<script language="javascript" type='text/javascript' src='js/libs/tinycolor.js'></script>
+	<script language="javascript" type='text/javascript' src='js/libs/sha1.js'></script>
+	<script language="javascript" type='text/javascript' src='js/libs/fastdom.js'></script>
+	<script language="javascript" type='text/javascript' src='js/libs/moment-with-langs.min.js'></script>
+
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Utils.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Rekall.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Source.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Project.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Document.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Tag.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Timeline.js'></script>
+
+	<script language="javascript" type='text/javascript' src='js/iannix.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-script.js'></script>
+
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/video.js"></script>
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/vjs.youtube.js"></script>
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/vjs.vimeo.js"></script>
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/vjs.dailymotion.js"></script>
+	<script>
+		videojs.options.flash.swf = "video-js/video-js.swf";
+	</script>
+
+</head>
+<body>         
+	<div id='container'>
+	    <video id="video" class="video-js vjs-default-skin vjs-big-play-centered">
+			<p class="vjs-no-js">HTML5 video svp !!</p>
+			<!--
+			<track kind="captions"  src="demo.captions.vtt" srclang="en" label="English"></track>
+			<track kind="subtitles" src="demo.captions.vtt" srclang="en" label="English"></track>
+			-->
+	    </video>
+		<div id='flattentimeline'>
+			<p id='videoProgress'>&nbsp;</p>
+		</div>
+	</div>          
+</body>
+</html>
