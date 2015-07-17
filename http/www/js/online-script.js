@@ -7,11 +7,21 @@ $(document).ready(function() {
 		"autoplay": false,
 		"preload": 	"auto",
 		"loop": 	"false",
-		/*
-		"techOrder": ["html5", "flash"],
-		*/
-		//"techOrder": ["youtube", "html5", "flash"],
-		"techOrder": ["youtube"],
+		"poster":   "http://video-js.zencoder.com/oceans-clip.png",
+		"techOrder": ["youtube", "html5", "flash"], //youtube dailymotion vimeo
+/*
+		"src": 	 	"https://vimeo.com/45161598",
+		"techOrder": [""], "src" : "",
+		"techOrder": ["vimeo"], "src" : "",
+		"techOrder": ["html5", "flash"], "src": "oceans-clip.mp4",
+*/
+		children: {
+			controlBar: {
+				children: {
+					fullscreenToggle: 	false,
+				}
+			}
+		}
 		/*
 		    PosterImage
 		    TextTrackDisplay
@@ -35,25 +45,13 @@ $(document).ready(function() {
 		                VolumeHandle
 		        MuteToggle
 		*/
-		children: {
-			controlBar: {
-				children: {
-					fullscreenToggle: 	false,
-				}
-			}
-		}
 	}, function() {
 		videoPlayer = this;
-		/*
-		videoPlayer.src([
-			{ type: "video/mp4",  src: "http://video-js.zencoder.com/oceans-clip.mp4" },
-			{ type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm" },
-			{ type: "video/ogg",  src: "http://video-js.zencoder.com/oceans-clip.ogv" },
-		]);
-		*/
-		//videoPlayer.poster("http://video-js.zencoder.com/oceans-clip.png");
-		videoPlayer.src("http://www.youtube.com/watch?v=bnC9pu65pa0");
 		//videoPlayer.volume(0);
+
+		//videoPlayer.src([{type: "video/mp4", src: "http://video-js.zencoder.com/oceans-clip.mp4"}, {type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm"}, {type: "video/ogg", src: "http://video-js.zencoder.com/oceans-clip.ogv"}]);
+		videoPlayer.src("http://www.youtube.com/watch?v=bnC9pu65pa0");
+		//videoPlayer.src("http://www.dailymotion.com/video/xxvfw4_guillaume-jacquemin-soiree-di-zain-5-code-s-data-s_creation");
 		rekall.timeline.play();
 		
 		videoPlayer.on("durationchange", function(e) {

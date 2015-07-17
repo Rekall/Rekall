@@ -351,9 +351,7 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response) {
         return;
     }
     else {
-        qDebug("====> %s", qPrintable(QString(request.path)));
         request.path = request.path.replace("/www/", "/pro-index.html");
-        qDebug("====> %s", qPrintable(QString(request.path)));
         Static::fileController->service(request, response);
         return;
     }
