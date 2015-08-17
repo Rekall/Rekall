@@ -32,23 +32,20 @@ contains(QT_VERSION, "^5.*") {
 TARGET   = Rekall
 TEMPLATE = app
 
-SOURCES  += main.cpp \
-    video/videoplayers.cpp
+SOURCES  += main.cpp video/videoplayers.cpp
 
 SOURCES  += rekall.cpp global.cpp core/project.cpp  core/analyse.cpp
-HEADERS  += rekall.h   global.h   core/project.h    core/analyse.h \
-    video/videoplayers.h
+HEADERS  += rekall.h   global.h   core/project.h    core/analyse.h    video/videoplayers.h
 
 SOURCES  += video/videoplayer.cpp webwrapper.cpp
 HEADERS  += video/videoplayer.h   webwrapper.h
-FORMS    += video/videoplayer.ui  webwrapper.ui \
-    video/videoplayers.ui
-
+FORMS    += video/videoplayer.ui  webwrapper.ui video/videoplayers.ui
 
 #Location
 HEADERS  += core/userinfos.h
 SOURCES  += core/userinfos.cpp
 macx {
+    CONFIG            += -no-c++11
     DEFINES           += LOCATION_INSTALLED
     OBJECTIVE_SOURCES += core/userinfos_mac.mm
     LIBS              += -framework Cocoa -framework CoreLocation
