@@ -110,84 +110,109 @@ Project.prototype.timelineUpdate = function() {
 
 Project.prototype.analyse = function() {
 	$('#flattentimeline').html("");
-	for (var keySource in rekall.project.sources) {      
-		for (var keyDocument in rekall.project.sources[keySource].documents) {
-			for (var key in rekall.project.sources[keySource].documents[keyDocument].tags) {
 
-				//Analyse de vignettes
-				if(true) {
-					var tag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
-					var thumbUrl = undefined
-					if((tag.getMetadata("File->Thumbnail") != undefined) && (tag.getMetadata("File->Thumbnail") != "")) {
-						var thumbUrl = Utils.getPreviewPath(tag);
+	//Tri les tags par ordre d'apparition croissante
+	Tags.flattenTimelineTags = [];
+	var filtredTags = new Array();
+	rekall.sortings["horizontal"].analyseStart();
+	for (var keySource in this.sources) {      
+		for (var keyDocument in this.sources[keySource].documents) {
+			for (var key in this.sources[keySource].documents[keyDocument].tags) {
+				var tag = this.sources[keySource].documents[keyDocument].tags[key];
 
-						if(tag.isVideo())	thumbUrl += "_1.jpg";
-						else				thumbUrl +=  ".jpg";
-					}
-					tag.thumbnail = {url: thumbUrl, tag: tag};
-				}
-				
-				//Dom
-				$('#flattentimeline').append(function() {
-					var tag = rekall.project.sources[keySource].documents[keyDocument].tags[key];
-					var styleColor = "background-color: " + tag.color + ";";
-					var textColor = "color: " + tag.color + ";";
-	
-					/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
-					var styleColor2 = styleColor;//"background-color: #3EA8B1;";
-					var styleImage = "";
-					if(tag.thumbnail.url != undefined) {
-						styleImage = "background-image: url(" + tag.thumbnail.url + ");";//" opacity: 0.5;";
-						/*styleColor += "opacity: 0.25;"; */
-					} else styleImage = "background-color: rgba(0,0,0,.9)";
-	
-					var icnType = "";
-					var tmpType = tag.getMetadata("Rekall->Type");
-					if(tmpType.indexOf("application/msword") >=0 ) 		icnType = "background-image:url(css/images/icn-word.png);";
-					else if(tmpType.indexOf("application/pdf") >=0 ) 	icnType = "background-image:url(css/images/icn-pdf.png);";
-					else if(tmpType.indexOf("application/") >=0 ) 		icnType = "background-image:url(css/images/icn-document.png);";
-					else if(tmpType.indexOf("audio/") >=0 ) 			icnType = "background-image:url(css/images/icn-music.png);";
-					else if(tmpType.indexOf("image/") >=0 ) 			icnType = "background-image:url(css/images/icn-image.png);";
-					else if(tmpType.indexOf("text/x-vcard") >=0 ) 		icnType = "background-image:url(css/images/icn-user.png);";
-					else if(tmpType.indexOf("text/") >=0 ) 				icnType = "background-image:url(css/images/icn-document.png);";
-					else if(tmpType.indexOf("video/") >=0 ) 			icnType = "background-image:url(css/images/icn-video.png);";
-	
-					//alert(icnType);
-	
-					var html = "<div draggable=true class='flattentimeline_item'>";
-					html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";
-					/*html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "'></div>";*/
-	
-					/*html 	+= "<div class='flattentimeline_bar'        style=''></div>";*/
-	
-					html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";
-	
-					/*html 	+= "<div class='flattentimeline_counter'      style='" + styleColor2 + "'></div>";*/
-	
-					html 	+= "<div class='flattentimeline_type'		style='" + icnType +"' title='" + tmpType + "'></div>";
-				/*	html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";
-					html 	+= "<div class='flattentimeline_type'		style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";*/
-					html 	+= "<div class='flattentimeline_title' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";
-					/*html 	+= "<div class='flattentimeline_subtitle'>" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "</div>";*/
-					html    += "</div>";
-	
-					tag.flattenTimelineDom = $(html);
-					tag.flattenTimelineDom.click(function(event) {
-						//Tags.addOne(tag, true);
-						//Tag.displayMetadata();
-						//alert(Utils.getLocalFilePath(this, "file"));	return;
-						console.log(tag);
-						tag.openBrowser();
-					});
-					tag.flattenTimelineDom.on({
-						dragstart: function(event) {
-				            event.dataTransfer.setData("key", 	  tag.document.key);
-				            event.dataTransfer.setData("version", tag.version);
-						}
-					});
-					return tag.flattenTimelineDom;
-				});
+				//Filtrage
+				var isOk = true;
+				if(isOk)	isOk &= rekall.sortings["horizontal"].analyseAdd(tag);
+				Tags.flattenTimelineTags.push(tag);
 			}
 		}
+	}
+	rekall.sortings["horizontal"].analyseEnd();
+	Tags.flattenTimelineTags.sort(function(a, b) {
+		if(a.timeStart < b.timeStart) return -1;
+		if(a.timeStart > b.timeStart) return 1;
+		return 0;
+	});
+
+	//Affichage
+	var categories = rekall.sortings["horizontal"].categories;
+	if(rekall.sortings["horizontal"].metadataKey == "Time")
+		categories = {time: {tags: Tags.flattenTimelineTags}};
+
+	//Tags / catégories
+	for (var key in categories) {
+		$.each(categories[key].tags, function(index, tag) {
+			//Analyse de vignettes
+			if(true) {
+				var thumbUrl = undefined
+				if((tag.getMetadata("File->Thumbnail") != undefined) && (tag.getMetadata("File->Thumbnail") != "")) {
+					var thumbUrl = Utils.getPreviewPath(tag);
+
+					if(tag.isVideo())	thumbUrl += "_1.jpg";
+					else				thumbUrl +=  ".jpg";
+				}
+				tag.thumbnail = {url: thumbUrl, tag: tag};
+			}
+			
+			//Dom
+			$('#flattentimeline').append(function() {
+				var styleColor = "background-color: " + tag.color + ";";
+				var textColor = "color: " + tag.color + ";";
+
+				/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
+				var styleColor2 = styleColor;//"background-color: #3EA8B1;";
+				var styleImage = "";
+				if(tag.thumbnail.url != undefined) {
+					styleImage = "background-image: url(" + tag.thumbnail.url + ");";//" opacity: 0.5;";
+					/*styleColor += "opacity: 0.25;"; */
+				} else styleImage = "background-color: rgba(0,0,0,.9)";
+
+				var icnType = "";
+				var tmpType = tag.getMetadata("Rekall->Type");
+				if(tmpType.indexOf("application/msword") >=0 ) 		icnType = "background-image:url(css/images/icn-word.png);";
+				else if(tmpType.indexOf("application/pdf") >=0 ) 	icnType = "background-image:url(css/images/icn-pdf.png);";
+				else if(tmpType.indexOf("application/") >=0 ) 		icnType = "background-image:url(css/images/icn-document.png);";
+				else if(tmpType.indexOf("audio/") >=0 ) 			icnType = "background-image:url(css/images/icn-music.png);";
+				else if(tmpType.indexOf("image/") >=0 ) 			icnType = "background-image:url(css/images/icn-image.png);";
+				else if(tmpType.indexOf("text/x-vcard") >=0 ) 		icnType = "background-image:url(css/images/icn-user.png);";
+				else if(tmpType.indexOf("text/") >=0 ) 				icnType = "background-image:url(css/images/icn-document.png);";
+				else if(tmpType.indexOf("video/") >=0 ) 			icnType = "background-image:url(css/images/icn-video.png);";
+
+				//alert(icnType);
+
+				var html = "<div draggable=true class='flattentimeline_item'>";
+				html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";
+				/*html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "'></div>";*/
+
+				/*html 	+= "<div class='flattentimeline_bar'        style=''></div>";*/
+
+				html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";
+
+				/*html 	+= "<div class='flattentimeline_counter'      style='" + styleColor2 + "'></div>";*/
+
+				html 	+= "<div class='flattentimeline_type'		style='" + icnType +"' title='" + tmpType + "'></div>";
+			/*	html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";
+				html 	+= "<div class='flattentimeline_type'		style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";*/
+				html 	+= "<div class='flattentimeline_title' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";
+				/*html 	+= "<div class='flattentimeline_subtitle'>" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "</div>";*/
+				html    += "</div>";
+
+				tag.flattenTimelineDom = $(html);
+				tag.flattenTimelineDom.click(function(event) {
+					//Tags.addOne(tag, true);
+					//Tag.displayMetadata();
+					//alert(Utils.getLocalFilePath(this, "file"));	return;
+					console.log(tag);
+					tag.openBrowser();
+				});
+				tag.flattenTimelineDom.on({
+					dragstart: function(event) {
+			            event.dataTransfer.setData("key", 	  tag.document.key);
+			            event.dataTransfer.setData("version", tag.version);
+					}
+				});
+				return tag.flattenTimelineDom;
+			});
+		});
 	}
 }

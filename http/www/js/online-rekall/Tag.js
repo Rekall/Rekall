@@ -29,6 +29,7 @@ function Tag(document) {
 	this.versionOriginal  = this.version;
 	this.timeStart = 0;
 	this.timeEnd   = 1;
+	this.color     = "#FFFFFF";
 }
 
 Tag.prototype.getMetadata = function(metadataKey, metadataValue) {

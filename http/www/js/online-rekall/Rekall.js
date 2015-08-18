@@ -23,6 +23,8 @@
 */
 
 function Rekall() {
+	this.sortings = new Object();
+	this.sortings["horizontal"] = new Sorting("Time");
 	this.timeline = new Timeline();
 }
 
