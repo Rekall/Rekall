@@ -526,10 +526,12 @@ Rekall.prototype.start = function() {
 	$('#timeline').on({
 		dragenter: function(event) {
 			//alert("dragenter");
+			event.stopImmediatePropagation();
 			event.preventDefault();
 		},
 		dragover: function(event) {
 			//alert("dragover");
+			event.stopImmediatePropagation();
 			event.preventDefault();
 		},
 		drop: function(event) {
@@ -545,11 +547,13 @@ Rekall.prototype.start = function() {
 				}
 			}
 			if(tag != undefined) {
+				event.stopImmediatePropagation();
+				event.preventDefault();
+				
 				console.log(event.pageX);
 				rekall.mouseMoveTime = Sorting.timeForPosition(Sorting.unmapPosition(rekall.timeline.getPointerPosition().x - rekall.timeline.timeLayer.x() - rekall.timeline.timeLayer.group.x()));
 				console.log(rekall.mouseMoveTime);
 				console.log(tag);
-				event.preventDefault();
 			}
 		},
 		/*

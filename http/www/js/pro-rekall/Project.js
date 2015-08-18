@@ -397,26 +397,31 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		//Drag/drop pour setter les tools
 		$('#left_menu .left_menu_item.dropable').on({
 			dragenter: function(event) {
-				$(this).addClass("dragEnter");
+				event.stopImmediatePropagation();
 				event.preventDefault();
+				$(this).addClass("dragEnter");
 			},
 			dragleave: function(event) {
-				$(this).removeClass("dragEnter");
+				event.stopImmediatePropagation();
 				event.preventDefault();
+				$(this).removeClass("dragEnter");
 			},
 			dragover: function(event) {
-				$(this).addClass("dragEnter");
+				event.stopImmediatePropagation();
 				event.preventDefault();
+				$(this).addClass("dragEnter");
 			},
 			drop: function(event) {
 				if(event.dataTransfer.getData("metadataKey") != undefined) {
+					event.stopImmediatePropagation();
+					event.preventDefault();
+					
 					var metadataKey = event.dataTransfer.getData("metadataKey");
 					//var sorting = $(this).find(".tag_metadatas_menu").attr("sorting");
 					var sorting = $(this).attr("id").replace("left_menu_item_", "");
 					//alert(sorting);
 					if((metadataKey != undefined) && (metadataKey != "") && (sorting != undefined))
 						rekall.sortings[sorting].setCriterias(metadataKey, rekall.sortings[sorting].valCanBeFloats, undefined, true);					
-					event.preventDefault();
 				}
 				$("#left_menu .dropable").removeClass("dragStart");
 				$("#left_menu .dropable").removeClass("dragEnter");

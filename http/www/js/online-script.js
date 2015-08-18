@@ -52,7 +52,7 @@ $(document).ready(function() {
 		//videoPlayer.src([{type: "video/mp4", src: "http://video-js.zencoder.com/oceans-clip.mp4"}, {type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm"}, {type: "video/ogg", src: "http://video-js.zencoder.com/oceans-clip.ogv"}]);
 		videoPlayer.src("http://www.youtube.com/watch?v=bnC9pu65pa0");
 		//videoPlayer.src("http://www.dailymotion.com/video/xxvfw4_guillaume-jacquemin-soiree-di-zain-5-code-s-data-s_creation");
-		rekall.timeline.play();
+		//rekall.timeline.play();
 		
 		videoPlayer.on("durationchange", function(e) {
 		});
@@ -94,8 +94,46 @@ $(document).ready(function() {
 		$(window).trigger("resize");
 	});
 	
+	
+	//Drag&drop files
+	$(document).on({
+		dragenter: function(event) {
+			event.stopImmediatePropagation();
+			event.preventDefault();
+		},
+		dragleave: function(event) {
+			event.stopImmediatePropagation();
+			event.preventDefault();
+		},
+		dragover: function(event) {
+			event.stopImmediatePropagation();
+			event.preventDefault();
+		},
+		drop: function(event) {
+			if(event.originalEvent.dataTransfer.files.length) {
+				event.stopImmediatePropagation();
+				event.preventDefault();
+				uploadFiles(event.originalEvent.dataTransfer.files);
+			}
+		}
+	});
+		
 	rekall.loadXMLFile();
 });
+
+function uploadFiles(files) {
+	$.each(files, function(index, file) {
+		if(file.name != undefined) {
+			var colorCategory = rekall.sortings["colors"].categories[Sorting.prefix + file.type];
+			if(colorCategory != undefined) {
+				//alert(colorCategory.color);
+			}
+			var fileType     = (file.type.split("/"))[0];
+			var fileDateTime = moment(file.lastModifiedDate);
+			alert("Chargement de " + file.name + " (" + fileType + ", " + file.size + " octets, date du " + fileDateTime.format("YYYY:MM:DD HH:mm:ss") + ")");
+		}
+	});
+}
 
 function showInRuban(texte, time) {
 	alert(texte);
