@@ -25,6 +25,7 @@
 function Rekall() {
 	this.sortings = new Object();
 	this.sortings["horizontal"] = new Sorting("Time");
+	this.sortings["colors"]     = new Sorting("Rekall->Type", false, "");
 	this.timeline = new Timeline();
 }
 

@@ -104,5 +104,62 @@ Tag.prototype.openBrowser = function() {
 }
 
 Tag.prototype.update = function(color, strong) {
+	if(color != undefined) {
+		this.colorRaw  = color;
+		this.color     = color.toString();
+		
+		this.isMarkerCache = this.isMarker();
+		/*
+		if(this.isMarkerCache) {
+			this.visuel.rect.setCornerRadius(0);
+		}
+		else {
+			this.visuel.rect.setCornerRadius(Tag.tagHeight/3);
+		}
+		*/
+	}
+	if(this.color == undefined)
+		this.color = "#000000";
 
+	var fillColor   = '';
+	var strokeColor = '';
+	var strokeWidth = 0;
+	var opacity = 1;
+		
+	if(this.isGoodVersion()) {
+		fillColor   = this.color;
+		strokeWidth = 0;
+		strokeColor = "";
+	}
+	else {
+		fillColor   = tinycolor(this.colorRaw.toString()).setAlpha(0.1).toString();
+		strokeColor = this.color;
+		strokeWidth = 0.8;
+	}
+	
+	/*
+	if((this.selected) || (this.document.selected > 0)) {
+		strokeColor = '#FFFFFF';
+		if(this.selected) {
+			if(strong)		strokeWidth = 2;
+			else			strokeWidth = 1.5;
+		}
+		else
+			strokeWidth       = 0.8;
+	}
+	
+	if(this.isMarkerCache) {
+		if(strokeColor == "")
+			this.visuel.rect.setStroke(fillColor);	
+		else
+			this.visuel.rect.setStroke(strokeColor);
+		this.visuel.rect.setStrokeWidth(max(1, strokeWidth));
+	}
+	else {
+		this.visuel.rect.setFill       (fillColor);
+		this.visuel.rect.setStroke     (strokeColor);	
+		this.visuel.rect.setStrokeWidth(strokeWidth);
+	}
+	this.visuel.rect.setOpacity(opacity);
+	*/
 }

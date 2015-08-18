@@ -111,23 +111,23 @@ Project.prototype.timelineUpdate = function() {
 Project.prototype.analyse = function() {
 	$('#flattentimeline').html("");
 
-	//Tri les tags par ordre d'apparition croissante
+	//Analyse
 	Tags.flattenTimelineTags = [];
 	var filtredTags = new Array();
 	rekall.sortings["horizontal"].analyseStart();
+	rekall.sortings["colors"]    .analyseStart();
 	for (var keySource in this.sources) {      
 		for (var keyDocument in this.sources[keySource].documents) {
 			for (var key in this.sources[keySource].documents[keyDocument].tags) {
 				var tag = this.sources[keySource].documents[keyDocument].tags[key];
-
-				//Filtrage
-				var isOk = true;
-				if(isOk)	isOk &= rekall.sortings["horizontal"].analyseAdd(tag);
+				rekall.sortings["horizontal"].analyseAdd(tag);
+				rekall.sortings["colors"]    .analyseAdd(tag);
 				Tags.flattenTimelineTags.push(tag);
 			}
 		}
 	}
 	rekall.sortings["horizontal"].analyseEnd();
+	rekall.sortings["colors"]    .analyseEnd();
 	Tags.flattenTimelineTags.sort(function(a, b) {
 		if(a.timeStart < b.timeStart) return -1;
 		if(a.timeStart > b.timeStart) return 1;
@@ -138,6 +138,34 @@ Project.prototype.analyse = function() {
 	var categories = rekall.sortings["horizontal"].categories;
 	if(rekall.sortings["horizontal"].metadataKey == "Time")
 		categories = {time: {tags: Tags.flattenTimelineTags}};
+	
+	//Affectation des couleurs
+	for (var key in rekall.sortings["colors"].categories) {
+		var colorSortingCategory = rekall.sortings["colors"].categories[key];
+		for (var key in colorSortingCategory.tags) {
+			var tag = colorSortingCategory.tags[key];
+			tag.update(colorSortingCategory.color);
+			tag.isSelectable = colorSortingCategory.checked;
+
+			//Analyse de vignettes
+			/*
+			if(true) {
+				var thumbUrl = undefined
+				if((tag.getMetadata("File->Thumbnail") != undefined) && (tag.getMetadata("File->Thumbnail") != "")) {
+					var thumbUrl = Utils.getPreviewPath(tag);
+
+					if(tag.isVideo())	thumbUrl += "_1.jpg";
+					else				thumbUrl +=  ".jpg";
+				}
+				tag.thumbnail = {url: thumbUrl, tag: tag};
+
+				if(rekall.panner.thumbnails[colorSortingCategory.category] == undefined)
+					rekall.panner.thumbnails[colorSortingCategory.category] = {category: colorSortingCategory, thumbnails: [], documents: []};
+				rekall.panner.thumbnails[colorSortingCategory.category].thumbnails.push(tag.thumbnail);
+			}
+			*/
+		}
+	}
 
 	//Tags / catégories
 	for (var key in categories) {
