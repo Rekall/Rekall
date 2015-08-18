@@ -67,13 +67,13 @@ Timeline.prototype.updateFlattenTimeline = function() {
 				var dom = tag.flattenTimelineDom;
 				if(progress == undefined) {
 					dom.slideUp();
-					tag.flattenTimelineDom.find(".flattentimeline_counter").hide();
+					dom.find(".flattentimeline_counter").hide();
 				}
 				else {
 					if(timeEndExtended == tag.timeEnd)
-						tag.flattenTimelineDom.find(".flattentimeline_opacifiant").css("width", constrain(progress, 0, 1)*100 + "%");
+						dom.find(".flattentimeline_opacifiant").css("width", constrain(progress, 0, 1)*100 + "%");
 					else
-						tag.flattenTimelineDom.find(".flattentimeline_opacifiant").css("width", "100%");
+						dom.find(".flattentimeline_opacifiant").css("width", "100%");
 
 					if((0 <= progress) && (progress < 1))
 						dom.css("opacity", 1.0).slideDown();
