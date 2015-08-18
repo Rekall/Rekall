@@ -109,7 +109,7 @@ Project.prototype.timelineUpdate = function() {
 }
 
 Project.prototype.analyse = function() {
-	$('#flattentimeline').html("");
+	$('#flattentimeline').html("<div id='flattentimeline_highlight'></div>");
 
 	//Analyse
 	Tags.flattenTimelineTags = [];
@@ -182,65 +182,112 @@ Project.prototype.analyse = function() {
 				tag.thumbnail = {url: thumbUrl, tag: tag};
 			}
 			
-			//Dom
-			$('#flattentimeline').append(function() {
-				var styleColor = "background-color: " + tag.color + ";";
-				var textColor = "color: " + tag.color + ";";
+			
+			if((tag.getMetadata("Rekall->Highlight") != undefined) && (tag.getMetadata("Rekall->Highlight") != "")) {   
+			
+				//Dom
+				$('#flattentimeline_highlight').append(function() {
+					var styleColor = "background-color: " + tag.color + ";";
+					var textColor = "color: " + tag.color + ";";
 
-				/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
-				var styleColor2 = styleColor;//"background-color: #3EA8B1;";
-				var styleImage = "";
-				if(tag.thumbnail.url != undefined) {
-					styleImage = "background-image: url(" + tag.thumbnail.url + ");";//" opacity: 0.5;";
-					/*styleColor += "opacity: 0.25;"; */
-				} else styleImage = "background-color: rgba(0,0,0,.9)";
+					/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
+					var styleColor2 = styleColor;//"background-color: #3EA8B1;";
+					var styleImage = "";
+					if(tag.thumbnail.url != undefined) {
+						styleImage = "background-image: url(" + tag.thumbnail.url + ");";//" opacity: 0.5;";
+						/*styleColor += "opacity: 0.25;"; */
+					} else styleImage = "background-color: rgba(0,0,0,.9)";
 
-				var icnType = "";
-				var tmpType = tag.getMetadata("Rekall->Type");
-				if(tmpType.indexOf("application/msword") >=0 ) 		icnType = "background-image:url(css/images/icn-word.png);";
-				else if(tmpType.indexOf("application/pdf") >=0 ) 	icnType = "background-image:url(css/images/icn-pdf.png);";
-				else if(tmpType.indexOf("application/") >=0 ) 		icnType = "background-image:url(css/images/icn-document.png);";
-				else if(tmpType.indexOf("audio/") >=0 ) 			icnType = "background-image:url(css/images/icn-music.png);";
-				else if(tmpType.indexOf("image/") >=0 ) 			icnType = "background-image:url(css/images/icn-image.png);";
-				else if(tmpType.indexOf("text/x-vcard") >=0 ) 		icnType = "background-image:url(css/images/icn-user.png);";
-				else if(tmpType.indexOf("text/") >=0 ) 				icnType = "background-image:url(css/images/icn-document.png);";
-				else if(tmpType.indexOf("video/") >=0 ) 			icnType = "background-image:url(css/images/icn-video.png);";
+					var icnType = "";
+					var tmpType = tag.getMetadata("Rekall->Type");
+					if(tmpType.indexOf("application/msword") >=0 ) 		icnType = "background-image:url(css/images/icn-word.png);";
+					else if(tmpType.indexOf("application/pdf") >=0 ) 	icnType = "background-image:url(css/images/icn-pdf.png);";
+					else if(tmpType.indexOf("application/") >=0 ) 		icnType = "background-image:url(css/images/icn-document.png);";
+					else if(tmpType.indexOf("audio/") >=0 ) 			icnType = "background-image:url(css/images/icn-music.png);";
+					else if(tmpType.indexOf("image/") >=0 ) 			icnType = "background-image:url(css/images/icn-image.png);";
+					else if(tmpType.indexOf("text/x-vcard") >=0 ) 		icnType = "background-image:url(css/images/icn-user.png);";
+					else if(tmpType.indexOf("text/") >=0 ) 				icnType = "background-image:url(css/images/icn-document.png);";
+					else if(tmpType.indexOf("video/") >=0 ) 			icnType = "background-image:url(css/images/icn-video.png);";
+                                    
 
-				//alert(icnType);
+					var htmlHighlight = ""; 
+					htmlHighlight	+=	"<div class='flattentimeline_item flattentimeline_highlightitem'>";
+					htmlHighlight	+=	"<div class='flattentimeline_type'			style='" + icnType +"' title='" + tmpType + "'></div>";       
+					htmlHighlight	+=	"<div class='flattentimeline_image'      	style='" + styleImage + "'></div>"; 
+					htmlHighlight 	+=	"<div class='flattentimeline_title' 		title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";   
+					htmlHighlight 	+=	"<div class='flattentimeline_description'>" + tag.getMetadata("Rekall->Comments") + "</div>"; 
+					htmlHighlight 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";  
+					htmlHighlight    += "</div>";          
+                   
+					tag.flattenTimelineDom = $(htmlHighlight); 
+					tag.flattenTimelineDom.click(function(event) {                
+						console.log(tag);
+						tag.openBrowser();
+					});
+					tag.flattenTimelineDom.on({
+						dragstart: function(event) {
+				            event.dataTransfer.setData("key", 	  tag.document.key);
+				            event.dataTransfer.setData("version", tag.version);
+						}
+					});  
+				
+					return tag.flattenTimelineDom;   
+				
+				});     
+			
+			} else {    
+			
+				//Dom
+				$('#flattentimeline').append(function() {
+					var styleColor = "background-color: " + tag.color + ";";
+					var textColor = "color: " + tag.color + ";";
 
-				var html = "<div draggable=true class='flattentimeline_item'>";
-				html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";
-				/*html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "'></div>";*/
+					/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
+					var styleColor2 = styleColor;//"background-color: #3EA8B1;";
+					var styleImage = "";
+					if(tag.thumbnail.url != undefined) {
+						styleImage = "background-image: url(" + tag.thumbnail.url + ");";//" opacity: 0.5;";
+						/*styleColor += "opacity: 0.25;"; */
+					} else styleImage = "background-color: rgba(0,0,0,.9)";
 
-				/*html 	+= "<div class='flattentimeline_bar'        style=''></div>";*/
+					var icnType = "";
+					var tmpType = tag.getMetadata("Rekall->Type");
+					if(tmpType.indexOf("application/msword") >=0 ) 		icnType = "background-image:url(css/images/icn-word.png);";
+					else if(tmpType.indexOf("application/pdf") >=0 ) 	icnType = "background-image:url(css/images/icn-pdf.png);";
+					else if(tmpType.indexOf("application/") >=0 ) 		icnType = "background-image:url(css/images/icn-document.png);";
+					else if(tmpType.indexOf("audio/") >=0 ) 			icnType = "background-image:url(css/images/icn-music.png);";
+					else if(tmpType.indexOf("image/") >=0 ) 			icnType = "background-image:url(css/images/icn-image.png);";
+					else if(tmpType.indexOf("text/x-vcard") >=0 ) 		icnType = "background-image:url(css/images/icn-user.png);";
+					else if(tmpType.indexOf("text/") >=0 ) 				icnType = "background-image:url(css/images/icn-document.png);";
+					else if(tmpType.indexOf("video/") >=0 ) 			icnType = "background-image:url(css/images/icn-video.png);";
+                                    
 
-				html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";
-
-				/*html 	+= "<div class='flattentimeline_counter'      style='" + styleColor2 + "'></div>";*/
-
-				html 	+= "<div class='flattentimeline_type'		style='" + icnType +"' title='" + tmpType + "'></div>";
-			/*	html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";
-				html 	+= "<div class='flattentimeline_type'		style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";*/
-				html 	+= "<div class='flattentimeline_title' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";
-				/*html 	+= "<div class='flattentimeline_subtitle'>" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "</div>";*/
-				html    += "</div>";
-
-				tag.flattenTimelineDom = $(html);
-				tag.flattenTimelineDom.click(function(event) {
-					//Tags.addOne(tag, true);
-					//Tag.displayMetadata();
-					//alert(Utils.getLocalFilePath(this, "file"));	return;
-					console.log(tag);
-					tag.openBrowser();
-				});
-				tag.flattenTimelineDom.on({
-					dragstart: function(event) {
-			            event.dataTransfer.setData("key", 	  tag.document.key);
-			            event.dataTransfer.setData("version", tag.version);
-					}
-				});
-				return tag.flattenTimelineDom;
-			});
+					var html = ""; 
+					html	+= "<div draggable=true class='flattentimeline_item'>";  
+					html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";   
+					html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";                     
+					html 	+= "<div class='flattentimeline_type'		style='" + icnType +"' title='" + tmpType + "'></div>";                                                           
+					html 	+= "<div class='flattentimeline_title' 		title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";     
+					html    += "</div>";           
+			    
+					tag.flattenTimelineDom = $(html); 
+					tag.flattenTimelineDom.click(function(event) {                
+						console.log(tag);
+						tag.openBrowser();
+					});
+					tag.flattenTimelineDom.on({
+						dragstart: function(event) {
+				            event.dataTransfer.setData("key", 	  tag.document.key);
+				            event.dataTransfer.setData("version", tag.version);
+						}
+					});        
+				
+					return tag.flattenTimelineDom;    
+				
+				});  
+			       
+			}
+			
 		});
 	}
 }

@@ -37,42 +37,48 @@ html, body {
 	background-color: 		black;
 	overflow-x:				hidden;	
 	overflow-y:				scroll;	 
+}       
+
+#flattentimeline_highlight {
+	margin-bottom:			1px;
 }
+ 
+
 #flattentimeline_main_title {
 	font-family:			"open_sanslight";
-	/*height:40px;*/
-	line-height:20px;
-	padding:10px 0;
-	text-align:center;
-	/*background:#2C3032;*/
-	/*background:#2C3033;*/
-	/*background:#57A5AF;*/
-	background:#EC8960;
+	/*height:				40px;*/
+	line-height:			20px;
+	padding:				10px 0;
+	text-align:				center;
+	/*background:			#2C3032;*/
+	/*background:			#2C3033;*/
+	/*background:			#57A5AF;*/
+	background:				#EC8960;
 	/*background-image: -webkit-linear-gradient(left, #EC8960 0%, #57A5AF 100%);*/
 	/*background-image: -webkit-linear-gradient(left, #94CA6F 0%, #B495CC 100%);*/
-	text-transform:uppercase;
-	color:rgba(255,255,255,1);
-	font-size:18px;
-	border-bottom:2px solid #1B1D1E;
+	text-transform:			uppercase;
+	color:					rgba(255,255,255,1);
+	font-size:				18px;
+	border-bottom:			2px solid #1B1D1E;
 }         
 #flattentimeline_settings {
 	font-family:			"open_sanslight";
-	height:240px;
-	line-height:40px;
-	text-align:center;
-	background:#26292B;
-	text-transform:uppercase;
-	color:#FFF;
-	font-size:18px;
-	margin-top:4px;
-	display:none;
+	height:					240px;
+	line-height:			40px;
+	text-align:				center;
+	background:				#26292B;
+	text-transform:			uppercase;
+	color:					#FFF;
+	font-size:				18px;
+	margin-top:				4px;
+	display:				none;
 }
 #flattentimeline_items {
-	width:100%;
-	height:100%;
-	overflow:	hidden;
-	overflow-y:	auto;
-	background-color:#1B1D1E; /*191716;*/
+	width:					100%;
+	height:					100%;
+	overflow:				hidden;
+	overflow-y:				auto;
+	background-color:		#1B1D1E; /*191716;*/
 }
 .flattentimeline_item {
 	position:				relative;
@@ -82,13 +88,28 @@ html, body {
 	cursor:					pointer;
 	background:				#26292B;/*231F1E;*/   
 	width:					100%;     
-	display:				block;
+	display:				none;
 }
 .flattentimeline_item:hover {
-	background:#1D2021;/*191716;*/
+	background:				#1D2021;/*191716;*/
+}   
+
+.flattentimeline_highlightitem {
+	position:				relative;
+	/*height: 		  		150px;*/  
+	height: 		  		auto; 
+	color:			  		white;
+	margin:					0px;
+	cursor:					pointer;
+	background:				#26292B;  
+	width:					100%;   
+	text-align:				center;  
+	padding-bottom:			2px;
+	/*display:block;*/ 
 }
+
 .flattentimeline_image {
-	border-radius: 0;
+	border-radius: 			0;
 }
 .flattentimeline_opacifiant, .flattentimeline_bar {
 	top:					0px;
@@ -103,7 +124,7 @@ html, body {
     -o-background-size: 	cover;
     background-size: 		cover;
 	text-align:				left;
-	overflow:hidden;
+	overflow:				hidden;
 }
 .flattentimeline_title, .flattentimeline_subtitle, .flattentimeline_counter {
 	top:					0px;
@@ -113,15 +134,16 @@ html, body {
 	background-repeat:		no-repeat; 
 	text-align:				left;
 	overflow:				hidden; 
-	line-height:20px;
+	line-height:			20px;
 }
 
 .flattentimeline_image {
 	width:					20px; 
 	height:					20px;
-	margin:					10px 10px;
+	margin:					9px 10px 9px 7px;
 	border-radius:			2px;
-	/*position:absolute; */   
+	/*position:absolute; */        
+	background-color:		#000;
 	float:					left;
 	background-position:	center center;
 	background-repeat:		no-repeat; 
@@ -129,6 +151,20 @@ html, body {
     -moz-background-size: 	cover;
     -o-background-size: 	cover;
     background-size: 		cover;
+} 
+
+.flattentimeline_highlightitem .flattentimeline_image {
+	width:					170px; 
+	height:					60px;   
+	margin:					15px 15px 5px 15px;    
+	border-radius:			3px;  
+	/*border-radius:			5px 5px 0px 0px;*/    
+	background-color:		#fff;   
+	display:				inline-block;  
+	float:					left; 
+	background-position:	center center;
+	/*border:					1px solid #000;   
+	border-bottom:			none;     */
 }
 
 /*.flattentimeline_color {
@@ -138,22 +174,49 @@ html, body {
 .flattentimeline_bar, .flattentimeline_opacifiant {
 	background-color:		rgba(0, 0, 0, 0.75);
 	height:					2px;
-	top:					50px;
+	top:					38px;
+}  
+.flattentimeline_highlightitem .flattentimeline_bar, .flattentimeline_highlightitem  .flattentimeline_opacifiant  {
+	top:					auto;   
+	display:				block;   
 }
 
 .flattentimeline_title {
 	font-family:			"open_sansregular";
 	font-size:				10px;  
-	line-height:			40px;   
-	color:rgba(255,255,255,.5);
+	line-height:			39px;   
+	color:					rgba(255,255,255,.5);
 
-	width:			55%;
-	text-overflow: 	ellipsis;
-	white-space: 	nowrap; 
-	overflow: 		hidden;    
+	/*width:					55%; */
+	width: 					132px;
+	text-overflow: 			ellipsis;
+	white-space: 			nowrap; 
+	overflow: 				hidden;    
 	
 	display:				inline-block;  
+}  
+
+.flattentimeline_highlightitem .flattentimeline_title {    
+	line-height:			1.2em; 
+	width: 					170px;  
+	font-size:				10px; 
+	padding:				10px 0; 
+	color:					rgba(255,255,255,1); 
+}           
+
+.flattentimeline_highlightitem .flattentimeline_description {
+	font-family:			"open_sansregular";
+	font-size:				9px;  
+	line-height:			1.4em;   
+	color:					rgba(255,255,255,.5);    
+	margin:					0px 15px 13px 15px;  
+	  
+	width: 					170px;  
+	text-align:				left;          
+	
+	display:				inline-block;
 }
+
 .flattentimeline_subtitle {
 	font-family:			"open_sanslight";
 	top:					25px;
@@ -179,19 +242,32 @@ html, body {
 	margin:20px 15px 20px 0;
 }*/
 .flattentimeline_type {
-	width:20px; height:20px;
-	border-radius:20px;
-	float:right;
+	width:					20px; 
+	height:					20px;
+	/*border-radius:			20px; */
+	float:					right;
 	background-position:	center center;
 	background-repeat:		no-repeat;
-	margin:10px 5px;
-	opacity:.75;
-}
+	margin:					9px 5px;
+	opacity:				0.75;
+}                 
+
+.flattentimeline_highlightitem .flattentimeline_type {  
+	width:					40px; 
+	height:					40px;
+	position:				absolute;
+	border-radius:			30px;
+	background-color:		rgba(0,0,0,.5);
+	margin:					25px 0 0 80px;  
+	opacity:				1;   
+}   
+
 .flattentimeline_color {
-	width:6px; height:6px;
-	border-radius:10px;
-	float:right;
-	margin:22px 5px;
+	width:					6px; 
+	height:					6px;
+	border-radius:			10px;
+	float:					right;
+	margin:					22px 5px;
 }
 .flattentimeline_counter {
 	font-family:			"open_sanssemibold";
@@ -206,10 +282,28 @@ html, body {
 	
 	font-size:				18px;
 	text-align: 			center; 
-	display:none;
+	display:				none;
 }
 .flattentimeline_bar {
-	/*width: 			  0%;*/
-	background-color:#26292B;/*#2DCAE1;*/
-	opacity:1;
-}      
+	/*width: 			  	0%;*/
+	background-color:		#26292B;	/*#2DCAE1;*/
+	opacity:				1;
+}    
+
+.docLive {
+	opacity:				1;  
+	display:				block;
+}     
+
+.docTocome {
+	opacity:				0.5;     
+	display:				block;
+}
+
+.docFaraway {
+	opacity:				0.1;       
+	display:				none;
+}
+
+
+

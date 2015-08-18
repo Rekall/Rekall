@@ -65,8 +65,9 @@ Timeline.prototype.updateFlattenTimeline = function() {
 					progress = undefined;
 				
 				var dom = tag.flattenTimelineDom;
-				if(progress == undefined) {
-					dom.slideUp();
+				if(progress == undefined) {         
+					//dom.slideUp();  
+					dom.removeClass("docTocome").removeClass("docLive").removeClass("docFaraway");
 					dom.find(".flattentimeline_counter").hide();
 				}
 				else {
@@ -75,14 +76,18 @@ Timeline.prototype.updateFlattenTimeline = function() {
 					else
 						dom.find(".flattentimeline_opacifiant").css("width", "100%");
 
-					if((0 <= progress) && (progress < 1))
-						dom.css("opacity", 1.0).slideDown();
+					if((0 <= progress) && (progress < 1))  
+						dom.removeClass("docTocome").removeClass("docFaraway").addClass("docLive");//.slideDown();//("opacity", 1.0).slideDown();   
+						//dom.css("opacity", 1.0).slideDown();
 					else if((-5 <= progress) && (progress <= 0))
-						dom.css("opacity", 0.5).slideDown();
+						dom.removeClass("docLive").removeClass("docFaraway").addClass("docTocome");//.slideDown();
+						//dom.css("opacity", 0.5).slideDown();
 					else if(-9999999 < progress)
-						dom.css("opacity", 0.1).slideDown();
-					else
-						dom.css("opacity", 0.1).hide();
+						dom.removeClass("docTocome").removeClass("docLive").addClass("docFaraway");//.slideDown();
+						//dom.css("opacity", 0.1).slideDown();
+					else         
+						dom.removeClass("docTocome").removeClass("docLive").removeClass("docFaraway");//.hide();
+						//dom.css("opacity", 0.1).hide();
 				}
 			}
 		}
