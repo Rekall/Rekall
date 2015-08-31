@@ -5,7 +5,6 @@ $(document).ready(function() {
 	rekall_common.isEditor = true;
 	rekall_common.owner = {"author": "Guillaume Jacquemin", "locationGps": "", "locationName": ""};
 	
-	
 	if((rekall_common.isEditor) && (navigator.geolocation))
 		navigator.geolocation.getCurrentPosition(function(position) {
 			rekall_common.owner.locationGps  = position.coords.latitude + ", " + position.coords.longitude;
@@ -177,7 +176,10 @@ function uploadFiles(files) {
 					success:    function(data) {
 						console.log(data);
 						data = JSON.parse(data);
-						alert(data.files[0].metas["Rekall->Name"] + " téléchargé");
+						if(data.files[0].code > 0)
+							alert(data.files[0].metas["Rekall->Name"] + " téléchargé");
+						else
+							alert(data.files[0].error);
 						window.document.title = "Rekall Online";
 						fileIsUploading = false;
 						uploadFilesNext();
@@ -200,11 +202,16 @@ function uploadFiles(files) {
 	});
 }
 function uploadFilesNext() {
-	if((filesToUpload.length > 0) && (!fileIsUploading)) {
-		fileIsUploading = true;
-		$.ajax(filesToUpload[0]);
-		filesToUpload.splice(0, 1);
-		uploadFilesNext();
+	if(!fileIsUploading) {
+		if(filesToUpload.length > 0) {
+			fileIsUploading = true;
+			$.ajax(filesToUpload[0]);
+			filesToUpload.splice(0, 1);
+			uploadFilesNext();
+		}
+		else {
+			rekall.loadXMLFile();
+		}
 	}
 }
 

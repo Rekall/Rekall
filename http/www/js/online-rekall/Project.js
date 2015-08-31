@@ -290,4 +290,6 @@ Project.prototype.analyse = function() {
 			
 		});
 	}
+	rekall.timeline.updateFlattenTimeline();
+	console.log(rekall);
 }
