@@ -75,13 +75,6 @@ Tag.prototype.setTimeEnd = function(val) {
 
 
 
-Tag.prototype.setVisible = function(val) {
-	this.visuel.rect.setVisible(val);
-}
-Tag.prototype.isVisible = function() {
-	return this.visuel.rect.getVisible();
-}
-
 Tag.prototype.isGoodVersion = function() {
 	return this.version == this.document.goodVersion;
 }
@@ -101,6 +94,9 @@ Tag.prototype.downloadFile = function() {
 }
 Tag.prototype.openBrowser = function() {
 	return this.document.openBrowser();
+}   
+Tag.prototype.openPopupEdit = function() {
+	fillPopupEdit(this);  
 }
 
 Tag.prototype.update = function(color, strong) {

@@ -132,9 +132,66 @@ $(document).ready(function() {
 		if(event.keyCode == 77)
 			uploadFiles(["Mon marker"]);
 	});
+	   
+	
+	$("#popupEdit").click(function(){
+		closeInputs();
+	});
+	            
+	$("#popupNom").click(function(){  
+		event.stopPropagation();     
+		closeInputs();
+		$(this).hide();
+		$("#popupNomInput").show(); 
+	});   
+	$("#popupLegende").click(function(){  
+		event.stopPropagation();     
+		closeInputs();
+		$(this).hide();
+		$("#popupLegendeInput").show(); 
+	});  
+	
+	$("#closePopupEdit").click(function(){  
+		closeInputs();  
+		$("#popupSpace").hide();   
+		$("#popupEdit").hide();
+	});
 		
 	rekall.loadXMLFile();
 });
+             
+function closeInputs() {
+   	$(".popupInput").hide();
+	$(".popupRightItem").show();
+}     
+
+function fillPopupEdit(tag) { 
+	//alert(tag.document.key);  
+	$("#popupEdit").css("background",tag.color);     
+	
+	$("#popupImg").attr("src",tag.thumbnail.url)
+	
+	$("#popupType").html(tag.getMetadata("Rekall->Type"));        
+	$("#popupNom").html(tag.getMetadata("Rekall->Name"));   
+	$("#popupNomInput").val(tag.getMetadata("Rekall->Name"));
+	$("#popupTCin").html(convertToTime(tag.getTimeStart()));  
+	$("#popupTCout").html(convertToTime(tag.getTimeEnd())); 
+	$("#popupLegende").html(tag.getMetadata("Rekall->Comments")); 
+	$("#popupLegendeInput").html(tag.getMetadata("Rekall->Comments")); 
+	//tag.getMetadata("Rekall->Highlight") = "true" ou ""    
+	
+	$("#popupSpace").show();   
+	$("#popupEdit").show();
+}
+          
+function convertToTime(seconds) {    
+	var minutes = Math.floor(seconds/60); 
+	seconds = Math.floor(seconds-(minutes*60));   
+	if(minutes<10) minutes="0"+minutes;
+	if(seconds<10) seconds="0"+seconds;   
+	var time = minutes+":"+seconds;
+	return time;
+}
 
 var filesToUpload = [], fileIsUploading = false;
 function uploadFiles(files) {
