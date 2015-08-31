@@ -221,7 +221,6 @@ Project.prototype.analyse = function() {
                    
 					tag.flattenTimelineDom = $(htmlHighlight); 
 					tag.flattenTimelineDom.click(function(event) {                
-						console.log(tag);
 						tag.openBrowser();
 					});
 					tag.flattenTimelineDom.on({
@@ -272,7 +271,6 @@ Project.prototype.analyse = function() {
 			    
 					tag.flattenTimelineDom = $(html); 
 					tag.flattenTimelineDom.click(function(event) {                
-						console.log(tag);
 						tag.openBrowser();
 					});
 					tag.flattenTimelineDom.on({
