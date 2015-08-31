@@ -40,30 +40,30 @@
 		
 		//Création des métadatas
 		$metasAdd = array(
-	        "Rekall->Comments"					=> "",
-	        "Rekall->Keywords"					=> "",
-	        "Rekall->Group"						=> "",
-	        "Rekall->Visibility"				=> "",
+	        "Rekall->Comments"			=> "",
+	        "Rekall->Keywords"			=> "",
+	        "Rekall->Group"				=> "",
+	        "Rekall->Visibility"		=> "",
 			
-			"File->Hash"						=> strtoupper(sha1_file($file)),
-			"Rekall->Flag"						=> "File",
+			"File->Hash"				=> strtoupper(sha1_file($file)),
+			"Rekall->Flag"				=> "File",
 			
-			"File->Thumbnail"					=> "",
-			"File->Owner"						=> $user,
+			"File->Thumbnail"			=> "",
+			"File->Owner"				=> $user,
 
-			"File->MIME Type"					=> finfo_file($finfo, $file),
-			"File->File Type"					=> finfo_file($finfo, $file),
-	        "Rekall->Type"						=> finfo_file($finfo, $file),
+			"File->MIME Type"			=> finfo_file($finfo, $file),
+			"File->File Type"			=> finfo_file($finfo, $file),
+	        "Rekall->Type"				=> finfo_file($finfo, $file),
 
-			"File->File Name"					=> pathinfo($file, PATHINFO_BASENAME),
-			"File->Extension"					=> pathinfo($file, PATHINFO_EXTENSION),
-	        "File->Basename"					=> pathinfo($file, PATHINFO_FILENAME),
-			"Rekall->Name"						=> pathinfo($file, PATHINFO_FILENAME),
-			"Rekall->Extension"					=> strtoupper(pathinfo($file, PATHINFO_EXTENSION)),
-			"Rekall->Folder"					=> "",
+			"File->File Name"			=> pathinfo($file, PATHINFO_BASENAME),
+			"File->Extension"			=> pathinfo($file, PATHINFO_EXTENSION),
+	        "File->Basename"			=> pathinfo($file, PATHINFO_FILENAME),
+			"Rekall->Name"				=> pathinfo($file, PATHINFO_FILENAME),
+			"Rekall->Extension"			=> strtoupper(pathinfo($file, PATHINFO_EXTENSION)),
+			"Rekall->Folder"			=> "",
 
-			"Rekall->File Size"					=> filesize($file),
-			"Rekall->File Size (MB)"			=> filesize($file)/(1024.*1024.),
+			"Rekall->File Size"			=> filesize($file),
+			"Rekall->File Size (MB)"	=> filesize($file)/(1024.*1024.),
 		); 
 		$metas = array_merge($metas, $metasAdd);
 		$key = "/".$metas["Rekall->Folder"].$metas["File->File Name"];
