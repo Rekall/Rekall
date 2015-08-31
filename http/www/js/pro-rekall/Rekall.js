@@ -112,7 +112,8 @@ Rekall.prototype.start = function() {
 	this.timeline.bar.text = new Kinetic.Text({
 		y: 			0,
 		fontSize: 	10,
-		fontFamily: 'open_sansregular',
+		fontFamily: 'OpenSans',  
+		fontWeight: 400,
 		fill: 		'#2DCAE1',
 		text: 		"",
 		listening: false, 

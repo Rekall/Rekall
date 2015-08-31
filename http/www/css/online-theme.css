@@ -5,7 +5,7 @@ html, body {
   	height: 	 			100%;
   	margin: 	 			0px;
 	color: 		 			white;
-    font-family:    		'Open Sans';
+    font-family:    		'OpenSans';
   	font-weight: 			400;
 	font-size:	 			12px;
 	background-color: 		black;
@@ -16,7 +16,56 @@ html, body {
 	-ms-user-select: 		none;
 	user-select: 			none;
 }
-   
+              
+
+#popupSpace {
+	width:					100%;
+	height:					100%;
+	background:				rgba(0,0,0,.25);
+	position:				absolute; 
+	z-index:				1000;         
+    display:none;           
+}
+#popup {
+	width:					80%;
+	height:					80%;
+	background:				#222;
+	position:				absolute;   
+	top:					10%;
+	left:					10%; 
+	border-radius:			5px;
+	border:					2px solid #333;  
+	box-shadow:				0 5px 10px #000;      
+  	font-weight: 			400;
+	font-size:	 			1.5em;
+}    
+#popupLeft {
+	width:					30%;
+	height:					90%;  
+	background:				rgba(255,255,255,.1); 
+	padding:				5%;    
+	vertical-align:			top;
+}                    
+#popupImg {
+	width:					100%; 
+	height:					100px;  
+	background:				rgba(255,255,255,.1);    
+	display:				inline-block;
+}   
+.popupText {
+	width:					100%; 
+	height:					100px;  
+	background:				rgba(255,255,255,.1);  
+	display:				inline-block;
+}
+#popupRight {
+	width:					55%;
+	height:					90%;   
+	background:				rgba(255,255,255,.1); 
+	padding:				5% 5% 5% 0;    
+	vertical-align:			top;
+}
+
 #container {
 	width: 			  		100%;
 	height: 		  		100%;
@@ -44,8 +93,8 @@ html, body {
 }
  
 
-#flattentimeline_main_title {
-	font-family:			"open_sanslight";
+#flattentimeline_main_title {             
+	font-weight:			200;
 	/*height:				40px;*/
 	line-height:			20px;
 	padding:				10px 0;
@@ -61,8 +110,8 @@ html, body {
 	font-size:				18px;
 	border-bottom:			2px solid #1B1D1E;
 }         
-#flattentimeline_settings {
-	font-family:			"open_sanslight";
+#flattentimeline_settings {                
+	font-weight:			200;
 	height:					240px;
 	line-height:			40px;
 	text-align:				center;
@@ -181,8 +230,8 @@ html, body {
 	display:				block;   
 }
 
-.flattentimeline_title {
-	font-family:			"open_sansregular";
+.flattentimeline_title {                   
+	font-weight:			400;
 	font-size:				10px;  
 	line-height:			39px;   
 	color:					rgba(255,255,255,.5);
@@ -204,8 +253,8 @@ html, body {
 	color:					rgba(255,255,255,1); 
 }           
 
-.flattentimeline_highlightitem .flattentimeline_description {
-	font-family:			"open_sansregular";
+.flattentimeline_highlightitem .flattentimeline_description {    
+	font-weight:			400;
 	font-size:				9px;  
 	line-height:			1.4em;   
 	color:					rgba(255,255,255,.5);    
@@ -218,7 +267,8 @@ html, body {
 }
 
 .flattentimeline_subtitle {
-	font-family:			"open_sanslight";
+	font-family:			"OpenSans";   
+	font-weight:			200;
 	top:					25px;
 	font-size:				10px;
 	left: 					40px;
@@ -270,7 +320,7 @@ html, body {
 	margin:					22px 5px;
 }
 .flattentimeline_counter {
-	font-family:			"open_sanssemibold";
+	font-weight:			600;
 	top:					5px;
 	left:					5px;
 	width:					40px;

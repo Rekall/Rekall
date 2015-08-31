@@ -211,7 +211,7 @@ Project.prototype.analyse = function() {
                                     
 
 					var htmlHighlight = ""; 
-					htmlHighlight	+=	"<div class='flattentimeline_item flattentimeline_highlightitem'>";
+					htmlHighlight	+=	"<div draggable=true class='flattentimeline_item flattentimeline_highlightitem'>";
 					htmlHighlight	+=	"<div class='flattentimeline_type'			style='" + icnType +"' title='" + tmpType + "'></div>";       
 					htmlHighlight	+=	"<div class='flattentimeline_image'      	style='" + styleImage + "'></div>"; 
 					htmlHighlight 	+=	"<div class='flattentimeline_title' 		title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";   
@@ -263,7 +263,7 @@ Project.prototype.analyse = function() {
                                     
 
 					var html = ""; 
-					html	+= "<div draggable=true class='flattentimeline_item'>";  
+					html	+= "<div draggable=true class='flattentimeline_item' title='" + tag.getMetadata("Rekall->Comments") + "'>";  
 					html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";   
 					html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";                     
 					html 	+= "<div class='flattentimeline_type'		style='" + icnType +"' title='" + tmpType + "'></div>";                                                           

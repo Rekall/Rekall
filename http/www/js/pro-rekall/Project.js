@@ -618,7 +618,8 @@ Project.prototype.analyse = function(full, isCheckbox) {
 			horizontalSortingCategory.categoryText = new Kinetic.Text({
 				fill: 		'#F5F8EE',
 				fontSize: 	9,
-				fontFamily: 'open_sansregular',
+				fontFamily: 'OpenSans',  
+				fontWeight: 400,  
 				listening: 	false,
 				transformsEnabled: 'position',
 			});
@@ -683,7 +684,8 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				
 				fill: 		'#F5F8EE',
 				fontSize: 	10,
-				fontFamily: 'open_sansregular',
+				fontFamily: 'OpenSans',    
+				fontWeight: 400,  
 				rotation: 	-90,
 				listening: 	false,
 				transformsEnabled: 'all',
@@ -730,7 +732,8 @@ Project.prototype.analyse = function(full, isCheckbox) {
 					fill: 		'#F5F8EE',
 					text: 		verticalSortingCategory.categoryVerbose,
 					fontSize: 	10,
-					fontFamily: 'open_sansregular',
+					fontFamily: 'OpenSans',  
+					fontWeight: 400,
 					listening: 	false,
 					transformsEnabled: 'position',
 				});
