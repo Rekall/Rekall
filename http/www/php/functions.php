@@ -36,7 +36,7 @@
 	}
 	
 	//Créé une vignette à hauteur fixe
-	function createThumb($filenameSrc, $filenameDst, $newheight) {
+	function createThumb($filenameSrc, $filenameDst, $maxcote) {
 		if(file_exists($filenameSrc)) {
 			//Créé une vignette PNG
 			if(strtolower(pathinfo($filenameSrc, PATHINFO_EXTENSION)) == "png") {
@@ -44,24 +44,26 @@
 				if($temp_image_file !== FALSE) {
 					list($width,$height) = getimagesize($filenameSrc);
 					if(($width > 10) && ($height > 10)) {
-						$newwidth = $width * ($newheight / $height);
+						$newwidth = $width * ($maxcote / $height);
+						if($width > $height)
+							$newwidth = $width * ($maxcote / $height);
+						else if($width > $height)
+							$maxcote = $height / ($maxcote / $width);
 
-						$image_file = imagecreatetruecolor($newwidth, $newheight);
+						$image_file = imagecreatetruecolor($newwidth, $maxcote);
 						imagealphablending($image_file, false );
 						imagesavealpha($image_file, true );
-						imagecopyresampled($image_file, $temp_image_file, 0,0,0,0, $newwidth, $newheight, $width, $height);
-						imagepng($image_file, $filenameDst);
+						imagecopyresampled($image_file, $temp_image_file, 0,0,0,0, $newwidth, $maxcote, $width, $height);
+						imagejpeg($image_file, $filenameDst);
 						imagedestroy($temp_image_file);
 						imagedestroy($image_file);
 					}
 					else {
-						echo "Image trop petite";
 						unline($filenameSrc);
 						unline($filenameDst);
 					}
 				}
 				else {
-					echo "Erreur de structure d'image";
 					unline($filenameSrc);
 					unline($filenameDst);
 				}
@@ -72,28 +74,24 @@
 				if($temp_image_file !== FALSE) {
 					list($width,$height) = getimagesize($filenameSrc);
 					if(($width > 10) && ($height > 10)) {
-						$newwidth = $width * ($newheight / $height);
+						$newwidth = $width * ($maxcote / $height);
 
-						$image_file = imagecreatetruecolor($newwidth, $newheight);
-						imagecopyresampled($image_file, $temp_image_file, 0,0,0,0, $newwidth, $newheight, $width, $height);
+						$image_file = imagecreatetruecolor($newwidth, $maxcote);
+						imagecopyresampled($image_file, $temp_image_file, 0,0,0,0, $newwidth, $maxcote, $width, $height);
 						imagejpeg($image_file, $filenameDst);
 						imagedestroy($temp_image_file);
 						imagedestroy($image_file);
 					}
 					else {
-						echo "Image trop petite";
 						unlink($filenameSrc);
 						unlink($filenameDst);
 					}
 				}
 				else {
-					echo "Erreur de structure d'image";
 					unlink($filenameSrc);
 					unlink($filenameDst);
 				}
 			}
 		}
-		else
-			echo "Fichier non trouvé";
 	}
 ?>

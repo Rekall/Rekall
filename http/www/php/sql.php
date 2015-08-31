@@ -5,6 +5,7 @@
 	session_start();
 	
 	$uploadFolder  = "../file/";
+	ini_set('memory_limit', '64M');
 /*
 	if(strpos(strtolower($_SERVER["HTTP_HOST"]), "typomatic.fr") !== false) {
 		header("Status: 301 Moved Permanently", false, 301);

@@ -2,7 +2,11 @@
 <?php
 	$project = new DomDocument();
 	$racine  = null;
+	
+	//Ouverture / fermeture
 	function openProject() {
+		header('Content-Type: text/plain charset=utf-8');
+		
 		global $project;
 		global $racine;
 		$project->preserveWhiteSpace = false;
@@ -10,6 +14,14 @@
 		$project->formatOutput = true;
 		$racine = $project->documentElement;
 	}
+	function closeProject() {
+		global $project;
+		global $racine;
+		$project->save("../file/project.xml");
+	}
+	
+	
+	//Ajoute un document
 	function addFileToProject($file, $metas, $tc) {
 		global $project;
 		global $racine;
@@ -55,6 +67,13 @@
 			"Rekall->File Size (MB)"			=> filesize($file)/(1024.*1024.),
 		); 
 		$metas = array_merge($metas, $metasAdd);
+		
+		//Génère une vignette
+		$fileDestBasename = strtoupper(sha1($metas["Rekall->Folder"])."-".$metas["File->Hash"]);
+		$fileDest = "../file/rekall_cache/".$fileDestBasename.".jpg";
+		createThumb($file, $fileDest, 160);
+		if(file_exists($fileDest))
+			$metas["File->Thumbnail"] = $fileDestBasename;
 
 		//Ajout des métadatas
 		foreach($metas as $metaCategory => $metaContent) {
@@ -75,9 +94,127 @@
 		
 		return $metas;
 	}
-	function closeProject() {
+	
+	//Supprime un document
+	function removeFileFromProject($folder, $file) {
 		global $project;
 		global $racine;
-		$project->save("../file/project.xml");
+		$key = "/".$folder.$file;
+		$retours = array("document" => 0, "tag" => 0, "file" => 0);
+		$thumbnail = "";
+		
+		//Recherche dans les documents
+		$documents = $racine->getElementsByTagName("document");
+		foreach($documents as $document) {
+			$metas = $document->getElementsByTagName("meta");
+			$searchFile   = "";
+			$searchFolder = "";
+			foreach($metas as $meta) {
+				if     ($meta->getAttribute("ctg") == "File->File Name")
+					$searchFile = $meta->getAttribute("cnt");
+				else if($meta->getAttribute("ctg") == "Rekall->Folder")
+					$searchFolder = $meta->getAttribute("cnt");
+				else if($meta->getAttribute("ctg") == "File->Thumbnail")
+					$thumbnail = $meta->getAttribute("cnt");
+			}
+			$searchKey = "/".$searchFolder.$searchFile;
+			if($searchKey == $key) {
+				$retours["document"]++;
+				$racine->removeChild($document);
+				break;
+			}
+			else
+				$thumbnail = "";
+		}
+		
+		//Recherche dans les tags
+		$tags = $racine->getElementsByTagName("tag");
+		foreach($tags as $tag) {
+			$searchKey = $tag->getAttribute("key");
+			if($searchKey == $key) {
+				$retours["tag"]++;
+				$racine->removeChild($tag);
+			}
+		}
+		
+		//Supprime le fichier
+		$fileToRemove = "../file".$key;
+		if(file_exists($fileToRemove)) {
+			$retours["file"]++;
+			unlink($fileToRemove);
+		}
+		//et sa vignette
+		$fileToRemove = "../file/rekall_cache/".$thumbnail.".jpg";
+		if(file_exists($fileToRemove)) {
+			$retours["file"]++;
+			unlink($fileToRemove);
+		}
+		
+		
+		
+		echo json_encode($retours);
+	}
+	
+	//Change le TC
+	function editTc($folder, $file, $tcIn, $tcOut) {
+		global $project;
+		global $racine;
+		$key = "/".$folder.$file;
+		$retours = array("success" => 1);
+		
+		//Tag de timeline
+		$tag = $project->createElement("tag");
+		$tag->setAttribute("key",       $key);
+		$tag->setAttribute("timeStart", $tcIn);
+		$tag->setAttribute("timeEnd",   $tcOut);
+		$tag->setAttribute("version",   0);
+		$racine->appendChild($tag);
+
+		echo json_encode($retours);
+	}
+	
+	//Change les metadonnées
+	function editMetadata($folder, $file, $metadataKey, $metadataValue) {
+		global $project;
+		global $racine;
+		$key = "/".$folder.$file;
+		$retours = array("success" => 1);
+
+		//Tag de timeline
+		$edition = $project->createElement("edition");
+		$edition->setAttribute("key",           $key);
+		$edition->setAttribute("metadataKey",   $metadataKey);
+		$edition->setAttribute("metadataValue", $metadataValue);
+		$edition->setAttribute("version",   0);
+		$racine->appendChild($edition);
+
+		echo json_encode($retours);
+	}
+
+	//API
+	if(true) {
+		//Opérations sur les fichiers
+		if((isset($_GET["folder"])) && (isset($_GET["file"]))) {
+			if(isset($_GET["remove"])) {
+				openProject();
+				removeFileFromProject($_GET["folder"], $_GET["file"]);
+				closeProject();
+			}
+			else if(isset($_GET["add"])) {
+				openProject();
+				removeFileFromProject($_GET["folder"], $_GET["file"]);
+				closeProject();
+			}
+			else if((isset($_GET["tcIn"])) && (isset($_GET["tcOut"]))) {
+				openProject();
+				editTc($_GET["folder"], $_GET["file"], $_GET["tcIn"], $_GET["tcOut"]);
+				closeProject();
+			}
+			else if((isset($_GET["metadataKey"])) && (isset($_GET["metadataValue"]))) {
+				openProject();
+				editMetadata($_GET["folder"], $_GET["file"], $_GET["metadataKey"], $_GET["metadataValue"]);
+				closeProject();
+			}
+		}
 	}
 ?>
