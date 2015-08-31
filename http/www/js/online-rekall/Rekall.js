@@ -47,7 +47,7 @@ Rekall.prototype.loadXMLFile = function() {
 	this.baseUrl = url;
 	
 	var thiss = this;
-	$.ajax("project.xml", {
+	$.ajax("file/project.xml", {
 		type: "GET",
 		dataType: "xml",
 		success: function(xml) {
