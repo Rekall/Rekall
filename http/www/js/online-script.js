@@ -1,6 +1,17 @@
 var videoPlayer = undefined;
 var rekall = new Rekall();
+var rekall_common = new Object();
 $(document).ready(function() {
+	rekall_common.isEditor = true;
+	rekall_common.owner = {"author": "Guillaume Jacquemin", "locationGps": "", "locationName": ""};
+	
+	
+	if((rekall_common.isEditor) && (navigator.geolocation))
+		navigator.geolocation.getCurrentPosition(function(position) {
+			rekall_common.owner.locationGps  = position.coords.latitude + ", " + position.coords.longitude;
+			rekall_common.owner.locationName = rekall_common.owner.locationGps;
+		});
+	
 	//Video
 	videojs("video", {
 		"controls": true,
@@ -121,6 +132,7 @@ $(document).ready(function() {
 	rekall.loadXMLFile();
 });
 
+var filesToUpload = [], fileIsUploading = false;
 function uploadFiles(files) {
 	$.each(files, function(index, file) {
 		if(file.name != undefined) {
@@ -130,9 +142,70 @@ function uploadFiles(files) {
 			}
 			var fileType     = (file.type.split("/"))[0];
 			var fileDateTime = moment(file.lastModifiedDate);
-			alert("Chargement de " + file.name + " (" + fileType + ", " + file.size + " octets, date du " + fileDateTime.format("YYYY:MM:DD HH:mm:ss") + ")");
+			//alert("Chargement de " + file.name + " (" + fileType + ", " + file.size + " octets, date du " + fileDateTime.format("YYYY:MM:DD HH:mm:ss") + ")");
+			
+			//Données du formulaire
+			var formData = undefined;
+			if($('form')[0] != undefined)
+				formData = new FormData($('form')[0]); //à vérifier
+			else {
+				formData = new FormData();
+				formData.append("fileToUpload", file);
+			}
+			formData.append(file.name + "_date", fileDateTime.format("YYYY:MM:DD HH:mm:ss"));
+			formData.append("tc", rekall.timeline.timeCurrent);
+			formData.append("author",       rekall_common.owner.author);
+			formData.append("locationGps",  rekall_common.owner.locationGps);
+			formData.append("locationName", rekall_common.owner.locationName);
+			
+			if(formData != undefined) {
+				filesToUpload.push({
+					url: 'php/upload.php',
+					type: 'POST',
+					xhr: function() {
+						var myXhr = $.ajaxSettings.xhr();
+						if(myXhr.upload) {
+							myXhr.upload.addEventListener('progress', function(event) {
+								window.document.title = "Téléchargement " + floor(event.loaded / event.total * 100) + "%";
+							}, false);
+						}
+						return myXhr;
+					},
+					beforeSend: function(data) {
+						//alert("beforeSend : " + data);
+					},
+					success:    function(data) {
+						console.log(data);
+						data = JSON.parse(data);
+						alert(data.files[0].metas["Rekall->Name"] + " téléchargé");
+						window.document.title = "Rekall Online";
+						fileIsUploading = false;
+						uploadFilesNext();
+					},
+					error:      function(data) {
+						alert("Erreur de téléchargement");
+						window.document.title = "Rekall Online";
+						fileIsUploading = false;
+						uploadFilesNext();
+					},
+
+					data:		 formData,
+					cache:       false,
+					contentType: false,
+					processData: false
+				});
+				uploadFilesNext();
+			}
 		}
 	});
+}
+function uploadFilesNext() {
+	if((filesToUpload.length > 0) && (!fileIsUploading)) {
+		fileIsUploading = true;
+		$.ajax(filesToUpload[0]);
+		filesToUpload.splice(0, 1);
+		uploadFilesNext();
+	}
 }
 
 function showInRuban(texte, time) {

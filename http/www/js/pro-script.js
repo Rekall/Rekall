@@ -282,11 +282,10 @@ function documentReadyIntro() {
 var rubanTimeout = 0;
 var rubanMessage = "";
 var rubanTimeoutTime = 0;
-function showInRuban(message, duration) {    
-    
+function showInRuban(message, duration) {
 	if(message == undefined) {     
 		clearInterval(rubanTimeout);
-		$("#ruban").slideUp(function() {
+		$("#ruban").slideUp(function() {
 			$("#ruban").html("");
 		});
 	}
