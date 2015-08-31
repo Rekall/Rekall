@@ -29,33 +29,26 @@
 			$date      = date("Y:m:d H:i:s");
 			
 			$filename = $_FILES[$fileinfo]['name'];
-			$filenam_ = str_replace(".", "_", $filename);
 			$retour .= "{";
 
 			if(isset($_POST["date"]))				$date = $_POST["date"];
-			if(isset($_POST[$filenam_."_date"]))	$date = $_POST[$filenam_."_date"];
 			$metas = array(
 				"Rekall->Author"					=> "",
 				"File->File Access Date/Time"		=> $date,
 				"File->File Creation Date/Time"		=> $date,
 				"File->File Modification Date/Time"	=> $date,
 				"Rekall->Date/Time"					=> $date,
-				"Rekall->Import Date"				=> $date,
+				"Rekall->Import Date"				=> date("Y:m:d H:i:s"),
 			);
 			
 			$fileTc = "";
 			if(isset($_POST["tc"]))					$fileTc = $_POST["tc"];
-			if(isset($_POST[$filenam_."_tc"]))		$fileTc = $_POST[$filenam_."_tc"];
 
 			if(isset($_POST["author"]))				$metas["Rekall->Author"] = $_POST["author"];
-			if(isset($_POST[$filenam_."_author"]))	$metas["Rekall->Author"] = $_POST[$filenam_."_author"];
 			$metas["Rekall User Infos->User Name"]  = $metas["Rekall->Author"];
 
 			if(isset($_POST["locationName"]))				$metas["Rekall->Location Name"] = $_POST["locationName"];
-			if(isset($_POST[$filenam_."_locationName"]))	$metas["Rekall->Location Name"] = $_POST[$filenam_."_locationName"];
 			if(isset($_POST["locationGps"]))				$metas["Rekall->Location GPS"]  = $_POST["locationGps"];
-			if(isset($_POST[$filenam_."_locationGps"]))		$metas["Rekall->Location GPS"]  = $_POST[$filenam_."_locationGps"];
-
 			$metas["Rekall User Infos->User IP"]    = $_SERVER['REMOTE_ADDR'];
 			
 			$infos = explode("|", $fileinfo);
@@ -94,6 +87,44 @@
 
 		exit();
 	}
+	else if((isset($_POST)) && (count($_POST) > 0)) {
+		header('Content-Type: text/plain charset=utf-8');
+		
+		$retour = "{";
+		$status = false;
+		openProject();
+
+		$date = date("Y:m:d H:i:s");
+		if(isset($_POST["date"]))	$date = $_POST["date"];
+		
+		$metas = array(
+			"Rekall->Author"					=> "",
+			"Rekall->Date/Time"					=> $date,
+			"Rekall->Import Date"				=> date("Y:m:d H:i:s"),
+		);
+		
+		$fileTc = "";
+		if(isset($_POST["tc"]))					$fileTc = $_POST["tc"];
+
+		if(isset($_POST["author"]))				$metas["Rekall->Author"] = $_POST["author"];
+		$metas["Rekall User Infos->User Name"]  = $metas["Rekall->Author"];
+
+		if(isset($_POST["locationName"]))				$metas["Rekall->Location Name"] = $_POST["locationName"];
+		if(isset($_POST["locationGps"]))				$metas["Rekall->Location GPS"]  = $_POST["locationGps"];
+		$metas["Rekall User Infos->User IP"]    = $_SERVER['REMOTE_ADDR'];
+
+		$metasAdded = addMarkerToProject($_POST["name"], $metas, $fileTc);
+		$retour .= '"code":1, "tc":'.$fileTc.', "status":"OK", "metas":'.json_encode($metasAdded);
+		$status |= true;
+
+		$retour .= "},";
+			
+		$retour = rtrim($retour, ",");
+		echo '{"code":'.(($status==true)?(1):(0)).', "files":['.$retour."]}";
+		closeProject();
+
+		exit();
+	}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -108,7 +139,7 @@
 		    
 			<input type="text" name="tc"     value="234">
 			<input type="text" name="author" value="Guillaume Jacquemin">
-		    <input type="text" name="image_jpg_date" value="2010:01:28 08:10:32">
+		    <input type="text" name="date" value="2010:01:28 08:10:32">
 			
 		    <input type="submit" value="Upload Image" name="submit">
 		</form>

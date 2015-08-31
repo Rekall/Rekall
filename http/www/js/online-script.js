@@ -127,6 +127,11 @@ $(document).ready(function() {
 			}
 		}
 	});
+	
+	$(document).keyup(function(event) {
+		if(event.keyCode == 77)
+			uploadFiles(["Mon marker"]);
+	});
 		
 	rekall.loadXMLFile();
 });
@@ -134,6 +139,8 @@ $(document).ready(function() {
 var filesToUpload = [], fileIsUploading = false;
 function uploadFiles(files) {
 	$.each(files, function(index, file) {
+		var formData = new FormData();
+		
 		if(file.name != undefined) {
 			var colorCategory = rekall.sortings["colors"].categories[Sorting.prefix + file.type];
 			if(colorCategory != undefined) {
@@ -144,60 +151,61 @@ function uploadFiles(files) {
 			//alert("Chargement de " + file.name + " (" + fileType + ", " + file.size + " octets, date du " + fileDateTime.format("YYYY:MM:DD HH:mm:ss") + ")");
 			
 			//Données du formulaire
-			var formData = undefined;
 			if($('form')[0] != undefined)
 				formData = new FormData($('form')[0]); //à vérifier
 			else {
-				formData = new FormData();
 				formData.append("fileToUpload", file);
+				formData.append("date", fileDateTime.format("YYYY:MM:DD HH:mm:ss"));
 			}
-			formData.append(file.name + "_date", fileDateTime.format("YYYY:MM:DD HH:mm:ss"));
-			formData.append("tc", rekall.timeline.timeCurrent);
-			formData.append("author",       rekall_common.owner.author);
-			formData.append("locationGps",  rekall_common.owner.locationGps);
-			formData.append("locationName", rekall_common.owner.locationName);
-			
-			if(formData != undefined) {
-				filesToUpload.push({
-					url: 'php/upload.php',
-					type: 'POST',
-					xhr: function() {
-						var myXhr = $.ajaxSettings.xhr();
-						if(myXhr.upload) {
-							myXhr.upload.addEventListener('progress', function(event) {
-								window.document.title = "Téléchargement " + floor(event.loaded / event.total * 100) + "%";
-							}, false);
-						}
-						return myXhr;
-					},
-					beforeSend: function(data) {
-						//alert("beforeSend : " + data);
-					},
-					success:    function(data) {
-						console.log(data);
-						data = JSON.parse(data);
-						if(data.files[0].code > 0)
-							alert(data.files[0].metas["Rekall->Name"] + " téléchargé");
-						else
-							alert(data.files[0].error);
-						window.document.title = "Rekall Online";
-						fileIsUploading = false;
-						uploadFilesNext();
-					},
-					error:      function(data) {
-						alert("Erreur de téléchargement");
-						window.document.title = "Rekall Online";
-						fileIsUploading = false;
-						uploadFilesNext();
-					},
-
-					data:		 formData,
-					cache:       false,
-					contentType: false,
-					processData: false
-				});
-				uploadFilesNext();
-			}
+		}
+		else {
+			formData.append("name", file);
+		}
+		
+		formData.append("tc", 			rekall.timeline.timeCurrent);
+		formData.append("author",       rekall_common.owner.author);
+		formData.append("locationGps",  rekall_common.owner.locationGps);
+		formData.append("locationName", rekall_common.owner.locationName);
+		
+		if(formData != undefined) {
+			filesToUpload.push({
+				url: 'php/upload.php',
+				type: 'POST',
+				xhr: function() {
+					var myXhr = $.ajaxSettings.xhr();
+					if(myXhr.upload) {
+						myXhr.upload.addEventListener('progress', function(event) {
+							window.document.title = "Téléchargement " + floor(event.loaded / event.total * 100) + "%";
+						}, false);
+					}
+					return myXhr;
+				},
+				beforeSend: function(data) {
+					//alert("beforeSend : " + data);
+				},
+				success:    function(data) {
+					console.log(data);
+					data = JSON.parse(data);
+					if(data.files[0].code > 0)
+						alert(data.files[0].metas["Rekall->Name"] + " téléchargé");
+					else
+						alert(data.files[0].error);
+					window.document.title = "Rekall Online";
+					fileIsUploading = false;
+					uploadFilesNext();
+				},
+				error:      function(data) {
+					alert("Erreur de téléchargement");
+					window.document.title = "Rekall Online";
+					fileIsUploading = false;
+					uploadFilesNext();
+				},
+				data:		 formData,
+				cache:       false,
+				contentType: false,
+				processData: false
+			});
+			uploadFilesNext();
 		}
 	});
 }
