@@ -347,7 +347,10 @@
 	}
 
 	//API
-	if(true) {
+	$isEditor = true;
+	if($isEditor) {
+		$_GET = array_merge($_GET, $_POST);
+		
 		//Opérations sur les fichiers
 		if((isset($_GET["folder"])) && (isset($_GET["file"]))) {
 			if(isset($_GET["remove"])) {
@@ -396,5 +399,8 @@
 				editProject($_GET["edit"], $_GET["to"]);
 			}
 		}
+	}
+	if(isset($_GET["status"])) {
+		echo json_encode(array("isEditor" => $isEditor));
 	}
 ?>

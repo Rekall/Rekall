@@ -30,13 +30,13 @@ function Timeline() {
 }
 
 Timeline.prototype.play = function(timeCurrentOffset) {
-	videoPlayer.play();
+	rekall.videoPlayer.play();
 }
 Timeline.prototype.stop = function() {
-	videoPlayer.stop();
+	rekall.videoPlayer.stop();
 }
 Timeline.prototype.rewind = function(timeCurrentOffset) {
-	videoPlayer.rewind();
+	rekall.videoPlayer.rewind();
 }
 
 Timeline.prototype.toggle = function() {

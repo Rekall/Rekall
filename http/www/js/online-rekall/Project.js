@@ -107,16 +107,105 @@ Project.prototype.loadXML = function(xml) {
 	videoTech = "youtube";
 	if((videoUrl != "") && (videoUrl != undefined)) {
 		/*
-		//videoPlayer."techOrder": ["youtube", "html5", "flash"], //youtube dailymotion vimeo
+		//rekall.videoPlayer."techOrder": ["youtube", "html5", "flash"], //youtube dailymotion vimeo
 		if((videoTech != "") && (videoTech != undefined))
-			videoPlayer.options.techOrder = [videoTech];
-		//videoPlayer.options.techOrder = ['flash', 'html5'];
+			rekall.videoPlayer.options.techOrder = [videoTech];
+		//rekall.videoPlayer.options.techOrder = ['flash', 'html5'];
 		*/
-		videoPlayer.src(videoUrl);	
-	}
+		//Video
+		if(rekall.videoPlayer == undefined) {
+			videojs("video", {
+				"controls": true,
+				"autoplay": false,
+				"preload": 	"auto",
+				"loop": 	"false",
+				//"poster":   "http://video-js.zencoder.com/oceans-clip.png",
+				"techOrder": ["youtube", "html5", "flash"], //youtube dailymotion vimeo
+		/*
+				"src": 	 	"https://vimeo.com/45161598",
+				"techOrder": [""], "src" : "",
+				"techOrder": ["vimeo"], "src" : "",
+				"techOrder": ["html5", "flash"], "src": "oceans-clip.mp4",
+		*/
+				children: {
+					controlBar: {
+						children: {
+							fullscreenToggle: 	false,
+						}
+					}
+				}
+				/*
+				    PosterImage
+				    TextTrackDisplay
+				    LoadingSpinner
+				    BigPlayButton
+				    ControlBar
+				        PlayToggle
+				        FullscreenToggle
+				        CurrentTimeDisplay
+				        TimeDivider
+				        DurationDisplay
+				        RemainingTimeDisplay
+				        ProgressControl
+				            SeekBar
+				              LoadProgressBar
+				              PlayProgressBar
+				              SeekHandle
+				        VolumeControl
+				            VolumeBar
+				                VolumeLevel
+				                VolumeHandle
+				        MuteToggle
+				*/
+			}, function() {
+				rekall.videoPlayer = this;
+				//rekall.videoPlayer.volume(0);
+				//rekall.timeline.play();
+				rekall.videoPlayer.src(videoUrl);
+				//rekall.videoPlayer.src([{type: "video/mp4", src: "http://video-js.zencoder.com/oceans-clip.mp4"}, {type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm"}, {type: "video/ogg", src: "http://video-js.zencoder.com/oceans-clip.ogv"}]);
+				//rekall.videoPlayer.src("http://www.dailymotion.com/video/xxvfw4_guillaume-jacquemin-soiree-di-zain-5-code-s-data-s_creation");
 
-	//videoPlayer.src([{type: "video/mp4", src: "http://video-js.zencoder.com/oceans-clip.mp4"}, {type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm"}, {type: "video/ogg", src: "http://video-js.zencoder.com/oceans-clip.ogv"}]);
-	//videoPlayer.src("http://www.dailymotion.com/video/xxvfw4_guillaume-jacquemin-soiree-di-zain-5-code-s-data-s_creation");
+				rekall.videoPlayer.on("durationchange", function(e) {
+				});
+				rekall.videoPlayer.on("ended", function(e) {
+				});
+				rekall.videoPlayer.on("error", function(e) {
+				});
+				rekall.videoPlayer.on("firstplay", function(e) {
+				});
+				rekall.videoPlayer.on("fullscreenchange", function(e) {
+				});
+				rekall.videoPlayer.on("loadedalldata", function(e) {
+				});
+				rekall.videoPlayer.on("loadeddata", function(e) {
+				});
+				rekall.videoPlayer.on("loadedmetadata", function(e) {
+				});
+				rekall.videoPlayer.on("loadstart", function(e) {
+				});
+				rekall.videoPlayer.on("pause", function(e) {
+				});
+				rekall.videoPlayer.on("play", function(e) {
+				});
+				rekall.videoPlayer.on("progress", function(e) {
+				});
+				rekall.videoPlayer.on("seeked", function(e) {
+				});
+				rekall.videoPlayer.on("seeking", function(e) {
+				});
+				rekall.videoPlayer.on("timeupdate", function(e) {
+					rekall.timeline.update(rekall.videoPlayer.currentTime());
+				});
+				rekall.videoPlayer.on("volumechange", function(e) {
+				});
+				rekall.videoPlayer.on("waiting", function(e) {
+				});
+				rekall.videoPlayer.on("resize", function(e) {
+				});
+				$(window).trigger("resize");
+			});
+		}
+	}
 	
 	console.log(counts.documents + " documents analysés, " + counts.metadatas + " métadonnées extraites et " + counts.tags + " tags affichés !");
 	this.analyse();

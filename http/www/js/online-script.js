@@ -1,106 +1,26 @@
-var videoPlayer = undefined;
 var rekall = new Rekall();
 var rekall_common = new Object();
 $(document).ready(function() {
 	rekall_common.isEditor = true;
 	rekall_common.owner = {"author": "Guillaume Jacquemin", "locationGps": "", "locationName": ""};
-	
-	if((rekall_common.isEditor) && (navigator.geolocation))
-		navigator.geolocation.getCurrentPosition(function(position) {
-			rekall_common.owner.locationGps  = position.coords.latitude + ", " + position.coords.longitude;
-			rekall_common.owner.locationName = rekall_common.owner.locationGps;
-		});
-	
-	//Video
-	videojs("video", {
-		"controls": true,
-		"autoplay": false,
-		"preload": 	"auto",
-		"loop": 	"false",
-		//"poster":   "http://video-js.zencoder.com/oceans-clip.png",
-		"techOrder": ["youtube", "html5", "flash"], //youtube dailymotion vimeo
-/*
-		"src": 	 	"https://vimeo.com/45161598",
-		"techOrder": [""], "src" : "",
-		"techOrder": ["vimeo"], "src" : "",
-		"techOrder": ["html5", "flash"], "src": "oceans-clip.mp4",
-*/
-		children: {
-			controlBar: {
-				children: {
-					fullscreenToggle: 	false,
-				}
-			}
+
+	$.ajax("php/project.php", {
+		type: "GET",
+		dataType: "json",
+		data: {"status": 1},
+		success: function(retour) {
+			rekall_common.isEditor = retour.isEditor;
+			if((rekall_common.isEditor) && (navigator.geolocation))
+				navigator.geolocation.getCurrentPosition(function(position) {
+					rekall_common.owner.locationGps  = position.coords.latitude + ", " + position.coords.longitude;
+					rekall_common.owner.locationName = rekall_common.owner.locationGps;
+				});
+
+			rekall.loadXMLFile();
+		},
+		error: function() {
 		}
-		/*
-		    PosterImage
-		    TextTrackDisplay
-		    LoadingSpinner
-		    BigPlayButton
-		    ControlBar
-		        PlayToggle
-		        FullscreenToggle
-		        CurrentTimeDisplay
-		        TimeDivider
-		        DurationDisplay
-		        RemainingTimeDisplay
-		        ProgressControl
-		            SeekBar
-		              LoadProgressBar
-		              PlayProgressBar
-		              SeekHandle
-		        VolumeControl
-		            VolumeBar
-		                VolumeLevel
-		                VolumeHandle
-		        MuteToggle
-		*/
-	}, function() {
-		videoPlayer = this;
-		rekall.loadXMLFile();
-		//videoPlayer.volume(0);
-		//rekall.timeline.play();
-		
-		videoPlayer.on("durationchange", function(e) {
-		});
-		videoPlayer.on("ended", function(e) {
-		});
-		videoPlayer.on("error", function(e) {
-		});
-		videoPlayer.on("firstplay", function(e) {
-		});
-		videoPlayer.on("fullscreenchange", function(e) {
-		});
-		videoPlayer.on("loadedalldata", function(e) {
-		});
-		videoPlayer.on("loadeddata", function(e) {
-		});
-		videoPlayer.on("loadedmetadata", function(e) {
-		});
-		videoPlayer.on("loadstart", function(e) {
-		});
-		videoPlayer.on("pause", function(e) {
-		});
-		videoPlayer.on("play", function(e) {
-		});
-		videoPlayer.on("progress", function(e) {
-		});
-		videoPlayer.on("seeked", function(e) {
-		});
-		videoPlayer.on("seeking", function(e) {
-		});
-		videoPlayer.on("timeupdate", function(e) {
-			rekall.timeline.update(videoPlayer.currentTime());
-		});
-		videoPlayer.on("volumechange", function(e) {
-		});
-		videoPlayer.on("waiting", function(e) {
-		});
-		videoPlayer.on("resize", function(e) {
-		});
-		$(window).trigger("resize");
-	});
-	
+	});	
 	
 	//Drag&drop files
 	$(document).on({
@@ -299,9 +219,9 @@ function getParameterByName(name) {
 }
 
 $(window).resize(function(e) {
-	if(videoPlayer != undefined) {
-		videoPlayer.width (($("#container").width() - $("#flattentimeline").width() - 5) + "px");
-		videoPlayer.height(($("#container").height()) + "px");
+	if(rekall.videoPlayer != undefined) {
+		rekall.videoPlayer.width (($("#container").width() - $("#flattentimeline").width() - 5) + "px");
+		rekall.videoPlayer.height(($("#container").height()) + "px");
 	}
 });
 	
