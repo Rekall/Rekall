@@ -41,10 +41,7 @@
 		//Création des métadatas
 		$metasAdd = array(
 	        "Rekall->Comments"			=> "",
-	        "Rekall->Keywords"			=> "",
-	        "Rekall->Group"				=> "",
-	        "Rekall->Visibility"		=> "",
-			
+
 			"File->Hash"				=> strtoupper(sha1_file($file)),
 			"Rekall->Flag"				=> "File",
 			
@@ -107,9 +104,6 @@
 		//Création des métadatas
 		$metasAdd = array(
 	        "Rekall->Comments"					=> "",
-	        "Rekall->Keywords"					=> "",
-	        "Rekall->Group"						=> "",
-	        "Rekall->Visibility"				=> "",
 	        "Rekall->Type"						=> "rekall/marker",
 	        "Rekall->Date/Time"					=> date("Y:m:d H:i:s"),
 	        "Rekall->Import Date"				=> date("Y:m:d H:i:s"),
