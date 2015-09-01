@@ -323,8 +323,8 @@ function deleteFromDom(keyDoc) {
 		dataType: "json",
 		data: {"key": keyDoc, "remove": 1},
 		success: function(retour) {
-			rekall.loadXMLFile();
 			deleteFromDomFinished();
+			rekall.loadXMLFile();
 		},
 		error: function() {
 			alert("Erreur lors de la mise à jour…");
