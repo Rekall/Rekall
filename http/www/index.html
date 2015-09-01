@@ -13,8 +13,6 @@
 
 	<link rel="apple-touch-icon" href="favicon.png" />
 	<link rel="stylesheet" type="text/css" href="css/reset.css" />
-	<link rel="stylesheet" type="text/css" href="js/libs/video-js/video-js.min.css" />
-	<link rel="stylesheet" type="text/css" href="css/online-theme.css" />
 
 	<title>Rekall Online</title>
 	
@@ -38,15 +36,20 @@
 	<script language="javascript" type='text/javascript' src='js/iannix.js'></script>
 	<script language="javascript" type='text/javascript' src='js/online-script.js'></script>
 
-	<script language="javascript" type='text/javascript' src="js/libs/video-js/video.js"></script>
-	<script language="javascript" type='text/javascript' src="js/libs/video-js/vjs.youtube.js"></script>
-	<script language="javascript" type='text/javascript' src="js/libs/video-js/vjs.vimeo.js"></script>
-	<script language="javascript" type='text/javascript' src="js/libs/video-js/vjs.dailymotion.js"></script>
-
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/video.dev.js"></script>
+	<link        rel="stylesheet" type="text/css"       href="js/libs/video-js/video-js.min.css" />
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/formats/vjs.youtube.js"></script>
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/formats/vjs.vimeo.js"></script>
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/formats/vjs.dailymotion.js"></script>
+	<!--
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/plugins/rangeslider.min.js"></script>
+	<link        rel="stylesheet" type="text/css"       href="js/libs/video-js/plugins/rangeslider.min.css" />
+	-->
 	<script>
 		videojs.options.flash.swf = "video-js/video-js.swf";
 	</script>
-
+	
+	<link rel="stylesheet" type="text/css" href="css/online-theme.css" />
 </head>
 <body>         
 	<div id='container'>   
