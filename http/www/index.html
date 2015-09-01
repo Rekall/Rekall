@@ -63,8 +63,16 @@
 	<link rel="stylesheet" type="text/css" href="css/online-theme.css" />
 </head>
 <body>         
-	<div id='container'>   
-		<div id="popupSpace">                
+	<div id='container'>       
+		<div id="popupAlertSpace">
+			<div id="popupAlert">
+				<div id="popupAlertMessage"></div>
+				<div id="popupAlertButtons">
+					<div class="popupAlertButton" id="popupAlertButtonOk">OK</div>
+				</div>  
+			</div>
+		</div>
+		<div id="popupSpace">  
 			<table id="popupEdit">  
 				<tr>
 					<td id="popupLeft">
@@ -87,7 +95,7 @@
 							<input class="popupTCeditfield" id="popupTCinMin" maxlength="2"  type="text" value=""/>&nbsp;:&nbsp;<input class="popupTCeditfield" id="popupTCinSec" maxlength="2"  type="text" value=""/>
 							<div class="nowTCbtn" id="nowTCin">now</div>    
 							&nbsp;&nbsp;&mdash;&nbsp;&nbsp;
-							stop
+							end
 							<input class="popupTCeditfield" id="popupTCoutMin" maxlength="2" type="text" value=""/>&nbsp;:&nbsp;<input class="popupTCeditfield" id="popupTCoutSec" maxlength="2" type="text" value=""/> 
 							<div class="nowTCbtn" id="nowTCout">now</div>    
 							<div class="TCvalidBtn" id="TCvalidModif">&#10003;</div>

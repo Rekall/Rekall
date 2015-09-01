@@ -29,7 +29,7 @@ $(document).ready(function() {
 		},
 		error: function() {
 		}
-	});	
+	});	                                                
 	
 	//Drag&drop files
 	$(document).on({
@@ -60,7 +60,15 @@ $(document).ready(function() {
 		else if(event.keyCode == 69) // E
 			embed();
 	});
-	   
+	                   
+	
+	$("#popupAlertSpace").click(function(){  
+		event.stopPropagation();      
+	});
+	$("#popupAlertButtonOk").click(function(){  
+		event.stopPropagation(); 
+		$("#popupAlertSpace").hide();
+	});
    
  	$("#popupSpace").click(function(){  
 		event.stopPropagation(); 
@@ -112,7 +120,10 @@ $(document).ready(function() {
 		var timeCurrent = convertToTime(Math.round(rekall.timeline.timeCurrent));
 		$("#popupTCoutMin").val(timeCurrent.split(":")[0]); 
 		$("#popupTCoutSec").val(timeCurrent.split(":")[1]); 
-	});        
+	});                              
+	
+	openAlert("Start time must be before stop", "ok");
+	
 	$("#TCvalidModif").click(function(){
 		event.stopPropagation();      
 		var keyDoc = $(this).parent().parent().attr("keydoc");    
@@ -123,7 +134,7 @@ $(document).ready(function() {
 		var TCin = (inMin*60)+(inSec*1);   
 		var TCout = (outMin*60)+(outSec*1);   
 		
-		if(TCin>TCout) openAlert("Starting time must be before stop");
+		if(TCin>TCout) openAlert("Start time must be set before end time", "ok");
 		else {
 			setTCFromDom(keyDoc, TCin, TCout); 
 		
@@ -187,8 +198,15 @@ $(document).ready(function() {
 	});
 });
              
-function openAlert(message) {
-	
+function openAlert(message,buttons) {
+	$("#popupAlertMessage").html(message);  
+	if(!buttons) {
+		$(".popupAlertButton").hide();
+	} else if(buttons=="ok") {   
+		$(".popupAlertButton").hide();  
+		$("#popupAlertButtonOk").show(); 
+	}  
+	$("#popupAlertSpace").show(); 
 }
 
 function closeInputs() {
