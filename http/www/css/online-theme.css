@@ -60,9 +60,12 @@ html, body {
 	font-size:				1.0em;  
 	cursor:					pointer;  
 	text-transform:			uppercase; 
-	margin:					2vh auto auto auto;        
+	margin:					3vh 1vw auto 1vw;        
 	display:				inline-block;
-}
+}   
+#popupAlertButtonOk, #popupAlertButtonYesdelete, #popupAlertButtonCancel  { 
+		display:				inline-block;
+} 
 
 
 

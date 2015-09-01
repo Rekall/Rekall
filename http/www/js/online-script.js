@@ -120,9 +120,7 @@ $(document).ready(function() {
 		var timeCurrent = convertToTime(Math.round(rekall.timeline.timeCurrent));
 		$("#popupTCoutMin").val(timeCurrent.split(":")[0]); 
 		$("#popupTCoutSec").val(timeCurrent.split(":")[1]); 
-	});                              
-	
-	openAlert("Start time must be before stop", "ok");
+	});                                                
 	
 	$("#TCvalidModif").click(function(){
 		event.stopPropagation();      
@@ -195,7 +193,21 @@ $(document).ready(function() {
 			else $("#popupLegende").html("Add a comment").addClass("empty");     
 			closeInputs(); 
 		}
+	});  
+	
+	$("#popupEditSupprimer").click(function(){
+		openAlert("Do youreally want to delete this file from the project ?", "yesnodelete");
+	});       
+	
+	$("#popupAlertButtonCancel").click(function(){
+		closeAlert();
+	});      
+	
+	$("#popupAlertButtonYesdelete").click(function(){
+		var keyDoc = $("#popupRight").attr("keyDoc");
+		deleteFromDom(keyDoc);
 	});
+	
 });
              
 function openAlert(message,buttons) {
@@ -205,8 +217,18 @@ function openAlert(message,buttons) {
 	} else if(buttons=="ok") {   
 		$(".popupAlertButton").hide();  
 		$("#popupAlertButtonOk").show(); 
-	}  
+	} else if(buttons=="yesnodelete") {   
+		$(".popupAlertButton").hide();  
+		$("#popupAlertButtonYesdelete").show(); 
+		$("#popupAlertButtonCancel").show(); 
+	}      
 	$("#popupAlertSpace").show(); 
+}       
+
+function closeAlert() {
+	$("#popupAlertMessage").html(""); 
+	$(".popupAlertButton").hide();         
+	$("#popupAlertSpace").hide(); 
 }
 
 function closeInputs() {
@@ -290,6 +312,10 @@ function setTCFromDom(keyDoc, TCin, TCout) {
 			alert("Erreur lors de la mise à jour…");
 		}
 	});	
+}  
+
+function deleteFromDom(keyDoc) {
+
 }
         
                   
