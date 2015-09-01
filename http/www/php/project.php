@@ -136,35 +136,41 @@
 	
 	
 	//Supprime un fichier
-	function removeFileFromProject($folder, $file) {
+	function removeDocumentFromProject($key) {
 		global $project;
 		global $racine;
-		$key = "/".$folder.$file;
 		$retours = array("document" => 0, "tag" => 0, "edition" => 0, "file" => 0);
 		$thumbnail = "";
 		
 		//Recherche dans les documents
 		$documents = $racine->getElementsByTagName("document");
 		foreach($documents as $document) {
-			$metas = $document->getElementsByTagName("meta");
-			$searchFile   = "";
-			$searchFolder = "";
-			foreach($metas as $meta) {
-				if     ($meta->getAttribute("ctg") == "File->File Name")
-					$searchFile = $meta->getAttribute("cnt");
-				else if($meta->getAttribute("ctg") == "Rekall->Folder")
-					$searchFolder = $meta->getAttribute("cnt");
-				else if($meta->getAttribute("ctg") == "File->Thumbnail")
-					$thumbnail = $meta->getAttribute("cnt");
-			}
-			$searchKey = "/".$searchFolder.$searchFile;
+			$searchKey = $document->getAttribute("key");
 			if($searchKey == $key) {
 				$retours["document"]++;
 				$racine->removeChild($document);
-				break;
 			}
-			else
-				$thumbnail = "";
+			else {
+				$metas = $document->getElementsByTagName("meta");
+				$searchFile   = "";
+				$searchFolder = "";
+				foreach($metas as $meta) {
+					if     ($meta->getAttribute("ctg") == "File->File Name")
+						$searchFile = $meta->getAttribute("cnt");
+					else if($meta->getAttribute("ctg") == "Rekall->Folder")
+						$searchFolder = $meta->getAttribute("cnt");
+					else if($meta->getAttribute("ctg") == "File->Thumbnail")
+						$thumbnail = $meta->getAttribute("cnt");
+				}
+				$searchKey = "/".$searchFolder.$searchFile;
+				if($searchKey == $key) {
+					$retours["document"]++;
+					$racine->removeChild($document);
+					break;
+				}
+				else
+					$thumbnail = "";
+			}
 		}
 		
 		//Recherche dans les tags
@@ -201,46 +207,6 @@
 		}
 		
 		
-		
-		echo json_encode($retours);
-	}
-	
-	
-	//Supprime un fichier
-	function removeMarkerFromProject($key) {
-		global $project;
-		global $racine;
-		$retours = array("document" => 0, "tag" => 0, "edition" => 0);
-		
-		//Recherche dans les documents
-		$documents = $racine->getElementsByTagName("document");
-		foreach($documents as $document) {
-			$searchKey = $document->getAttribute("key");
-			if($searchKey == $key) {
-				$retours["document"]++;
-				$racine->removeChild($document);
-			}
-		}
-		
-		//Recherche dans les tags
-		$tags = $racine->getElementsByTagName("tag");
-		foreach($tags as $tag) {
-			$searchKey = $tag->getAttribute("key");
-			if($searchKey == $key) {
-				$retours["tag"]++;
-				$racine->removeChild($tag);
-			}
-		}
-		
-		//Recherche dans les editions
-		$editions = $racine->getElementsByTagName("edition");
-		foreach($editions as $edition) {
-			$searchKey = $edition->getAttribute("key");
-			if($searchKey == $key) {
-				$retours["edition"]++;
-				$racine->removeChild($edition);
-			}
-		}
 		
 		echo json_encode($retours);
 	}
@@ -355,7 +321,7 @@
 		if((isset($_GET["folder"])) && (isset($_GET["file"]))) {
 			if(isset($_GET["remove"])) {
 				openProject();
-				removeFileFromProject($_GET["folder"], $_GET["file"]);
+				removeDocumentFromProject("/".$_GET["folder"].$_GET["file"]);
 				closeProject();
 			}
 			else if((isset($_GET["tcIn"])) && (isset($_GET["tcOut"]))) {
@@ -372,7 +338,7 @@
 		else if(isset($_GET["key"])) {
 			if(isset($_GET["remove"])) {
 				openProject();
-				removeMarkerFromProject($_GET["key"]);
+				removeDocumentFromProject($_GET["key"]);
 				closeProject();
 			}
 			else if((isset($_GET["tcIn"])) && (isset($_GET["tcOut"]))) {
