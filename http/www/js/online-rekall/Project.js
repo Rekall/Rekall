@@ -458,11 +458,11 @@ Project.prototype.analyse = function() {
 				display:     false,
 				displayTime: 3,
 				style: {
-					'width':'100%',
-					'height': '20%',
+					'width':            '100%',
+					'height':           '20%',
 					'background-color': 'rgba(0,0,0,0.7)',
-					'color': 'white',
-					'font-size': '17px'
+					'color':            'white',
+					'font-size':        '17px'
 				},
 				text: function(marker) {
 					return "Break overlay: " + marker.overlayText;
