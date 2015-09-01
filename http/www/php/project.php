@@ -295,6 +295,56 @@
 
 		echo json_encode($retours);
 	}
+	
+	//Créé un projet Rekall
+	function createProject($name) {
+		$retours = array("success" => 0, "error" => "", "value" => "");
+		$name = sanitize($name);
+
+		if($name == "")
+			$name = sha1(rand());
+		
+		if(!file_exists("../".$name)) {
+			$zip = new ZipArchive;
+			$res = $zip->open("seed.zip");
+			if ($res === TRUE) {
+				$zip->extractTo("../".$name);
+				$zip->close();
+				$retours["success"] = 1;
+			} else {
+				$retours["success"] = -1;
+				$retours["error"] = "No seed found";
+			}
+		}
+		else {
+			$retours["success"] = 0;
+			$retours["error"] = "Project exists";
+		}
+		$retours["value"] = $name;
+
+		echo json_encode($retours);
+	}
+	
+	//Renomme un projet Rekall
+	function editProject($oldName, $newName) {
+		$retours = array("success" => 1, "error" => "", "value" => "");
+		$oldName = sanitize($oldName);
+		$newName = sanitize($newName);
+
+		if($newName == "")
+			$newName = sha1(rand());
+		if(file_exists("../".$oldName)) {
+			rename("../".$oldName, "../".$newName);
+		}
+		else {
+			$retours["success"] = 0;
+			$retours["error"] = "Project doesn't exist";
+		}
+
+		$retours["value"] = $newName;
+
+		echo json_encode($retours);
+	}
 
 	//API
 	if(true) {
@@ -338,6 +388,12 @@
 				openProject();
 				editVideo($_GET["video"]);
 				closeProject();
+			}
+			else if(isset($_GET["create"])) {
+				createProject($_GET["create"]);
+			}
+			else if((isset($_GET["edit"])) && (isset($_GET["to"]))) {
+				editProject($_GET["edit"], $_GET["to"]);
 			}
 		}
 	}
