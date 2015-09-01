@@ -1,19 +1,29 @@
 var rekall = new Rekall();
 var rekall_common = new Object();
 $(document).ready(function() {
-	rekall_common.isEditor = true;
-	rekall_common.owner = {"author": "Guillaume Jacquemin", "locationGps": "", "locationName": ""};
+	rekall_common.owner = {"canEdit": false, "author": "", "locationGps": "", "locationName": ""};
 
 	$.ajax("php/project.php", {
 		type: "GET",
 		dataType: "json",
 		data: {"status": 1},
-		success: function(retour) {
-			rekall_common.isEditor = retour.isEditor;
-			if((rekall_common.isEditor) && (navigator.geolocation))
+		success: function(infos) {
+			rekall_common.owner = infos.owner;
+			console.log(rekall_common);
+			if((rekall_common.owner.canEdit) && (navigator.geolocation))
 				navigator.geolocation.getCurrentPosition(function(position) {
-					rekall_common.owner.locationGps  = position.coords.latitude + ", " + position.coords.longitude;
-					rekall_common.owner.locationName = rekall_common.owner.locationGps;
+					rekall_common.owner.locationGps = position.coords.latitude + "," + position.coords.longitude;
+					$.ajax("http://maps.googleapis.com/maps/api/geocode/json", {
+						type: "GET",
+						dataType: "json",
+						data: {"latlng": rekall_common.owner.locationGps},
+						success: function(infos) {
+							if((infos.results != undefined) && (infos.results[0] != undefined) && (infos.results[0].formatted_address != undefined))
+								rekall_common.owner.locationName = infos.results[0].formatted_address;
+						},
+						error: function() {
+						}
+					});	
 				});
 
 			rekall.loadXMLFile();

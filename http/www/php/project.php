@@ -347,8 +347,8 @@
 	}
 
 	//API
-	$isEditor = true;
-	if($isEditor) {
+	$canEdit = true;
+	if($canEdit) {
 		$_GET = array_merge($_GET, $_POST);
 		
 		//Opérations sur les fichiers
@@ -401,6 +401,14 @@
 		}
 	}
 	if(isset($_GET["status"])) {
-		echo json_encode(array("isEditor" => $isEditor));
+		//Récupère le lieu de l'édition
+		$details = json_decode(file_get_contents("http://ipinfo.io/{$_SERVER['REMOTE_ADDR']}"));
+		$retour  = array("owner" => array("canEdit" => false, "author" => "", "locationGps" => "", "locationName" => ""));
+		if(property_exists($details, "city"))
+			$retour["owner"]["locationName"] = $details->city;
+		$retour["owner"]["canEdit"] = $canEdit;
+
+		$retour["owner"]["author"] = "Guillaume Jacquemin";
+		echo json_encode($retour);
 	}
 ?>
