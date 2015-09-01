@@ -17,7 +17,7 @@ $(document).ready(function() {
 		"autoplay": false,
 		"preload": 	"auto",
 		"loop": 	"false",
-		"poster":   "http://video-js.zencoder.com/oceans-clip.png",
+		//"poster":   "http://video-js.zencoder.com/oceans-clip.png",
 		"techOrder": ["youtube", "html5", "flash"], //youtube dailymotion vimeo
 /*
 		"src": 	 	"https://vimeo.com/45161598",
