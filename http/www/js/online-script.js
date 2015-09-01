@@ -131,8 +131,11 @@ $(document).ready(function() {
 		var outSec = $("#popupTCoutSec").val();
 		var TCin = (inMin*60)+(inSec*1);   
 		var TCout = (outMin*60)+(outSec*1);   
+		                                                                         
+		var endVideo = rekall.videoPlayer.duration();
 		
-		if(TCin>TCout) openAlert("Start time must be set before end time", "ok");
+		if(TCin>TCout) openAlert("Start time must be set before end time", "ok"); 
+		else if(TCout>endVideo) openAlert("End time must not be set after "+convertToTime(endVideo)+" (end of the video)", "ok");  
 		else {
 			setTCFromDom(keyDoc, TCin, TCout); 
 		
