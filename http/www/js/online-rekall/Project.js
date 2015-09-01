@@ -229,12 +229,14 @@ Project.prototype.loadXML = function(xml) {
 				rekall.videoPlayer.on("resize", function(e) {
 				});
 				$(window).trigger("resize");
+	
+				console.log(counts.documents + " documents analysés, " + counts.metadatas + " métadonnées extraites et " + counts.tags + " tags affichés !");
+				rekall.project.analyse();
 			});
 		}
+		else
+			rekall.project.analyse();
 	}
-	
-	console.log(counts.documents + " documents analysés, " + counts.metadatas + " métadonnées extraites et " + counts.tags + " tags affichés !");
-	this.analyse();
 }
 
 Project.prototype.timelineUpdate = function() {
@@ -301,8 +303,20 @@ Project.prototype.analyse = function() {
 	}
 
 	//Tags / catégories
+	var markers = [];
 	for (var key in categories) {
 		$.each(categories[key].tags, function(index, tag) {
+			//Marqueurs sur la timeline
+			if(tag.isMarker()) {
+				markers.push({
+					time: 		 tag.getTimeStart(),
+					text: 		 tag.getMetadata("Rekall->Name"),
+					overlayText: tag.getMetadata("Rekall->Comments"), 
+					/*
+					class:*/
+				});
+			}
+			
 			//Analyse de vignettes
 			if(true) {
 				var thumbUrl = undefined
@@ -418,10 +432,47 @@ Project.prototype.analyse = function() {
 					return tag.flattenTimelineDom;    
 				
 				});  
-			       
 			}
-			
 		});
 	}
 	rekall.timeline.updateFlattenTimeline();
+
+	//Ajout des marqueurs sur la timeline
+	if(rekall.videoPlayer.markers.removeAll == undefined) {
+		rekall.videoPlayer.markers({
+			markerStyle: {
+				'width':            '7px',
+				'border-radius':    '30%',
+				'background-color': 'yellow'
+			},
+			markerTip:{
+				display: true,
+				text: function(marker) {
+					return "Marker: "+ marker.text;
+				},
+				time: function(marker) {
+					return marker.time;
+				}
+			},
+			breakOverlay:{
+				display:     false,
+				displayTime: 3,
+				style: {
+					'width':'100%',
+					'height': '20%',
+					'background-color': 'rgba(0,0,0,0.7)',
+					'color': 'white',
+					'font-size': '17px'
+				},
+				text: function(marker) {
+					return "Break overlay: " + marker.overlayText;
+				}
+			},
+			onMarkerClick: 	 function(marker) {},
+			onMarkerReached: function(marker) {},
+			markers: markers
+		});
+	}
+	else
+		rekall.videoPlayer.markers.reset(markers);
 }
