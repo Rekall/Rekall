@@ -99,10 +99,12 @@ Project.prototype.loadXML = function(xml) {
 			}
 		}
 	});
+	var videoUrl = "";
 	xml.find('video').each(function() {
-		var url = $(this).attr('url');
-		videoPlayer.src(url);
+		videoUrl = $(this).attr('url');
 	});
+	if(videoUrl != "")
+		videoPlayer.src(videoUrl);
 	
 
 	//videoPlayer.src([{type: "video/mp4", src: "http://video-js.zencoder.com/oceans-clip.mp4"}, {type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm"}, {type: "video/ogg", src: "http://video-js.zencoder.com/oceans-clip.ogv"}]);
@@ -299,5 +301,4 @@ Project.prototype.analyse = function() {
 		});
 	}
 	rekall.timeline.updateFlattenTimeline();
-	console.log(rekall);
 }

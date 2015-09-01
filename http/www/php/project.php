@@ -249,7 +249,7 @@
 	function editTc($key, $tcIn, $tcOut) {
 		global $project;
 		global $racine;
-		$retours = array("success" => 1);
+		$retours = array("success" => 1, "value" => "");
 		
 		//Tag de timeline
 		$tag = $project->createElement("tag");
@@ -258,6 +258,7 @@
 		$tag->setAttribute("timeEnd",   $tcOut);
 		$tag->setAttribute("version",   0);
 		$racine->appendChild($tag);
+		$retours["value"] = $key." = [".$tcIn.", ".$tcOut."]";
 
 		echo json_encode($retours);
 	}
@@ -266,7 +267,7 @@
 	function editMetadata($key, $metadataKey, $metadataValue) {
 		global $project;
 		global $racine;
-		$retours = array("success" => 1);
+		$retours = array("success" => 1, "value" => "");
 
 		//Tag de timeline
 		$edition = $project->createElement("edition");
@@ -275,6 +276,22 @@
 		$edition->setAttribute("metadataValue", $metadataValue);
 		$edition->setAttribute("version",   0);
 		$racine->appendChild($edition);
+		$retours["value"] = $key." => '".$metadataKey."' = '".$metadataValue."'";
+
+		echo json_encode($retours);
+	}
+	
+	//Change les metadonnées
+	function editVideo($url) {
+		global $project;
+		global $racine;
+		$retours = array("success" => 1, "value" => "");
+
+		//Tag de timeline
+		$video = $project->createElement("video");
+		$video->setAttribute("url", $url);
+		$racine->appendChild($video);
+		$retours["value"] = "url = ".$url;
 
 		echo json_encode($retours);
 	}
@@ -313,6 +330,13 @@
 			else if((isset($_GET["metadataKey"])) && (isset($_GET["metadataValue"]))) {
 				openProject();
 				editMetadata($_GET["key"], $_GET["metadataKey"], $_GET["metadataValue"]);
+				closeProject();
+			}
+		}
+		else {
+			if(isset($_GET["video"])) {
+				openProject();
+				editVideo($_GET["video"]);
 				closeProject();
 			}
 		}
