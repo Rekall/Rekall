@@ -45,13 +45,24 @@ $(document).ready(function() {
 		}
 	});
 	
-	$(document).keyup(function(event) {
+	$(document).keyup(function(event) {  
 		if(event.keyCode == 77) // M
 			uploadFiles(["Mon marker"]);
 		else if(event.keyCode == 69) // E
 			embed();
 	});
 	   
+   
+ 	$("#popupSpace").click(function(){  
+		closeInputs();  
+		$("#popupSpace").hide();   
+		$("#popupEdit").hide();
+	});                    
+	$("#closePopupEdit").click(function(){  
+		closeInputs();  
+		$("#popupSpace").hide();   
+		$("#popupEdit").hide();
+	});
 	
 	$("#popupEdit").click(function(){
 		closeInputs();
@@ -61,19 +72,44 @@ $(document).ready(function() {
 		event.stopPropagation();     
 		closeInputs();
 		$(this).hide();
-		$("#popupNomInput").show(); 
+		$("#popupNomInput").show().focus(); 
 	});   
 	$("#popupLegende").click(function(){  
 		event.stopPropagation();     
 		closeInputs();
 		$(this).hide();
-		$("#popupLegendeInput").show(); 
+		$("#popupLegendeInput").show().focus(); 
 	});  
 	
-	$("#closePopupEdit").click(function(){  
-		closeInputs();  
-		$("#popupSpace").hide();   
-		$("#popupEdit").hide();
+	
+	$(".popupInput").click(function(){
+		event.stopPropagation();
+	});     
+	
+	$("#popupNomInput").keyup(function(e){             
+		if(e.which == 13) {    
+			var keyDoc = $(this).parent().attr("keydoc"); 
+			var newName = $(this).val().trim();        
+			$(this).val(newName);
+			setMetaFromDom(keyDoc, "Rekall->Name", newName); 
+			
+			if(newName!="") $("#popupNom").html(newName).removeClass("empty"); 
+			else $("#popupNom").html("Add a name").addClass("empty");     
+			closeInputs(); 
+		}
+	});    
+	 
+	$("#popupLegendeInput").keyup(function(e){             
+		if(e.which == 13) {    
+			var keyDoc = $(this).parent().attr("keydoc"); 
+			var newComment = $(this).val().trim(); 
+			$(this).val(newComment);
+			setMetaFromDom(keyDoc, "Rekall->Comments", newComment); 
+			
+			if(newComment!="") $("#popupLegende").html(newComment).removeClass("empty"); 
+			else $("#popupLegende").html("Add a comment").addClass("empty");     
+			closeInputs(); 
+		}
 	});
 });
              
@@ -89,12 +125,19 @@ function fillPopupEdit(tag) {
 	$("#popupImg").attr("src",tag.thumbnail.url)
 	
 	$("#popupType").html(tag.getMetadata("Rekall->Type"));        
-	$("#popupNom").html(tag.getMetadata("Rekall->Name"));   
+	var name = tag.getMetadata("Rekall->Name");    
+	if(name!="") $("#popupNom").html(name).removeClass("empty");
+	else $("#popupNom").html("Add a name").addClass("empty");  
 	$("#popupNomInput").val(tag.getMetadata("Rekall->Name"));
 	$("#popupTCin").html(convertToTime(tag.getTimeStart()));  
 	$("#popupTCout").html(convertToTime(tag.getTimeEnd())); 
-	$("#popupLegende").html(tag.getMetadata("Rekall->Comments")); 
-	$("#popupLegendeInput").html(tag.getMetadata("Rekall->Comments")); 
+	var comments = tag.getMetadata("Rekall->Comments");
+	if(comments!="") $("#popupLegende").html(comments).removeClass("empty");
+	else $("#popupLegende").html("Add a comment").addClass("empty"); 
+	$("#popupLegendeInput").html(comments);
+	
+	$("#popupLeft").attr("keydoc",tag.document.key); 
+	$("#popupRight").attr("keydoc",tag.document.key); 
 	//tag.getMetadata("Rekall->Highlight") = "true" ou ""    
 	
 	$("#popupSpace").show();   
@@ -108,9 +151,14 @@ function convertToTime(seconds) {
 	if(seconds<10) seconds="0"+seconds;   
 	var time = minutes+":"+seconds;
 	return time;
-}
+}       
 
-//Gestion d'upload
+
+function setMetaFromDom(keyDoc, metaType, meta) {
+	
+}
+                          
+//Gestion d'upload        
 var filesToUpload = [], fileIsUploading = false;
 function uploadFiles(files) {
 	$.each(files, function(index, file) {
