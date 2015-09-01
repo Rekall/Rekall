@@ -155,19 +155,74 @@ html, body {
 	line-height:			1.6em;
 }
 #popupTC {
-	line-height:			1.6em;
+	font-size:				1em;
+	line-height:			1.8em;
 }
 #popupTCin, #popupTCout {                          
-	background:				rgba(0,0,0,.25);/*gba(255,255,255,.15);*/   
-	box-shadow:				0 1px 3px rgba(0,0,0,.1); 
+	/*background:				rgba(0,0,0,.15);/*gba(255,255,255,.15);*/   
+   /* box-shadow:				0 1px 3px rgba(0,0,0,.1);         */   
+	color:					rgba(0,0,0,.5);  
+	background:				rgba(255,255,255,.15);   
+	box-shadow:				0 1px 3px rgba(0,0,0,.1);
+	
 	border-radius:			3px;    
 	padding:				0 3%;
 	cursor:					pointer;    
 	display:				inline-block;
 }
 #popupTCin:hover, #popupTCout:hover { 
-	background:				rgba(0,0,0,.4);
-}                   
+	background:				rgba(255,255,255,.25); 
+}                    
+#popupTCedit {  
+	font-size:				1.0em;  
+	line-height:			1.2em;
+	margin-bottom:			5%;   
+	font-weight:			200;    
+	background:				rgba(0,0,0,.05); 
+	color:					rgba(255,255,255,.5);    
+	display:				none;                
+}
+.popupTCeditfield {
+	background:				rgba(0,0,0,.05);/*gba(255,255,255,.15);*/   
+	box-shadow:				0 1px 3px rgba(0,0,0,.2) inset;  
+	border:					0;   
+	border-radius:			3px;     
+	color:					rgba(255,255,255,.85); 
+	width:					1.5vw;        
+	padding:				0 2%;  
+	display:				inline-block;
+	font-size:				1.0em;    
+	line-height:			1.8em;    
+	text-align:				center;
+}          
+.nowTCbtn {
+	/*background:				rgba(255,255,255,.15);  
+	box-shadow:				0 1px 3px rgba(0,0,0,.2);  
+	border:					0;   
+	border-radius:			3px;     
+	color:					rgba(0,0,0,.25);    
+	padding:				0 2%;  
+	display:				inline-block;  
+	font-size:				1.0em;            
+	line-height:			1.8em; 
+	text-align:				center; 
+	margin-left:			1vw;    
+	text-transform:			uppercase;      */
+	/*font-variant: 			small-caps;*/  
+	text-decoration:		underline;  
+	padding:				0 1%;  
+	display:				inline-block;   
+	color:					rgba(255,255,255,.75);   
+	cursor:					pointer;
+}      
+.TCvalidBtn {
+	padding:				0 1%;    
+	margin:					0 1%;    
+	float:					right;    
+	line-height:			1.8em;  
+	color:					rgba(255,255,255,.75);  
+	cursor:					pointer;
+}
 #popupLink {
 	font-style:				italic;  
 	text-decoration:		underline; 
@@ -181,10 +236,11 @@ html, body {
 	cursor:					pointer;   
 	font-weight:			200;  
 	line-height:			1.2em;
-	padding:				2% 0;
+	padding:				0;
 }   
 .popupRightItem.empty {
 	font-style:				italic; 
+	opacity:				.8;
 }
 #popupLegendeInput {
 	font-weight:			200;

@@ -76,10 +76,21 @@
 						<div id="closePopupEdit">&times;</div>                                                        
 						<div class="popupRightItem" id="popupType"></div>
 						<div class="popupRightItem" id="popupNom"></div> 
-						<input class="popupInput" id="popupNomInput" type="text" value="Titre highlight assez long"/> 
+						<input class="popupInput" id="popupNomInput" type="text" value=""/> 
 						<div class="popupRightItem" id="popupTC">
-							<div id="popupTCin"></div>&nbsp;&nbsp;&mdash;&nbsp;&nbsp;<div id="popupTCout"></div>
-						</div>    
+							<div class="popupTCdisplay" id="popupTCin"></div>&nbsp;&nbsp;&mdash;&nbsp;&nbsp;<div class="popupTCdisplay" id="popupTCout"></div>
+						</div>
+						<div class="" id="popupTCedit">
+							&nbsp;start
+							<input class="popupTCeditfield" id="popupTCinMin" maxlength="2"  type="text" value=""/>&nbsp;:&nbsp;<input class="popupTCeditfield" id="popupTCinSec" maxlength="2"  type="text" value=""/>
+							<div class="nowTCbtn" id="nowTCin">now</div>    
+							&nbsp;&nbsp;&mdash;&nbsp;&nbsp;
+							stop
+							<input class="popupTCeditfield" id="popupTCoutMin" maxlength="2" type="text" value=""/>&nbsp;:&nbsp;<input class="popupTCeditfield" id="popupTCoutSec" maxlength="2" type="text" value=""/> 
+							<div class="nowTCbtn" id="nowTCout">now</div>    
+							<div class="TCvalidBtn" id="TCvalidModif">&#10003;</div>
+							<div class="TCvalidBtn" id="TCinvalidModif">&#10007;</div>    
+						</div>
 						<!--<div class="popupRightItem" id="popupLink">http://www.buzzinglight.com</div> -->
 						<div class="popupRightItem" id="popupLegende"></div>  
 						<textarea class="popupInput" id="popupLegendeInput" type="text"></textarea>   

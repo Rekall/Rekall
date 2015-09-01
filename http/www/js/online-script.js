@@ -63,17 +63,24 @@ $(document).ready(function() {
 	   
    
  	$("#popupSpace").click(function(){  
-		closeInputs();  
+		event.stopPropagation(); 
+		closeInputs();   
+		var isPaused = $("#popupEdit").attr("isPaused");   
+		if(isPaused=="false") rekall.timeline.play();
 		$("#popupSpace").hide();   
 		$("#popupEdit").hide();
 	});                    
-	$("#closePopupEdit").click(function(){  
-		closeInputs();  
+	$("#closePopupEdit").click(function(){
+		event.stopPropagation();     
+		closeInputs();    
+		var isPaused = $("#popupEdit").attr("isPaused");   
+		if(isPaused=="false") rekall.timeline.play();
 		$("#popupSpace").hide();   
 		$("#popupEdit").hide();
 	});
 	
-	$("#popupEdit").click(function(){
+	$("#popupEdit").click(function(){  
+		event.stopPropagation(); 
 		closeInputs();
 	});
 	            
@@ -82,7 +89,62 @@ $(document).ready(function() {
 		closeInputs();
 		$(this).hide();
 		$("#popupNomInput").show().focus(); 
-	});   
+	});       
+	
+	$(".popupTCdisplay").click(function(){ 
+		event.stopPropagation();     
+		closeInputs();
+		$("#popupTC").hide();
+		$("#popupTCedit").show();//.focus(); 
+	});     
+	
+	$(".popupTCeditfield").click(function(){
+		event.stopPropagation();
+	});     
+	$("#nowTCin").click(function(){
+		event.stopPropagation();                                                            
+		var timeCurrent = convertToTime(Math.round(rekall.timeline.timeCurrent));   
+		$("#popupTCinMin").val(timeCurrent.split(":")[0]); 
+		$("#popupTCinSec").val(timeCurrent.split(":")[1]); 
+	});         
+	$("#nowTCout").click(function(){
+		event.stopPropagation();                                                             
+		var timeCurrent = convertToTime(Math.round(rekall.timeline.timeCurrent));
+		$("#popupTCoutMin").val(timeCurrent.split(":")[0]); 
+		$("#popupTCoutSec").val(timeCurrent.split(":")[1]); 
+	});        
+	$("#TCvalidModif").click(function(){
+		event.stopPropagation();      
+		var keyDoc = $(this).parent().parent().attr("keydoc");    
+		var inMin = $("#popupTCinMin").val();
+		var inSec = $("#popupTCinSec").val();
+		var outMin = $("#popupTCoutMin").val();
+		var outSec = $("#popupTCoutSec").val();
+		var TCin = (inMin*60)+(inSec*1);   
+		var TCout = (outMin*60)+(outSec*1);   
+		
+		if(TCin>TCout) openAlert("Starting time must be before stop");
+		else {
+			setTCFromDom(keyDoc, TCin, TCout); 
+		
+			$("#popupTCin").html(inMin+":"+inSec);  
+			$("#popupTCout").html(outMin+":"+outSec);  
+			
+			closeInputs();   
+		}
+	});
+	$("#TCinvalidModif").click(function(){
+		event.stopPropagation();  
+		var TCin = $("#popupTCin").html().split(":"); 
+		var TCout = $("#popupTCout").html().split(":");   
+		$("#popupTCinMin").val(TCin[0]);
+		$("#popupTCinSec").val(TCin[1]);
+		$("#popupTCoutMin").val(TCout[0]);
+		$("#popupTCoutSec").val(TCout[1]);
+		closeInputs();  
+	});
+	           
+	
 	$("#popupLegende").click(function(){  
 		event.stopPropagation();     
 		closeInputs();
@@ -93,9 +155,11 @@ $(document).ready(function() {
 	
 	$(".popupInput").click(function(){
 		event.stopPropagation();
-	});     
+	});   
+	 
 	
-	$("#popupNomInput").keyup(function(e){             
+	$("#popupNomInput").keyup(function(e){  
+		event.stopPropagation();              
 		if(e.which == 13) {    
 			var keyDoc = $(this).parent().attr("keydoc"); 
 			var newName = $(this).val().trim();        
@@ -108,7 +172,8 @@ $(document).ready(function() {
 		}
 	});    
 	 
-	$("#popupLegendeInput").keyup(function(e){             
+	$("#popupLegendeInput").keyup(function(e){  
+		event.stopPropagation();              
 		if(e.which == 13) {    
 			var keyDoc = $(this).parent().attr("keydoc"); 
 			var newComment = $(this).val().trim(); 
@@ -122,14 +187,24 @@ $(document).ready(function() {
 	});
 });
              
+function openAlert(message) {
+	
+}
+
 function closeInputs() {
    	$(".popupInput").hide();
-	$(".popupRightItem").show();
-}     
-
-function fillPopupEdit(tag) { 
+	$(".popupRightItem").show();  
+	$("#popupTC").show();
+	$("#popupTCedit").hide();
+}                             
+                           
+function fillPopupEdit(tag) {                
+	
+	var isPaused = rekall.timeline.isPaused();  
+	rekall.timeline.pause();   
+	
 	//alert(tag.document.key);  
-	$("#popupEdit").css("background",tag.color);     
+	$("#popupEdit").css("background",tag.color).attr("isPaused",isPaused);     
 	
 	$("#popupImg").attr("src",tag.thumbnail.url)
 	
@@ -138,8 +213,17 @@ function fillPopupEdit(tag) {
 	if(name!="") $("#popupNom").html(name).removeClass("empty");
 	else $("#popupNom").html("Add a name").addClass("empty");  
 	$("#popupNomInput").val(tag.getMetadata("Rekall->Name"));
-	$("#popupTCin").html(convertToTime(tag.getTimeStart()));  
-	$("#popupTCout").html(convertToTime(tag.getTimeEnd())); 
+	
+	var startVerb = convertToTime(tag.getTimeStart());
+	$("#popupTCin").html(startVerb);       
+	$("#popupTCinMin").val(startVerb.split(":")[0]);
+	$("#popupTCinSec").val(startVerb.split(":")[1]);
+	
+	var endVerb = convertToTime(tag.getTimeEnd());  
+	$("#popupTCout").html(endVerb);      
+	$("#popupTCoutMin").val(endVerb.split(":")[0]);
+	$("#popupTCoutSec").val(endVerb.split(":")[1]);  
+	
 	var comments = tag.getMetadata("Rekall->Comments");
 	if(comments!="") $("#popupLegende").html(comments).removeClass("empty");
 	else $("#popupLegende").html("Add a comment").addClass("empty"); 
@@ -164,6 +248,10 @@ function convertToTime(seconds) {
 
 
 function setMetaFromDom(keyDoc, metaType, meta) {
+	
+}   
+
+function setTCFromDom(keyDoc, TCin, TCout) {
 	
 }
                           
