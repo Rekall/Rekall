@@ -60,7 +60,9 @@
 							//echo "Upload de ".$fileinfo."\t".$filename."...";
 							if(move_uploaded_file($_FILES[$fileinfo]['tmp_name'], $uploadFolder.$filename)) {
 								$metasAdded = addFileToProject($uploadFolder.$filename, $metas, $fileTc);
-								$retour .= '"code":1, "tc":'.$fileTc.', "status":"OK ('.(filesize($uploadFolder.$filename)/1000.).' kB)", "metas":'.json_encode($metasAdded);
+								$key = $metasAdded["key"];
+								unset($metasAdded["key"]);
+								$retour .= '"code":1, "tc":'.$fileTc.', "key":"'.$key.'", "status":"OK ('.(filesize($uploadFolder.$filename)/1000.).' kB)", "metas":'.json_encode($metasAdded);
 								$status |= true;
 							}
 							else
@@ -110,7 +112,9 @@
 		$metas["Rekall User Infos->User IP"]   = $_SERVER['REMOTE_ADDR'];
 
 		$metasAdded = addMarkerToProject($_POST["name"], $metas, $fileTc);
-		$retour .= '"code":1, "tc":'.$fileTc.', "status":"OK", "metas":'.json_encode($metasAdded);
+		$key = $metasAdded["key"];
+		unset($metasAdded["key"]);
+		$retour .= '"code":1, "tc":'.$fileTc.', "key":"'.$key.'", "status":"OK", "metas":'.json_encode($metasAdded);
 		$status |= true;
 
 		$retour .= "},";

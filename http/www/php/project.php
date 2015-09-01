@@ -64,6 +64,7 @@
 		); 
 		$metas = array_merge($metas, $metasAdd);
 		$key = "/".$metas["Rekall->Folder"].$metas["File->File Name"];
+		$metas["key"] = $key;
 		
 		//Génère une vignette
 		$fileDestBasename = strtoupper(sha1($metas["Rekall->Folder"])."-".$metas["File->Hash"]);
@@ -113,6 +114,7 @@
 		$metas = array_merge($metas, $metasAdd);
 		$key = "marker-".sha1(mktime().rand()."");
 		$document->setAttribute("key", $key);
+		$metas["key"] = $key;
 
 		//Ajout des métadatas
 		foreach($metas as $metaCategory => $metaContent) {
