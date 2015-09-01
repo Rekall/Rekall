@@ -126,8 +126,10 @@ $(document).ready(function() {
 	});
 	
 	$(document).keyup(function(event) {
-		if(event.keyCode == 77)
+		if(event.keyCode == 77) // M
 			uploadFiles(["Mon marker"]);
+		else if(event.keyCode == 69) // E
+			embed();
 	});
 	   
 	
@@ -188,6 +190,7 @@ function convertToTime(seconds) {
 	return time;
 }
 
+//Gestion d'upload
 var filesToUpload = [], fileIsUploading = false;
 function uploadFiles(files) {
 	$.each(files, function(index, file) {
@@ -273,6 +276,15 @@ function uploadFilesNext() {
 			rekall.loadXMLFile();
 		}
 	}
+}
+
+//Code d'embarquement du projet Rekall
+function embed() {
+	var width = 960, height = width * 0.44;
+	var embedUrl = '<iframe src="' + rekall.baseUrl + '" width="' + width + '" height="' + height + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+	embedUrl += '<p><a href="' + rekall.baseUrl + '">' + "Mon Projet Rekall" + '</a></p>';
+	alert("Code exporté dans la console");
+	console.log(embedUrl);
 }
 
 function showInRuban(texte, time) {
