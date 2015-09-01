@@ -48,8 +48,9 @@ Rekall.prototype.loadXMLFile = function() {
 	
 	var thiss = this;
 	$.ajax("file/project.xml", {
-		type: "GET",
-		data: {"rand": random()},
+		type: 	"GET",
+		cache: 	false,
+		data: 	{"rand": random()},
 		dataType: "xml",
 		success: function(xml) {
 			if((xml == null) || (xml == undefined))
