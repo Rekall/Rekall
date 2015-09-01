@@ -57,11 +57,8 @@ $(document).ready(function() {
 		*/
 	}, function() {
 		videoPlayer = this;
+		rekall.loadXMLFile();
 		//videoPlayer.volume(0);
-
-		//videoPlayer.src([{type: "video/mp4", src: "http://video-js.zencoder.com/oceans-clip.mp4"}, {type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm"}, {type: "video/ogg", src: "http://video-js.zencoder.com/oceans-clip.ogv"}]);
-		videoPlayer.src("http://www.youtube.com/watch?v=bnC9pu65pa0");
-		//videoPlayer.src("http://www.dailymotion.com/video/xxvfw4_guillaume-jacquemin-soiree-di-zain-5-code-s-data-s_creation");
 		//rekall.timeline.play();
 		
 		videoPlayer.on("durationchange", function(e) {
@@ -156,8 +153,6 @@ $(document).ready(function() {
 		$("#popupSpace").hide();   
 		$("#popupEdit").hide();
 	});
-		
-	rekall.loadXMLFile();
 });
              
 function closeInputs() {

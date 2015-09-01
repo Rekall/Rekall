@@ -11,7 +11,7 @@
 		$status = false;
 		openProject();
 		
-		//Clean
+		//Harmonise le tableau $_FILES
 		$_FILES_OK = array();
 		foreach($_FILES as $fileinfo => $file) {
 			foreach($file as $fileKey => $fileValues) {
@@ -42,14 +42,12 @@
 			);
 			
 			$fileTc = "";
-			if(isset($_POST["tc"]))					$fileTc = $_POST["tc"];
-
-			if(isset($_POST["author"]))				$metas["Rekall->Author"] = $_POST["author"];
-			$metas["Rekall User Infos->User Name"]  = $metas["Rekall->Author"];
-
-			if(isset($_POST["locationName"]))		$metas["Rekall->Location Name"] = $_POST["locationName"];
-			if(isset($_POST["locationGps"]))		$metas["Rekall->Location GPS"]  = $_POST["locationGps"];
-			$metas["Rekall User Infos->User IP"]    = $_SERVER['REMOTE_ADDR'];
+			if(isset($_POST["tc"]))					 $fileTc = $_POST["tc"];
+			if(isset($_POST["locationName"]))		 $metas["Rekall->Location Name"] = $_POST["locationName"];
+			if(isset($_POST["locationGps"]))		 $metas["Rekall->Location GPS"]  = $_POST["locationGps"];
+			if(isset($_POST["author"]))				 $metas["Rekall->Author"]        = $_POST["author"];
+			$metas["Rekall User Infos->User Name"] = $metas["Rekall->Author"];
+			$metas["Rekall User Infos->User IP"]   = $_SERVER['REMOTE_ADDR'];
 			
 			$infos = explode("|", $fileinfo);
 			if(count($infos) > 1)
@@ -98,20 +96,18 @@
 		if(isset($_POST["date"]))	$date = $_POST["date"];
 		
 		$metas = array(
-			"Rekall->Author"		=> "",
-			"Rekall->Date/Time"		=> $date,
-			"Rekall->Import Date"	=> date("Y:m:d H:i:s"),
+			"Rekall->Author"	  => "",
+			"Rekall->Date/Time"	  => $date,
+			"Rekall->Import Date" => date("Y:m:d H:i:s"),
 		);
 		
 		$fileTc = "";
-		if(isset($_POST["tc"]))					$fileTc = $_POST["tc"];
-
-		if(isset($_POST["author"]))				$metas["Rekall->Author"] = $_POST["author"];
-		$metas["Rekall User Infos->User Name"]  = $metas["Rekall->Author"];
-
-		if(isset($_POST["locationName"]))		$metas["Rekall->Location Name"] = $_POST["locationName"];
-		if(isset($_POST["locationGps"]))		$metas["Rekall->Location GPS"]  = $_POST["locationGps"];
-		$metas["Rekall User Infos->User IP"]    = $_SERVER['REMOTE_ADDR'];
+		if(isset($_POST["tc"]))					 $fileTc = $_POST["tc"];
+		if(isset($_POST["locationName"]))		 $metas["Rekall->Location Name"] = $_POST["locationName"];
+		if(isset($_POST["locationGps"]))		 $metas["Rekall->Location GPS"]  = $_POST["locationGps"];
+		if(isset($_POST["author"]))				 $metas["Rekall->Author"]        = $_POST["author"];
+		$metas["Rekall User Infos->User Name"] = $metas["Rekall->Author"];
+		$metas["Rekall User Infos->User IP"]   = $_SERVER['REMOTE_ADDR'];
 
 		$metasAdded = addMarkerToProject($_POST["name"], $metas, $fileTc);
 		$retour .= '"code":1, "tc":'.$fileTc.', "status":"OK", "metas":'.json_encode($metasAdded);
