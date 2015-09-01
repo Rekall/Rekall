@@ -35,22 +35,38 @@ $(document).ready(function() {
 	$(document).on({
 		dragenter: function(event) {
 			event.stopImmediatePropagation();
-			event.preventDefault();
+			event.preventDefault();                              
 		},
 		dragleave: function(event) {
 			event.stopImmediatePropagation();
-			event.preventDefault();
+			event.preventDefault();   
 		},
 		dragover: function(event) {
 			event.stopImmediatePropagation();
-			event.preventDefault();
+			event.preventDefault();  
 		},
-		drop: function(event) {
+		drop: function(event) {    
 			if(event.originalEvent.dataTransfer.files.length) {
 				event.stopImmediatePropagation();
 				event.preventDefault();
 				uploadFiles(event.originalEvent.dataTransfer.files);
 			}
+		}
+	});   
+	                     
+	
+	$("#flattentimeline").on({
+		dragenter: function(event) {
+			//$(".flattentimeline_item").removeClass("draggable").addClass("drag");
+		},
+		dragleave: function(event) {
+			$("#flattentimeline").removeClass("draggable").removeClass("drag"); 
+		},
+		dragover: function(event) {
+			$("#flattentimeline").removeClass("draggable").addClass("drag"); 
+		},
+		drop: function(event) {
+			$("#flattentimeline").removeClass("draggable").removeClass("drag");  
 		}
 	});
 	

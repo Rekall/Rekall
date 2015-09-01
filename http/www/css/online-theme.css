@@ -321,7 +321,14 @@ html, body {
 	background-color: 		black;
 	overflow-x:				hidden;	
 	overflow-y:				scroll;	 
-}       
+}    
+#flattentimeline.drag  {
+	/*background:				rgba(2,212,255,.5);*/
+	box-shadow:				0 0 20px 20px rgba(63,223,255,.45) inset;
+}  
+.flattentimeline_item.draggable  {
+	background:				rgba(63,223,255,.25); 
+}
 
 #flattentimeline_highlight {
 	margin-bottom:			1px;
@@ -362,7 +369,7 @@ html, body {
 	height:					100%;
 	overflow:				hidden;
 	overflow-y:				auto;
-	background-color:		#1B1D1E; /*191716;*/
+	background-color:		rgba(255,255,255,.05); /*191716;*/
 }
 .flattentimeline_item {
 	position:				relative;
@@ -370,12 +377,12 @@ html, body {
 	color:			  		white;
 	margin:					0px 0px;
 	cursor:					pointer;
-	background:				#26292B;/*231F1E;*/   
+	background:				rgba(255,255,255,.15);/*231F1E;*/   
 	width:					100%;     
 	display:				none;
 }
-.flattentimeline_item:hover {
-	background:				#1D2021;/*191716;*/
+.flattentimeline_item:hover, .flattentimeline_highlightitem:hover { 
+	background:				rgba(255,255,255,.12);/*191716;*/
 }   
 
 .flattentimeline_highlightitem {
@@ -385,7 +392,7 @@ html, body {
 	color:			  		white;
 	margin:					0px;
 	cursor:					pointer;
-	background:				#26292B;  
+	background:				rgba(255,255,255,.15); 
 	width:					100%;   
 	text-align:				center;  
 	padding-bottom:			2px;
