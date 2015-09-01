@@ -32,6 +32,9 @@ function Timeline() {
 Timeline.prototype.play = function(timeCurrentOffset) {
 	rekall.videoPlayer.play();
 }
+Timeline.prototype.pause = function(timeCurrentOffset) {
+	rekall.videoPlayer.pause();
+}
 Timeline.prototype.stop = function() {
 	rekall.videoPlayer.stop();
 }

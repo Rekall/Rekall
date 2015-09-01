@@ -128,6 +128,8 @@ function closeInputs() {
 }     
 
 function fillPopupEdit(tag) { 
+	rekall.timeline.stop();
+	
 	//alert(tag.document.key);  
 	$("#popupEdit").css("background",tag.color);     
 	

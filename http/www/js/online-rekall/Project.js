@@ -101,11 +101,14 @@ Project.prototype.loadXML = function(xml) {
 	});
 	var videoUrl = undefined, videoTech = undefined;
 	xml.find('video').each(function() {
-		videoUrl = $(this).attr('url');
-		videoTech = $(this).attr('videoTech');
+		videoUrl  = $(this).attr('url');
+		videoTech = $(this).attr('tech');
 	});
-	videoTech = "youtube";
+	
 	if((videoUrl != "") && (videoUrl != undefined)) {
+		var techOrder = ["youtube", "html5", "flash"];
+		if((videoTech != "") && (videoTech != undefined))
+			techOrder = [videoTech, "html5", "flash"];
 		/*
 		//rekall.videoPlayer."techOrder": ["youtube", "html5", "flash"], //youtube dailymotion vimeo
 		if((videoTech != "") && (videoTech != undefined))
@@ -119,9 +122,9 @@ Project.prototype.loadXML = function(xml) {
 				"autoplay": false,
 				"preload": 	"auto",
 				"loop": 	"false",
-				//"poster":   "http://video-js.zencoder.com/oceans-clip.png",
-				"techOrder": ["youtube", "html5", "flash"], //youtube dailymotion vimeo
+				"techOrder": techOrder, //youtube dailymotion vimeo
 		/*
+				"poster":   "http://video-js.zencoder.com/oceans-clip.png",
 				"src": 	 	"https://vimeo.com/45161598",
 				"techOrder": [""], "src" : "",
 				"techOrder": ["vimeo"], "src" : "",
