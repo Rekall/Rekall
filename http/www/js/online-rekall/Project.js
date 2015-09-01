@@ -164,6 +164,29 @@ Project.prototype.loadXML = function(xml) {
 				rekall.videoPlayer.src(videoUrl);
 				//rekall.videoPlayer.src([{type: "video/mp4", src: "http://video-js.zencoder.com/oceans-clip.mp4"}, {type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm"}, {type: "video/ogg", src: "http://video-js.zencoder.com/oceans-clip.ogv"}]);
 				//rekall.videoPlayer.src("http://www.dailymotion.com/video/xxvfw4_guillaume-jacquemin-soiree-di-zain-5-code-s-data-s_creation");
+				
+				/*
+				try {
+					var options = {
+						optionsAnnotator: {user: {},store: {}},
+						optionsVideoJS: {},
+						optionsRS: {},
+						optionsOVA: {posBigNew:'ul'},
+					}
+					//Add the div id to annotate by Annotator. In the demo.html the id is "airlock" too.
+					var ova = new OpenVideoAnnotation.Annotator($('#video'),options);
+
+					//(optional) Set the configuration for the users
+					ova.setCurrentUser($('#username').val());
+
+					$('#username').change(function () {
+						ova.setCurrentUser($(this).val());
+					});
+				}
+				catch(err) {
+					
+				}
+				*/
 
 				rekall.videoPlayer.on("durationchange", function(e) {
 				});
