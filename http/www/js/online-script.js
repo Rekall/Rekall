@@ -248,13 +248,33 @@ function convertToTime(seconds) {
 
 
 function setMetaFromDom(keyDoc, metaType, meta) {
-	
-}   
-
-function setTCFromDom(keyDoc, TCin, TCout) {
-	
+	$.ajax("php/project.php", {
+		type: "GET",
+		dataType: "json",
+		data: {"key": keyDoc, "metadataKey": metaType, "metadataValue": meta},
+		success: function(retour) {
+			rekall.loadXMLFile();
+		},
+		error: function() {
+			alert("Erreur lors de la mise à jour…");
+		}
+	});	
 }
-                          
+function setTCFromDom(keyDoc, TCin, TCout) {
+	$.ajax("php/project.php", {
+		type: "GET",
+		dataType: "json",
+		data: {"key": keyDoc, "tcIn": TCin, "tcOut": TCout},
+		success: function(retour) {
+			rekall.loadXMLFile();
+		},
+		error: function() {
+			alert("Erreur lors de la mise à jour…");
+		}
+	});	
+}
+        
+                  
 //Gestion d'upload        
 var filesToUpload = [], fileIsUploading = false;
 function uploadFiles(files) {

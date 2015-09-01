@@ -234,8 +234,10 @@ Project.prototype.loadXML = function(xml) {
 				rekall.project.analyse();
 			});
 		}
-		else
+		else {
+			console.log(counts.documents + " documents analysés, " + counts.metadatas + " métadonnées extraites et " + counts.tags + " tags affichés !");
 			rekall.project.analyse();
+		}
 	}
 }
 
