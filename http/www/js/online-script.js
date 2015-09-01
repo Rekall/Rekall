@@ -8,7 +8,7 @@ $(document).ready(function() {
 		dataType: "json",
 		data: {"status": 1},
 		success: function(infos) {
-			rekall_common.owner = infos.owner;
+			rekall_common = infos;
 			console.log(rekall_common);
 			if((rekall_common.owner.canEdit) && (navigator.geolocation))
 				navigator.geolocation.getCurrentPosition(function(position) {
@@ -183,6 +183,12 @@ function uploadFiles(files) {
 			var fileDateTime = moment(file.lastModifiedDate);
 			//alert("Chargement de " + file.name + " (" + fileType + ", " + file.size + " octets, date du " + fileDateTime.format("YYYY:MM:DD HH:mm:ss") + ")");
 			
+			alert(rekall_common.uploadMax);
+			if (file.size > rekall_common.uploadMax) {
+				alert("File size too large!");
+				return;
+			}
+			
 			//Données du formulaire
 			if($('form')[0] != undefined)
 				formData = new FormData($('form')[0]); //à vérifier
@@ -217,12 +223,17 @@ function uploadFiles(files) {
 					//alert("beforeSend : " + data);
 				},
 				success:    function(data) {
-					console.log(data);
-					data = JSON.parse(data);
-					if(data.files[0].code > 0)
-						alert(data.files[0].metas["Rekall->Name"] + " téléchargé");
-					else
-						alert(data.files[0].error);
+					try {
+						console.log(data);
+						data = JSON.parse(data);
+						if(data.files[0].code > 0)
+							alert(data.files[0].metas["Rekall->Name"] + " téléchargé");
+						else
+							alert(data.files[0].error);
+					}
+					catch(err) {
+						
+					}
 					window.document.title = "Rekall Online";
 					fileIsUploading = false;
 					uploadFilesNext();
