@@ -99,13 +99,21 @@ Project.prototype.loadXML = function(xml) {
 			}
 		}
 	});
-	var videoUrl = "";
+	var videoUrl = undefined, videoTech = undefined;
 	xml.find('video').each(function() {
 		videoUrl = $(this).attr('url');
+		videoTech = $(this).attr('videoTech');
 	});
-	if(videoUrl != "")
-		videoPlayer.src(videoUrl);
-	
+	videoTech = "youtube";
+	if((videoUrl != "") && (videoUrl != undefined)) {
+		/*
+		//videoPlayer."techOrder": ["youtube", "html5", "flash"], //youtube dailymotion vimeo
+		if((videoTech != "") && (videoTech != undefined))
+			videoPlayer.options.techOrder = [videoTech];
+		//videoPlayer.options.techOrder = ['flash', 'html5'];
+		*/
+		videoPlayer.src(videoUrl);	
+	}
 
 	//videoPlayer.src([{type: "video/mp4", src: "http://video-js.zencoder.com/oceans-clip.mp4"}, {type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm"}, {type: "video/ogg", src: "http://video-js.zencoder.com/oceans-clip.ogv"}]);
 	//videoPlayer.src("http://www.dailymotion.com/video/xxvfw4_guillaume-jacquemin-soiree-di-zain-5-code-s-data-s_creation");

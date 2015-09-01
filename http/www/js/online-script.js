@@ -291,6 +291,13 @@ function showInRuban(texte, time) {
 	alert(texte);
 }
 
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
 $(window).resize(function(e) {
 	if(videoPlayer != undefined) {
 		videoPlayer.width (($("#container").width() - $("#flattentimeline").width() - 5) + "px");
