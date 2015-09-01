@@ -4,7 +4,7 @@ $(document).ready(function() {
 	rekall_common.owner = {"canEdit": false, "author": "", "locationGps": "", "locationName": ""};
 
 	$.ajax("php/project.php", {
-		type: "GET",
+		type: "POST",
 		dataType: "json",
 		data: {"status": 1},
 		success: function(infos) {
@@ -292,9 +292,9 @@ function convertToTime(seconds) {
 
 function setMetaFromDom(keyDoc, metaType, meta) {
 	$.ajax("php/project.php", {
-		type: "GET",
+		type: "POST",
 		dataType: "json",
-		data: {"key": keyDoc, "metadataKey": metaType, "metadataValue": meta},
+		data: {"key": keyDoc, "metadataKey": metaType, "metadataValue": meta.replace(/'/g, '’')},
 		success: function(retour) {
 			rekall.loadXMLFile();
 		},
@@ -305,7 +305,7 @@ function setMetaFromDom(keyDoc, metaType, meta) {
 }
 function setTCFromDom(keyDoc, TCin, TCout) {
 	$.ajax("php/project.php", {
-		type: "GET",
+		type: "POST",
 		dataType: "json",
 		data: {"key": keyDoc, "tcIn": TCin, "tcOut": TCout},
 		success: function(retour) {
@@ -319,7 +319,7 @@ function setTCFromDom(keyDoc, TCin, TCout) {
 
 function deleteFromDom(keyDoc) {
 	$.ajax("php/project.php", {
-		type: "GET",
+		type: "POST",
 		dataType: "json",
 		data: {"key": keyDoc, "remove": 1},
 		success: function(retour) {
