@@ -305,7 +305,7 @@ Project.prototype.analyse = function() {
 	}
 
 	//Tags / catégories
-	var markers = [];
+	var markers = [], captions = [];
 	for (var key in categories) {
 		$.each(categories[key].tags, function(index, tag) {
 			//Marqueurs sur la timeline
@@ -314,8 +314,13 @@ Project.prototype.analyse = function() {
 					time: 		 tag.getTimeStart(),
 					text: 		 tag.getMetadata("Rekall->Name"),
 					overlayText: tag.getMetadata("Rekall->Comments"), 
-					/*
-					class:*/
+				});
+				captions.push({
+					startTime: 	tag.getTimeStart() * 1000,
+					endTime: 	(tag.timeStart + max(2, tag.timeEnd - tag.timeStart)) * 1000,
+					position:  	"HB",
+					data: 	 	tag.getMetadata("Rekall->Name"),
+					alignment: 	"C"
 				});
 			}
 			
@@ -438,6 +443,28 @@ Project.prototype.analyse = function() {
 		});
 	}
 	rekall.timeline.updateFlattenTimeline();
+
+
+	//Initialisation des captions
+	if(rekall.videoPlayer.caption.updateCaption == undefined) {
+		rekall.videoPlayer.caption({
+			data: captions, 
+			setting: {
+				captionSize:  3,
+				captionStyle: {
+					'background-color': 'rgba(255,0,0,0.8)',
+					'color':  			'white',
+					'padding': 			'3px',
+					'font-family': 		'OpenSans',
+				},
+				onCaptionChange: function(num_c) {
+					//console.log("playing: " + num_c + " caption");
+				}
+			}
+		});
+	}
+	else
+		rekall.videoPlayer.caption.loadNewCaption({data: captions});
 
 	//Ajout des marqueurs sur la timeline
 	if(rekall.videoPlayer.markers.removeAll == undefined) {

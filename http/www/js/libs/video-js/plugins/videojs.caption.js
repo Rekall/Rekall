@@ -292,8 +292,8 @@
             if(callback) callback();
             
          },
-         loadNewCaption: function() {
-            player.pause().currentTime(0);
+         loadNewCaption: function(newCaption) {
+            //player.pause().currentTime(0);
             captions = newCaption.data;
             cursorID = 0;
             noCaption = false;
