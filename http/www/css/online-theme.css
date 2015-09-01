@@ -114,14 +114,16 @@ html, body {
 	padding:				0 4%;
 	cursor:					pointer;  
 	text-transform:			uppercase;  
-	display:				inline-block;
+	display:				inline-block; 
+	margin-top:				1vh;  
 }      
 .popupLeftButton:hover {                                
 	background:				rgba(255,255,255,.35);
 }     
 #popupImgBox {    
 	/*width:					15vw;*/             
-	margin-bottom:			15%;
+	margin-bottom:			3vh;    
+	cursor:					pointer;
 }        
 #popupImg {
 	max-width:				15vw;
@@ -133,10 +135,10 @@ html, body {
 }   
 #popupRight {
 	/*width:					58%;   */     
-	width:					35vw;        
+	width:					27vw;       
 	min-height:				50vh;
 	/*height:					90%;*/                     
-	padding:				5% 5% 5% 5%;    
+	padding:				5% 2vw;    
 	vertical-align:			top;      
 	background:				rgba(0,0,0,.1);
 }        
@@ -152,10 +154,10 @@ html, body {
 	text-align:				center;
 	line-height:			30px;   
 	cursor:					pointer;   
-	margin:					-30px -30px 0 0;
+	margin:					-30px -1.5vw 0 0;
 }
 .popupRightItem {
-	width:					30vw;                   
+	width:					25vw;                   
 	display:				inline-block;      
 	padding-bottom:			5%;          
 	font-size:				1.2em; 

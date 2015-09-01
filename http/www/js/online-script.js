@@ -87,20 +87,12 @@ $(document).ready(function() {
 	});
    
  	$("#popupSpace").click(function(){  
-		event.stopPropagation(); 
-		closeInputs();   
-		var isPaused = $("#popupEdit").attr("isPaused");   
-		if(isPaused=="false") rekall.timeline.play();
-		$("#popupSpace").hide();   
-		$("#popupEdit").hide();
+		event.stopPropagation();  
+		closeEdit();              
 	});                    
 	$("#closePopupEdit").click(function(){
-		event.stopPropagation();     
-		closeInputs();    
-		var isPaused = $("#popupEdit").attr("isPaused");   
-		if(isPaused=="false") rekall.timeline.play();
-		$("#popupSpace").hide();   
-		$("#popupEdit").hide();
+		event.stopPropagation();  
+		closeEdit(); 
 	});
 	
 	$("#popupEdit").click(function(){  
@@ -212,7 +204,20 @@ $(document).ready(function() {
 			else $("#popupLegende").html("Add a comment").addClass("empty");     
 			closeInputs(); 
 		}
-	});  
+	});        
+	 
+	$("#popupSetHighlight").click(function(){
+		event.stopPropagation(); 
+		var keyDoc = $(this).parent().attr("keydoc");
+		var isHL = $(this).attr("isHighlight");  
+		if(isHL=="true") {
+			setMetaFromDom(keyDoc, "Rekall->Highlight", "");  
+			$(this).html("Highlight").attr("isHighlight", "false");  
+		} else { 
+			setMetaFromDom(keyDoc, "Rekall->Highlight", "true");  
+			$(this).html("Un-Highlight").attr("isHighlight", "true");   	
+		}
+	});
 	
 	$("#popupEditSupprimer").click(function(){
 		openAlert("Do youreally want to delete this file from the project ?", "yesnodelete");
@@ -225,7 +230,9 @@ $(document).ready(function() {
 	$("#popupAlertButtonYesdelete").click(function(){
 		var keyDoc = $("#popupRight").attr("keyDoc");
 		deleteFromDom(keyDoc);
-	});
+	});       
+	
+	
 	
 });
              
@@ -255,7 +262,15 @@ function closeInputs() {
 	$(".popupRightItem").show();  
 	$("#popupTC").show();
 	$("#popupTCedit").hide();
-}                             
+}       
+
+function closeEdit() {
+	closeInputs();   
+	var isPaused = $("#popupEdit").attr("isPaused");   
+	if(isPaused=="false") rekall.timeline.play();
+	$("#popupSpace").hide();   
+	$("#popupEdit").hide();
+}                      
                            
 function fillPopupEdit(tag) {                
 	
@@ -264,8 +279,17 @@ function fillPopupEdit(tag) {
 	
 	//alert(tag.document.key);  
 	$("#popupEdit").css("background",tag.color).attr("isPaused",isPaused);     
-	
-	$("#popupImg").attr("src",tag.thumbnail.url)
+	                         
+	if(tag.thumbnail.url){        
+		$("#popupImg").show();   
+		$("#popupImg").attr("src",tag.thumbnail.url);  
+		$("#popupImg").unbind( "click" );
+		$("#popupImg").click(function(){
+			tag.openBrowser(); 
+		});     
+	} else {
+		$("#popupImg").hide(); 
+	}                     
 	
 	$("#popupType").html(tag.getMetadata("Rekall->Type"));        
 	var name = tag.getMetadata("Rekall->Name");    
@@ -286,7 +310,11 @@ function fillPopupEdit(tag) {
 	var comments = tag.getMetadata("Rekall->Comments");
 	if(comments!="") $("#popupLegende").html(comments).removeClass("empty");
 	else $("#popupLegende").html("Add a comment").addClass("empty"); 
-	$("#popupLegendeInput").html(comments);
+	$("#popupLegendeInput").html(comments);       
+	
+	var highlight = tag.getMetadata("Rekall->Highlight");        
+	if(highlight=="true") $("#popupSetHighlight").html("Un-Highlight").attr("isHighlight","true");
+	else $("#popupSetHighlight").html("Highlight").attr("isHighlight","false");
 	
 	$("#popupLeft").attr("keydoc",tag.document.key); 
 	$("#popupRight").attr("keydoc",tag.document.key); 
@@ -348,7 +376,8 @@ function deleteFromDom(keyDoc) {
 	});	
 }
 function deleteFromDomFinished() {
-	alert("J'ai finiiiii.");
+	closeAlert(); 
+	closeEdit();
 }
         
                   
