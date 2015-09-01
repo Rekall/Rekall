@@ -99,9 +99,13 @@ Project.prototype.loadXML = function(xml) {
 			}
 		}
 	});
+	xml.find('video').each(function() {
+		var url = $(this).attr('url');
+		videoPlayer.src(url);
+	});
+	
 
 	//videoPlayer.src([{type: "video/mp4", src: "http://video-js.zencoder.com/oceans-clip.mp4"}, {type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm"}, {type: "video/ogg", src: "http://video-js.zencoder.com/oceans-clip.ogv"}]);
-	videoPlayer.src("http://www.youtube.com/watch?v=bnC9pu65pa0");
 	//videoPlayer.src("http://www.dailymotion.com/video/xxvfw4_guillaume-jacquemin-soiree-di-zain-5-code-s-data-s_creation");
 	
 	console.log(counts.documents + " documents analysés, " + counts.metadatas + " métadonnées extraites et " + counts.tags + " tags affichés !");
