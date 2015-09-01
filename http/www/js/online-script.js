@@ -318,7 +318,21 @@ function setTCFromDom(keyDoc, TCin, TCout) {
 }  
 
 function deleteFromDom(keyDoc) {
-
+	$.ajax("php/project.php", {
+		type: "GET",
+		dataType: "json",
+		data: {"key": keyDoc, "remove": 1},
+		success: function(retour) {
+			rekall.loadXMLFile();
+			deleteFromDomFinished();
+		},
+		error: function() {
+			alert("Erreur lors de la mise à jour…");
+		}
+	});	
+}
+function deleteFromDomFinished() {
+	alert("J'ai finiiiii.");
 }
         
                   
