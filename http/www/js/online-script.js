@@ -9,7 +9,6 @@ $(document).ready(function() {
 		data: {"status": 1},
 		success: function(infos) {
 			rekall_common = infos;
-			console.log(rekall_common);
 			if((rekall_common.owner.canEdit) && (navigator.geolocation))
 				navigator.geolocation.getCurrentPosition(function(position) {
 					rekall_common.owner.locationGps = position.coords.latitude + "," + position.coords.longitude;
