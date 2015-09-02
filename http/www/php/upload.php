@@ -136,11 +136,11 @@
 		<form action="upload.php" method="post" enctype="multipart/form-data">
 		    Select image to upload:
 		    <input type="file" name="fileToUpload[]" multiple="multiple">
-		    
+			
 			<input type="text" name="tc"     value="234">
 			<input type="text" name="author" value="Guillaume Jacquemin">
-		    <input type="text" name="date" value="2010:01:28 08:10:32">
-			
+		    <input type="text" name="date"   value="2010:01:28 08:10:32">
+
 		    <input type="submit" value="Upload Image" name="submit">
 		</form>
 	</body>

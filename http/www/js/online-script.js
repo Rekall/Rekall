@@ -443,7 +443,7 @@ function uploadFiles(files) {
 					var myXhr = $.ajaxSettings.xhr();
 					if(myXhr.upload) {
 						myXhr.upload.addEventListener('progress', function(event) {
-							window.document.title = "Téléchargement " + floor(event.loaded / event.total * 100) + "%";
+							rouletteProgress(floor(event.loaded / event.total * 100));
 						}, false);
 					}
 					return myXhr;
@@ -487,7 +487,7 @@ function uploadFilesNext() {
 	if(!fileIsUploading) {
 		if(filesToUpload.length > 0) {
 			fileIsUploading = true;
-			rouletteStart();
+			rouletteStart(true);
 			$.ajax(filesToUpload[0]);
 			
 			if(filesToUpload[0].file.name != undefined)
@@ -517,11 +517,15 @@ function showInRuban(texte, time) {
 	alert(texte);
 }
 
-function rouletteStart() {
-	console.log("Début de la roulette");
+function rouletteStart(isProgress) {
+	if(isProgress == undefined)
+		console.log("Début de la roulette infinie");
+	else
+		console.log("Début de la roulette avec progression");
 }
 function rouletteProgress(progress) {
-	console.log("Progression de la roulette @ " + progress);
+	console.log("Progression de la roulette @ " + progress + "%");
+	window.document.title = "Téléchargement " + progress + "%";
 }
 function rouletteEnd() {
 	console.log("Fin de la roulette");
