@@ -489,7 +489,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 									/*tmp = tmp[1].split("|");
 									if(tmp.length>1) 
 									meta = tmp[0];     */   
-								   // alert(tmp.length+" / "+meta); 
+								   	//alert(tmp.length+" / "+meta); 
 									$(".left_menu_select_meta").hide();
 									$("#left_menu_select_"+category).val(meta).show();
 								}
@@ -1084,11 +1084,11 @@ Project.prototype.analyse = function(full, isCheckbox) {
 	
 	if((localStorage != null) && (rekall.sortings["horizontal"].metadataKey == "Time") && (localStorage.timelineInfo != "1")) {
 		localStorage.timelineInfo = "1";
-		showInRuban("To see documents in Timeline mode, you have to set their visibility in the metadata “Rekall&nbsp;&#x25B8;&nbsp;Visibility”.");
+		openAlert("To see documents in Timeline mode, you have to set their visibility in the metadata “Rekall&nbsp;&#x25B8;&nbsp;Visibility”.");
 	}
 	
 	if((full != false) && (rekall.sortings["horizontal"].metadataKey == "Time") && (rekall.sortings["colors"].categoriesIndex == 0)) {
-		showInRuban("Your timeline view is empty! Add documents by changing their metadata <i>Visibility</i>&nbsp;&nbsp;to <i>Show in Timeline</i>.")
+		openAlert("Your timeline view is empty! Add documents by changing their metadata <i>Visibility</i>&nbsp;&nbsp;to <i>Show in Timeline</i>.")
 	}
 	
 	rekall.updateFlattenTimeline();

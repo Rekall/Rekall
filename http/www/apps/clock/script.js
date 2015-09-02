@@ -5,7 +5,7 @@
 var clock = undefined;
 function documentReady() {
 	if(clock == undefined) {
-		showInRuban("Share this page with computers on stage through WiFi (see Rekall welcome page > Share) to have a synced clock");
+		openAlert("Share this page with computers on stage through WiFi (see Rekall welcome page > Share) to have a synced clock");
 		
 		clock = new Object();
 		clock.lastCheck = 0;
@@ -35,7 +35,7 @@ function documentReady() {
 			if(clock.type == 'rst')
 				$("#clock_sync").text("VALIDATE?");
 			else if(clock.type == 'txt') {
-				showInRuban("Send OSC data on <span style='text-transform:none;'>/rekall/clock/text</span> to Rekall running computer on port " + window.url("port", window.document.location+"") + "");
+				openAlert("Send OSC data on <span style='text-transform:none;'>/rekall/clock/text</span> to Rekall running computer on port " + window.url("port", window.document.location+"") + "");
 				$("#clock_sync").text("");
 			}
 			else

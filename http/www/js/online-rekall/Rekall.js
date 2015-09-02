@@ -55,11 +55,11 @@ Rekall.prototype.loadXMLFile = function() {
 		dataType: "xml",
 		success: function(xml) {
 			if((xml == null) || (xml == undefined))
-				showInRuban("Your project is unreachable. Did you move the folder to an other location?", 60);
+				openAlert("Your project is unreachable. Did you move the folder to an other location?", 60);
 			else {
 				$(xml).find('project').each(function() {
 					if($(this).find('document').length == 0)
-						showInRuban("Start by addind files to your project.", 60);
+						openAlert("Start by addind files to your project.", 60);
 					else {
 						if(rekall.project == undefined)
 							rekall.project = new Project(url);

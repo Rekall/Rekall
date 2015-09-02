@@ -468,7 +468,7 @@ Tag.displayMetadata = function() {
 		if(elementClass != "")	value = "Multiple values";  
 // GM Affichage comments raccourci		  
     	if(metadataKey == "Rekall->Comments") {
-//			alert(" keyTip : "+keyTip+" \n metadataKey : "+metadataKey+" \n value : "+value+" \n value replace : "+value.replace(/'/g, "\\'"));   
+			//alert(" keyTip : "+keyTip+" \n metadataKey : "+metadataKey+" \n value : "+value+" \n value replace : "+value.replace(/'/g, "\\'"));   
 
 			if(value=="&nbsp;") $("#metadatas_comments").val("Comments").addClass("emptyField").off("focus");
 			else $("#metadatas_comments").val(value).removeClass("emptyField").off("focus");
@@ -506,7 +506,7 @@ Tag.displayMetadata = function() {
 		if((obj != undefined) && (!Tag.metadataCancel)) {
 			var changed = false;
 			var reopen  = false;        
-//			alert(obj.attr("class"));
+			//alert(obj.attr("class"));
 			if(obj.hasClass("one_selection")) {
 				if(metadataValue == undefined)
 					metadataValue = obj.parent().find(".selected").text();

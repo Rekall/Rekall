@@ -495,7 +495,7 @@ Project.prototype.analyse = function() {
 			markerTip:{
 				display: true,
 				text: function(marker) {
-					return "Marker: "+ marker.text;
+					return marker.text;
 				},
 				time: function(marker) {
 					return marker.time;

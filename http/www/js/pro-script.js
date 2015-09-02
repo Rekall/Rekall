@@ -55,12 +55,12 @@ function documentReadyCommon() {
 					if(sessionStorage.firstTimeOpened != infos.firstTimeOpened) {
 						sessionStorage.firstTimeOpened = infos.firstTimeOpened;
 						if(sessionStorage.firstTimeOpened == 1)
-							showInRuban("It's the first time you open Rekall. Please have a look at our documentation!");
+							openAlert("It's the first time you open Rekall. Please have a look at our documentation!");
 					}
 					if(sessionStorage.newVersionOfRekall != infos.newVersionOfRekall) {
 						sessionStorage.newVersionOfRekall = infos.newVersionOfRekall;
 						if(sessionStorage.newVersionOfRekall == 1)
-							showInRuban("A new version of Rekall is available. Please visit <a href='http://www.rekall.fr' target='_blank'><u>rekall.fr</u></a> to discover new features and to download it.");
+							openAlert("A new version of Rekall is available. Please visit <a href='http://www.rekall.fr' target='_blank'><u>rekall.fr</u></a> to discover new features and to download it.");
 					}
 					if((rekall != undefined) && (rekall.infos != undefined)) {
 						$.each(infos.projects, function(index, project) {
@@ -68,7 +68,7 @@ function documentReadyCommon() {
 								if(sessionStorage["project_" + project.name] != project.state) {
 									if(sessionStorage["project_" + project.name] >= 0) {
 										if(rekall_common.enableRubanNextTime)
-											showInRuban("The project has changed (new files, document analysis finished or someone edited the project remotely). It's strongly recommended to <a href='javascript: reload();'><u>refresh this page</u></a>!");
+											openAlert("The project has changed (new files, document analysis finished or someone edited the project remotely). It's strongly recommended to <a href='javascript: reload();'><u>refresh this page</u></a>!");
 										rekall_common.enableRubanNextTime = true;
 									}
 									sessionStorage["project_" + project.name] = project.state;
@@ -282,7 +282,7 @@ function documentReadyIntro() {
 var rubanTimeout = 0;
 var rubanMessage = "";
 var rubanTimeoutTime = 0;
-function showInRuban(message, duration) {
+function openAlert(message, duration) {
 	if(message == undefined) {     
 		clearInterval(rubanTimeout);
 		$("#ruban").slideUp(function() {
@@ -290,7 +290,7 @@ function showInRuban(message, duration) {
 		});
 	}
 	else if($("#ruban").text().length == 0) {   
-		showInRuban();
+		openAlert();
 		messageWithClose = message;
 		if(duration == undefined)
 			duration = 15;
@@ -299,14 +299,14 @@ function showInRuban(message, duration) {
 			rubanTimeoutTime--;
 			if(rubanTimeoutTime > 0) {
 				if(rubanTimeoutTime > 1000)
-					messageWithClose = message + "&nbsp;&nbsp;&nbsp;&nbsp;<u onClick='javascript:showInRuban();'>&times;&nbsp;close</u>";
+					messageWithClose = message + "&nbsp;&nbsp;&nbsp;&nbsp;<u onClick='javascript:openAlert();'>&times;&nbsp;close</u>";
 				else
-					messageWithClose = message + "&nbsp;&nbsp;&nbsp;&nbsp;<u onClick='javascript:showInRuban();'>&times;&nbsp;autoclose in " + rubanTimeoutTime + " sec.</u>";
+					messageWithClose = message + "&nbsp;&nbsp;&nbsp;&nbsp;<u onClick='javascript:openAlert();'>&times;&nbsp;autoclose in " + rubanTimeoutTime + " sec.</u>";
 				$("#ruban").html(messageWithClose);
 				$("#ruban").slideDown();
 			}
 			else
-				showInRuban();
+				openAlert();
 		}, 1000);
 	}
 }

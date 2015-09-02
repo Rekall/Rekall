@@ -150,8 +150,8 @@ $(document).ready(function() {
 		                                                                         
 		var endVideo = rekall.videoPlayer.duration();
 		
-		if(TCin>TCout) openAlert("Start time must be set before end time", "ok"); 
-		else if(TCout>endVideo) openAlert("End time must not be set after "+convertToTime(endVideo)+" (end of the video)", "ok");  
+		if(TCin>TCout) 			openAlert("Start time must be set before end time", "ok"); 
+		else if(TCout>endVideo) openAlert("End time must not be set after " + convertToTime(endVideo) + " (end of the video)", "ok");  
 		else {
 			setTCFromDom(keyDoc, TCin, TCout); 
 		
@@ -207,17 +207,17 @@ $(document).ready(function() {
 		
 		if (event.key !== undefined) {
 		       if (event.key === 'Enter' && event.altKey) {
-		          //alert('Alt + Enter pressed!');
+		          //openAlert('Alt + Enter pressed!');
 		       } else if(event.key === 'Enter') isEnter = true; 
 		
 		    } else if (event.keyIdentifier !== undefined) {
 		       if (event.keyIdentifier === "Enter" && event.altKey) {
-		          //alert('Alt + Enter pressed!');
+		          //openAlert('Alt + Enter pressed!');
 		       } else if(event.keyIdentifier === 'Enter') isEnter = true;
 
 		    } else if (event.keyCode !== undefined) {
 		       if (event.keyCode === 13 && event.altKey) {
-		          //alert('Alt + Enter pressed!');
+		          //openAlert('Alt + Enter pressed!');
 		    } else if(event.keyCode === 13) isEnter = true; 
 		}
 		             
@@ -263,21 +263,26 @@ $(document).ready(function() {
 	
 });
              
-function openAlert(message,buttons) {
+function openAlert(message, buttons) {
+	//Rétro-compatibilité Rekall-Pro
+	if((message == undefined) && (buttons == undefined))
+		closeAlert();
+	
 	$("#popupAlertMessage").html(message);  
-	if(!buttons) {
+	if(buttons == "nobuttons") {
 		$(".popupAlertButton").hide();
-	} else if(buttons=="ok") {   
-		$(".popupAlertButton").hide();  
-		$("#popupAlertButtonOk").show(); 
-	} else if(buttons=="yesnodelete") {   
+	}
+	else if(buttons == "yesnodelete") {   
 		$(".popupAlertButton").hide();  
 		$("#popupAlertButtonYesdelete").show(); 
 		$("#popupAlertButtonCancel").show(); 
 	}      
+	else {
+		$(".popupAlertButton").hide();  
+		$("#popupAlertButtonOk").show(); 
+	}
 	$("#popupAlertSpace").show(); 
 }       
-
 function closeAlert() {
 	$("#popupAlertMessage").html(""); 
 	$(".popupAlertButton").hide();         
@@ -381,7 +386,7 @@ function setMetaFromDom(keyDoc, metaType, meta) {
 			rekall.loadXMLFile();
 		},
 		error: function() {
-			alert("Erreur lors de la mise à jour…");
+			openAlert("Server error. Try again.");
 			rouletteEnd();
 		}
 	});	
@@ -397,7 +402,7 @@ function setTCFromDom(keyDoc, TCin, TCout) {
 			rekall.loadXMLFile();
 		},
 		error: function() {
-			alert("Erreur lors de la mise à jour…");
+			openAlert("Server error. Try again.");
 			rouletteEnd();
 		}
 	});	
@@ -415,7 +420,7 @@ function deleteFromDom(keyDoc) {
 			rekall.loadXMLFile();
 		},
 		error: function() {
-			alert("Erreur lors de la mise à jour…");
+			openAlert("Server error. Try again.");
 			rouletteEnd();
 		}
 	});	
@@ -435,14 +440,12 @@ function uploadFiles(files) {
 		if(file.name != undefined) {
 			var colorCategory = rekall.sortings["colors"].categories[Sorting.prefix + file.type];
 			if(colorCategory != undefined) {
-				//alert(colorCategory.color);
 			}
 			var fileType     = (file.type.split("/"))[0];
 			var fileDateTime = moment(file.lastModifiedDate);
-			//alert("Chargement de " + file.name + " (" + fileType + ", " + file.size + " octets, date du " + fileDateTime.format("YYYY:MM:DD HH:mm:ss") + ")");
 			
 			if (file.size > rekall_common.uploadMax) {
-				alert("File size too large!");
+				openAlert("File size is too large! Maximum is " + rekall_common.uploadMax + " bytes.");
 				return;
 			}
 			
@@ -482,20 +485,17 @@ function uploadFiles(files) {
 					return myXhr;
 				},
 				beforeSend: function(data) {
-					//alert("beforeSend : " + data);
 				},
 				success:    function(data) {
 					try {
 						console.log(data);
 						data = JSON.parse(data);
 						Tag.keyToOpenAfterLoading = data.files[0].key;
-						if(data.files[0].code > 0)
-							alert(data.files[0].metas["Rekall->Name"] + " téléchargé, clé " + Tag.keyToOpenAfterLoading);
-						else
-							alert(data.files[0].error);
+						if(data.files[0].code <= 0)
+							openAlert("Uploading error. " + data.files[0].error);
 					}
 					catch(err) {
-						
+						openAlert("Uploading error. Try again.");
 					}
 					window.document.title = "Rekall Online";
 					fileIsUploading = false;
@@ -504,7 +504,7 @@ function uploadFiles(files) {
 					uploadFilesNext();
 				},
 				error: function(data) {
-					alert("Erreur de téléchargement");
+					openAlert("Uploading error. Try again.");
 					window.document.title = "Rekall Online";
 					fileIsUploading = false;
 
@@ -524,9 +524,9 @@ function uploadFilesNext() {
 			$.ajax(filesToUpload[0]);
 			
 			if(filesToUpload[0].file.name != undefined)
-				alert("Début du téléchargement de " + filesToUpload[0].file.name);
+				openAlert("Starting upload of " + filesToUpload[0].file.name);
 			else
-				alert("Début du téléchargement de " + filesToUpload[0].file);
+				openAlert("Creation of " + filesToUpload[0].file + " in progress");
 			
 			filesToUpload.splice(0, 1);
 			uploadFilesNext();
@@ -542,12 +542,8 @@ function embed() {
 	var width = 960, height = round(width * 0.44);
 	var embedUrl = '<iframe src="' + rekall.baseUrl + '" width="' + width + '" height="' + height + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
 	embedUrl += '<p><a href="' + rekall.baseUrl + '">' + "Mon Projet Rekall" + '</a></p>';
-	alert("Code exporté dans la console");
 	console.log(embedUrl);
-}
-
-function showInRuban(texte, time) {
-	alert(texte);
+	openAlert("Embed code in console");
 }
 
 function rouletteStart(isProgress) {
@@ -562,6 +558,7 @@ function rouletteProgress(progress) {
 }
 function rouletteEnd() {
 	console.log("Fin de la roulette");
+	closeAlert();
 }
 
 function getParameterByName(name) {

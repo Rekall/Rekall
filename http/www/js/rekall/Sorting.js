@@ -83,7 +83,7 @@ Sorting.prototype.setCriterias = function(metadataConfigStr, valCanBeFloats, met
 		}
 	}           
 	
-//	alert(this.metadataKey+" / "+this.metadataFormat+" / "+analyse);
+	//alert(this.metadataKey+" / "+this.metadataFormat+" / "+analyse);
 	
 	if(valCanBeFloats == undefined)
 		valCanBeFloats = false;

@@ -61,7 +61,7 @@ function Panner() {
 			var focusX = $("#panner .panzoom").width()*0.5;
 			var focusY = $("#panner .panzoom").height()*0.5;                  
 			var pt = {clientX: focusX, clientY: focusY}; 
-  //  		alert(ui.value+" / "+focusX+" / "+focusY);
+  		  	//alert(ui.value+" / "+focusX+" / "+focusY);
 			$("#panner .panzoom").panzoom('zoom', ui.value, {focal: pt});
 		}
 	});
@@ -74,25 +74,23 @@ function Panner() {
 		var height = $(this).height();
         var top = 0;
 		if(true) {   
-			                              
-			
 			// Check if current height is larger than max
 			if(height > maxHeight) {
 				ratio = maxHeight / height;   
 				width = width * ratio;
 				height = height * ratio;        
-		  //  	top = (maxHeight-height)/2;
+		  	  	//top = (maxHeight-height)/2;
 				//$(this).css({"height": height, "width": width}); 
-	   // 		alert("2 - width = "+width+" / maxWidth = "+maxWidth+" / height = "+height+" / maxHeight = "+maxHeight);  
+	   		 	//alert("2 - width = "+width+" / maxWidth = "+maxWidth+" / height = "+height+" / maxHeight = "+maxHeight);  
 			}             
 			// Check if the current width is larger than the max
 			if(width > maxWidth){
 				ratio = maxWidth / width;        
 				height = height * ratio;
 				width = width * ratio;                    
-		  //  	top = (maxHeight-height)/2;
+		  	  	//top = (maxHeight-height)/2;
 				//$(this).css({"width": width, "height": height});   
-	 //   		alert("1 - width = "+width+" / maxWidth = "+maxWidth+" / height = "+height+" / maxHeight = "+maxHeight); 
+	 		   	//alert("1 - width = "+width+" / maxWidth = "+maxWidth+" / height = "+height+" / maxHeight = "+maxHeight); 
 			}
 			   
 			top = (maxHeight-height)/2;   
@@ -107,7 +105,7 @@ function Panner() {
 	    $("#panner .panzoom").panzoom('resetPan');
 	    $("#panner .panzoom").panzoom('resetZoom');        
 		                        
-   // 	alert("3 - width = "+width+" / maxWidth = "+maxWidth+" / height = "+height+" / maxHeight = "+maxHeight);
+   	 	//alert("3 - width = "+width+" / maxWidth = "+maxWidth+" / height = "+height+" / maxHeight = "+maxHeight);
 		var zoom = 1;//Math.floor(maxWidth / width);
 		//alert(zoom);
 		$("#panner #panzoom-slider").slider({value: zoom});
