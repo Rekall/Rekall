@@ -66,19 +66,19 @@
 								$status |= true;
 							}
 							else
-								$retour .= '"code":0, "error":"Erreur de copie dans '.$uploadFolder.$filename.'"';
+								$retour .= '"code":0, "error":"Server error (copy of '.$uploadFolder.$filename.' is impossible)"';
 						}
 						else
-							$retour .= '"code":-1, "error":"Dossier '.$uploadFolder.' n‘a pas les droits"';
+							$retour .= '"code":-1, "error":"The upload folder '.$uploadFolder.' has not enough permissions"';
 					}
 					else
-						$retour .= '"code":-2, "error":"Fichier existant"';
+						$retour .= '"code":-2, "error":"File is already in project"';
 				} 
 				else
-					$retour .= '"code":-3, "error":"Fichier uploadé temporaire introuvable"';
+					$retour .= '"code":-3, "error":"Server error in upload (temporary file missing)"';
 			}
 			else
-				$retour .= '"code":-4, "error":"Aucun fichier uploadé"';
+				$retour .= '"code":-4, "error":"No file uploaded"';
 			$retour .= "},";
 		}
 		$retour = rtrim($retour, ",");
