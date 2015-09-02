@@ -10,22 +10,29 @@ $(document).ready(function() {
 		data: {"status": 1},
 		success: function(infos) {
 			rekall_common = infos;
-			if((rekall_common.owner.canEdit) && (navigator.geolocation))
-				navigator.geolocation.getCurrentPosition(function(position) {
-					rekall_common.owner.locationGps = position.coords.latitude + "," + position.coords.longitude;
-					$.ajax("http://maps.googleapis.com/maps/api/geocode/json", {
-						type: "GET",
-						dataType: "json",
-						data: {"latlng": rekall_common.owner.locationGps},
-						success: function(infos) {
-							if((infos.results != undefined) && (infos.results[0] != undefined) && (infos.results[0].formatted_address != undefined))
-								rekall_common.owner.locationName = infos.results[0].formatted_address;
-						},
-						error: function() {
-						}
-					});	
-				});
+			if(rekall_common.owner.canEdit) {
+				//Mode preview or not
+				
+				
+				//Geoloc en mode édition
+				if(navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function(position) {
+						rekall_common.owner.locationGps = position.coords.latitude + "," + position.coords.longitude;
+						$.ajax("http://maps.googleapis.com/maps/api/geocode/json", {
+							type: "GET",
+							dataType: "json",
+							data: {"latlng": rekall_common.owner.locationGps},
+							success: function(infos) {
+								if((infos.results != undefined) && (infos.results[0] != undefined) && (infos.results[0].formatted_address != undefined))
+									rekall_common.owner.locationName = infos.results[0].formatted_address;
+							},
+							error: function() {
+							}
+						});	
+					});
+				}
 
+			}
 			rouletteEnd();
 			rekall.loadXMLFile();
 		},
