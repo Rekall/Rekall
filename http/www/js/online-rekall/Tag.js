@@ -31,6 +31,8 @@ function Tag(document) {
 	this.timeEnd   = 1;
 	this.color     = "#FFFFFF";
 }
+Tag.keyToOpenAfterLoading = undefined;
+
 
 Tag.prototype.getMetadata = function(metadataKey, metadataValue) {
 	return this.document.getMetadata(metadataKey, this.version);

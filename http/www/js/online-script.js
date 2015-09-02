@@ -396,7 +396,6 @@ function uploadFiles(files) {
 			var fileDateTime = moment(file.lastModifiedDate);
 			//alert("Chargement de " + file.name + " (" + fileType + ", " + file.size + " octets, date du " + fileDateTime.format("YYYY:MM:DD HH:mm:ss") + ")");
 			
-			alert(rekall_common.uploadMax);
 			if (file.size > rekall_common.uploadMax) {
 				alert("File size too large!");
 				return;
@@ -421,7 +420,8 @@ function uploadFiles(files) {
 		
 		if(formData != undefined) {
 			filesToUpload.push({
-				url: 'php/upload.php',
+				file: file,
+				url:  'php/upload.php',
 				type: 'POST',
 				xhr: function() {
 					var myXhr = $.ajaxSettings.xhr();
@@ -439,8 +439,9 @@ function uploadFiles(files) {
 					try {
 						console.log(data);
 						data = JSON.parse(data);
+						Tag.keyToOpenAfterLoading = data.files[0].key;
 						if(data.files[0].code > 0)
-							alert(data.files[0].metas["Rekall->Name"] + " téléchargé");
+							alert(data.files[0].metas["Rekall->Name"] + " téléchargé, clé " + Tag.keyToOpenAfterLoading);
 						else
 							alert(data.files[0].error);
 					}
@@ -471,6 +472,12 @@ function uploadFilesNext() {
 		if(filesToUpload.length > 0) {
 			fileIsUploading = true;
 			$.ajax(filesToUpload[0]);
+			
+			if(filesToUpload[0].file.name != undefined)
+				alert("Début du téléchargement de " + filesToUpload[0].file.name);
+			else
+				alert("Début du téléchargement de " + filesToUpload[0].file);
+			
 			filesToUpload.splice(0, 1);
 			uploadFilesNext();
 		}
