@@ -201,6 +201,8 @@
          var newOverlayText = $("<span class='vjs-caption-overlay-text'><span></span></span>")
             .css(setting.captionStyle);
          newOverlayText.find('span').html(captionText).addClass('caption-font-size-'+ setting.captionSize);
+		if(cursor.css != undefined)
+			captionOverlays[numNewDisplayCaption - 1].find('.vjs-caption-overlay-text').css(cursor.css);
          
          //append to bottom
          captionOverlays[0].append(newOverlayText);
@@ -236,6 +238,8 @@
             var captionText = convertRubyTags(cursor.data);
             captionText = applyGroupTagStyle(captionText);
             captionOverlays[numNewDisplayCaption - 1].find('.vjs-caption-overlay-text span').html(captionText);
+			if(cursor.css != undefined)
+				captionOverlays[numNewDisplayCaption - 1].find('.vjs-caption-overlay-text').css(cursor.css);
 
             // check if more than one caption in the same time period (same start and end time)
             if ((cursorID < captions.length - 1) && (

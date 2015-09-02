@@ -314,13 +314,25 @@ Project.prototype.analyse = function() {
 					time: 		 tag.getTimeStart(),
 					text: 		 tag.getMetadata("Rekall->Name"),
 					overlayText: tag.getMetadata("Rekall->Comments"), 
+					css: {
+						"background-color": tag.color
+					},
+					markerTipCss: {
+						"font-familly": 	"OpenSans",
+						"color": 			tag.color,
+					}
 				});
 				captions.push({
 					startTime: 	tag.getTimeStart() * 1000,
 					endTime: 	(tag.timeStart + max(2, tag.timeEnd - tag.timeStart)) * 1000,
 					position:  	"HB",
 					data: 	 	tag.getMetadata("Rekall->Name"),
-					alignment: 	"C"
+					alignment: 	"C",
+					css: {
+						"background-color": "black",
+						"font-familly": 	"OpenSans",
+						"color": 			tag.color,
+					}
 				});
 			}
 			

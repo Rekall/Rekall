@@ -76,6 +76,8 @@
          // create the markers
          $.each(newMarkers, function(index, marker) {
             marker.key = generateUUID();
+			if(marker.css == undefined)
+				marker.css = "";
             
             videoWrapper.find('.vjs-progress-control').append(
                createMarkerDiv(marker));
@@ -97,8 +99,9 @@
          markerDiv.css(setting.markerStyle)
             .css({"margin-left" : -parseFloat(markerDiv.css("width"))/2 + 'px', 
                "left" : getPosition(marker) + '%'})
+			.css(marker.css)
             .attr("data-marker-key", marker.key)
-            .attr("data-marker-time", setting.markerTip.time(marker));
+			.attr("data-marker-time", setting.markerTip.time(marker));
             
          // add user-defined class to marker
          if (marker.class) {
@@ -180,13 +183,15 @@
          
          markerDiv.on('mouseover', function(){
             var marker = markersMap[$(this).data('marker-key')];
+			if(marker.markerTipCss == undefined)
+				marker.markerTipCss = "";
             
             markerTip.find('.vjs-tip-inner').text(setting.markerTip.text(marker));
             
             // margin-left needs to minus the padding length to align correctly with the marker
             markerTip.css({"left" : getPosition(marker) + '%',
                            "margin-left" : -parseFloat(markerTip.css("width"))/2 - 5 + 'px',
-                           "visibility"  : "visible"});
+						   "visibility"  : "visible"}).find(".vjs-tip-inner").css(marker.markerTipCss);
             
          }).on('mouseout',function(){
             markerTip.css("visibility", "hidden");
