@@ -502,7 +502,7 @@ function getParameterByName(name) {
 
 $(window).resize(function(e) {
 	if(rekall.videoPlayer != undefined) {
-		rekall.videoPlayer.width (($("#container").width() - $("#flattentimeline").width() - 5) + "px");
+		rekall.videoPlayer.width (($("#container").width() - $("#left_menu").width() - $("#flattentimeline").width() - 10) + "px");
 		rekall.videoPlayer.height(($("#container").height()) + "px");
 	}
 });

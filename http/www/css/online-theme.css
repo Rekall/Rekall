@@ -307,7 +307,79 @@ html, body {
 	width: 			  		100%;
 	height: 		  		100%;
 	vertical-align:			top;
+} 
+
+#left_menu { 
+	width:					80px;        
+	height: 		  		100vh;    
+	background:				#559299; 
+	display:				inline-block;  
+}   
+#left_menu_top {                    
+	height: 		  		50vh;
+	vertical-align:			top;  
+	text-align:				center; 
+	/*background:				rgba(0,0,0,.1);  */
+}       
+#left_menu_bottom {                 
+	height: 		  		50vh;
+	vertical-align:			bottom;  
+	text-align:				center;  
+	/*background:				rgba(0,0,0,.05); */
+}  
+
+.left_menu_item {
+	color:					rgba(255,255,255,.5);
+	font-size:				10px;
+	width:					70px;
+	margin:					0 5px;
+	height:					60px;
+	border-radius:			2px;
+	padding:				5px 0;
+	text-align:				center;
+	cursor:					pointer;    
+	display:				inline-block;
 }
+.left_menu_item:hover {
+	background:				rgba(0,0,0,.1);
+}
+.left_menu_item.selected {
+	background:				rgba(0,0,0,.15);
+}         
+.left_menu_item:first-child { 
+	margin-top:			   	10px;           
+} 
+.left_menu_item:last-child { 
+	margin-bottom:		   	10px;           
+}
+
+.left_menu_item_icn {
+	width:40px; height:40px;
+	margin:0px 15px;
+}
+#left_menu_item_icn_presets { background:url("images/icn-menu-presets.png"); }
+#left_menu_item_icn_horizontal { background:url("images/icn-menu-horizontal.png"); }
+#left_menu_item_icn_vertical { background:url("images/icn-menu-vertical.png"); }
+#left_menu_item_icn_groups { background:url("images/icn-menu-groups.png"); }
+#left_menu_item_icn_colors { background:url("images/icn-menu-colors.png"); }
+#left_menu_item_icn_filter { background:url("images/icn-menu-filter.png"); }
+#left_menu_item_icn_highlight { background:url("images/icn-menu-highlight.png"); }
+#left_menu_item_icn_search { background:url("images/icn-menu-search.png"); }
+#left_menu_item_icn_keywords { background:url("images/icn-menu-keywords.png"); }  
+
+#left_menu_item_icn_preview { background:url("images/icn-menu-preview.png"); }  
+
+.left_menu_item_title {
+	height:20px;
+	line-height:20px;
+}
+
+#left_menu .break {
+	width:40px; height:1px;
+	background:rgba(255,255,255,.2);
+	margin:5px 20px;
+}
+
 #video {
 	display:				inline-block;
 	vertical-align:			top;   
