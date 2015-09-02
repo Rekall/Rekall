@@ -73,12 +73,12 @@ $(document).ready(function() {
 		}
 	});
 	
-	$(document).keyup(function(event) {  
+	/*$(document).keyup(function(event) {  
 		if(event.keyCode == 77) // M
 			uploadFiles(["New note"]);
 		else if(event.keyCode == 69) // E
 			embed();
-	});
+	});*/
 	            
 	
 	$("#left_menu_item_addnote").click(function(){  
@@ -357,7 +357,7 @@ function fillPopupEdit(tag) {
 	$("#popupRight").attr("keydoc",tag.document.key);        
 
 	$("#popupSpace").show();   
-	$("#popupEdit").show();s
+	$("#popupEdit").show();
 }
           
 function convertToTime(seconds) {    
