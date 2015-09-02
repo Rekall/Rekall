@@ -223,7 +223,7 @@ $(document).ready(function() {
 		             
 		if(isEnter == true) {    
 			var keyDoc = $(this).parent().attr("keydoc"); 
-			var newComment = $(this).val().trim(); 
+			var newComment = $(this).val().trim().replace(/\n/gi, "<br/>");    
 			$(this).val(newComment);
 			setMetaFromDom(keyDoc, "Rekall->Comments", newComment); 
 			
@@ -347,7 +347,7 @@ function fillPopupEdit(tag) {
 	var comments = tag.getMetadata("Rekall->Comments");
 	if(comments!="") $("#popupLegende").html(comments).removeClass("empty");
 	else $("#popupLegende").html("+ Add a comment").addClass("empty"); 
-	$("#popupLegendeInput").html(comments);  
+	$("#popupLegendeInput").html(comments.replace(/<br\/>/gi, '\n'));  
 		
 	var highlight = tag.getMetadata("Rekall->Highlight");        
 	if(highlight=="true") $("#popupSetHighlight").html("&#9733;&nbsp;Highlight").attr("isHighlight","true").addClass("selected");  
