@@ -200,7 +200,7 @@ $(document).ready(function() {
 		}
 	});    
 	 
-	$("#popupLegendeInput").keyup(function(e){  
+	$("#popupLegendeInput").keyup(function(event){    
 		event.stopPropagation(); 
 		
 		var isEnter = false; 
@@ -223,11 +223,11 @@ $(document).ready(function() {
 		             
 		if(isEnter == true) {    
 			var keyDoc = $(this).parent().attr("keydoc"); 
-			var newComment = $(this).val().trim().replace(/\n/gi, "<br/>");    
+			var newComment = $(this).val().trim();    
 			$(this).val(newComment);
-			setMetaFromDom(keyDoc, "Rekall->Comments", newComment); 
+			setMetaFromDom(keyDoc, "Rekall->Comments", newComment.replace(/\n/gi, "<br/>")); 
 			
-			if(newComment!="") $("#popupLegende").html(newComment).removeClass("empty"); 
+			if(newComment!="") $("#popupLegende").html(newComment.replace(/\n/gi, "<br/>")).removeClass("empty"); 
 			else $("#popupLegende").html("Add a comment").addClass("empty");     
 			closeInputs(); 
 		}
