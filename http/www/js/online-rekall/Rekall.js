@@ -47,6 +47,7 @@ Rekall.prototype.loadXMLFile = function() {
 	this.baseUrl = url;
 	
 	var thiss = this;
+	rouletteStart();
 	$.ajax("file/project.xml", {
 		type: 	"GET",
 		cache: 	false,
@@ -66,6 +67,10 @@ Rekall.prototype.loadXMLFile = function() {
 					}
 				});
 			}
+			rouletteEnd();
+		},
+		error: function() {
+			rouletteEnd();
 		}
 	});
 }

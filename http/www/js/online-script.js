@@ -3,6 +3,7 @@ var rekall_common = new Object();
 $(document).ready(function() {
 	rekall_common.owner = {"canEdit": false, "author": "", "locationGps": "", "locationName": ""};
 
+	rouletteStart();
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
@@ -25,11 +26,13 @@ $(document).ready(function() {
 					});	
 				});
 
+			rouletteEnd();
 			rekall.loadXMLFile();
 		},
 		error: function() {
+			rouletteEnd();
 		}
-	});	                                                
+	});
 	
 	//Drag&drop files
 	$(document).on({
@@ -335,43 +338,52 @@ function convertToTime(seconds) {
 
 
 function setMetaFromDom(keyDoc, metaType, meta) {
+	rouletteStart();
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
 		data: {"key": keyDoc, "metadataKey": metaType, "metadataValue": meta.replace(/'/g, '’')},
 		success: function(retour) {
+			rouletteEnd();
 			rekall.loadXMLFile();
 		},
 		error: function() {
 			alert("Erreur lors de la mise à jour…");
+			rouletteEnd();
 		}
 	});	
 }
 function setTCFromDom(keyDoc, TCin, TCout) {
+	rouletteStart();
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
 		data: {"key": keyDoc, "tcIn": TCin, "tcOut": TCout},
 		success: function(retour) {
+			rouletteEnd();
 			rekall.loadXMLFile();
 		},
 		error: function() {
 			alert("Erreur lors de la mise à jour…");
+			rouletteEnd();
 		}
 	});	
 }  
 
 function deleteFromDom(keyDoc) {
+	rouletteStart();
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
 		data: {"key": keyDoc, "remove": 1},
 		success: function(retour) {
 			deleteFromDomFinished();
+			rouletteEnd();
 			rekall.loadXMLFile();
 		},
 		error: function() {
 			alert("Erreur lors de la mise à jour…");
+			rouletteEnd();
 		}
 	});	
 }
@@ -420,9 +432,13 @@ function uploadFiles(files) {
 		
 		if(formData != undefined) {
 			filesToUpload.push({
-				file: file,
-				url:  'php/upload.php',
-				type: 'POST',
+				file: 		 file,
+				url:  		 'php/upload.php',
+				type: 		 'POST',
+				data:		 formData,
+				cache:       false,
+				contentType: false,
+				processData: false,
 				xhr: function() {
 					var myXhr = $.ajaxSettings.xhr();
 					if(myXhr.upload) {
@@ -450,18 +466,18 @@ function uploadFiles(files) {
 					}
 					window.document.title = "Rekall Online";
 					fileIsUploading = false;
+
+					rouletteEnd();
 					uploadFilesNext();
 				},
-				error:      function(data) {
+				error: function(data) {
 					alert("Erreur de téléchargement");
 					window.document.title = "Rekall Online";
 					fileIsUploading = false;
+
+					rouletteEnd();
 					uploadFilesNext();
-				},
-				data:		 formData,
-				cache:       false,
-				contentType: false,
-				processData: false
+				}
 			});
 			uploadFilesNext();
 		}
@@ -471,6 +487,7 @@ function uploadFilesNext() {
 	if(!fileIsUploading) {
 		if(filesToUpload.length > 0) {
 			fileIsUploading = true;
+			rouletteStart();
 			$.ajax(filesToUpload[0]);
 			
 			if(filesToUpload[0].file.name != undefined)
@@ -498,6 +515,16 @@ function embed() {
 
 function showInRuban(texte, time) {
 	alert(texte);
+}
+
+function rouletteStart() {
+	console.log("Début de la roulette");
+}
+function rouletteProgress(progress) {
+	console.log("Progression de la roulette @ " + progress);
+}
+function rouletteEnd() {
+	console.log("Fin de la roulette");
 }
 
 function getParameterByName(name) {
