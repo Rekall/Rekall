@@ -75,11 +75,16 @@ $(document).ready(function() {
 	
 	$(document).keyup(function(event) {  
 		if(event.keyCode == 77) // M
-			uploadFiles(["Mon marker"]);
+			uploadFiles(["New note"]);
 		else if(event.keyCode == 69) // E
 			embed();
 	});
-	                   
+	            
+	
+	$("#left_menu_item_addnote").click(function(){  
+		event.stopPropagation();   
+		uploadFiles(["New note"]);   
+	});       
 	
 	$("#popupAlertSpace").click(function(){  
 		event.stopPropagation();      
@@ -110,7 +115,7 @@ $(document).ready(function() {
 		$("#popupNomInput").show().focus(); 
 	});       
 	
-	$(".popupTCdisplay").click(function(){ 
+	$("#popupTC").click(function(){ 
 		event.stopPropagation();     
 		closeInputs();
 		$("#popupTC").hide();
@@ -196,8 +201,27 @@ $(document).ready(function() {
 	});    
 	 
 	$("#popupLegendeInput").keyup(function(e){  
-		event.stopPropagation();              
-		if(e.which == 13) {    
+		event.stopPropagation(); 
+		
+		var isEnter = false; 
+		
+		if (event.key !== undefined) {
+		       if (event.key === 'Enter' && event.altKey) {
+		          //alert('Alt + Enter pressed!');
+		       } else if(event.key === 'Enter') isEnter = true; 
+		
+		    } else if (event.keyIdentifier !== undefined) {
+		       if (event.keyIdentifier === "Enter" && event.altKey) {
+		          //alert('Alt + Enter pressed!');
+		       } else if(event.keyIdentifier === 'Enter') isEnter = true;
+
+		    } else if (event.keyCode !== undefined) {
+		       if (event.keyCode === 13 && event.altKey) {
+		          //alert('Alt + Enter pressed!');
+		    } else if(event.keyCode === 13) isEnter = true; 
+		}
+		             
+		if(isEnter == true) {    
 			var keyDoc = $(this).parent().attr("keydoc"); 
 			var newComment = $(this).val().trim(); 
 			$(this).val(newComment);
@@ -215,10 +239,10 @@ $(document).ready(function() {
 		var isHL = $(this).attr("isHighlight");  
 		if(isHL=="true") {
 			setMetaFromDom(keyDoc, "Rekall->Highlight", "");  
-			$(this).html("Highlight").attr("isHighlight", "false");  
+			$(this).html("&#9734;&nbsp;Highlight").attr("isHighlight", "false").removeClass("selected");  
 		} else { 
 			setMetaFromDom(keyDoc, "Rekall->Highlight", "true");  
-			$(this).html("Un-Highlight").attr("isHighlight", "true");   	
+			$(this).html("&#9733;&nbsp;Highlight").attr("isHighlight", "true").addClass("selected");   	
 		}
 	});
 	
@@ -276,55 +300,64 @@ function closeEdit() {
 }                      
                            
 function fillPopupEdit(tag) {                
-	
+	      
 	var isPaused = rekall.timeline.isPaused();  
 	rekall.timeline.pause();   
-	
-	//alert(tag.document.key);  
-	$("#popupEdit").css("background",tag.color).attr("isPaused",isPaused);     
-	                         
-	if(tag.thumbnail.url){        
+                                    
+	$("#popupEdit").css("background",tag.color).attr("isPaused",isPaused); 
+	$("#popupTC").css("background",tag.color); 
+	/*$("#popupType").css("color",tag.color);*/
+	                                              
+	if(tag.isMarker()==true){         
 		$("#popupImg").show();   
-		$("#popupImg").attr("src",tag.thumbnail.url);  
-		$("#popupImg").unbind( "click" );
-		$("#popupImg").click(function(){
-			tag.openBrowser(); 
-		});     
-	} else {
-		$("#popupImg").hide(); 
-	}                     
-	
+		$("#popupImg").attr("src","css/images/img-note.png");  
+		$("#popupImg").unbind( "click" );  
+		$("#popupEditSupprimer").html("&#10761;&nbsp;&nbsp;Delete Note");
+		
+	} else {                
+		if(tag.thumbnail.url){        
+			$("#popupImg").show();   
+			$("#popupImg").attr("src",tag.thumbnail.url);  
+			$("#popupImg").unbind( "click" );
+			$("#popupImg").click(function(){
+				tag.openBrowser(); 
+			});     
+		} else {
+			$("#popupImg").hide(); 
+		}  
+		$("#popupEditSupprimer").html("&#10761;&nbsp;&nbsp;Delete File");    
+	}     
+	 
 	$("#popupType").html(tag.getMetadata("Rekall->Type"));        
 	var name = tag.getMetadata("Rekall->Name");    
 	if(name!="") $("#popupNom").html(name).removeClass("empty");
-	else $("#popupNom").html("Add a name").addClass("empty");  
+	else $("#popupNom").html("+ Add a name").addClass("empty");  
 	$("#popupNomInput").val(tag.getMetadata("Rekall->Name"));
-	
+
 	var startVerb = convertToTime(tag.getTimeStart());
 	$("#popupTCin").html(startVerb);       
 	$("#popupTCinMin").val(startVerb.split(":")[0]);
 	$("#popupTCinSec").val(startVerb.split(":")[1]);
-	
+
 	var endVerb = convertToTime(tag.getTimeEnd());  
 	$("#popupTCout").html(endVerb);      
 	$("#popupTCoutMin").val(endVerb.split(":")[0]);
-	$("#popupTCoutSec").val(endVerb.split(":")[1]);  
-	
+	$("#popupTCoutSec").val(endVerb.split(":")[1]);
+	  
 	var comments = tag.getMetadata("Rekall->Comments");
 	if(comments!="") $("#popupLegende").html(comments).removeClass("empty");
-	else $("#popupLegende").html("Add a comment").addClass("empty"); 
-	$("#popupLegendeInput").html(comments);       
-	
+	else $("#popupLegende").html("+ Add a comment").addClass("empty"); 
+	$("#popupLegendeInput").html(comments);  
+		
 	var highlight = tag.getMetadata("Rekall->Highlight");        
-	if(highlight=="true") $("#popupSetHighlight").html("Un-Highlight").attr("isHighlight","true");
-	else $("#popupSetHighlight").html("Highlight").attr("isHighlight","false");
+	if(highlight=="true") $("#popupSetHighlight").html("&#9733;&nbsp;Highlight").attr("isHighlight","true").addClass("selected");  
+	else $("#popupSetHighlight").html("&#9734;&nbsp;Highlight").attr("isHighlight","false").removeClass("selected");  
 	
 	$("#popupLeft").attr("keydoc",tag.document.key); 
-	$("#popupRight").attr("keydoc",tag.document.key); 
-	//tag.getMetadata("Rekall->Highlight") = "true" ou ""    
-	
+	$("#popupRight").attr("keydoc",tag.document.key);        
+
 	$("#popupSpace").show();   
-	$("#popupEdit").show();
+	$("#popupEdit").show();s
 }
           
 function convertToTime(seconds) {    

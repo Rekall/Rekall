@@ -88,12 +88,10 @@ html, body {
 #popupEdit tr, #popupEdit td {   	  
 	min-height:				50vh;  
 }
-#popupLeft {
-	/*width:					28%;  */   
+#popupLeft {                               
 	width:					18vw;       
-	min-height:				50vh;
-	/*height:					90%;*/                  
-	padding:				5% 2% 5% 2%;    
+	min-height:				50vh;       
+	padding:				40px 0;    
 	vertical-align:			top;  
 	text-align:				center; 
 	background:				rgba(0,0,0,.15);  
@@ -119,47 +117,64 @@ html, body {
 }      
 .popupLeftButton:hover {                                
 	background:				rgba(255,255,255,.35);
-}     
+}               
+
+#popupEditSupprimer {
+	font-weight:			600;
+	color:					rgba(255,255,255,.75);         
+	font-size:				.9em; 
+	cursor:					pointer;  
+	/*text-transform:			uppercase;  */  
+	display:				inline-block; 
+	margin-top:				1vh;
+} 
+#popupEditSupprimer:hover {        
+	text-decoration:		underline;
+}      
+
+
 #popupImgBox {    
 	/*width:					15vw;*/             
-	margin-bottom:			3vh;    
+	margin-bottom:			2vh;    
 	cursor:					pointer;
 }        
 #popupImg {
 	max-width:				15vw;
-	max-height:				18vw; 
+	max-height:				15vw; 
 	background:				rgba(255,255,255,.1);    
 	display:				inline-block;  
 	border-radius:			3px;     
 	box-shadow: 			0 1px 3px rgba(0,0,0,.35);
 }   
-#popupRight {
-	/*width:					58%;   */     
+#popupRight {                                 
 	width:					27vw;       
-	min-height:				50vh;
-	/*height:					90%;*/                     
-	padding:				5% 2vw;    
+	min-height:				50vh;                          
+	padding:				40px 30px 40px 0px;    
 	vertical-align:			top;      
-	background:				rgba(0,0,0,.1);
+	background:				rgba(0,0,0,.15);
 }        
 #closePopupEdit {                  
-	width:					30px; 
-	height:					30px;
+	width:					40px; 
+	height:					40px;
 	float:					right;  
-	font-weight:			200;
-	border-radius:			25px;  
-	font-size:				24px;   
-	/*border:					1px solid #FFF; */   
-	background:				rgba(0,0,0,.2);            
+	font-weight:			200;    
+	color:					rgba(0,0,0,.5);/*rgba(255,255,255,.75);  
+	/*background:				rgba(0,0,0,.05);    */  
+	font-size:				20px;                       
 	text-align:				center;
-	line-height:			30px;   
+	line-height:			40px;   
 	cursor:					pointer;   
-	margin:					-30px -1.5vw 0 0;
+	margin:					-30px -20px 0 0;  
+	border-radius:			3px;
+} 
+#closePopupEdit:hover {            	 
+	/*background:				rgba(255,255,255,.15); */
+	color:					#000;
 }
 .popupRightItem {
 	width:					25vw;                   
 	display:				inline-block;      
-	padding-bottom:			5%;          
+	margin-bottom:			2vh;          
 	font-size:				1.2em; 
 	line-height:			1.2em;   
 	color:					rgba(255,255,255,.75);  
@@ -176,22 +191,41 @@ html, body {
 	display:				none;
 }
 #popupType {                  
-	font-size:				1em;  
-	color:					rgba(255,255,255,.5);
-	padding-bottom:			0;       
+	font-size:				0.8em; 
+	font-weight:			400; 
+	color:					rgba(0,0,0,.75);/*rgba(255,255,255,.75);  */
+	margin-bottom:			0;   
+	display:				inline-block; 
+	margin-bottom:			1vh;   
+}                       
+#popupSetHighlight {
+	font-weight:			200;
+	color:					rgba(0,0,0,.5);         
+	font-size:				.9em; 
+	cursor:					pointer;             
+	display:				inline-block;    
+	margin-bottom:			1vh;    
+} 
+#popupSetHighlight.selected {       
+	color:					rgba(0,0,0,.75);                 
+}  
+#popupSetHighlight:hover {       
+	text-decoration:		underline;                 
 }
+
 #popupNom {
 	font-weight:			200;
-	font-size:				1.6em; 
+	font-size:				1.2em; 
 	color:					#FFF;   
 	cursor:					pointer; 
-	padding-bottom:			0; 
+	padding:				1vh 0; 
 	margin-bottom:			3%; 
-	line-height:			1.8em;  
+	line-height:			1.2em;  
+	text-transform:			uppercase; 
 }     
 #popupNomInput {
 	font-weight:			200;
-	font-size:				1.6em;       
+	font-size:				1.2em;      
 	cursor:					pointer;  
 	padding-bottom:			0; 
 	margin-bottom:			3%;
@@ -199,22 +233,26 @@ html, body {
 }
 #popupTC {
 	font-size:				1em;
-	line-height:			1.8em;
-}
-#popupTCin, #popupTCout {                          
-	/*background:				rgba(0,0,0,.15);/*gba(255,255,255,.15);*/   
-   /* box-shadow:				0 1px 3px rgba(0,0,0,.1);         */   
-	color:					rgba(0,0,0,.5);  
-	background:				rgba(255,255,255,.15);   
-	box-shadow:				0 1px 3px rgba(0,0,0,.1);
-	
-	border-radius:			3px;    
+	line-height:			1.8em;   
+	/*background:				rgba(255,255,255,.15);*/   
+	box-shadow:				0 1px 3px rgba(0,0,0,.15);
 	padding:				0 3%;
-	cursor:					pointer;    
-	display:				inline-block;
+	border-radius:			3px;            
+	cursor:					pointer;
+	text-align:				center;    
+	margin-bottom:			3vh;    
 }
-#popupTCin:hover, #popupTCout:hover { 
-	background:				rgba(255,255,255,.25); 
+#popupTCin {                          
+	float:					left;   
+	color:					rgba(0,0,0,.5);
+}           
+#popupTCout {                          
+	float:					right;   
+	color:					rgba(0,0,0,.5);
+}
+#popupTC:hover { 
+	/*background:				rgba(255,255,255,.25);*/
+	background:				rgba(255,255,255,.1); 
 }                    
 #popupTCedit {  
 	font-size:				1.0em;  
@@ -238,20 +276,7 @@ html, body {
 	line-height:			1.8em;    
 	text-align:				center;
 }          
-.nowTCbtn {
-	/*background:				rgba(255,255,255,.15);  
-	box-shadow:				0 1px 3px rgba(0,0,0,.2);  
-	border:					0;   
-	border-radius:			3px;     
-	color:					rgba(0,0,0,.25);    
-	padding:				0 2%;  
-	display:				inline-block;  
-	font-size:				1.0em;            
-	line-height:			1.8em; 
-	text-align:				center; 
-	margin-left:			1vw;    
-	text-transform:			uppercase;      */
-	/*font-variant: 			small-caps;*/  
+.nowTCbtn {                                             
 	text-decoration:		underline;  
 	padding:				0 1%;  
 	display:				inline-block;   
@@ -274,16 +299,21 @@ html, body {
 #popupLink:hover {
 	color:					#fff;  
 	text-decoration:		underline;
-}        
+}          
+
+
+
 #popupLegende {                     
 	cursor:					pointer;   
 	font-weight:			200;  
-	line-height:			1.2em;
-	padding:				0;
+	line-height:			1.2em;    
+	font-size:				1.0em; 
+	padding:				0;   
+	font-style:				italic;  
 }   
 .popupRightItem.empty {
 	font-style:				italic; 
-	opacity:				.8;
+	color:					rgba(0,0,0,.5);
 }
 #popupLegendeInput {
 	font-weight:			200;
@@ -292,7 +322,7 @@ html, body {
 	cursor:					pointer;  
 	padding:				2%; 
 	margin-bottom:			3%;
-	font-size:				1.2em; 
+	font-size:				1.0em; 
 	line-height:			1.2em;       
 }    
 
