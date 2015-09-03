@@ -455,7 +455,7 @@ Project.prototype.analyse = function() {
 			
 			//Ouverture du popup
 			if((Tag.keyToOpenAfterLoading != undefined) && (tag.document.key == Tag.keyToOpenAfterLoading)) {
-				fillPopupEdit(tag);
+				tag.openPopupEdit();
 				Tag.keyToOpenAfterLoading = undefined;
 			}
 		});
