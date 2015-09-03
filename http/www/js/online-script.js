@@ -88,64 +88,64 @@ $(document).ready(function() {
 	});*/
 	            
 	
-	$("#left_menu_item_addnote").click(function(){  
+	$("#left_menu_item_addnote").click(function(event){  
 		event.stopPropagation();   
 		uploadFiles(["New note"]);   
 	});       
 	
-	$("#popupAlertSpace").click(function(){  
+	$("#popupAlertSpace").click(function(event){  
 		event.stopPropagation();      
 	});
-	$("#popupAlertButtonOk").click(function(){  
+	$("#popupAlertButtonOk").click(function(event){  
 		event.stopPropagation(); 
 		$("#popupAlertSpace").hide();
 	});
    
- 	$("#popupSpace").click(function(){  
+ 	$("#popupSpace").click(function(event){  
 		event.stopPropagation();  
 		closeEdit();              
 	});                    
-	$("#closePopupEdit").click(function(){
+	$("#closePopupEdit").click(function(event){
 		event.stopPropagation();  
 		closeEdit(); 
 	});
 	
-	$("#popupEdit").click(function(){  
+	$("#popupEdit").click(function(event){  
 		event.stopPropagation(); 
 		closeInputs();
 	});
 	            
-	$("#popupNom").click(function(){  
+	$("#popupNom").click(function(event){  
 		event.stopPropagation();     
 		closeInputs();
 		$(this).hide();
 		$("#popupNomInput").show().focus(); 
 	});       
 	
-	$("#popupTC").click(function(){ 
+	$("#popupTC").click(function(event){        
 		event.stopPropagation();     
 		closeInputs();
 		$("#popupTC").hide();
 		$("#popupTCedit").show();//.focus(); 
 	});     
 	
-	$(".popupTCeditfield").click(function(){
+	$(".popupTCeditfield").click(function(event){
 		event.stopPropagation();
 	});     
-	$("#nowTCin").click(function(){
+	$("#nowTCin").click(function(event){
 		event.stopPropagation();                                                            
 		var timeCurrent = convertToTime(Math.round(rekall.timeline.timeCurrent));   
 		$("#popupTCinMin").val(timeCurrent.split(":")[0]); 
 		$("#popupTCinSec").val(timeCurrent.split(":")[1]); 
 	});         
-	$("#nowTCout").click(function(){
+	$("#nowTCout").click(function(event){
 		event.stopPropagation();                                                             
 		var timeCurrent = convertToTime(Math.round(rekall.timeline.timeCurrent));
 		$("#popupTCoutMin").val(timeCurrent.split(":")[0]); 
 		$("#popupTCoutSec").val(timeCurrent.split(":")[1]); 
 	});                                                
 	
-	$("#TCvalidModif").click(function(){
+	$("#TCvalidModif").click(function(event){
 		event.stopPropagation();      
 		var keyDoc = $(this).parent().parent().attr("keydoc");    
 		var inMin = $("#popupTCinMin").val();
@@ -168,7 +168,7 @@ $(document).ready(function() {
 			closeInputs();   
 		}
 	});
-	$("#TCinvalidModif").click(function(){
+	$("#TCinvalidModif").click(function(event){
 		event.stopPropagation();  
 		var TCin = $("#popupTCin").html().split(":"); 
 		var TCout = $("#popupTCout").html().split(":");   
@@ -180,7 +180,7 @@ $(document).ready(function() {
 	});
 	           
 	
-	$("#popupLegende").click(function(){  
+	$("#popupLegende").click(function(event){  
 		event.stopPropagation();     
 		closeInputs();
 		$(this).hide();
@@ -188,14 +188,14 @@ $(document).ready(function() {
 	});  
 	
 	
-	$(".popupInput").click(function(){
+	$(".popupInput").click(function(event){
 		event.stopPropagation();
 	});   
 	 
 	
-	$("#popupNomInput").keyup(function(e){  
+	$("#popupNomInput").keyup(function(event){  
 		event.stopPropagation();              
-		if(e.which == 13) {    
+		if(event.which == 13) {    
 			var keyDoc = $(this).parent().attr("keydoc"); 
 			var newName = $(this).val().trim();        
 			$(this).val(newName);
@@ -240,7 +240,7 @@ $(document).ready(function() {
 		}
 	});        
 	 
-	$("#popupSetHighlight").click(function(){
+	$("#popupSetHighlight").click(function(event){
 		event.stopPropagation(); 
 		var keyDoc = $(this).parent().attr("keydoc");
 		var isHL = $(this).attr("isHighlight");  
@@ -331,7 +331,8 @@ function fillPopupEdit(tag) {
 			$("#popupImg").show();   
 			$("#popupImg").attr("src",tag.thumbnail.url);  
 			$("#popupImg").unbind( "click" );
-			$("#popupImg").click(function(){
+			$("#popupImg").click(function(event){ 
+				event.stopPropagation(); 
 				tag.openBrowser(); 
 			});     
 		} else {
