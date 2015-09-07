@@ -7,7 +7,7 @@ $(document).ready(function() {
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
-		data: {"status": 1},
+		data: {"status": 1, "password": getParameterByName("password")},
 		success: function(infos) {
 			rekall_common = infos;
 			if(rekall_common.owner.canEdit) {
