@@ -82,7 +82,6 @@ $(document).ready(function() {
 });    
 
 function setEditionControls() {  
-	
 	//Drag&drop files
 	$(document).on({
 		dragenter: function(event) {          
@@ -127,12 +126,14 @@ function setEditionControls() {
 		event.stopPropagation();   
 		uploadFiles(["New note"]);   
 	}); 
-  
-	
+
 	$("#left_menu_item_btn_addfile").change(function(event){  
-		var docName = $("#left_menu_item_btn_addfile").get(0).files[0].name;  
-		$("#popupFormMessage").html(""+docName);
-		$("#popupFormSpace").show(); 
+		var docName = $("#left_menu_item_btn_addfile").get(0).files[0].name;
+		uploadFiles($("#left_menu_item_btn_addfile").get(0).files);
+		/*
+		$("#popupFormMessage").html("" + docName);
+		$("#popupFormSpace").show();
+		*/
 	});   
 	
 	$("#popupFormSpace").click(function(event){  
@@ -288,7 +289,7 @@ function setEditionControls() {
 	});
 	
 	$("#popupEditSupprimer").click(function(){
-		openAlert("Do youreally want to delete this file from the project ?", "yesnodelete");
+		openAlert("Do you really want to delete this file from the project ?", "yesnodelete");
 	});       
 
 	
@@ -505,7 +506,7 @@ function uploadFiles(files) {
 			}
 			
 			//Données du formulaire
-			if($('form')[0] != undefined)
+			if($("uploadForm")[0] != undefined)
 				formData = new FormData($('form')[0]); //à vérifier
 			else {
 				formData.append("fileToUpload", file);
