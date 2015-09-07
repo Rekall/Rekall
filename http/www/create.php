@@ -83,7 +83,7 @@
 					});	
 				}
 				else
-					alert("Merci de saisir tous les champs");
+					alert("Please fill all the form before submit!");
 				return false;
 			});			
 		});
@@ -93,13 +93,13 @@
 	<body>
 		<form action="create.php" method="post" id='formCreate'>
 			<label>Project name</label>
-			<input type="text" name="create"   value="my-project-name" size="30"><br/>
-			<label>Video URL</label>
-		    <input type="text" name="video"    value="https://www.youtube.com/watch?v=4Rcw5GCXJnQ" size="30"><br/>
+			<input type="text" name="create"   placeholder="my-project-name" size="30"><br/>
+			<label>Youtube video URL</label>
+		    <input type="text" name="video"    placeholder="https://www.youtube.com/watch?v=4Rcw5GCXJnQ" size="50"><br/>
 			<label>Edition password</label>
-		    <input type="text" name="password" value="password" size="30"><br/>
+		    <input type="password" name="password" placeholder="Password" size="10"><br/>
 
-		    <input type="submit" value="Create" name="submit">
+		    <input type="submit" value="Create project" name="submit">
 		</form>
 	</body>
 </body>

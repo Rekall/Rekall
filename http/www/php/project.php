@@ -351,7 +351,6 @@
 		if(property_exists($details, "city"))
 			$retour["owner"]["locationName"] = $details->city;
 		$retour["owner"]["canEdit"] = $_SESSION["canEdit"];
-
 		$retour["owner"]["author"] = "Guillaume Jacquemin";
 		echo json_encode($retour);
 	}
