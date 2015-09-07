@@ -329,14 +329,22 @@ function fillPopupEdit(tag) {
 	} else {                
 		if(tag.thumbnail.url){        
 			$("#popupImg").show();   
-			$("#popupImg").attr("src",tag.thumbnail.url);  
+		   	$("#popupImg").attr("src",tag.thumbnail.url);    
 			$("#popupImg").unbind( "click" );
 			$("#popupImg").click(function(event){ 
 				event.stopPropagation(); 
 				tag.openBrowser(); 
 			});     
-		} else {
-			$("#popupImg").hide(); 
+		} else {                   
+			var type = tag.getMetadata("Rekall->Type");
+			//alert(type);        
+			if(type.indexOf("image") > -1) $("#popupImg").attr("src","css/images/img-image.png");  //alert("image");
+			else if(type.indexOf("pdf") > -1) $("#popupImg").attr("src","css/images/img-pdf.png");  //alert("pdf"); 
+			else if(type.indexOf("audio") > -1) $("#popupImg").attr("src","css/images/img-music.png");  //alert("son");  
+			else if(type.indexOf("vcard") > -1) $("#popupImg").attr("src","css/images/img-user.png");  //alert("user"); 
+			else if(type.indexOf("video") > -1) $("#popupImg").attr("src","css/images/img-video.png");  //alert("video");  
+			else if(type.indexOf("msword") > -1) $("#popupImg").attr("src","css/images/img-word.png");  //alert("word");  
+			else $("#popupImg").attr("src","css/images/img-document.png");  //alert(type);
 		}  
 		$("#popupEditSupprimer").html("&#10761;&nbsp;&nbsp;Delete File");    
 	}     
