@@ -67,9 +67,8 @@
 
 	<title>Rekall Online</title>
 	
-    <script language="javascript" type='text/javascript' src='js/libs/jquery.min.js'></script>     
-    <script language="javascript" type='text/javascript' src='js/libs/jquery-migrate.js'></script>	             
-	<script language="javascript" type='text/javascript' src='js/libs/sha1.js'></script>
+    <script language="javascript" type='text/javascript' src='createJs/jquery.min.js'></script>     
+	<script language="javascript" type='text/javascript' src='createJs/sha1.js'></script>
 	<link rel="stylesheet" type="text/css" href="css/online-theme.css" />
 	
 	<script language="javascript" type='text/javascript'>
