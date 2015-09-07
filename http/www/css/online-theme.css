@@ -415,7 +415,7 @@ html, body {
 
 #video {
 	display:				inline-block;
-	vertical-align:			top;   
+	vertical-align:			top;    
 }
 
 #flattentimeline {
@@ -702,7 +702,22 @@ html, body {
 .docFaraway {
 	opacity:				0.1;       
 	display:				none;
-}
+}           
+
+
+
+
+
+
+
+
+
+.editmode {
+	display:none !important;   
+	width:0 !important;
+}    
+                 
+
 
 
 

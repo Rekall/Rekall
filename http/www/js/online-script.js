@@ -12,7 +12,7 @@ $(document).ready(function() {
 			rekall_common = infos;
 			if(rekall_common.owner.canEdit) {
 				//Mode preview or not
-				
+				$(".editmode").removeClass("editmode");
 				
 				//Geoloc en mode édition
 				if(navigator.geolocation) {
@@ -40,26 +40,36 @@ $(document).ready(function() {
 			rouletteEnd();
 		}
 	});
-	
+	   
+
+		
 	//Drag&drop files
 	$(document).on({
-		dragenter: function(event) {
-			event.stopImmediatePropagation();
-			event.preventDefault();                              
-		},
-		dragleave: function(event) {
-			event.stopImmediatePropagation();
-			event.preventDefault();   
-		},
-		dragover: function(event) {
-			event.stopImmediatePropagation();
-			event.preventDefault();  
-		},
-		drop: function(event) {    
-			if(event.originalEvent.dataTransfer.files.length) {
+		dragenter: function(event) { 
+			if(rekall_common.owner.canEdit) { 
 				event.stopImmediatePropagation();
-				event.preventDefault();
-				uploadFiles(event.originalEvent.dataTransfer.files);
+				event.preventDefault();   
+			}                           
+		},
+		dragleave: function(event) {      
+			if(rekall_common.owner.canEdit) { 
+				event.stopImmediatePropagation();
+				event.preventDefault();   
+			}
+		},
+		dragover: function(event) {     
+			if(rekall_common.owner.canEdit) { 
+				event.stopImmediatePropagation();
+				event.preventDefault();  
+			}
+		},
+		drop: function(event) {         
+			if(rekall_common.owner.canEdit) { 
+				if(event.originalEvent.dataTransfer.files.length) {
+					event.stopImmediatePropagation();
+					event.preventDefault();
+					uploadFiles(event.originalEvent.dataTransfer.files);
+				}  
 			}
 		}
 	});   
@@ -69,23 +79,18 @@ $(document).ready(function() {
 		dragenter: function(event) {
 			//$(".flattentimeline_item").removeClass("draggable").addClass("drag");
 		},
-		dragleave: function(event) {
-			$("#flattentimeline").removeClass("draggable").removeClass("drag"); 
+		dragleave: function(event) {  
+			if(rekall_common.owner.canEdit) $("#flattentimeline").removeClass("draggable").removeClass("drag"); 
 		},
 		dragover: function(event) {
-			$("#flattentimeline").removeClass("draggable").addClass("drag"); 
+			if(rekall_common.owner.canEdit) $("#flattentimeline").removeClass("draggable").addClass("drag"); 
 		},
 		drop: function(event) {
-			$("#flattentimeline").removeClass("draggable").removeClass("drag");  
+			if(rekall_common.owner.canEdit) $("#flattentimeline").removeClass("draggable").removeClass("drag");  
 		}
 	});
+	   
 	
-	/*$(document).keyup(function(event) {  
-		if(event.keyCode == 77) // M
-			uploadFiles(["New note"]);
-		else if(event.keyCode == 69) // E
-			embed();
-	});*/
 	            
 	
 	$("#left_menu_item_addnote").click(function(event){  
@@ -589,5 +594,5 @@ $(window).resize(function(e) {
 		rekall.videoPlayer.width (($("#container").width() - $("#left_menu").width() - $("#flattentimeline").width() - 10) + "px");
 		rekall.videoPlayer.height(($("#container").height()) + "px");
 	}
-});
+}); 
 	
