@@ -291,11 +291,11 @@
 		$_SESSION["canEdit"] = false;
 	
 	if(isset($_GET["password"])) {
-		if($_GET["password"] != "")
+		$sha1password = strtoupper(file_get_contents("../file/projectPassword.txt"));
+		if(($_GET["password"] != "") && ($_GET["password"] == $sha1password))
 			$_SESSION["canEdit"] = true;
-		else {
+		else
 			$_SESSION["canEdit"] = false;
-		}
 	}
 	if($_SESSION["canEdit"] == true) {
 		//Opérations sur les fichiers

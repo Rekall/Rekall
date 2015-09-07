@@ -1,7 +1,7 @@
 <?php require_once("php/sql.php"); ?>
 <?php
 	//Créé un projet Rekall
-	function createProject($name, $videoUrl) {
+	function createProject($name, $videoUrl, $sha1password) {
 		$retours = array("success" => 0, "error" => "", "value" => "");
 		$name = sanitize($name);
 
@@ -15,6 +15,7 @@
 				$zip->extractTo($name);
 				$zip->close();
 				file_put_contents($name."/file/project.xml", str_replace("__video__", $videoUrl, file_get_contents($name."/file/project.xml")));
+				file_put_contents($name."/file/projectPassword.txt", $sha1password);				
 				$retours["success"] = 1;
 			} else {
 				$retours["success"] = -1;
@@ -30,8 +31,8 @@
 		echo json_encode($retours);
 	}
 	
-	if((isset($_POST["create"])) && (isset($_POST["video"]))) {
-		createProject($_POST["create"], $_POST["video"]);
+	if((isset($_POST["create"])) && (isset($_POST["video"])) && (isset($_POST["password"]))) {
+		createProject($_POST["create"], $_POST["video"], $_POST["password"]);
 		exit();
 	}
 ?>
@@ -55,27 +56,34 @@
 	
     <script language="javascript" type='text/javascript' src='js/libs/jquery.min.js'></script>     
     <script language="javascript" type='text/javascript' src='js/libs/jquery-migrate.js'></script>	             
+	<script language="javascript" type='text/javascript' src='js/libs/sha1.js'></script>
 	<link rel="stylesheet" type="text/css" href="css/online-theme.css" />
 	
 	<script language="javascript" type='text/javascript'>
 		$(document).ready(function() {
 			$("#formCreate").submit(function(event) {
 				event.stopPropagation();
-				$.ajax("create.php", {
-					type: "POST",
-					dataType: "json",
-					data: {"create": $("input[name=create]").val(), "video": $("input[name=video]").val()},
-					success: function(retour) {
-						if(retour.success == 1) {
-							alert(retour.value);
-							window.document.location = document.URL.substr(0,document.URL.lastIndexOf('/')) + "/" + retour.value + "?password=test";
+				if(($("input[name=create]").val() != "") && ($("input[name=video]").val() != "") && ($("input[name=password]").val() != "")) {
+					var passwordRaw = $("input[name=password]").val();
+					var password = (CryptoJS.SHA1(passwordRaw) + "").toUpperCase();
+					$.ajax("create.php", {
+						type: "POST",
+						dataType: "json",
+						data: {"create": $("input[name=create]").val(), "video": $("input[name=video]").val(), "password": password},
+						success: function(retour) {
+							console.log(retour);
+							if(retour.success == 1) {
+								window.document.location = document.URL.substr(0,document.URL.lastIndexOf('/')) + "/" + retour.value + "?password=" + passwordRaw;
+							}
+							else
+								alert(retour.error)
+						},
+						error: function(retour) {
 						}
-						else
-							alert(retour.error)
-					},
-					error: function(retour) {
-					}
-				});	
+					});	
+				}
+				else
+					alert("Merci de saisir tous les champs");
 				return false;
 			});			
 		});
@@ -83,7 +91,7 @@
 </head>
 <body>         
 	<body>
-		<form action="index.php" method="post" id='formCreate'>
+		<form action="create.php" method="post" id='formCreate'>
 			<label>Project name</label>
 			<input type="text" name="create"   value="my-project-name" size="30"><br/>
 			<label>Video URL</label>

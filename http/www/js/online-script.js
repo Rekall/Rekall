@@ -4,10 +4,13 @@ $(document).ready(function() {
 	rekall_common.owner = {"canEdit": false, "author": "", "locationGps": "", "locationName": ""};
 
 	rouletteStart();
+	var password = "";
+	if(getParameterByName("password") != "")
+		password = (CryptoJS.SHA1(getParameterByName("password")) + "").toUpperCase();
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
-		data: {"status": 1, "password": getParameterByName("password")},
+		data: {"status": 1, "password": password},
 		success: function(infos) {
 			rekall_common = infos;
 			if(rekall_common.owner.canEdit) {
