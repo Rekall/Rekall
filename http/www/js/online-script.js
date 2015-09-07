@@ -126,7 +126,22 @@ function setEditionControls() {
 	$("#left_menu_item_addnote").click(function(event){  
 		event.stopPropagation();   
 		uploadFiles(["New note"]);   
+	}); 
+  
+	
+	$("#left_menu_item_btn_addfile").change(function(event){  
+		var docName = $("#left_menu_item_btn_addfile").get(0).files[0].name;  
+		$("#popupFormMessage").html(""+docName);
+		$("#popupFormSpace").show(); 
+	});   
+	
+	$("#popupFormSpace").click(function(event){  
+		event.stopPropagation();      
+	});  
+	$("#popupFormButtonCancel").click(function(){   
+		closeForm();
 	});
+   
 	
 	
 	$("#popupEdit").click(function(event){  
@@ -303,6 +318,11 @@ function closeAlert() {
 	$("#popupAlertMessage").html(""); 
 	$(".popupAlertButton").hide();         
 	$("#popupAlertSpace").hide(); 
+}  
+
+function closeForm() {
+	$("#popupFormMessage").html("");        
+	$("#popupFormSpace").hide(); 
 }
 
 function closeInputs() {
