@@ -317,7 +317,7 @@
 	//API
 	$_GET = array_merge($_GET, $_POST);
 	$canEdit = false;
-	if(isset($_GET["password"])) {
+	if((isset($_GET["password"])) && ($_GET["password"] != "")) {
 		$canEdit = true;
 	}
 	if($canEdit) {
