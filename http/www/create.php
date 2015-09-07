@@ -83,24 +83,23 @@
 					});	
 				}
 				else
-					alert("Please fill all the form before submit!");
+					alert("Merci de saisir tous les champs");
 				return false;
 			});			
 		});
 	</script>
 </head>
-<body>         
-	<body>
-		<form action="create.php" method="post" id='formCreate'>
-			<label>Project name</label>
-			<input type="text" name="create"   placeholder="my-project-name" size="30"><br/>
-			<label>Youtube video URL</label>
-		    <input type="text" name="video"    placeholder="https://www.youtube.com/watch?v=4Rcw5GCXJnQ" size="50"><br/>
-			<label>Edition password</label>
-		    <input type="password" name="password" placeholder="Password" size="10"><br/>
+<body id="createProjectBody">              
+	<img id="createProjectLogo" src="css/images/logo.png" />
+	<form action="create.php" method="post" id='formCreate'>
+		<label>Project name *</label>
+		<input type="text" name="create"   placeholder="my-project-name" size="30"><br/>
+		<label>YouTube video URL *</label>
+	    <input type="text" name="video"    placeholder="https://www.youtube.com/watch?v=4Rcw5GCXJnQ" size="30"><br/>
+		<label>Edition password *</label>
+	    <input type="text" name="password" placeholder="password" size="30"><br/>
 
-		    <input type="submit" value="Create project" name="submit">
-		</form>
-	</body>
+	    <input id="submitCreate" type="submit" value="Create a project" name="submit">
+	</form>        
 </body>
 </html>

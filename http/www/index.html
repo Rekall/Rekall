@@ -63,19 +63,16 @@
 	<link rel="stylesheet" type="text/css" href="css/online-theme.css" />
 </head>
 <body>     
-	<form id="uploadForm" action="php/upload.php" method="post" enctype="multipart/form-data"> 
+	
 		       
 	<div id='container'>       
-		<div id="popupFormSpace">   
-			<div id="popupForm"> 
-				<!--<input type="text" name="tc"     value="234">
-				<input type="text" name="author" value="Guillaume Jacquemin">
-			    <input type="text" name="date"   value="2010:01:28 08:10:32"> -->   
+	   <!-- <div id="popupFormSpace">   
+			<div id="popupForm">                                                    
 				<div id="popupFormMessage"></div>                  
 				<div class="popupFormButton" id="popupFormButtonCancel">Cancel</div> 
 			    <input class="popupFormButton" id="popupFormButtonUpload" type="submit" value="Upload" name="submit">   
 			</div>  
-		</div>
+		</div>     -->
 		<div id="popupAlertSpace">
 			<div id="popupAlert">    
 				<div id="popupAlertMessage"></div>
@@ -136,8 +133,10 @@
 				</div>
 			</tr></td>
 			<tr><td id="left_menu_bottom">                                     
-				<div class="left_menu_item dropable" id="left_menu_item_addfile" title="AddFile">    
-					<input type="file" name="fileToUpload[]" multiple="multiple" id="left_menu_item_btn_addfile">
+				<div class="left_menu_item dropable" id="left_menu_item_addfile" title="AddFile">  
+					<form id="uploadForm" action="php/upload.php" method="post" enctype="multipart/form-data">    
+						<input type="file" name="fileToUpload[]" multiple="multiple" id="left_menu_item_btn_addfile">
+					</form>
 					<div class="left_menu_item_icn" id="left_menu_item_icn_addfile"></div>
 					<div class="left_menu_item_title">Add File</div>
 					<div class="left_menu_item_value"></div>
@@ -166,9 +165,6 @@
 			</div>
 			<p id='videoProgress'>&nbsp;</p>
 		</div>
-	</div>    
-	  
-</form>
-      
+	</div>      
 </body>
 </html>
