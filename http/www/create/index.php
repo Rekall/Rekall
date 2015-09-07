@@ -79,6 +79,7 @@
 				if(($("input[name=create]").val() != "") && ($("input[name=video]").val() != "") && ($("input[name=password]").val() != "")) {
 					var passwordRaw = $("input[name=password]").val();
 					var password = (CryptoJS.SHA1(passwordRaw) + "").toUpperCase();
+					$("#submitCreate").hide();
 					$.ajax("index.php", {
 						type: "POST",
 						dataType: "json",
@@ -88,10 +89,13 @@
 							if(retour.success == 1) {
 								window.document.location = document.URL.substr(0,document.URL.lastIndexOf('/')) + "/" + retour.value + "?password=" + passwordRaw;
 							}
-							else
+							else {
 								alert(retour.error)
+								$("#submitCreate").show();
+							}
 						},
 						error: function(retour) {
+							$("#submitCreate").show();
 						}
 					});	
 				}
