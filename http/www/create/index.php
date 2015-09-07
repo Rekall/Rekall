@@ -79,7 +79,7 @@
 				if(($("input[name=create]").val() != "") && ($("input[name=video]").val() != "") && ($("input[name=password]").val() != "")) {
 					var passwordRaw = $("input[name=password]").val();
 					var password = (CryptoJS.SHA1(passwordRaw) + "").toUpperCase();
-					$.ajax("create.php", {
+					$.ajax("index.php", {
 						type: "POST",
 						dataType: "json",
 						data: {"create": $("input[name=create]").val(), "video": $("input[name=video]").val(), "password": password},
@@ -104,7 +104,7 @@
 </head>
 <body id="createProjectBody">              
 	<img id="createProjectLogo" src="css/images/logo.png" />
-	<form action="create.php" method="post" id='formCreate'>
+	<form action="index.php" method="post" id='formCreate'>
 		<label>Project name *</label>
 		<input type="text" name="create"   placeholder="my-project-name" size="30"><br/>
 		<label>YouTube video URL *</label>
