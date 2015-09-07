@@ -315,10 +315,12 @@
 	}
 
 	//API
-	$canEdit = true;
+	$_GET = array_merge($_GET, $_POST);
+	$canEdit = false;
+	if(isset($_GET["password"]) {
+		$canEdit = true;
+	}
 	if($canEdit) {
-		$_GET = array_merge($_GET, $_POST);
-		
 		//Opérations sur les fichiers
 		if((isset($_GET["folder"])) && (isset($_GET["file"]))) {
 			if(isset($_GET["remove"])) {
