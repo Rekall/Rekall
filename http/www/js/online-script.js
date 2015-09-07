@@ -12,7 +12,9 @@ $(document).ready(function() {
 			rekall_common = infos;
 			if(rekall_common.owner.canEdit) {
 				//Mode preview or not
-				$(".editmode").removeClass("editmode");
+				$(".editmode").removeClass("editmode");   
+				
+				setEditionControls();
 				
 				//Geoloc en mode édition
 				if(navigator.geolocation) {
@@ -43,60 +45,8 @@ $(document).ready(function() {
 	   
 
 		
-	//Drag&drop files
-	$(document).on({
-		dragenter: function(event) { 
-			if(rekall_common.owner.canEdit) { 
-				event.stopImmediatePropagation();
-				event.preventDefault();   
-			}                           
-		},
-		dragleave: function(event) {      
-			if(rekall_common.owner.canEdit) { 
-				event.stopImmediatePropagation();
-				event.preventDefault();   
-			}
-		},
-		dragover: function(event) {     
-			if(rekall_common.owner.canEdit) { 
-				event.stopImmediatePropagation();
-				event.preventDefault();  
-			}
-		},
-		drop: function(event) {         
-			if(rekall_common.owner.canEdit) { 
-				if(event.originalEvent.dataTransfer.files.length) {
-					event.stopImmediatePropagation();
-					event.preventDefault();
-					uploadFiles(event.originalEvent.dataTransfer.files);
-				}  
-			}
-		}
-	});   
-	                     
-	
-	$("#flattentimeline").on({
-		dragenter: function(event) {
-			//$(".flattentimeline_item").removeClass("draggable").addClass("drag");
-		},
-		dragleave: function(event) {  
-			if(rekall_common.owner.canEdit) $("#flattentimeline").removeClass("draggable").removeClass("drag"); 
-		},
-		dragover: function(event) {
-			if(rekall_common.owner.canEdit) $("#flattentimeline").removeClass("draggable").addClass("drag"); 
-		},
-		drop: function(event) {
-			if(rekall_common.owner.canEdit) $("#flattentimeline").removeClass("draggable").removeClass("drag");  
-		}
-	});
-	   
-	
-	            
-	
-	$("#left_menu_item_addnote").click(function(event){  
-		event.stopPropagation();   
-		uploadFiles(["New note"]);   
-	});       
+  
+	    
 	
 	$("#popupAlertSpace").click(function(event){  
 		event.stopPropagation();      
@@ -114,6 +64,67 @@ $(document).ready(function() {
 		event.stopPropagation();  
 		closeEdit(); 
 	});
+	
+	$("#popupAlertButtonCancel").click(function(){
+		closeAlert();
+	});      
+	
+	$("#popupAlertButtonYesdelete").click(function(){
+		var keyDoc = $("#popupRight").attr("keyDoc");
+		deleteFromDom(keyDoc);
+	});       
+	
+
+	
+});    
+
+function setEditionControls() {  
+	
+	//Drag&drop files
+	$(document).on({
+		dragenter: function(event) {          
+			event.stopImmediatePropagation();
+			event.preventDefault();    
+		},
+		dragleave: function(event) {               
+			event.stopImmediatePropagation();
+			event.preventDefault();      
+		},
+		dragover: function(event) {            
+			event.stopImmediatePropagation();
+			event.preventDefault();       
+		},
+		drop: function(event) {                
+			if(event.originalEvent.dataTransfer.files.length) {
+				event.stopImmediatePropagation();
+				event.preventDefault();
+				uploadFiles(event.originalEvent.dataTransfer.files);
+			}        
+		}
+	});   
+	                     
+	
+	$("#flattentimeline").on({
+		dragenter: function(event) {
+			//$(".flattentimeline_item").removeClass("draggable").addClass("drag");
+		},
+		dragleave: function(event) {  
+			$("#flattentimeline").removeClass("draggable").removeClass("drag"); 
+		},
+		dragover: function(event) {
+			$("#flattentimeline").removeClass("draggable").addClass("drag"); 
+		},
+		drop: function(event) {
+			$("#flattentimeline").removeClass("draggable").removeClass("drag");  
+		}
+	});
+	   
+	                                           
+	$("#left_menu_item_addnote").click(function(event){  
+		event.stopPropagation();   
+		uploadFiles(["New note"]);   
+	});
+	
 	
 	$("#popupEdit").click(function(event){  
 		event.stopPropagation(); 
@@ -246,7 +257,7 @@ $(document).ready(function() {
 	});        
 	 
 	$("#popupSetHighlight").click(function(event){
-		event.stopPropagation(); 
+		event.stopPropagation();
 		var keyDoc = $(this).parent().attr("keydoc");
 		var isHL = $(this).attr("isHighlight");  
 		if(isHL=="true") {
@@ -255,25 +266,15 @@ $(document).ready(function() {
 		} else { 
 			setMetaFromDom(keyDoc, "Rekall->Highlight", "true");  
 			$(this).html("&#9733;&nbsp;Highlight").attr("isHighlight", "true").addClass("selected");   	
-		}
+		}              
 	});
 	
 	$("#popupEditSupprimer").click(function(){
 		openAlert("Do youreally want to delete this file from the project ?", "yesnodelete");
 	});       
+
 	
-	$("#popupAlertButtonCancel").click(function(){
-		closeAlert();
-	});      
-	
-	$("#popupAlertButtonYesdelete").click(function(){
-		var keyDoc = $("#popupRight").attr("keyDoc");
-		deleteFromDom(keyDoc);
-	});       
-	
-	
-	
-});
+}
              
 function openAlert(message, buttons) {
 	//Rétro-compatibilité Rekall-Pro
@@ -317,7 +318,8 @@ function closeEdit() {
 }                      
                            
 function fillPopupEdit(tag) {                
-	      
+	
+	//if(rekall_common.owner.canEdit) { alert("edit mode !"); }      
 	var isPaused = rekall.timeline.isPaused();  
 	rekall.timeline.pause();   
                                     
@@ -328,18 +330,12 @@ function fillPopupEdit(tag) {
 	if(tag.isMarker()==true){         
 		$("#popupImg").show();   
 		$("#popupImg").attr("src","css/images/img-note.png");  
-		$("#popupImg").unbind( "click" );  
-		$("#popupEditSupprimer").html("&#10761;&nbsp;&nbsp;Delete Note");
+		$("#popupImg").unbind( "click" );   
 		
 	} else {                
 		if(tag.thumbnail.url){        
-			$("#popupImg").show();   
 		   	$("#popupImg").attr("src",tag.thumbnail.url);    
-			$("#popupImg").unbind( "click" );
-			$("#popupImg").click(function(event){ 
-				event.stopPropagation(); 
-				tag.openBrowser(); 
-			});     
+			   
 		} else {                   
 			var type = tag.getMetadata("Rekall->Type");
 			//alert(type);        
@@ -350,34 +346,49 @@ function fillPopupEdit(tag) {
 			else if(type.indexOf("video") > -1) $("#popupImg").attr("src","css/images/img-video.png");  //alert("video");  
 			else if(type.indexOf("msword") > -1) $("#popupImg").attr("src","css/images/img-word.png");  //alert("word");  
 			else $("#popupImg").attr("src","css/images/img-document.png");  //alert(type);
-		}  
-		$("#popupEditSupprimer").html("&#10761;&nbsp;&nbsp;Delete File");    
+		}    
+		$("#popupImg").unbind( "click" );
+		$("#popupImg").click(function(event){ 
+			event.stopPropagation(); 
+			tag.openBrowser(); 
+		});                               
 	}     
 	 
 	$("#popupType").html(tag.getMetadata("Rekall->Type"));        
 	var name = tag.getMetadata("Rekall->Name");    
 	if(name!="") $("#popupNom").html(name).removeClass("empty");
-	else $("#popupNom").html("+ Add a name").addClass("empty");  
-	$("#popupNomInput").val(tag.getMetadata("Rekall->Name"));
+	else $("#popupNom").html("+ Add a name").addClass("empty");    
 
 	var startVerb = convertToTime(tag.getTimeStart());
 	$("#popupTCin").html(startVerb);       
-	$("#popupTCinMin").val(startVerb.split(":")[0]);
-	$("#popupTCinSec").val(startVerb.split(":")[1]);
-
+	                                                 
 	var endVerb = convertToTime(tag.getTimeEnd());  
-	$("#popupTCout").html(endVerb);      
-	$("#popupTCoutMin").val(endVerb.split(":")[0]);
-	$("#popupTCoutSec").val(endVerb.split(":")[1]);
+	$("#popupTCout").html(endVerb);                  
 	  
 	var comments = tag.getMetadata("Rekall->Comments");
 	if(comments!="") $("#popupLegende").html(comments).removeClass("empty");
-	else $("#popupLegende").html("+ Add a comment").addClass("empty"); 
-	$("#popupLegendeInput").html(comments.replace(/<br\/>/gi, '\n'));  
+	else $("#popupLegende").html("+ Add a comment").addClass("empty");        
+	
+	                                         
+	if(rekall_common.owner.canEdit) {       
+		if(tag.isMarker()==true) $("#popupEditSupprimer").html("&#10761;&nbsp;&nbsp;Delete Note");  
+		else $("#popupEditSupprimer").html("&#10761;&nbsp;&nbsp;Delete File");  
 		
-	var highlight = tag.getMetadata("Rekall->Highlight");        
-	if(highlight=="true") $("#popupSetHighlight").html("&#9733;&nbsp;Highlight").attr("isHighlight","true").addClass("selected");  
-	else $("#popupSetHighlight").html("&#9734;&nbsp;Highlight").attr("isHighlight","false").removeClass("selected");  
+		$("#popupNomInput").val(tag.getMetadata("Rekall->Name")); 
+		
+		$("#popupTCinMin").val(startVerb.split(":")[0]);
+		$("#popupTCinSec").val(startVerb.split(":")[1]);
+		
+		$("#popupTCoutMin").val(endVerb.split(":")[0]);
+		$("#popupTCoutSec").val(endVerb.split(":")[1]);
+		
+		$("#popupLegendeInput").html(comments.replace(/<br\/>/gi, '\n'));   
+		
+		var highlight = tag.getMetadata("Rekall->Highlight");        
+		if(highlight=="true") $("#popupSetHighlight").html("&#9733;&nbsp;Highlight").attr("isHighlight","true").addClass("selected");  
+		else $("#popupSetHighlight").html("&#9734;&nbsp;Highlight").attr("isHighlight","false").removeClass("selected");
+	}
+	
 	
 	$("#popupLeft").attr("keydoc",tag.document.key); 
 	$("#popupRight").attr("keydoc",tag.document.key);        
