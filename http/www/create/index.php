@@ -63,14 +63,14 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 
 	<link rel="apple-touch-icon" href="favicon.png" />
-	<link rel="stylesheet" type="text/css" href="create-css/reset.css" />
+	<link rel="stylesheet" type="text/css" href="css/reset.css" />
 
 	<title>Rekall Online</title>
 	                                                                          
-    <script language="javascript" type='text/javascript' src='js/libs/jquery.min.js'></script>     
-    <script language="javascript" type='text/javascript' src='js/libs/jquery-migrate.js'></script>	             
-	<script language="javascript" type='text/javascript' src='js/libs/sha1.js'></script>
-	<link rel="stylesheet" type="text/css" href="create-css/create-theme.css" />    
+    <script language="javascript" type='text/javascript' src='js/jquery.min.js'></script>     
+    <script language="javascript" type='text/javascript' src='js/jquery-migrate.js'></script>	             
+	<script language="javascript" type='text/javascript' src='js/sha1.js'></script>
+	<link rel="stylesheet" type="text/css" href="css/create-theme.css" />    
 	
 	<script language="javascript" type='text/javascript'>
 		$(document).ready(function() {
