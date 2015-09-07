@@ -535,7 +535,7 @@ function uploadFiles(files) {
 					catch(err) {
 						openAlert("Uploading error. Try again.");
 					}
-					window.document.title = "Rekall Online";
+					window.document.title = "Rekall";
 					fileIsUploading = false;
 
 					rouletteEnd();
@@ -543,7 +543,7 @@ function uploadFiles(files) {
 				},
 				error: function(data) {
 					openAlert("Uploading error. Try again.");
-					window.document.title = "Rekall Online";
+					window.document.title = "Rekall";
 					fileIsUploading = false;
 
 					rouletteEnd();

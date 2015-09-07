@@ -65,7 +65,7 @@
 	<link rel="apple-touch-icon" href="favicon.png" />
 	<link rel="stylesheet" type="text/css" href="css/reset.css" />
 
-	<title>Rekall Online</title>
+	<title>Rekall</title>
 	                                                                          
     <script language="javascript" type='text/javascript' src='js/jquery.min.js'></script>     
     <script language="javascript" type='text/javascript' src='js/jquery-migrate.js'></script>	             
