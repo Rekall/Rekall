@@ -264,35 +264,6 @@
 		echo json_encode($retours);
 	}
 	
-	//Créé un projet Rekall
-	function createProject($name) {
-		$retours = array("success" => 0, "error" => "", "value" => "");
-		$name = sanitize($name);
-
-		if($name == "")
-			$name = sha1(rand());
-		
-		if(!file_exists("../".$name)) {
-			$zip = new ZipArchive;
-			$res = $zip->open("seed.zip");
-			if ($res === TRUE) {
-				$zip->extractTo("../".$name);
-				$zip->close();
-				$retours["success"] = 1;
-			} else {
-				$retours["success"] = -1;
-				$retours["error"] = "No seed found";
-			}
-		}
-		else {
-			$retours["success"] = 0;
-			$retours["error"] = "Project exists";
-		}
-		$retours["value"] = $name;
-
-		echo json_encode($retours);
-	}
-	
 	//Renomme un projet Rekall
 	function editProject($oldName, $newName) {
 		$retours = array("success" => 1, "error" => "", "value" => "");
@@ -316,11 +287,17 @@
 
 	//API
 	$_GET = array_merge($_GET, $_POST);
-	$canEdit = false;
-	if((isset($_GET["password"])) && ($_GET["password"] != "")) {
-		$canEdit = true;
+	if(!isset($_SESSION["canEdit"]))
+		$_SESSION["canEdit"] = false;
+	
+	if(isset($_GET["password"])) {
+		if($_GET["password"] != "")
+			$_SESSION["canEdit"] = true;
+		else {
+			$_SESSION["canEdit"] = false;
+		}
 	}
-	if($canEdit) {
+	if($_SESSION["canEdit"] == true) {
 		//Opérations sur les fichiers
 		if((isset($_GET["folder"])) && (isset($_GET["file"]))) {
 			if(isset($_GET["remove"])) {
@@ -362,9 +339,6 @@
 				editVideo($_GET["video"]);
 				closeProject();
 			}
-			else if(isset($_GET["create"])) {
-				createProject($_GET["create"]);
-			}
 			else if((isset($_GET["edit"])) && (isset($_GET["to"]))) {
 				editProject($_GET["edit"], $_GET["to"]);
 			}
@@ -376,7 +350,7 @@
 		$retour  = array("uploadMax" => file_upload_max_size(), "owner" => array("canEdit" => false, "author" => "", "locationGps" => "", "locationName" => ""));
 		if(property_exists($details, "city"))
 			$retour["owner"]["locationName"] = $details->city;
-		$retour["owner"]["canEdit"] = $canEdit;
+		$retour["owner"]["canEdit"] = $_SESSION["canEdit"];
 
 		$retour["owner"]["author"] = "Guillaume Jacquemin";
 		echo json_encode($retour);
