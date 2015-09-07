@@ -397,7 +397,10 @@ html, body {
 #left_menu_item_icn_search { background:url("images/icn-menu-search.png"); }
 #left_menu_item_icn_keywords { background:url("images/icn-menu-keywords.png"); }  
 
-#left_menu_item_icn_preview { background:url("images/icn-menu-preview.png"); }  
+#left_menu_item_icn_preview { background:url("images/icn-menu-preview.png"); }
+#left_menu_item_icn_settings { background:url("images/icn-menu-settings.png"); }  
+#left_menu_item_icn_addfile { background:url("images/icn-menu-addfile.png"); }  
+#left_menu_item_icn_addnote { background:url("images/icn-menu-addnote.png"); }  
 
 .left_menu_item_title {
 	height:20px;
