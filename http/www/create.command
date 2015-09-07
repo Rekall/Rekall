@@ -12,5 +12,6 @@ cp -R index.html createTmp/
 cp -R .htaccess createTmp/
 cd createTmp/
 zip -r -y ../create/create.zip *
+zip -r -y ../create/create.zip .htaccess
 cd ..
 rm -R -f createTmp
