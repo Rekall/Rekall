@@ -68,7 +68,6 @@
 	<title>Rekall</title>
 	                                                                          
     <script language="javascript" type='text/javascript' src='js/jquery.min.js'></script>     
-    <script language="javascript" type='text/javascript' src='js/jquery-migrate.js'></script>	             
 	<script language="javascript" type='text/javascript' src='js/sha1.js'></script>
 	<link rel="stylesheet" type="text/css" href="css/create-theme.css" />    
 	
