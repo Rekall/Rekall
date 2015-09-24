@@ -43,6 +43,7 @@ $(document).ready(function() {
 		},
 		error: function() {
 			rouletteEnd();
+			rekall.loadXMLFile();
 		}
 	});
 	   

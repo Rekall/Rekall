@@ -346,9 +346,9 @@
 	}
 	if(isset($_GET["status"])) {
 		//Récupère le lieu de l'édition
-		$details = json_decode(file_get_contents("http://ipinfo.io/{$_SERVER['REMOTE_ADDR']}"));
+		//$details = json_decode(file_get_contents("http://ipinfo.io/{$_SERVER['REMOTE_ADDR']}"));
 		$retour  = array("uploadMax" => file_upload_max_size(), "owner" => array("canEdit" => false, "author" => "", "locationGps" => "", "locationName" => ""));
-		if(property_exists($details, "city"))
+		if((isset($details)) && (property_exists($details, "city")))
 			$retour["owner"]["locationName"] = $details->city;
 		$retour["owner"]["canEdit"] = $_SESSION["canEdit"];
 		$retour["owner"]["author"] = "Guillaume Jacquemin";
