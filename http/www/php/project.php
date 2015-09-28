@@ -284,6 +284,32 @@
 
 		echo json_encode($retours);
 	}
+	
+	
+	//Met à jour Rekall
+	function update() {
+		$retours = array("success" => 0, "error" => "", "value" => "");
+		
+		downloadFile("http://projet.memorekall.fr/create.zip", "create.zip");
+
+		$zip = new ZipArchive;
+		$res = $zip->open("create.zip");
+		if ($res === TRUE) {
+			rename("../file", "../file_cpy");
+			$zip->extractTo("../");
+			$zip->close();
+			SureRemoveDir("../file", true);
+			rename("../file_cpy", "../file");
+			$retours["success"] = 1;
+		} else {
+			$retours["success"] = -1;
+			$retours["error"] = "No seed found";
+		}
+
+		echo json_encode($retours);
+	}
+	
+	
 
 	//API
 	$_GET = array_merge($_GET, $_POST);
@@ -353,5 +379,8 @@
 		$retour["owner"]["canEdit"] = $_SESSION["canEdit"];
 		$retour["owner"]["author"] = "Guillaume Jacquemin";
 		echo json_encode($retour);
+	}
+	else if(isset($_GET["update"])) {
+		update();
 	}
 ?>
