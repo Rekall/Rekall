@@ -8,7 +8,9 @@ html, body {
     font-family:    		'OpenSans';
   	font-weight: 			400;
 	font-size:	 			12px;
-	background-color: 		black;
+	/*background-color: 		white;
+	background-color:		#061619; */ 
+	background:				#142E33;
 	-webkit-touch-callout: 	none;
 	-webkit-user-select: 	none;
 	-khtml-user-select: 	none;
@@ -429,19 +431,22 @@ html, body {
 
 #video {
 	display:				inline-block;
-	vertical-align:			top;    
+	vertical-align:			top;         
 }
 
 #flattentimeline {
 	width:					200px;
 	height: 		  		100%;
-	background-color:		blue;
+	/*background-color:		#061619;  
+	background-color:		#FFF;*/  
 	display:				inline-block;
 	vertical-align:			top;
-	color:					white;
-	background-color: 		black;
+	color:					white;  
 	overflow-x:				hidden;	
 	overflow-y:				scroll;	 
+	/*background:				red;        
+	background:				#092126;  
+	background:				#0F1C1E;      */
 }    
 #flattentimeline.drag  {
 	/*background:				rgba(2,212,255,.5);*/
@@ -452,7 +457,7 @@ html, body {
 }
 
 #flattentimeline_highlight {
-	margin-bottom:			1px;
+	margin-bottom:			0px;
 }
  
 
@@ -496,14 +501,15 @@ html, body {
 	position:				relative;
 	height: 		  		40px; 
 	color:			  		white;
-	margin:					0px 0px;
-	cursor:					pointer;
-	background:				rgba(255,255,255,.15);/*231F1E;*/   
+	margin:					0px 0px; 
+	cursor:					pointer;                              
 	width:					100%;     
-	display:				none;
+	display:				none;  
+	/*border-radius:			2px;*/           
 }
 .flattentimeline_item:hover, .flattentimeline_highlightitem:hover { 
-	background:				rgba(255,255,255,.12);/*191716;*/
+	background:				rgba(255,255,255,.12);/*191716;*/      
+	opacity:				1; 
 }   
 
 .flattentimeline_highlightitem {
@@ -511,12 +517,13 @@ html, body {
 	/*height: 		  		150px;*/  
 	height: 		  		auto; 
 	color:			  		white;
-	margin:					0px;
+	margin:					3px 0px 0px 0px;
 	cursor:					pointer;
 	background:				rgba(255,255,255,.15); 
 	width:					100%;   
 	text-align:				center;  
-	padding-bottom:			2px;
+	padding-bottom:			2px;    
+	border-radius:			1px;
 	/*display:block;*/ 
 }
 
@@ -536,7 +543,10 @@ html, body {
     -o-background-size: 	cover;
     background-size: 		cover;
 	text-align:				left;
-	overflow:				hidden;
+	overflow:				hidden; 
+	                           
+	border-radius:			3px;
+    /*mix-blend-mode: 		overlay;*/ 
 }
 .flattentimeline_title, .flattentimeline_subtitle, .flattentimeline_counter {
 	top:					0px;
@@ -546,30 +556,30 @@ html, body {
 	background-repeat:		no-repeat; 
 	text-align:				left;
 	overflow:				hidden; 
-	line-height:			20px;
+	line-height:			20px;     
 }
 
-.flattentimeline_image {
-	width:					20px; 
-	height:					20px;
-	margin:					9px 10px 9px 7px;
-	border-radius:			2px;
+.flattentimeline_image {         
+	height:					30px;
+	width:					30px; 
+	margin:					4px 6px 4px 1px;
+	border-radius:			1px;
 	/*position:absolute; */        
-	background-color:		#000;
+	background-color:		rgba(255,255,255,.25);
 	float:					left;
 	background-position:	center center;
 	background-repeat:		no-repeat; 
     -webkit-background-size:cover;
     -moz-background-size: 	cover;
     -o-background-size: 	cover;
-    background-size: 		cover;
+    background-size: 		cover;    
 } 
 
 .flattentimeline_highlightitem .flattentimeline_image {
 	width:					170px; 
 	height:					60px;   
 	margin:					15px 15px 5px 15px;    
-	border-radius:			3px;  
+	border-radius:			2px;  
 	/*border-radius:			5px 5px 0px 0px;*/    
 	background-color:		#fff;   
 	display:				inline-block;  
@@ -583,10 +593,17 @@ html, body {
 	top:					0px;
 	height:					100%;
 }*/
-.flattentimeline_bar, .flattentimeline_opacifiant {
-	background-color:		rgba(0, 0, 0, 0.75);
+.flattentimeline_opacifiant, .flattentimeline_bar {
+	background-color:		rgba(0, 0, 0, 0.75);  
 	height:					2px;
-	top:					38px;
+	top:					38px;      
+	
+	mix-blend-mode: 		luminosity; 
+	
+  /*  mix-blend-mode: multiply;
+  /*  height:					40px;
+	top:					0px; 
+	opacity:				.25;  */
 }  
 .flattentimeline_highlightitem .flattentimeline_bar, .flattentimeline_highlightitem  .flattentimeline_opacifiant  {
 	top:					auto;   
@@ -597,7 +614,7 @@ html, body {
 	font-weight:			400;
 	font-size:				10px;  
 	line-height:			39px;   
-	color:					rgba(255,255,255,.5);
+   /* color:					rgba(255,255,255,.5); */
 
 	/*width:					55%; */
 	width: 					132px;
@@ -605,13 +622,15 @@ html, body {
 	white-space: 			nowrap; 
 	overflow: 				hidden;    
 	
-	display:				inline-block;  
+	display:				inline-block; 
+	/*color:					#0C2D33; */    
+	/*mix-blend-mode: 		screen;      */
 }  
 
 .flattentimeline_highlightitem .flattentimeline_title {    
 	line-height:			1.2em; 
 	width: 					170px;  
-	font-size:				10px; 
+	font-size:				11px; 
 	padding:				10px 0; 
 	color:					rgba(255,255,255,1); 
 }           
@@ -709,13 +728,13 @@ html, body {
 }     
 
 .docTocome {
-	opacity:				0.5;     
+	opacity:				0.1;                
 	display:				block;
 }
 
 .docFaraway {
-	opacity:				0.1;       
-	display:				none;
+	opacity:				0.1;                 
+	display:				block;
 }           
 
 

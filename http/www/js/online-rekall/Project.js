@@ -352,9 +352,14 @@ Project.prototype.analyse = function() {
 			if((tag.getMetadata("Rekall->Highlight") != undefined) && (tag.getMetadata("Rekall->Highlight") != "")) {   
 			
 				//Dom
-				$('#flattentimeline_highlight').append(function() {
+				//$('#flattentimeline_highlight').append(function() {     
+				$('#flattentimeline').append(function() {
 					var styleColor = "background-color: " + tag.color + ";";
-					var textColor = "color: " + tag.color + ";";
+					var textColor = "color: " + tag.color + ";";       
+					var textColor2 = "color: rgba(255,255,255,1)";     
+					var textColor3 = "color: rgba(255,255,255,.75)";
+					
+					var colorTransp = styleColor.replace(/rgb/g, "rgba").replace(/\)/g, ",.75)");
 
 					/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
 					var styleColor2 = styleColor;//"background-color: #3EA8B1;";
@@ -362,7 +367,7 @@ Project.prototype.analyse = function() {
 					if(tag.thumbnail.url != undefined) {
 						styleImage = "background-image: url(" + tag.thumbnail.url + ");";//" opacity: 0.5;";
 						/*styleColor += "opacity: 0.25;"; */
-					} else styleImage = "background-color: rgba(0,0,0,.9)";
+					} else styleImage = "background-color: rgba(255,255,255,.25)";
 
 					var icnType = "";
 					var tmpType = tag.getMetadata("Rekall->Type");
@@ -377,11 +382,11 @@ Project.prototype.analyse = function() {
                                     
 
 					var htmlHighlight = ""; 
-					htmlHighlight	+=	"<div draggable=true class='flattentimeline_item flattentimeline_highlightitem'>";
-					htmlHighlight	+=	"<div class='flattentimeline_type'			style='" + icnType +"' title='" + tmpType + "'></div>";       
+					htmlHighlight	+=	"<div draggable=true class='flattentimeline_item flattentimeline_highlightitem' style='"+colorTransp+"' >";
+					if(tag.thumbnail.url != undefined)  htmlHighlight	+=	"<div class='flattentimeline_type'			style='" + icnType +"' title='" + tmpType + "'></div>";       
 					htmlHighlight	+=	"<div class='flattentimeline_image'      	style='" + styleImage + "'></div>"; 
-					htmlHighlight 	+=	"<div class='flattentimeline_title' 		title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";   
-					htmlHighlight 	+=	"<div class='flattentimeline_description'>" + tag.getMetadata("Rekall->Comments") + "</div>"; 
+					htmlHighlight 	+=	"<div class='flattentimeline_title' 		style='" + textColor2 + "' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";   
+					htmlHighlight 	+=	"<div class='flattentimeline_description' style='" + textColor3 + "'>" + tag.getMetadata("Rekall->Comments") + "</div>"; 
 					htmlHighlight 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";  
 					htmlHighlight    += "</div>";          
                    
@@ -407,6 +412,10 @@ Project.prototype.analyse = function() {
 				$('#flattentimeline').append(function() {
 					var styleColor = "background-color: " + tag.color + ";";
 					var textColor = "color: " + tag.color + ";";
+					var textColor2 = "color: rgba(255,255,255,.8)";     
+					var textColor3 = "color: rgba(0,0,0,.75);";    
+					
+					var colorTransp = styleColor.replace(/rgb/g, "rgba").replace(/\)/g, ",.75)");
 
 					/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
 					var styleColor2 = styleColor;//"background-color: #3EA8B1;";
@@ -414,7 +423,7 @@ Project.prototype.analyse = function() {
 					if(tag.thumbnail.url != undefined) {
 						styleImage = "background-image: url(" + tag.thumbnail.url + ");";//" opacity: 0.5;";
 						/*styleColor += "opacity: 0.25;"; */
-					} else styleImage = "background-color: rgba(0,0,0,.9)";
+					} else styleImage = "background-color: rgba(255,255,255,.25)";
 
 					var icnType = "";
 					var tmpType = tag.getMetadata("Rekall->Type");
@@ -429,11 +438,11 @@ Project.prototype.analyse = function() {
                                     
 
 					var html = ""; 
-					html	+= "<div draggable=true class='flattentimeline_item' title='" + tag.getMetadata("Rekall->Comments") + "'>";  
+					html	+= "<div draggable=true class='flattentimeline_item' title='" + tag.getMetadata("Rekall->Comments") + "' >";  
 					html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";   
 					html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";                     
 					html 	+= "<div class='flattentimeline_type'		style='" + icnType +"' title='" + tmpType + "'></div>";                                                           
-					html 	+= "<div class='flattentimeline_title' 		title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";     
+					html 	+= "<div class='flattentimeline_title' 		style='" + textColor2 + "' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";     
 					html    += "</div>";           
 			    
 					tag.flattenTimelineDom = $(html); 
