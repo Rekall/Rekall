@@ -76,7 +76,7 @@ html, body {
 #popupEdit {
 	/*width:					60vw;   
 	min-height:				40vh;  */
-	background:				rgb(102,202,138);
+	/*background:				rgb(102,202,138);
 	/*background:				rgb(100,100,100);*/ 
 	margin-top:				15vh;
 	/*left:					20%;
@@ -87,7 +87,10 @@ html, body {
   	font-weight: 			400;
 	font-size:	 			1vw; 
 	display:				inline-block;  
-	text-align:				left;   
+	text-align:				left;       
+	background:				#243538;
+	/*background-image:		-webkit-linear-gradient(right bottom,  rgb(20,46,51) 0%, #475457 150%);
+	/*box-shadow:				0px 0px 2px 3px rgba(255,255,255,.1) inset;  */
 }   
 #popupEdit tr, #popupEdit td {   	  
 	min-height:				50vh;  
@@ -95,10 +98,11 @@ html, body {
 #popupLeft {                               
 	width:					18vw;       
 	min-height:				50vh;       
-	padding:				40px 0;    
+	padding:				5vh 0 4vh 0;    
 	vertical-align:			top;  
 	text-align:				center; 
-	background:				rgba(0,0,0,.15);  
+	background:				rgba(0,0,0,.15);   
+	border-radius:			3px 0 0 3px;  
 }      
 .popupLeftItem {
 	width:					100%;   
@@ -123,18 +127,7 @@ html, body {
 	background:				rgba(255,255,255,.35);
 }               
 
-#popupEditSupprimer {
-	font-weight:			600;
-	color:					rgba(255,255,255,.75);         
-	font-size:				.9em; 
-	cursor:					pointer;  
-	/*text-transform:			uppercase;  */  
-	display:				inline-block; 
-	margin-top:				1vh;
-} 
-#popupEditSupprimer:hover {        
-	text-decoration:		underline;
-}      
+     
 
 
 #popupImgBox {    
@@ -151,34 +144,36 @@ html, body {
 	box-shadow: 			0 1px 3px rgba(0,0,0,.35);
 }   
 #popupRight {                                 
-	width:					27vw;       
+	width:					25vw;       
 	min-height:				50vh;                          
-	padding:				40px 30px 40px 0px;    
+	padding:				5vh 3vw 4vh 3vw;    
 	vertical-align:			top;      
 	background:				rgba(0,0,0,.15);
 }        
 #closePopupEdit {                  
 	width:					40px; 
-	height:					40px;
-	float:					right;  
+	height:					40px;    
 	font-weight:			200;    
-	color:					rgba(0,0,0,.5);/*rgba(255,255,255,.75);  
-	/*background:				rgba(0,0,0,.05);    */  
-	font-size:				20px;                       
+	/*color:					rgba(255,255,255,.5);*/  
+	color:					rgba(0,0,0,.25);      
+	font-size:				30px;                       
 	text-align:				center;
 	line-height:			40px;   
-	cursor:					pointer;   
-	margin:					-30px -20px 0 0;  
-	border-radius:			3px;
+	cursor:					pointer;           
+	border-radius:			3px;  
+	position:				fixed;
+	top:					15vh;
+	right:					25.5vw;
+	z-index:				110;   
 } 
 #closePopupEdit:hover {            	 
 	/*background:				rgba(255,255,255,.15); */
-	color:					#000;
+	color:					rgba(255,255,255,.75);
 }
 .popupRightItem {
 	width:					25vw;                   
 	display:				inline-block;      
-	margin-bottom:			2vh;          
+	margin-bottom:			1vh;          
 	font-size:				1.2em; 
 	line-height:			1.2em;   
 	color:					rgba(255,255,255,.75);  
@@ -195,64 +190,54 @@ html, body {
 	display:				none;
 }
 #popupType {                  
-	font-size:				0.8em; 
+	font-size:				0.9em; 
 	font-weight:			400; 
-	color:					rgba(0,0,0,.75);/*rgba(255,255,255,.75);  */
-	margin-bottom:			0;   
+	color:					#FFF;/*rgba(255,0,0,.75);/*rgba(255,255,255,.75);  */     
 	display:				inline-block; 
-	margin-bottom:			1vh;   
+	margin:					1vh 0;   
 }                       
-#popupSetHighlight {
-	font-weight:			200;
-	color:					rgba(0,0,0,.5);         
-	font-size:				.9em; 
-	cursor:					pointer;             
-	display:				inline-block;    
-	margin-bottom:			1vh;    
-} 
-#popupSetHighlight.selected {       
-	color:					rgba(0,0,0,.75);                 
-}  
-#popupSetHighlight:hover {       
-	text-decoration:		underline;                 
-}
+
 
 #popupNom {
-	font-weight:			200;
+	font-weight:			400;
 	font-size:				1.2em; 
 	color:					#FFF;   
 	cursor:					pointer; 
-	padding:				1vh 0; 
-	margin-bottom:			3%; 
+	padding:				0;  
 	line-height:			1.2em;  
-	text-transform:			uppercase; 
+	text-transform:			uppercase;   
+	margin-bottom:			1.5vh;
 }     
 #popupNomInput {
 	font-weight:			200;
 	font-size:				1.2em;      
 	cursor:					pointer;  
-	padding-bottom:			0; 
-	margin-bottom:			3%;
+	padding-bottom:			0;    
 	line-height:			1.6em;
-}
+}       
+
+
 #popupTC {
 	font-size:				1em;
 	line-height:			1.8em;   
 	/*background:				rgba(255,255,255,.15);*/   
 	box-shadow:				0 1px 3px rgba(0,0,0,.15);
-	padding:				0 3%;
-	border-radius:			3px;            
+	padding:				0;
+	border-radius:			2px;            
 	cursor:					pointer;
 	text-align:				center;    
-	margin-bottom:			3vh;    
+	margin-bottom:			3vh;     
+	font-weight:			600;
 }
 #popupTCin {                          
 	float:					left;   
-	color:					rgba(0,0,0,.5);
+	color:					#142E33; 
+	margin-left:			3%;
 }           
 #popupTCout {                          
 	float:					right;   
-	color:					rgba(0,0,0,.5);
+	color:					#142E33; 
+	margin-right:			3%;
 }
 #popupTC:hover { 
 	/*background:				rgba(255,255,255,.25);*/
@@ -294,42 +279,123 @@ html, body {
 	line-height:			1.8em;  
 	color:					rgba(255,255,255,.75);  
 	cursor:					pointer;
-}
-#popupLink {
-	font-style:				italic;  
-	text-decoration:		underline; 
-	cursor:					pointer;
-}      
-#popupLink:hover {
-	color:					#fff;  
-	text-decoration:		underline;
-}          
-
-
+}            
 
 #popupLegende {                     
 	cursor:					pointer;   
 	font-weight:			200;  
 	line-height:			1.2em;    
-	font-size:				1.0em; 
-	padding:				0;   
-	font-style:				italic;  
+	font-size:				0.9em; 
+	padding:				0;      
+	margin:					0 0 2vh 0;
+	/*font-style:				italic; */ 
 }   
-.popupRightItem.empty {
-	font-style:				italic; 
-	color:					rgba(0,0,0,.5);
-}
+
 #popupLegendeInput {
-	font-weight:			200;
-	font-size:				1.8em;   
+	font-weight:			200;     
 	min-height:				10vh;    
 	cursor:					pointer;  
 	padding:				2%; 
 	margin-bottom:			3%;
 	font-size:				1.0em; 
 	line-height:			1.2em;       
-}    
+}     
 
+
+#popupAuthorInput, #popupLinkInput {
+	font-weight:			200;     
+	height:					1.2em;    
+	cursor:					pointer;  
+	padding:				2%; 
+	margin-bottom:			3%;
+	font-size:				1.0em; 
+	line-height:			1.2em;       
+}
+
+                                          
+  
+
+#popupLink {                     
+	cursor:					pointer;   
+	font-weight:			200;  
+	line-height:			1.2em;    
+	font-size:				0.9em; 
+	padding:				0;      
+	margin:					0 0 2vh 0;   
+	color:					rgba(255,255,255,.5);  
+	text-decoration:		underline;   
+}            
+#popupLink:hover {
+	color:					#fff;  
+	text-decoration:		underline;
+}
+
+#popupAuthor {                     
+	cursor:					pointer;   
+	font-weight:			200;  
+	line-height:			1.2em;    
+	font-size:				0.9em; 
+	padding:				0;      
+	margin:					0 0 3vh 0;               
+}
+                 
+
+#popupSetHighlight {
+	font-weight:			400;
+	color:					#142E33;       
+	font-size:				.8em; 
+	cursor:					pointer;        
+	text-transform:			uppercase;   
+	display:				inline-block;   
+	margin:					2vh 0 0vh 0;  
+	line-height:			1.4em;
+	background:				rgba(255,255,255,.1);   
+	padding:				.7em 1.8em .8em 1.8em;
+	border-radius:			2px;
+} 
+#popupSetHighlight.selected {      
+	color:					rgba(255,255,255,.75);  /*rgba(0,0,0,.5);  */    
+	background:				rgba(0,0,0,.15);       
+}  
+#popupSetHighlight:hover {       
+	background:				rgba(0,0,0,.25); 
+	color:					#FFF;                
+}
+
+
+#popupEditSupprimer {
+	font-weight:			400;
+	color:					rgba(255,255,255,.25);         
+	font-size:				.8em; 
+	cursor:					pointer;  
+	text-transform:			uppercase;     
+	margin-top:				1vh;    
+	float:					right;  
+	line-height:			1.4em;
+	background:				rgba(0,0,0,.15);   
+	padding:				.7em 1.4em .8em 1.4em;
+	border-radius:			2px;
+} 
+#popupEditSupprimer:hover {        
+	background:				rgba(0,0,0,.25); 
+	color:					rgba(255,255,255,.5); 
+}      
+                 
+
+
+.empty, .empty#popupAuthor, .empty#popupLink {
+	/*font-style:				italic; */
+	color:					rgba(255,255,255,.25);  
+	text-decoration:		none !important;
+}
+ 
+           
+
+.separationHDark {
+	height:					1px;  
+	background:				rgba(0,0,0,.25);  
+	margin:					1.3vh 0 1.6vh 0;
+}
 
 
 
@@ -495,7 +561,7 @@ html, body {
 	height:					100%;
 	overflow:				hidden;
 	overflow-y:				auto;
-	background-color:		rgba(255,255,255,.05); /*191716;*/
+	background-color:		rgba(255,255,255,.05);
 }
 .flattentimeline_item {
 	position:				relative;
@@ -507,10 +573,7 @@ html, body {
 	display:				none;  
 	/*border-radius:			2px;*/           
 }
-.flattentimeline_item:hover, .flattentimeline_highlightitem:hover { 
-	background:				rgba(255,255,255,.12);/*191716;*/      
-	opacity:				1; 
-}   
+ 
 
 .flattentimeline_highlightitem {
 	position:				relative;
@@ -519,17 +582,30 @@ html, body {
 	color:			  		white;
 	margin:					3px 0px 0px 0px;
 	cursor:					pointer;
-	background:				rgba(255,255,255,.15); 
+	/*background:				rgba(255,255,255,.15);  */
 	width:					100%;   
 	text-align:				center;  
-	padding-bottom:			2px;    
-	border-radius:			1px;
+	padding:				2px 0 3px 0;    
+	border-radius:			1px;  
+	
+	background-position:	center center;
+	background-repeat:		no-repeat; 
+    -webkit-background-size:cover;
+    -moz-background-size: 	cover;
+    -o-background-size: 	cover;
+    background-size: 		cover;   
+	 
+	background-blend-mode: 	normal; 
+                                         
 	/*display:block;*/ 
+}  
+
+ 
+.flattentimeline_item:hover, .flattentimeline_highlightitem:hover { 
+	background-color:   	rgba(255,255,255,.15);      
+	opacity:				1; 
 }
 
-.flattentimeline_image {
-	border-radius: 			0;
-}
 .flattentimeline_opacifiant, .flattentimeline_bar {
 	top:					0px;
 	left:					0px;
@@ -545,7 +621,7 @@ html, body {
 	text-align:				left;
 	overflow:				hidden; 
 	                           
-	border-radius:			3px;
+	/*border-radius:			3px;
     /*mix-blend-mode: 		overlay;*/ 
 }
 .flattentimeline_title, .flattentimeline_subtitle, .flattentimeline_counter {
@@ -558,13 +634,13 @@ html, body {
 	overflow:				hidden; 
 	line-height:			20px;     
 }
+              
 
-.flattentimeline_image {         
+.flattentimeline_item .flattentimeline_image {         
 	height:					30px;
 	width:					30px; 
-	margin:					4px 6px 4px 1px;
-	border-radius:			1px;
-	/*position:absolute; */        
+	margin:					4px 7px 4px 0px;
+	border-radius:			1px;     
 	background-color:		rgba(255,255,255,.25);
 	float:					left;
 	background-position:	center center;
@@ -572,22 +648,36 @@ html, body {
     -webkit-background-size:cover;
     -moz-background-size: 	cover;
     -o-background-size: 	cover;
-    background-size: 		cover;    
-} 
+    background-size: 		cover;      
+}                                       
 
-.flattentimeline_highlightitem .flattentimeline_image {
+
+.flattentimeline_highlightitem .flattentimeline_image {         
+	height:					100%;
+	width:					100%; 
+	margin:					0;
+	border-radius:			1px;    
+	position:				absolute;       
+	background-position:	center center;
+	background-repeat:		no-repeat; 
+    -webkit-background-size:cover;
+    -moz-background-size: 	cover;
+    -o-background-size: 	cover;
+    background-size: 		cover;  
+	background-blend-mode: 		normal;    
+	opacity:				.5;
+}
+
+/*.flattentimeline_highlightitem .flattentimeline_image {
 	width:					170px; 
 	height:					60px;   
 	margin:					15px 15px 5px 15px;    
-	border-radius:			2px;  
-	/*border-radius:			5px 5px 0px 0px;*/    
+	border-radius:			2px;                       
 	background-color:		#fff;   
 	display:				inline-block;  
 	float:					left; 
-	background-position:	center center;
-	/*border:					1px solid #000;   
-	border-bottom:			none;     */
-}
+	background-position:	center center;          
+}  */
 
 /*.flattentimeline_color {
 	top:					0px;
@@ -595,10 +685,11 @@ html, body {
 }*/
 .flattentimeline_opacifiant, .flattentimeline_bar {
 	background-color:		rgba(0, 0, 0, 0.75);  
-	height:					2px;
-	top:					38px;      
-	
-	mix-blend-mode: 		luminosity; 
+	height:					3px;
+	top:					37px;      
+	                                       
+   /* box-shadow:				0px 0px 1px 1px rgba(20,46,51,.25);
+/*	mix-blend-mode: 		luminosity;  */
 	
   /*  mix-blend-mode: multiply;
   /*  height:					40px;
@@ -630,17 +721,19 @@ html, body {
 .flattentimeline_highlightitem .flattentimeline_title {    
 	line-height:			1.2em; 
 	width: 					170px;  
-	font-size:				11px; 
-	padding:				10px 0; 
-	color:					rgba(255,255,255,1); 
+	font-size:				12px;      
+	text-transform:			uppercase;
+	padding:				20px 0 20px 0; 
+	color:					#FFF;/*rgba(255,255,255,1);*/
+	font-weight:			600; 
 }           
 
 .flattentimeline_highlightitem .flattentimeline_description {    
 	font-weight:			400;
-	font-size:				9px;  
+	font-size:				11px;  
 	line-height:			1.4em;   
-	color:					rgba(255,255,255,.5);    
-	margin:					0px 15px 13px 15px;  
+	color:					rgba(255,255,255,.9);    
+	margin:					-15px 15px 20px 15px;  
 	  
 	width: 					170px;  
 	text-align:				left;          
@@ -690,8 +783,7 @@ html, body {
 	position:				absolute;
 	border-radius:			30px;
 	background-color:		rgba(0,0,0,.5);
-	margin:					25px 0 0 80px;  
-	opacity:				1;   
+	margin:					25px 0 0 80px; 
 }   
 
 .flattentimeline_color {
@@ -741,7 +833,11 @@ html, body {
 
 
 
-
+       
+.vjs-big-play-button {                          
+	border-radius:			10px !important;
+	color:					#fff !important;
+}
 
 
 

@@ -208,6 +208,20 @@ function setEditionControls() {
 		closeInputs();
 		$(this).hide();
 		$("#popupLegendeInput").show().focus(); 
+	});    
+	
+	$("#popupAuthor").click(function(event){  
+		event.stopPropagation();     
+		closeInputs();
+		$(this).hide();
+		$("#popupAuthorInput").show().focus(); 
+	});      
+	
+	$("#popupLink").click(function(event){  
+		event.stopPropagation();     
+		closeInputs();
+		$(this).hide();
+		$("#popupLinkInput").show().focus(); 
 	});  
 	
 	
@@ -225,7 +239,7 @@ function setEditionControls() {
 			setMetaFromDom(keyDoc, "Rekall->Name", newName); 
 			
 			if(newName!="") $("#popupNom").html(newName).removeClass("empty"); 
-			else $("#popupNom").html("Add a name").addClass("empty");     
+			else $("#popupNom").html("+ Add a name").addClass("empty");     
 			closeInputs(); 
 		}
 	});    
@@ -258,10 +272,38 @@ function setEditionControls() {
 			setMetaFromDom(keyDoc, "Rekall->Comments", newComment.replace(/\n/gi, "<br/>")); 
 			
 			if(newComment!="") $("#popupLegende").html(newComment.replace(/\n/gi, "<br/>")).removeClass("empty"); 
-			else $("#popupLegende").html("Add a comment").addClass("empty");     
+			else $("#popupLegende").html("+ Add a comment").addClass("empty");     
 			closeInputs(); 
 		}
-	});        
+	});         
+	
+	$("#popupAuthorInput").keyup(function(event){  
+		event.stopPropagation();              
+		if(event.which == 13) {    
+			var keyDoc = $(this).parent().attr("keydoc"); 
+			var newAuthor = $(this).val().trim();        
+			$(this).val(newAuthor);
+			setMetaFromDom(keyDoc, "Rekall->Author", newAuthor); 
+			
+			if(newAuthor!="") $("#popupAuthor").html(newAuthor).removeClass("empty"); 
+			else $("#popupAuthor").html("+ Add an author").addClass("empty");     
+			closeInputs(); 
+		}
+	});
+	
+	$("#popupLinkInput").keyup(function(event){  
+		event.stopPropagation();              
+		if(event.which == 13) {    
+			var keyDoc = $(this).parent().attr("keydoc"); 
+			var newLink = $(this).val().trim();        
+			$(this).val(newLink);
+			setMetaFromDom(keyDoc, "Rekall->Link", newLink); 
+			
+			if(newLink!="") $("#popupLink").html(newLink).removeClass("empty"); 
+			else $("#popupLink").html("+ Add a link").addClass("empty");     
+			closeInputs(); 
+		}
+	});
 	 
 	$("#popupSetHighlight").click(function(event){
 		event.stopPropagation();
@@ -269,10 +311,11 @@ function setEditionControls() {
 		var isHL = $(this).attr("isHighlight");  
 		if(isHL=="true") {
 			setMetaFromDom(keyDoc, "Rekall->Highlight", "");  
-			$(this).html("&#9734;&nbsp;Highlight").attr("isHighlight", "false").removeClass("selected");  
+			$(this).attr("isHighlight", "false").removeClass("selected");
 		} else { 
-			setMetaFromDom(keyDoc, "Rekall->Highlight", "true");  
-			$(this).html("&#9733;&nbsp;Highlight").attr("isHighlight", "true").addClass("selected");   	
+			setMetaFromDom(keyDoc, "Rekall->Highlight", "true");     
+			var tmpColor = $("#popupNom").css("color");             
+			$(this).attr("isHighlight", "true").addClass("selected");	
 		}              
 	});
 	
@@ -329,10 +372,16 @@ function fillPopupEdit(tag) {
 	//if(rekall_common.owner.canEdit) { alert("edit mode !"); }      
 	var isPaused = rekall.timeline.isPaused();  
 	rekall.timeline.pause();   
-                                    
-	$("#popupEdit").css("background",tag.color).attr("isPaused",isPaused); 
+                         
+    var bgColor = "-webkit-linear-gradient(right bottom,  rgb(20,46,51) 0%, #757F81 150%)" ; //"rgb(20,46,51)";
+
+	$("#popupEdit").attr("isPaused",isPaused);//.css("background",bgColor); 
 	$("#popupTC").css("background",tag.color); 
-	/*$("#popupType").css("color",tag.color);*/
+	/*$("#popupType").css("color",tag.color);*/   
+	 
+	var bgColorLeft = "-webkit-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)" 
+	
+	$("#popupLeft").css("background",bgColorLeft);
 	                                              
 	if(tag.isMarker()==true){         
 		$("#popupImg").show();   
@@ -359,9 +408,11 @@ function fillPopupEdit(tag) {
 			event.stopPropagation(); 
 			tag.openBrowser(); 
 		});                               
-	}     
+	}                        
+	
+	$("#popupNom").css("color",tag.color); 
 	 
-	$("#popupType").html(tag.getMetadata("Rekall->Type"));        
+	$("#popupType").html(tag.getMetadata("Rekall->Type")).css("color",tag.color);         
 	var name = tag.getMetadata("Rekall->Name");    
 	if(name!="") $("#popupNom").html(name).removeClass("empty");
 	else $("#popupNom").html("+ Add a name").addClass("empty");    
@@ -373,8 +424,16 @@ function fillPopupEdit(tag) {
 	$("#popupTCout").html(endVerb);                  
 	  
 	var comments = tag.getMetadata("Rekall->Comments");
-	if(comments!="") $("#popupLegende").html(comments).removeClass("empty");
-	else $("#popupLegende").html("+ Add a comment").addClass("empty");        
+	if((comments)&&(comments!="")) $("#popupLegende").html(comments).removeClass("empty");
+	else $("#popupLegende").html("+ Add a comment").addClass("empty"); 
+	
+	var author = tag.getMetadata("Rekall->Author");
+	if((author)&&(author!="")) $("#popupAuthor").html(author).removeClass("empty");
+	else $("#popupAuthor").html("+ Add an author").addClass("empty"); 
+    
+	var link = tag.getMetadata("Rekall->Link");
+	if((link)&&(link!="")) $("#popupLink").html(link).removeClass("empty");
+	else $("#popupLink").html("+ Add a link").addClass("empty");      
 	
 	                                         
 	if(rekall_common.owner.canEdit) {       
@@ -389,11 +448,13 @@ function fillPopupEdit(tag) {
 		$("#popupTCoutMin").val(endVerb.split(":")[0]);
 		$("#popupTCoutSec").val(endVerb.split(":")[1]);
 		
-		$("#popupLegendeInput").html(comments.replace(/<br\/>/gi, '\n'));   
+		$("#popupLegendeInput").html(comments.replace(/<br\/>/gi, '\n'));    
+		$("#popupAuthorInput").val(tag.getMetadata("Rekall->Author")); 
+		$("#popupLinkInput").val(tag.getMetadata("Rekall->Link")); 
 		
 		var highlight = tag.getMetadata("Rekall->Highlight");        
-		if(highlight=="true") $("#popupSetHighlight").html("&#9733;&nbsp;Highlight").attr("isHighlight","true").addClass("selected");  
-		else $("#popupSetHighlight").html("&#9734;&nbsp;Highlight").attr("isHighlight","false").removeClass("selected");
+		if(highlight=="true") $("#popupSetHighlight").attr("isHighlight","true").addClass("selected"); 
+		else $("#popupSetHighlight").attr("isHighlight","false").removeClass("selected");
 	}
 	
 	
@@ -609,7 +670,7 @@ function getParameterByName(name) {
 
 $(window).resize(function(e) {
 	if(rekall.videoPlayer != undefined) {
-		rekall.videoPlayer.width (($("#container").width() - $("#left_menu").width() - $("#flattentimeline").width() - 10) + "px");
+		rekall.videoPlayer.width (($("#container").width() - ($("#left_menu").width()+3) - ($("#flattentimeline").width()+6)) + "px");
 		rekall.videoPlayer.height(($("#container").height()) + "px");
 	}
 }); 
