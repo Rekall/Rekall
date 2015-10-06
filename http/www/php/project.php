@@ -390,7 +390,7 @@
 		if((isset($details)) && (property_exists($details, "city")))
 			$retour["owner"]["locationName"] = $details->city;
 		$retour["owner"]["canEdit"] = $_SESSION["canEdit"];
-		$retour["owner"]["author"] = "Guillaume Jacquemin";
+		$retour["owner"]["author"] = "";
 		echo json_encode($retour);
 	}
 	else if(isset($_GET["update"])) {
