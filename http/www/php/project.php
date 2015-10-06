@@ -290,16 +290,29 @@
 	function update() {
 		$retours = array("success" => 0, "error" => "", "value" => "");
 		
-		downloadFile("http://projet.memorekall.fr/create.zip", "create.zip");
+		if(!file_exists("create.zip")) {
+			$retours["value"] .= "Download of create.zip... ";
+			downloadFile("http://project.memorekall.fr/create.zip", "create.zip");
+		}
 
 		$zip = new ZipArchive;
 		$res = $zip->open("create.zip");
 		if ($res === TRUE) {
+			$retours["value"] .= "Moving files... ";
 			rename("../file", "../file_cpy");
+
+			$retours["value"] .= "Unzipping... ";
 			$zip->extractTo("../");
 			$zip->close();
+
+			$retours["value"] .= "Cleaning... ";
 			SureRemoveDir("../file", true);
+
+			$retours["value"] .= "Moving files... ";
 			rename("../file_cpy", "../file");
+
+			$retours["value"] .= "Cleaning update... ";
+			unlink("create.zip");
 			$retours["success"] = 1;
 		} else {
 			$retours["success"] = -1;
