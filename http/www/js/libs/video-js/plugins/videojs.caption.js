@@ -183,6 +183,7 @@
          } else if (setting.captionType == ROLLUP) {
             updateRollUpCaptionText();
          }
+		 
       }
 
       //Roll-up style:
@@ -201,8 +202,11 @@
          var newOverlayText = $("<span class='vjs-caption-overlay-text'><span></span></span>")
             .css(setting.captionStyle);
          newOverlayText.find('span').html(captionText).addClass('caption-font-size-'+ setting.captionSize);
+		captionOverlays[0].unbind("click");
 		if(cursor.css != undefined)
-			captionOverlays[numNewDisplayCaption - 1].find('.vjs-caption-overlay-text').css(cursor.css);
+			captionOverlays[0].find('.vjs-caption-overlay-text').css(cursor.css);
+		if(typeof cursor.onCaptionChange === "function")
+			captionOverlays[0].bind("click", cursor.onCaptionChange);
          
          //append to bottom
          captionOverlays[0].append(newOverlayText);
@@ -238,8 +242,11 @@
             var captionText = convertRubyTags(cursor.data);
             captionText = applyGroupTagStyle(captionText);
             captionOverlays[numNewDisplayCaption - 1].find('.vjs-caption-overlay-text span').html(captionText);
+			captionOverlays[numNewDisplayCaption - 1].unbind("click");
 			if(cursor.css != undefined)
 				captionOverlays[numNewDisplayCaption - 1].find('.vjs-caption-overlay-text').css(cursor.css);
+			if(typeof cursor.onCaptionChange === "function")
+				captionOverlays[numNewDisplayCaption - 1].bind("click", cursor.onCaptionChange);
 
             // check if more than one caption in the same time period (same start and end time)
             if ((cursorID < captions.length - 1) && (

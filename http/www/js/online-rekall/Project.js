@@ -310,7 +310,6 @@ Project.prototype.analyse = function() {
 		$.each(categories[key].tags, function(index, tag) {
 			//Elements sur la timeline
 			markers.push({
-				tag: 		 tag,
 				time: 		 tag.getTimeStart()+0.1,
 				text: 		 tag.getMetadata("Rekall->Name"),
 				overlayText: tag.getMetadata("Rekall->Comments"), 
@@ -323,7 +322,7 @@ Project.prototype.analyse = function() {
 					"color": 			tag.color,
 				},
 				onMarkerClick: function() {
-					this.tag.openPopupEdit();
+					tag.openPopupEdit();
 				}
 			});
 			
@@ -339,6 +338,9 @@ Project.prototype.analyse = function() {
 						"background-color": "black",
 						"font-familly": 	"OpenSans",
 						"color": 			tag.color,
+					},
+					onCaptionChange: function() {
+						tag.openPopupEdit();
 					}
 				});
 			}
