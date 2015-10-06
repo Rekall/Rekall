@@ -310,15 +310,20 @@ Project.prototype.analyse = function() {
 		$.each(categories[key].tags, function(index, tag) {
 			//Elements sur la timeline
 			markers.push({
-				time: 		 tag.getTimeStart(),
+				tag: 		 tag,
+				time: 		 tag.getTimeStart()+0.1,
 				text: 		 tag.getMetadata("Rekall->Name"),
 				overlayText: tag.getMetadata("Rekall->Comments"), 
 				css: {
-					"background-color": tag.color
+					"background-color": tag.color,
+					"width": 			"2px",
 				},
 				markerTipCss: {
 					"font-familly": 	"OpenSans",
 					"color": 			tag.color,
+				},
+				onMarkerClick: function() {
+					this.tag.openPopupEdit();
 				}
 			});
 			

@@ -120,6 +120,9 @@
             if (!preventDefault) {
                var key = $(this).data('marker-key');
                player.currentTime(setting.markerTip.time(markersMap[key]));
+               if (typeof markersMap[key].onMarkerClick === "function") {
+				   markersMap[key].onMarkerClick();
+               }
             }
          });
          
