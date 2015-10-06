@@ -308,20 +308,22 @@ Project.prototype.analyse = function() {
 	var markers = [], captions = [];
 	for (var key in categories) {
 		$.each(categories[key].tags, function(index, tag) {
-			//Marqueurs sur la timeline
+			//Elements sur la timeline
+			markers.push({
+				time: 		 tag.getTimeStart(),
+				text: 		 tag.getMetadata("Rekall->Name"),
+				overlayText: tag.getMetadata("Rekall->Comments"), 
+				css: {
+					"background-color": tag.color
+				},
+				markerTipCss: {
+					"font-familly": 	"OpenSans",
+					"color": 			tag.color,
+				}
+			});
+			
+			//Captions en popup
 			if(tag.isMarker()) {
-				markers.push({
-					time: 		 tag.getTimeStart(),
-					text: 		 tag.getMetadata("Rekall->Name"),
-					overlayText: tag.getMetadata("Rekall->Comments"), 
-					css: {
-						"background-color": tag.color
-					},
-					markerTipCss: {
-						"font-familly": 	"OpenSans",
-						"color": 			tag.color,
-					}
-				});
 				captions.push({
 					startTime: 	tag.getTimeStart() * 1000,
 					endTime: 	(tag.timeStart + max(2, tag.timeEnd - tag.timeStart)) * 1000,
