@@ -448,9 +448,9 @@ function fillPopupEdit(tag) {
 		$("#popupTCoutMin").val(endVerb.split(":")[0]);
 		$("#popupTCoutSec").val(endVerb.split(":")[1]);
 		
-		$("#popupLegendeInput").html(comments.replace(/<br\/>/gi, '\n'));    
-		$("#popupAuthorInput").val(tag.getMetadata("Rekall->Author")); 
-		$("#popupLinkInput").val(tag.getMetadata("Rekall->Link")); 
+		$("#popupLegendeInput").val(""+comments.replace(/<br\/>/gi, '\n'));    
+		$("#popupAuthorInput").val(""+author); 
+		$("#popupLinkInput").val(""+link); 
 		
 		var highlight = tag.getMetadata("Rekall->Highlight");        
 		if(highlight=="true") $("#popupSetHighlight").attr("isHighlight","true").addClass("selected"); 
