@@ -311,11 +311,13 @@ function setEditionControls() {
 		var isHL = $(this).attr("isHighlight");  
 		if(isHL=="true") {
 			setMetaFromDom(keyDoc, "Rekall->Highlight", "");  
-			$(this).attr("isHighlight", "false").removeClass("selected");
+			$(this).attr("isHighlight", "false").removeClass("selected");  
+			$("#popupEdit").removeClass("highlightPopup");
 		} else { 
 			setMetaFromDom(keyDoc, "Rekall->Highlight", "true");     
 			var tmpColor = $("#popupNom").css("color");             
-			$(this).attr("isHighlight", "true").addClass("selected");	
+			$(this).attr("isHighlight", "true").addClass("selected");
+			$("#popupEdit").addClass("highlightPopup"); 	
 		}              
 	});
 	
@@ -453,8 +455,14 @@ function fillPopupEdit(tag) {
 		$("#popupLinkInput").val(""+link); 
 		
 		var highlight = tag.getMetadata("Rekall->Highlight");        
-		if(highlight=="true") $("#popupSetHighlight").attr("isHighlight","true").addClass("selected"); 
-		else $("#popupSetHighlight").attr("isHighlight","false").removeClass("selected");
+		if(highlight=="true") {
+			$("#popupSetHighlight").attr("isHighlight","true").addClass("selected");   
+			$("#popupEdit").addClass("highlightPopup"); 
+		}
+		else {
+			$("#popupSetHighlight").attr("isHighlight","false").removeClass("selected");  
+			$("#popupEdit").removeClass("highlightPopup"); 
+		}
 	}
 	
 	

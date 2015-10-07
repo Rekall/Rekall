@@ -86,12 +86,14 @@
 		<div id="popupSpace">  
 			<table id="popupEdit">  
 				<tr>
-					<td id="popupLeft">                                                           
+					<td id="popupLeft">            
+						<div class="editmode" id="popupSetHighlight">&#9733;&nbsp;Highlight</div>                                               
 						<div class="popupLeftItem" id="popupImgBox">
 							<img id="popupImg" src="file/rekall_cache/568261E53001FA741A069C684C6E25E7571006E8-45972424CDE1275C6FDD9DD7D52216C878F04AB8.jpg"/>
-						</div>                  
-						<div class="popupLeftItem" id="popupType"></div>  
-						<div class="editmode" id="popupSetHighlight">&#9733;&nbsp;Highlight</div>
+							<div class="popupLeftItem" id="popupType"></div>  
+						</div>          
+						<div class="popupRightItem separationHDark editmode"></div>         
+						<div class="editmode" id="popupEditSupprimer">&#10761;&nbsp;&nbsp;Delete file</div>                                                       
 					</td>   
 					<td id="popupRight">    
 						<div id="closePopupEdit">&#10005;</div> 
@@ -123,10 +125,9 @@
 						<div class="popupRightItem empty" id="popupLink" title="Link"></div>  
 						<textarea class="popupInput" id="popupLinkInput" type="text"></textarea>      
 						       
-						<div class="popupRightItem separationHDark editmode"></div>                         
-						<div class="editmode" id="popupEditSupprimer">&#10761;&nbsp;&nbsp;Delete file</div>
+					   <!-- <div class="popupRightItem separationHDark editmode"></div> -->                 
 					</td>
-				</tr>
+				</tr>          
 			</table>
 		</div>     
 		<table id='left_menu' class="editmode">  

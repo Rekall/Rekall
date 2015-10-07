@@ -81,7 +81,7 @@ html, body {
 	margin-top:				15vh;
 	/*left:					20%;
 	position:				absolute;  */  
-	border-radius:			3px;  
+	border-radius:			2px;  
 	/*border:					2px solid #333;*/  
 	box-shadow:				0 5px 25px #000;      
   	font-weight: 			400;
@@ -91,18 +91,23 @@ html, body {
 	background:				#243538;
 	/*background-image:		-webkit-linear-gradient(right bottom,  rgb(20,46,51) 0%, #475457 150%);
 	/*box-shadow:				0px 0px 2px 3px rgba(255,255,255,.1) inset;  */
-}   
-#popupEdit tr, #popupEdit td {   	  
-	min-height:				50vh;  
+}    
+#popupEdit.highlightPopup { 
+	/*box-shadow:				0 0 0 2px #000 inset;
+	border:					2px solid #000;  */
+}
+#popupEdit tr, #popupEdit td {    
+	
+	background:				rgba(0,0,0,.15); 
 }
 #popupLeft {                               
 	width:					18vw;       
 	min-height:				50vh;       
-	padding:				5vh 0 4vh 0;    
-	vertical-align:			top;  
+	padding:				5vh 0 3vh 0;    
+	vertical-align:		    middle;  
 	text-align:				center; 
-	background:				rgba(0,0,0,.15);   
-	border-radius:			3px 0 0 3px;  
+	background:				rgba(0,0,0,.15); 
+	border-radius:			2px 0 0 2px;
 }      
 .popupLeftItem {
 	width:					100%;   
@@ -132,8 +137,9 @@ html, body {
 
 #popupImgBox {    
 	/*width:					15vw;*/             
-	margin-bottom:			2vh;    
-	cursor:					pointer;
+	margin-bottom:			3vh;    
+	cursor:					pointer;  
+	height:					100%;      
 }        
 #popupImg {
 	max-width:				15vw;
@@ -194,7 +200,7 @@ html, body {
 	font-weight:			400; 
 	color:					#FFF;/*rgba(255,0,0,.75);/*rgba(255,255,255,.75);  */     
 	display:				inline-block; 
-	margin:					1vh 0;   
+	margin:					2vh 0 0 0;   
 }                       
 
 
@@ -345,40 +351,53 @@ html, body {
 	color:					#142E33;       
 	font-size:				.8em; 
 	cursor:					pointer;        
-	text-transform:			uppercase;   
-	display:				inline-block;   
-	margin:					2vh 0 0vh 0;  
-	line-height:			1.4em;
-	background:				rgba(255,255,255,.1);   
+	text-transform:			uppercase;      
+	text-align:				center;
+	margin:					-5vh 0 4vh 0;  
+	line-height:			2.0em;
+	background:				rgba(255,255,255,.1); 
+	/*background:				rgba(0,0,0,.1);  */ 
 	padding:				.7em 1.8em .8em 1.8em;
-	border-radius:			2px;
+	border-radius:			2px 0 0 0;
 } 
 #popupSetHighlight.selected {      
-	color:					rgba(255,255,255,.75);  /*rgba(0,0,0,.5);  */    
-	background:				rgba(0,0,0,.15);       
+	/*color:					rgba(255,255,255,.75);   
+	background:				rgba(0,0,0,.15);        */
+	background:				rgba(255,255,255,.15);
+	color:					#FFF;   
 }  
 #popupSetHighlight:hover {       
-	background:				rgba(0,0,0,.25); 
-	color:					#FFF;                
+	/*background:				rgba(0,0,0,.25); 
+	color:					#FFF;   */
+	background:				rgba(255,255,255,.2);
+	color:				    #142E33;            
+}    
+#popupSetHighlight.selected:hover {      
+	/*color:					rgba(255,255,255,.75);   
+	background:				rgba(0,0,0,.15);        */
+	background:				rgba(255,255,255,.25);
+	color:					#FFF;   
 }
 
 
 #popupEditSupprimer {
 	font-weight:			400;
-	color:					rgba(255,255,255,.25);         
-	font-size:				.8em; 
+	color:					rgba(255,255,255,.5);         
+	font-size:				.7em; 
 	cursor:					pointer;  
-	text-transform:			uppercase;     
-	margin-top:				1vh;    
-	float:					right;  
-	line-height:			1.4em;
-	background:				rgba(0,0,0,.15);   
-	padding:				.7em 1.4em .8em 1.4em;
-	border-radius:			2px;
+	text-transform:			uppercase;           
+	text-align:				center;
+	display:				inline-block;        
+	bottom:					0;
+	margin:					3vh 0 0vh 0;     
+	line-height:			1.2em;
+	background:				rgba(20,46,51,.8);/*rgba(0,0,0,.2);   */
+	padding:				.6em 1.6em .7em 1.6em;
+	border-radius:			2px;                               
 } 
 #popupEditSupprimer:hover {        
-	background:				rgba(0,0,0,.25); 
-	color:					rgba(255,255,255,.5); 
+	background:				rgba(20,46,51,.65);/*rgba(20,46,51,.75);  */
+	color:					rgba(255,255,255,.85); 
 }      
                  
 
@@ -393,8 +412,11 @@ html, body {
 
 .separationHDark {
 	height:					1px;  
-	background:				rgba(0,0,0,.25);  
-	margin:					1.3vh 0 1.6vh 0;
+	background:				rgba(0,0,0,.2);  
+	background:				rgba(255,255,255,.1);
+	margin:					1vh 0 0vh 0;   
+	width:					70%;
+	display:				inline-block;
 }
 
 
