@@ -20,7 +20,7 @@ $(document).ready(function() {
 				setEditionControls();
 				
 				//Geoloc en mode édition
-				if(navigator.geolocation) {
+				if((false) && (navigator.geolocation)) {
 					navigator.geolocation.getCurrentPosition(function(position) {
 						rekall_common.owner.locationGps = position.coords.latitude + "," + position.coords.longitude;
 						$.ajax("http://maps.googleapis.com/maps/api/geocode/json", {
