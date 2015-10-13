@@ -104,7 +104,7 @@ html, body {
 	width:					18vw;       
 	min-height:				50vh;       
 	padding:				5vh 0 3vh 0;    
-	vertical-align:		    middle;  
+	vertical-align:		    top;  
 	text-align:				center; 
 	background:				rgba(0,0,0,.15); 
 	border-radius:			2px 0 0 2px;
@@ -357,7 +357,7 @@ html, body {
 	line-height:			2.0em;
 	background:				rgba(255,255,255,.1); 
 	/*background:				rgba(0,0,0,.1);  */ 
-	padding:				.7em 1.8em .8em 1.8em;
+	padding:				.8em 1.8em .8em 1.8em;
 	border-radius:			2px 0 0 0;
 } 
 #popupSetHighlight.selected {      
@@ -392,7 +392,7 @@ html, body {
 	margin:					3vh 0 0vh 0;     
 	line-height:			1.2em;
 	background:				rgba(20,46,51,.8);/*rgba(0,0,0,.2);   */
-	padding:				.6em 1.6em .7em 1.6em;
+	padding:				.7em 1.6em .7em 1.6em;
 	border-radius:			2px;                               
 } 
 #popupEditSupprimer:hover {        
@@ -615,9 +615,7 @@ html, body {
     -webkit-background-size:cover;
     -moz-background-size: 	cover;
     -o-background-size: 	cover;
-    background-size: 		cover;   
-	 
-	background-blend-mode: 	normal; 
+    background-size: 		cover;     
                                          
 	/*display:block;*/ 
 }  
@@ -761,6 +759,21 @@ html, body {
 	text-align:				left;          
 	
 	display:				inline-block;
+} 
+
+.flattentimeline_highlightitem .flattentimeline_typeTxt {    
+	font-weight:			400;
+	font-size:				9px;  
+	line-height:			1.2em;                  
+	margin:					-13px 15px 20px 15px;  
+	  
+	width: 					170px;  
+	text-align:				left;   
+	color:					rgba(255,255,255,.75);    
+	
+	display:				inline-block;   
+	font-style:				italic;   
+	/*text-transform:			uppercase; */
 }
 
 .flattentimeline_subtitle {
@@ -856,9 +869,11 @@ html, body {
 
 
        
-.vjs-big-play-button {                          
+.vjs-big-play-button {                         
+	border-width:			3px !important;  
 	border-radius:			10px !important;
-	color:					#fff !important;
+	color:					#fff !important; 
+	background:				rgba(0,0,0,.75) !important;  
 }
 
 

@@ -373,12 +373,14 @@ Project.prototype.analyse = function() {
 					/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
 					var styleColor2 = styleColor;//"background-color: #3EA8B1;";
 					var styleImage = "";
-					if(tag.thumbnail.url != undefined) {
+					if(tag.thumbnail.url != undefined) {  
+						                                                        
+						
 						//styleImage = "background-image: url(" + tag.thumbnail.url + ");";//" opacity: 0.5;";    
-						styleImage = "background-image: -webkit-linear-gradient(right bottom,  rgba(20,46,51,.60) 0%,rgba(20,46,51,.90) 100%), url(" + tag.thumbnail.url + ");";
+						styleImage = "background-image: -webkit-linear-gradient(right bottom,  rgba(20,46,51,.60) 0%,rgba(20,46,51,.90) 100%), url(" + tag.thumbnail.url + "); background-image: -moz-linear-gradient(right bottom,  rgba(20,46,51,.60) 0%,rgba(20,46,51,.90) 100%), url(" + tag.thumbnail.url + "); background-image: -o-linear-gradient(right bottom,  rgba(20,46,51,.60) 0%,rgba(20,46,51,.90) 100%), url(" + tag.thumbnail.url + ");";
 					//	styleImage = "background-image: -webkit-linear-gradient(right bottom,  "+tag.color.replace(/rgb/g, "rgba").replace(/\)/g, ",.6)")+" 0%,"+tag.color.replace(/rgb/g, "rgba").replace(/\)/g, ",.9)")+" 100%), url(" + tag.thumbnail.url + ");";
 						/*styleColor += "opacity: 0.25;"; */
-					} else styleImage = "background-color: " + tag.color + "; background-image: -webkit-linear-gradient(right bottom, rgba(20,46,51,.5) 0%,rgba(20,46,51,.8) 100%);" ;//styleColor.replace(/rgb/g, "rgba").replace(/\)/g, ",.85)");//"background-color: rgba(255,255,255,.25)";
+					} else styleImage = "background-color: " + tag.color + "; background-image: -webkit-linear-gradient(right bottom, rgba(20,46,51,.5) 0%,rgba(20,46,51,.8) 100%); background-image: -moz-linear-gradient(right bottom, rgba(20,46,51,.5) 0%,rgba(20,46,51,.8) 100%); background-image: -o-linear-gradient(right bottom, rgba(20,46,51,.5) 0%,rgba(20,46,51,.8) 100%);" ;//styleColor.replace(/rgb/g, "rgba").replace(/\)/g, ",.85)");//"background-color: rgba(255,255,255,.25)";
 
 					var icnType = "";
 					var tmpType = tag.getMetadata("Rekall->Type");
@@ -389,7 +391,9 @@ Project.prototype.analyse = function() {
 					else if(tmpType.indexOf("image/") >=0 ) 			icnType = "background-image:url(css/images/icn-image.png);";
 					else if(tmpType.indexOf("text/x-vcard") >=0 ) 		icnType = "background-image:url(css/images/icn-user.png);";
 					else if(tmpType.indexOf("text/") >=0 ) 				icnType = "background-image:url(css/images/icn-document.png);";
-					else if(tmpType.indexOf("video/") >=0 ) 			icnType = "background-image:url(css/images/icn-video.png);";
+					else if(tmpType.indexOf("video/") >=0 ) 			icnType = "background-image:url(css/images/icn-video.png);";  
+					
+					var typeTxt = tmpType.split("/")[1];  
                                     
                     /*
 					var htmlHighlight = ""; 
@@ -406,9 +410,12 @@ Project.prototype.analyse = function() {
 					htmlHighlight	+=	"<div draggable=true class='flattentimeline_item flattentimeline_highlightitem' style='"+colorTransp+" "+styleImage+"'>";
 					//if(tag.thumbnail.url != undefined)  htmlHighlight	+=	"<div class='flattentimeline_type'			style='" + icnType +"' title='" + tmpType + "'></div>";       
 					//htmlHighlight	+=	"<div class='flattentimeline_image'      	style='"+colorTransp+" "+styleImage+"'></div>"; 
-					htmlHighlight 	+=	"<div class='flattentimeline_title' 		style='" + textColor + "' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";   
+					htmlHighlight 	+=	"<div class='flattentimeline_title' 		style='" + textColor + "' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>"; 
+					
 					if(tag.getMetadata("Rekall->Comments")!="") 
 						htmlHighlight 	+=	"<div class='flattentimeline_description'>" + tag.getMetadata("Rekall->Comments") + "</div>"; 
+						
+					htmlHighlight 	+=	"<div class='flattentimeline_typeTxt'		>" + typeTxt + "</div>";      
 					htmlHighlight 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";  
 					htmlHighlight    += "</div>";
                    

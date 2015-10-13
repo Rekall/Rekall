@@ -375,13 +375,23 @@ function fillPopupEdit(tag) {
 	var isPaused = rekall.timeline.isPaused();  
 	rekall.timeline.pause();   
                          
-    var bgColor = "-webkit-linear-gradient(right bottom,  rgb(20,46,51) 0%, #757F81 150%)" ; //"rgb(20,46,51)";
+ //   var bgColor = "-webkit-linear-gradient(right bottom,  rgb(20,46,51) 0%, #757F81 150%)" ; //"rgb(20,46,51)";
 
 	$("#popupEdit").attr("isPaused",isPaused);//.css("background",bgColor); 
 	$("#popupTC").css("background",tag.color); 
 	/*$("#popupType").css("color",tag.color);*/   
-	 
-	var bgColorLeft = "-webkit-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)" 
+	                                                                                              
+	var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;  // Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
+	var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
+	var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;   // At least Safari 3+: "[object HTMLElementConstructor]"
+	var isChrome = !!window.chrome && !isOpera;              // Chrome 1+
+	var isIE = /*@cc_on!@*/false || !!document.documentMode; // At least IE6
+
+	var bgColorLeft = tag.color.replace(/rgb/g, "rgba").replace(/\)/g, ",.35)");;
+	
+  //  if(isOpera) bgColorLeft = "-o-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)";
+  //  else if(isFirefox) bgColorLeft = "-moz-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)";          
+  //  else if((isSafari)||(isChrome))  bgColorLeft = "-webkit-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)"; 
 	
 	$("#popupLeft").css("background",bgColorLeft);
 	                                              

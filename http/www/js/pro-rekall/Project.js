@@ -1037,8 +1037,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 					else if(tmpType.indexOf("text/") >=0 ) 				icnType = "background-image:url(../../css/images/icn-document.png);";
 					else if(tmpType.indexOf("video/") >=0 ) 			icnType = "background-image:url(../../css/images/icn-video.png);";
 				
-					//alert(icnType);
-				
+					
 					var html = "<div draggable=true class='flattentimeline_item'>";
 					html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";
 					/*html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "'></div>";*/
