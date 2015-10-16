@@ -354,7 +354,54 @@ function closeAlert() {
 	$("#popupAlertSpace").hide(); 
 }  
 
-function closeInputs() {
+function closeInputs() {  
+	$.each($(".popupInput"), function() { 
+		if($(this).css("display") != "none") {
+			if($(this).attr("id")=="popupNomInput") { 
+				
+				var keyDoc = $(this).parent().attr("keydoc"); 
+				var newName = $(this).val().trim();        
+				$(this).val(newName);
+				setMetaFromDom(keyDoc, "Rekall->Name", newName); 
+
+				if(newName!="") $("#popupNom").html(newName).removeClass("empty"); 
+				else $("#popupNom").html("+ Add a name").addClass("empty");
+				  
+			} else if($(this).attr("id")=="popupLegendeInput") {  
+				
+				var keyDoc = $(this).parent().attr("keydoc"); 
+				var newComment = $(this).val().trim();    
+				$(this).val(newComment);
+				setMetaFromDom(keyDoc, "Rekall->Comments", newComment.replace(/\n/gi, "<br/>")); 
+
+				if(newComment!="") $("#popupLegende").html(newComment.replace(/\n/gi, "<br/>")).removeClass("empty"); 
+				else $("#popupLegende").html("+ Add a comment").addClass("empty"); 
+				   
+			} else if($(this).attr("id")=="popupAuthorInput") {  
+				
+				var keyDoc = $(this).parent().attr("keydoc"); 
+				var newAuthor = $(this).val().trim();        
+				$(this).val(newAuthor);
+				setMetaFromDom(keyDoc, "Rekall->Author", newAuthor); 
+
+				if(newAuthor!="") $("#popupAuthor").html(newAuthor).removeClass("empty"); 
+				else $("#popupAuthor").html("+ Add an author").addClass("empty");   
+				  
+			} else if($(this).attr("id")=="popupLinkInput") {   
+			
+				var keyDoc = $(this).parent().attr("keydoc"); 
+				var newLink = $(this).val().trim();        
+				$(this).val(newLink);
+				setMetaFromDom(keyDoc, "Rekall->Link", newLink); 
+
+				if(newLink!="") $("#popupLink").html(newLink).removeClass("empty"); 
+				else $("#popupLink").html("+ Add a link").addClass("empty");
+			
+			}
+		}
+		
+		//alert("ok"); 
+	});
    	$(".popupInput").hide();
 	$(".popupRightItem").show();  
 	$("#popupTC").show();
@@ -387,11 +434,11 @@ function fillPopupEdit(tag) {
 	var isChrome = !!window.chrome && !isOpera;              // Chrome 1+
 	var isIE = /*@cc_on!@*/false || !!document.documentMode; // At least IE6
 
-	var bgColorLeft = tag.color.replace(/rgb/g, "rgba").replace(/\)/g, ",.35)");;
+	var bgColorLeft = tag.color.replace(/rgb/g, "rgba").replace(/\)/g, ",.35)");
 	
-  //  if(isOpera) bgColorLeft = "-o-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)";
-  //  else if(isFirefox) bgColorLeft = "-moz-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)";          
-  //  else if((isSafari)||(isChrome))  bgColorLeft = "-webkit-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)"; 
+    if(isOpera) bgColorLeft = "-o-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)";
+    else if(isFirefox) bgColorLeft = "-moz-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)";          
+    else if((isSafari)||(isChrome))  bgColorLeft = "-webkit-linear-gradient(right bottom,  rgba(20,46,51,1) 0%, "+tag.color+" 100%)"; 
 	
 	$("#popupLeft").css("background",bgColorLeft);
 	                                              
@@ -449,9 +496,11 @@ function fillPopupEdit(tag) {
 	
 	                                         
 	if(rekall_common.owner.canEdit) {       
-		if(tag.isMarker()==true) $("#popupEditSupprimer").html("&#10761;&nbsp;&nbsp;Delete Note");  
-		else $("#popupEditSupprimer").html("&#10761;&nbsp;&nbsp;Delete File");  
-		
+		if(tag.isMarker()==true) $("#popupEditSupprimer").html("Delete Note");  
+		else $("#popupEditSupprimer").html("Delete File");  
+		                                  
+    	$(".empty").show();            
+		$("#watermark").hide();
 		$("#popupNomInput").val(tag.getMetadata("Rekall->Name")); 
 		
 		$("#popupTCinMin").val(startVerb.split(":")[0]);
@@ -473,6 +522,10 @@ function fillPopupEdit(tag) {
 			$("#popupSetHighlight").attr("isHighlight","false").removeClass("selected");  
 			$("#popupEdit").removeClass("highlightPopup"); 
 		}
+	} else {
+		$(".empty").hide();
+		$(".editmode").hide();
+		$("#watermark").show();
 	}
 	
 	

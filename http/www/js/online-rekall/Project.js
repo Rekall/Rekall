@@ -393,7 +393,7 @@ Project.prototype.analyse = function() {
 					else if(tmpType.indexOf("text/") >=0 ) 				icnType = "background-image:url(css/images/icn-document.png);";
 					else if(tmpType.indexOf("video/") >=0 ) 			icnType = "background-image:url(css/images/icn-video.png);";  
 					
-					var typeTxt = tmpType.split("/")[1];  
+					var typeTxt = tmpType.split("/")[1].replace(/marker/g, "note");  
                                     
                     /*
 					var htmlHighlight = ""; 

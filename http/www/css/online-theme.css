@@ -35,7 +35,7 @@ html, body {
  
 #popupAlert {
 	width:					46vw;           
-	background:				rgb(50,50,50); 
+	background:				#142E33;/*rgb(50,50,50); */
 	/*margin:					20vh 0 0 0;  */ 
 	padding:				5vh 2vw;         
 	border-radius:			3px;                    
@@ -196,11 +196,11 @@ html, body {
 	display:				none;
 }
 #popupType {                  
-	font-size:				0.9em; 
+	font-size:				0.8em; 
 	font-weight:			400; 
 	color:					#FFF;/*rgba(255,0,0,.75);/*rgba(255,255,255,.75);  */     
 	display:				inline-block; 
-	margin:					2vh 0 0 0;   
+	margin:					3vh 0 0 0;   
 }                       
 
 
@@ -348,14 +348,14 @@ html, body {
 
 #popupSetHighlight {
 	font-weight:			400;
-	color:					#142E33;       
-	font-size:				.8em; 
+	color:					rgba(0,0,0,.75);/*#142E33;*/       
+	font-size:				0.75em;  
 	cursor:					pointer;        
 	text-transform:			uppercase;      
-	text-align:				center;
-	margin:					-5vh 0 4vh 0;  
+	text-align:				center;       
+	margin:					-3vh 2vh 2vh 2vh;  
 	line-height:			2.0em;
-	background:				rgba(255,255,255,.1); 
+	/*background:				rgba(255,255,255,.1); 
 	/*background:				rgba(0,0,0,.1);  */ 
 	padding:				.8em 1.8em .8em 1.8em;
 	border-radius:			2px 0 0 0;
@@ -363,41 +363,46 @@ html, body {
 #popupSetHighlight.selected {      
 	/*color:					rgba(255,255,255,.75);   
 	background:				rgba(0,0,0,.15);        */
-	background:				rgba(255,255,255,.15);
+   /* background:				rgba(255,255,255,.15);   */
 	color:					#FFF;   
 }  
 #popupSetHighlight:hover {       
 	/*background:				rgba(0,0,0,.25); 
 	color:					#FFF;   */
-	background:				rgba(255,255,255,.2);
-	color:				    #142E33;            
+	/*background:				rgba(255,255,255,.2);  */
+	color:				    rgba(255,255,255,.25);  /*#142E33;  */          
 }    
 #popupSetHighlight.selected:hover {      
 	/*color:					rgba(255,255,255,.75);   
 	background:				rgba(0,0,0,.15);        */
-	background:				rgba(255,255,255,.25);
-	color:					#FFF;   
+	/*background:				rgba(255,255,255,.25);    */
+	color:					rgba(255,255,255,.75);   /*#FFF; */  
 }
 
 
 #popupEditSupprimer {
 	font-weight:			400;
-	color:					rgba(255,255,255,.5);         
-	font-size:				.7em; 
+	color:					rgba(255,255,255,.75);/*#142E33;/*#FFF;/*rgba(255,255,255,.5); */        
+	font-size:				0.6em;  
 	cursor:					pointer;  
 	text-transform:			uppercase;           
 	text-align:				center;
 	display:				inline-block;        
 	bottom:					0;
-	margin:					3vh 0 0vh 0;     
+	margin:					2vh 0 1vh 0;     
 	line-height:			1.2em;
-	background:				rgba(20,46,51,.8);/*rgba(0,0,0,.2);   */
-	padding:				.7em 1.6em .7em 1.6em;
-	border-radius:			2px;                               
+	/*background:				#142E33;/*rgba(20,46,51,.8);/*rgba(0,0,0,.2);   */      
+	/*background-image:		-webkit-linear-gradient(top, rgba(255,255,255,.25) 0%, rgba(255,255,255,.10) 100%);   */
+	padding:				1.2em 2.4em 1.2em 2.4em;     
+	padding:				1.2em 0;     
+	width:					9vw;
+	border-radius:			3px;           
+	border:					1px solid rgba(255,255,255,.15);
+	/*border-bottom:			1px solid #142E33;   */                     
 } 
 #popupEditSupprimer:hover {        
-	background:				rgba(20,46,51,.65);/*rgba(20,46,51,.75);  */
-	color:					rgba(255,255,255,.85); 
+	background:				rgba(255,255,255,.05);/*rgba(20,46,51,.75);/*rgba(20,46,51,.75);  */
+	color:					#fff 
 }      
                  
 
@@ -405,18 +410,20 @@ html, body {
 .empty, .empty#popupAuthor, .empty#popupLink {
 	/*font-style:				italic; */
 	color:					rgba(255,255,255,.25);  
-	text-decoration:		none !important;
+	text-decoration:		none !important;  
+	display:				none;
 }
  
            
 
 .separationHDark {
 	height:					1px;  
-	background:				rgba(0,0,0,.2);  
-	background:				rgba(255,255,255,.1);
+	/*background:				rgba(0,0,0,.25);  
+	/*background:				rgba(255,255,255,.1);  */ 
+	border-bottom:			1px solid rgba(0,0,0,.1);
 	margin:					1vh 0 0vh 0;   
-	width:					70%;
-	display:				inline-block;
+	width:					100%;
+	display:				none;
 }
 
 
@@ -881,7 +888,15 @@ html, body {
 .editmode {
 	display:none !important;   
 	width:0 !important;
-}    
+}      
+
+#watermark {
+	position:absolute;
+	z-index:100000;
+	width:100px; height:100px;
+	top:20px; left:20px;                
+}
+
                  
 
 
