@@ -19,17 +19,16 @@ html, body {
 	user-select: 			none;
 }    
 
-#popupSpace, #popupAlertSpace {
+#popupSpace, #popupAlertSpace, #popupAddLinkSpace {
 	width:					100%;
 	height:					100%;
 	background:				rgba(0,0,0,.25);
 	position:				absolute; 
 	z-index:				1000;    	  
-	text-align:				center;
-    /*display:none;       */            
+	text-align:				center;     
 	display:				none;
 }     
-#popupAlertSpace {           
+#popupAlertSpace, #popupAddLinkSpace {           
 	z-index:				10000;     
 }  
  
@@ -46,11 +45,11 @@ html, body {
 	text-align:				center;  
 	color:					rgba(255,255,255,.75); 
 }     
-#popupAlertButtons {      	       
+#popupAlertButtons, #popupAddLinkButtons {      	       
 	width:					100%;
 	text-align:				center;   
 }
-.popupAlertButton {                          
+.popupAlertButton, .popupAddLinkButton {                          
 	width:					8vw;       
 	padding:				1vh 1vw !important;
 	font-weight:			400;
@@ -70,6 +69,48 @@ html, body {
 #popupAlertButtonOk, #popupAlertButtonYesdelete, #popupAlertButtonCancel  { 
 		display:				inline-block;
 } 
+
+          
+#popupAddLink {
+	
+	width:					50vw;   
+	height:					30vh;  
+	/*background:				rgb(102,202,138);
+	/*background:				rgb(100,100,100);*/ 
+	margin-top:				25vh;
+	/*left:					20%;
+	position:				absolute;  */  
+	border-radius:			2px;  
+	/*border:					2px solid #333;*/  
+	box-shadow:				0 5px 25px #000;      
+  	font-weight: 			400;
+	font-size:	 			1vw; 
+	display:				inline-block;  
+	text-align:				center;       
+	background:				#243538;
+	/*background-image:		-webkit-linear-gradient(right bottom,  rgb(20,46,51) 0%, #475457 150%);
+	/*box-shadow:				0px 0px 2px 3px rgba(255,255,255,.1) inset;  */
+	
+}     
+
+#popupAddLinkInput {
+	background:				rgba(0,0,0,.05);/*gba(255,255,255,.15);*/   
+	box-shadow:				0 1px 3px rgba(0,0,0,.2) inset;  
+	border:					0;   
+	border-radius:			3px;     
+	color:					rgba(255,255,255,.85); 
+	width:					33vw;        
+	padding:				0 2%;  
+	display:				inline-block;   
+	
+	font-weight:			200;
+	font-size:				1.4em;      
+	cursor:					pointer;  
+	padding-bottom:			0;    
+	line-height:			1.6em;   
+	margin:					9vh 0 1vh 0;
+}
+
 
 
 
