@@ -250,19 +250,20 @@
 	}
 	
 	//Change les metadonnées
-	function editVideo($url) {
+	function editProjectMeta($baliseName, $metadataKey, $metadataValue) {
 		global $project;
 		global $racine;
 		$retours = array("success" => 1, "value" => "");
 
 		//Tag de timeline
-		$video = $project->createElement("video");
-		$video->setAttribute("url", $url);
-		$racine->appendChild($video);
-		$retours["value"] = "url = ".$url;
+		$balise = $project->createElement($baliseName);
+		$balise->setAttribute($metadataKey, $metadataValue);
+		$racine->appendChild($balise);
+		$retours["value"] = $metadataKey." = ".$metadataValue;
 
 		echo json_encode($retours);
 	}
+	
 	
 	//Renomme un projet Rekall
 	function editProject($oldName, $newName) {
@@ -375,7 +376,12 @@
 		else {
 			if(isset($_GET["video"])) {
 				openProject();
-				editVideo($_GET["video"]);
+				editProjectMeta("video", "url", $_GET["video"]);
+				closeProject();
+			}
+			else if((isset($_GET["metadataKey"])) && (isset($_GET["metadataValue"]))) {
+				openProject();
+				editProjectMeta("meta", $_GET["metadataKey"], $_GET["metadataValue"]);
 				closeProject();
 			}
 			else if((isset($_GET["edit"])) && (isset($_GET["to"]))) {
