@@ -13,12 +13,14 @@ $(document).ready(function() {
 		data: {"status": 1, "password": password},
 		success: function(infos) {
 			rekall_common = infos;
+			if(getParameterByName("preview") != "")
+				rekall_common.owner.canEdit = false;
+			
 			if(rekall_common.owner.canEdit) {
 				//Mode preview or not
 				$(".editmode").removeClass("editmode"); 
 			    $(".empty").show();  
 			    $("#watermark").hide();
-				
 				
 				setEditionControls();
 				
