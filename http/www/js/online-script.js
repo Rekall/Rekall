@@ -4,13 +4,13 @@ $(document).ready(function() {
 	rekall_common.owner = {"canEdit": false, "author": "", "locationGps": "", "locationName": ""};
 
 	rouletteStart();
-	var password = "";
+	var httpGetData = {"status": 1};
 	if(getParameterByName("password") != "")
-		password = (CryptoJS.SHA1(getParameterByName("password")) + "").toUpperCase();
+		httpGetData.password = (CryptoJS.SHA1(getParameterByName("password")) + "").toUpperCase();
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
-		data: {"status": 1, "password": password},
+		data: httpGetData,
 		success: function(infos) {
 			rekall_common = infos;
 			if(getParameterByName("preview") != "")
@@ -19,7 +19,7 @@ $(document).ready(function() {
 			if(rekall_common.owner.canEdit) {
 				//Mode preview or not
 				$(".editmode").removeClass("editmode"); 
-			    $(".empty").show();  
+			    $(".empty").show();
 			    $("#watermark").hide();
 				
 				setEditionControls();
