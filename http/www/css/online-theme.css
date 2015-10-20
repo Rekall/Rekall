@@ -499,7 +499,8 @@ html, body {
 #left_menu_item_icn_preview { background:url("images/icn-menu-preview.png"); }
 #left_menu_item_icn_settings { background:url("images/icn-menu-settings.png"); }  
 #left_menu_item_icn_addfile { background:url("images/icn-menu-addfile.png"); }  
-#left_menu_item_icn_addnote { background:url("images/icn-menu-addnote.png"); }  
+#left_menu_item_icn_addnote { background:url("images/icn-menu-addnote.png"); }     
+#left_menu_item_icn_addlink { background:url("images/icn-menu-addlink.png"); }     
 
 .left_menu_item_title {
 	height:20px;
@@ -890,12 +891,25 @@ html, body {
 	width:0 !important;
 }      
 
-#watermark {
-	position:absolute;
-	z-index:100000;
-	width:100px; height:100px;
-	top:20px; left:20px;                
+#watermark {                  
+	width:				15vh; 
+	height:				15vh; 
+	min-width:			80px; 
+	min-height:			80px;
+	position:			absolute;
+	z-index:			100000;   
+	top:				10px; 
+	left:				10px; 
+	opacity:			.5;                  
 }
+#watermark:hover {   
+    opacity:			1;  
+} 
+
+
+
+
+
 
                  
 

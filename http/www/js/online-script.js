@@ -15,7 +15,10 @@ $(document).ready(function() {
 			rekall_common = infos;
 			if(rekall_common.owner.canEdit) {
 				//Mode preview or not
-				$(".editmode").removeClass("editmode");   
+				$(".editmode").removeClass("editmode"); 
+			    $(".empty").show();  
+			    $("#watermark").hide();
+				
 				
 				setEditionControls();
 				
@@ -37,7 +40,11 @@ $(document).ready(function() {
 					});
 				}
 
-			}
+			} else {
+				$(".empty").hide();  
+			    $("#watermark").show();
+			} 
+			
 			rouletteEnd();
 			rekall.loadXMLFile();
 		},
@@ -48,8 +55,7 @@ $(document).ready(function() {
 	});
 	   
 
-		
-  
+   
 	    
 	
 	$("#popupAlertSpace").click(function(event){  
