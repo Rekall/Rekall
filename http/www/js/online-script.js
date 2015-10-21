@@ -136,9 +136,34 @@ function setEditionControls() {
 		uploadFiles(["New note"]);   
 	}); 
 
-	$("#left_menu_item_btn_addfile").change(function(event){                      
+	$("#left_menu_item_btn_addfile").change(function(event){   
+		event.stopPropagation();                   
 		uploadFiles($("#left_menu_item_btn_addfile").get(0).files);  
+	});      
+	
+	$("#left_menu_item_addlink").click(function(event){   
+		event.stopPropagation();   
+		$("#popupAddLinkSpace").show();  
+		$("#popupAddLinkInput").focus();
+	});       
+	    
+	$("#popupAddLinkButtonCancel").click(function(event){   
+		event.stopPropagation();            
+		closeAddLinkPopup();
 	});   
+	
+	$("#popupAddLinkButtonOk").click(function(event){ 
+		var myLink = $("#popupAddLinkInput").val();    
+		addLink(myLink);
+	}); 
+	
+	$("#popupAddLinkInput").keyup(function(event){  
+		event.stopPropagation();              
+		if(event.which == 13) {     
+			var myLink = $("#popupAddLinkInput").val();
+		    addLink(myLink);
+		}
+	});
                             
 	
 	$("#popupEdit").click(function(event){  
@@ -334,7 +359,24 @@ function setEditionControls() {
 	});       
 
 	
+}  
+
+
+function addLink(url) {
+	
+	if(url.trim()=="") openAlert("Invalid URL");
+	else {
+		uploadFiles(["NewLink"+url]); 
+		closeAddLinkPopup();
+	}
+}    
+
+function closeAddLinkPopup() {
+	$("#popupAddLinkInput").val("");  
+	$("#popupAddLinkSpace").hide();
 }
+
+
              
 function openAlert(message, buttons) {
 	//Rétro-compatibilité Rekall-Pro
@@ -635,6 +677,10 @@ function uploadFiles(files) {
 				formData.append("fileToUpload", file);
 				formData.append("date", fileDateTime.format("YYYY:MM:DD HH:mm:ss"));
 			}
+		}
+		else if(file.indexOf("NewLink") == 0){
+			formData.append("name", "New link");  
+			formData.append("link", file);  
 		}
 		else {
 			formData.append("name", file);

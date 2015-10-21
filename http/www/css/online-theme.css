@@ -28,7 +28,7 @@ html, body {
 	text-align:				center;     
 	display:				none;
 }     
-#popupAlertSpace, #popupAddLinkSpace {           
+#popupAlertSpace {           
 	z-index:				10000;     
 }  
  
@@ -49,35 +49,46 @@ html, body {
 	width:					100%;
 	text-align:				center;   
 }
-.popupAlertButton, .popupAddLinkButton {                          
-	width:					8vw;       
-	padding:				1vh 1vw !important;
+
+.popupAlertButton, .popupAddLinkButton { 
+	width:					9vw;       
+	
 	font-weight:			400;
-	color:					rgba(255,255,255,.5);
-	background:				rgba(255,255,255,.15);   
-	box-shadow:				0 1px 3px rgba(0,0,0,.1);     
-	border:					none;
-	border-radius:			3px;                           
-	font-size:				1.0em !important;  
-	line-height:			1.2em !important;
+  /*  color:					rgba(255,255,255,.75);  */
+	font-size:				0.7em;            
+	line-height:			1.2em;      
+	
 	cursor:					pointer;  
-	text-transform:			uppercase; 
-	margin:					3vh 1vw auto 1vw !important;        
-	display:				inline-block; 
+	text-transform:			uppercase;           
+	text-align:				center;
+	display:				inline-block;     
+ /*   border:					1px solid rgba(255,255,255,.15); */ 
+	border-radius:			3px;                    
+	padding:				1.1em 0;
+	                                   
+    color:					rgba(255,255,255,.5);
+	background:				rgba(255,255,255,.15);   
+	box-shadow:				0 1px 3px rgba(0,0,0,.1);
+	
+	margin:					3vh 1vw 0vh 1vw !important;      
 	font-family:			'OpenSans' !important;  
+}   
+.popupAlertButton:hover, .popupAddLinkButton:hover {        
+	background:				rgba(255,255,255,.05);
+	color:					#fff 
 }   
 #popupAlertButtonOk, #popupAlertButtonYesdelete, #popupAlertButtonCancel  { 
 		display:				inline-block;
-} 
+}
 
           
 #popupAddLink {
 	
-	width:					50vw;   
-	height:					30vh;  
+	width:					40vw;       
 	/*background:				rgb(102,202,138);
 	/*background:				rgb(100,100,100);*/ 
-	margin-top:				25vh;
+	margin-top:				25vh;   
+	padding:				5vh 0 6vh 0;
 	/*left:					20%;
 	position:				absolute;  */  
 	border-radius:			2px;  
@@ -91,7 +102,17 @@ html, body {
 	/*background-image:		-webkit-linear-gradient(right bottom,  rgb(20,46,51) 0%, #475457 150%);
 	/*box-shadow:				0px 0px 2px 3px rgba(255,255,255,.1) inset;  */
 	
-}     
+}       
+
+#popupAddLinkMessage {    
+	font-weight:			100;        
+	color:					rgba(255,255,255,.75);  
+	text-align:				center;  
+	display:				inline-block;     
+	font-size:				1em;
+	width:					30vw;    
+	margin:					0vh 0vw 2vh 0vw !important;
+}
 
 #popupAddLinkInput {
 	background:				rgba(0,0,0,.05);/*gba(255,255,255,.15);*/   
@@ -99,16 +120,18 @@ html, body {
 	border:					0;   
 	border-radius:			3px;     
 	color:					rgba(255,255,255,.85); 
-	width:					33vw;        
-	padding:				0 2%;  
+	width:					30vw;   
 	display:				inline-block;   
 	
 	font-weight:			200;
-	font-size:				1.4em;      
+	font-size:				0.9em;      
 	cursor:					pointer;  
 	padding-bottom:			0;    
-	line-height:			1.6em;   
-	margin:					9vh 0 1vh 0;
+	
+	line-height:			1.2em;  
+	padding:				1.0em 1vw;
+	
+	margin:					2vh 0 1.5vh 0;
 }
 
 
@@ -941,7 +964,8 @@ html, body {
 	z-index:			100000;   
 	top:				10px; 
 	left:				10px; 
-	opacity:			.5;                  
+	opacity:			.5;   
+	display:			none;               
 }
 #watermark:hover {   
     opacity:			1;  
