@@ -330,9 +330,9 @@
 	if(!isset($_SESSION["canEdit"]))
 		$_SESSION["canEdit"] = false;
 	
-	if(isset($_GET["password"])) {
+	if(isset($_GET["p"])) {
 		$sha1password = strtoupper(file_get_contents("../file/projectPassword.txt"));
-		if(($_GET["password"] != "") && ($_GET["password"] == $sha1password))
+		if(($_GET["p"] != "") && ($_GET["p"] == $sha1password))
 			$_SESSION["canEdit"] = true;
 		else
 			$_SESSION["canEdit"] = false;

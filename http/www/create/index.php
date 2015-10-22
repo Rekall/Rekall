@@ -44,8 +44,8 @@
 		echo json_encode($retours);
 	}
 	
-	if((isset($_POST["create"])) && (isset($_POST["video"])) && (isset($_POST["password"]))) {
-		createProject($_POST["create"], $_POST["video"], $_POST["password"]);
+	if((isset($_POST["create"])) && (isset($_POST["video"])) && (isset($_POST["p"]))) {
+		createProject($_POST["create"], $_POST["video"], $_POST["p"]);
 		exit();
 	}
 ?>
@@ -82,7 +82,7 @@
 					$.ajax("index.php", {
 						type: "POST",
 						dataType: "json",
-						data: {"create": $("input[name=create]").val(), "video": $("input[name=video]").val(), "password": password},
+						data: {"create": $("input[name=create]").val(), "video": $("input[name=video]").val(), "p": password},
 						success: function(retour) {
 							console.log(retour);
 							if(retour.success == 1) {
@@ -113,7 +113,7 @@
 		<label>YouTube video URL *</label>
 	    <input type="text" name="video"    placeholder="https://www.youtube.com/watch?v=4Rcw5GCXJnQ" size="30"><br/>
 		<label>Edition password *</label>
-	    <input type="password" name="password" placeholder="password" size="30"><br/>
+	    <input type="password" name="p" placeholder="password" size="30"><br/>
 
 	    <input id="submitCreate" type="submit" value="Create a project" name="submit">
 	</form>        

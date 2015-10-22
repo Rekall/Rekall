@@ -5,15 +5,15 @@ $(document).ready(function() {
 
 	rouletteStart();
 	var httpGetData = {"status": 1};
-	if(getParameterByName("password") != "")
-		httpGetData.password = (CryptoJS.SHA1(getParameterByName("password")) + "").toUpperCase();
+	if(getParameterByName("p") != "")
+		httpGetData.password = (CryptoJS.SHA1(getParameterByName("p")) + "").toUpperCase();
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
 		data: httpGetData,
 		success: function(infos) {
 			rekall_common = infos;
-			if(getParameterByName("preview") != "")
+			if(getParameterByName("w") != "")
 				rekall_common.owner.canEdit = false;
 			
 			if(rekall_common.owner.canEdit) {
@@ -143,8 +143,8 @@ function setEditionControls() {
 	
 	$("#left_menu_item_preview").click(function(event){  
 		event.stopPropagation();
-		window.open("?preview=1", '_blank');
-		window.open("?preview=1", "Preview Rekall", "menubar=no, status=no, scrollbars=no, menubar=no, width=1150, height=560");
+		window.open("?w=1", '_blank');
+		window.open("?w=1", "Preview Rekall", "menubar=no, status=no, scrollbars=no, menubar=no, width=1150, height=560");
 	});
 	
 	                                           
