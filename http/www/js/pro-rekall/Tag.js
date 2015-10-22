@@ -82,6 +82,9 @@ Tag.prototype.isMarker = function() {
 Tag.prototype.isImage = function() {
 	return this.document.isImage(this.version); 
 }
+Tag.prototype.isLink = function() {
+	return this.document.isLink(this.version); 
+}
 
 
 Tag.prototype.getTimeStart = function() {

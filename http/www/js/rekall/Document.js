@@ -79,6 +79,13 @@ Document.prototype.isImage = function(version) {
 	else
 		return type.startsWith("image"); 
 }
+Document.prototype.isLink = function(version) {
+	var type = this.getMetadata("Rekall->Type", version);
+	if(type == undefined)
+		return false;
+	else
+		return type.startsWith("link"); 
+}
 
 
 Document.availableMetadataKeys = new Object();

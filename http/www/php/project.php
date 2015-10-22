@@ -95,7 +95,7 @@
 
 	
 	//Ajoute un marker
-	function addMarkerToProject($name, $metas, $tc) {
+	function addMarkerToProject($type, $name, $metas, $tc) {
 		global $project;
 		global $racine;
 
@@ -105,7 +105,7 @@
 		//Création des métadatas
 		$metasAdd = array(
 	        "Rekall->Comments"					=> "",
-	        "Rekall->Type"						=> "rekall/marker",
+	        "Rekall->Type"						=> $type,
 	        "Rekall->Date/Time"					=> date("Y:m:d H:i:s"),
 	        "Rekall->Import Date"				=> date("Y:m:d H:i:s"),
 			"Rekall->Flag"						=> "Marker",

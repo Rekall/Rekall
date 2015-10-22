@@ -111,7 +111,10 @@
 		$metas["Rekall User Infos->User Name"] = $metas["Rekall->Author"];
 		$metas["Rekall User Infos->User IP"]   = $_SERVER['REMOTE_ADDR'];
 
-		$metasAdded = addMarkerToProject($_POST["name"], $metas, $fileTc);
+		$type = "rekall/marker";
+		if(isset($_POST["type"]))
+			$type = $_POST["type"];
+		$metasAdded = addMarkerToProject($_POST["type"], $_POST["name"], $metas, $fileTc);
 		$key = $metasAdded["key"];
 		unset($metasAdded["key"]);
 		$retour .= '"code":1, "tc":'.$fileTc.', "key":"'.$key.'", "status":"OK", "metas":'.json_encode($metasAdded);
