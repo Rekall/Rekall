@@ -59,7 +59,7 @@ html, body {
 #popupSettingsLeft {                                 
 	width:					25vw;       
 	min-height:				50vh;                          
-	padding:				5vh 3vw 5vh 3vw;    
+	padding:				6vh 3vw 6vh 3vw;    
 	vertical-align:			top;  
 	background:				rgba(0,0,0,.15);              
 }     
@@ -67,7 +67,7 @@ html, body {
 #popupSettingsRight {                               
 	width:					18vw;       
 	min-height:				50vh;       
-	padding:				5vh 0 5vh 0;    
+	padding:				6vh 0 6vh 0;    
 	vertical-align:		    top;  
 	text-align:				center;               
 	border-radius:			2px 0 0 2px;         
@@ -100,7 +100,26 @@ html, body {
 	background:				rgba(255,255,255,.05);/*rgba(20,46,51,.75);/*rgba(20,46,51,.75);  */
 	color:					#fff 
 }        
+      
+.popupSettingsTxt {              
+	font-weight:			200;
+	width:					25vw;                   
+	display:				inline-block;      
+	margin-bottom:			1vh;          
+	font-size:				.9em; 
+	line-height:			1.2em;   
+	color:					rgba(255,255,255,.75); 
+	padding:				.5vh 0 0 0; 
+}      
 
+#popupSettingsTitle {
+	text-transform:			uppercase; 
+	font-size:				1.2em;     
+	padding:				0 0 1vh 0;  
+	color:					#fff;
+}                                        
+#popupSettingsCredits, #popupSettingsCreationDate {   
+}
 
 
 
