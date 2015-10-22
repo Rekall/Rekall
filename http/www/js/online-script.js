@@ -752,8 +752,8 @@ function uploadFiles(files) {
 			}
 		}
 		else if(file.indexOf("NewLink") == 0){
-			formData.append("name", "New link");      
-			formData.append("link", file.replace("New link",""));
+			formData.append("name", "NewLink");      
+			formData.append("link", file.replace("NewLink",""));
 			formData.append("type", "rekall/link");
 		}
 		else {
