@@ -84,7 +84,7 @@ Document.prototype.isLink = function(version) {
 	if(type == undefined)
 		return false;
 	else
-		return type.startsWith("link"); 
+		return type.startsWith("rekall/link"); 
 }
 
 
