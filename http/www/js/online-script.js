@@ -48,7 +48,8 @@ $(document).ready(function() {
 			} 
 			
 			rouletteEnd();
-			rekall.loadXMLFile();
+			rekall.loadXMLFile();  
+
 		},
 		error: function() {
 			rouletteEnd();
@@ -133,8 +134,56 @@ function setEditionControls() {
 	
 	$("#left_menu_item_settings").click(function(event){  
 		event.stopPropagation(); 
-		$("#popupSettingsSpace").show(); 
-	}); 
+		$("#popupSettingsSpace").show();         
+		                     
+		if(rekall.project.metadata["Title"]!="") $("#popupSettingsTitle").html(rekall.project.metadata["Title"]).removeClass("empty"); 
+		else $("#popupSettingsTitle").html("+ Add project title").addClass("empty");
+		
+		if(rekall.project.metadata["Author"]!="") $("#popupSettingsAuthor").html(rekall.project.metadata["Author"]).removeClass("empty"); 
+		else $("#popupSettingsAuthor").html("+ Add project author").addClass("empty");
+		
+		if(rekall.project.metadata["Email"]!="") $("#popupSettingsEmail").html(rekall.project.metadata["Email"]).removeClass("empty"); 
+		else $("#popupSettingsEmail").html("+ Add an email address").addClass("empty");
+		
+		if(rekall.project.metadata["Comments"]!="") $("#popupSettingsCredits").html(rekall.project.metadata["Comments"]).removeClass("empty"); 
+		else $("#popupSettingsCredits").html("+ Add project credits").addClass("empty");      
+		
+		if(rekall_common.owner.canEdit) {                    
+	    	$(".empty").show();         
+		}
+		                                                                             
+	});   
+	
+	$("#popupSettingsTitle").click(function(event){  
+		event.stopPropagation();     
+		closeSettingsInputs();
+		$(this).hide();   
+		if(!$(this).hasClass("empty")) $("#popupSettingsTitleInput").val($(this).html());
+		$("#popupSettingsTitleInput").show().focus(); 
+	});  
+	$("#popupSettingsAuthor").click(function(event){  
+		event.stopPropagation();     
+		closeSettingsInputs();
+		$(this).hide();          
+		if(!$(this).hasClass("empty")) $("#popupSettingsAuthorInput").val($(this).html());
+		$("#popupSettingsAuthorInput").show().focus(); 
+	});
+	$("#popupSettingsEmail").click(function(event){  
+		event.stopPropagation();     
+		closeSettingsInputs();
+		$(this).hide();            
+		if(!$(this).hasClass("empty")) $("#popupSettingsEmailInput").val($(this).html());
+		$("#popupSettingsEmailInput").show().focus(); 
+	});
+	$("#popupSettingsCredits").click(function(event){  
+		event.stopPropagation();     
+		closeSettingsInputs();
+		$(this).hide();      
+		if(!$(this).hasClass("empty")) $("#popupSettingsCreditsInput").val($(this).html());
+		$("#popupSettingsCreditsInput").show().focus(); 
+	});
+	
+	
 	
 	$("#popupSettingsSpace").click(function(event){  
 		event.stopPropagation(); 
@@ -158,14 +207,12 @@ function setEditionControls() {
 	});
 	$("#popupSettingsBtnDownloadXml").click(function(event){  
 		event.stopPropagation();
-		window.open("php/project.php?downloadXML=1", '_self');
-
+		window.open("php/project.php?downloadXML=1", '_self'); 
 	});
 	$("#popupSettingsBtnDelete").click(function(event){  
 		event.stopPropagation();
 		alert("DELETE");
-	});
-	
+	});                               
 	                                           
 	$("#left_menu_item_addnote").click(function(event){  
 		event.stopPropagation();   
@@ -475,7 +522,12 @@ function closeAlert() {
 	$("#popupAlertMessage").html(""); 
 	$(".popupAlertButton").hide();         
 	$("#popupAlertSpace").hide(); 
-}  
+}     
+
+function closeSettingsInputs() {         
+   	$(".popupSettingsInput").hide();
+	$(".popupSettingsTxt").show();  
+}
 
 function closeInputs() {  
 	$.each($(".popupInput"), function() { 

@@ -26,16 +26,17 @@ function Project(url) {
 	this.sources = new Object();
 	this.url = url;
 	this.firstAnalysis = true;
-	this.metadata = {
-		"Title":    "Title",
-		"Author":   "Author",
-		"Email":    "Email",
-		"Date": 	"Date",
-		"Comments": "Comments",
+	this.metadata = {      
+		"Title":    "",
+		"Author":   "",
+		"Email":    "",
+		"Date": 	"",
+		"Comments": "",
 	};
 	var urlItems = rekall.baseUrl.split("/");
 	urlItems = $.grep(urlItems,function(n){ return(n) });
 	this.metadata["Title"] = urlItems[urlItems.length-1];
+
 }
 
 Project.prototype.addDocument = function(key, document) {

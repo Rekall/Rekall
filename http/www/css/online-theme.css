@@ -98,7 +98,7 @@ html, body {
 } 
 .popupSettingsBtn:hover {        
 	background:				rgba(255,255,255,.05);/*rgba(20,46,51,.75);/*rgba(20,46,51,.75);  */
-	color:					#fff 
+	color:					#fff; 
 }        
       
 .popupSettingsTxt {              
@@ -109,15 +109,36 @@ html, body {
 	font-size:				.9em; 
 	line-height:			1.2em;   
 	color:					rgba(255,255,255,.75); 
-	padding:				.5vh 0 0 0; 
-}      
+	padding:				.5vh 0 .5vh 0;   
+	cursor:					pointer;
+}   
+
+.popupSettingsInput {                         
+	width:					23vw;                   
+	display:				inline-block;      
+	margin-bottom:			1vh;          
+	font-size:				.9em; 
+	line-height:			1.2em;                  
+	
+	font-weight:			200;
+	
+    background:				rgba(0,0,0,.05);  
+	box-shadow:				0 1px 3px rgba(0,0,0,.2) inset;  
+	border:					0;   
+	border-radius:			3px;     
+	color:					rgba(255,255,255,.85);    
+	padding:				.5vh 1vw;          
+	display:				none;
+}   
 
 #popupSettingsTitle {
 	text-transform:			uppercase; 
 	font-size:				1.2em;     
 	padding:				0 0 1vh 0;  
-	color:					#fff;
-}                                        
+}            
+#popupSettingsTitleInput {             
+	font-size:				1.2em;            
+}                                     
 #popupSettingsCredits, #popupSettingsCreationDate {   
 }
 
