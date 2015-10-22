@@ -139,7 +139,35 @@ html, body {
 	display:				inline-block;  
 	text-align:				center;  
 	color:					rgba(255,255,255,.75); 
-}     
+}   
+#popupAlertMessage {
+	font-size:				.9em;
+	font-weight:			200;
+}                              
+
+#popupAlertInput, #popupAlertTextarea {
+	background:				rgba(0,0,0,.05);/*gba(255,255,255,.15);*/   
+	box-shadow:				0 1px 3px rgba(0,0,0,.2) inset;  
+	border:					0;   
+	border-radius:			3px;     
+	color:					rgba(255,255,255,.85); 
+	width:					30vw; 
+	  
+	display:				inline-block;   
+	
+	font-weight:			200;
+	font-size:				0.9em;      
+	cursor:					pointer;  
+	padding-bottom:			0;    
+	
+	line-height:			1.4em;  
+	padding:				2vh 1vw;
+	
+	margin:					3vh 0 1.5vh 0;
+}        
+
+
+
 #popupAlertButtons, #popupAddLinkButtons {      	       
 	width:					100%;
 	text-align:				center;   

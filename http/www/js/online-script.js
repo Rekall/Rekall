@@ -144,19 +144,21 @@ function setEditionControls() {
 	$("#left_menu_item_preview").click(function(event){  
 		event.stopPropagation();
 		window.open("?w=1", '_blank');
-		window.open("?w=1", "Preview Rekall", "menubar=no, status=no, scrollbars=no, menubar=no, width=1150, height=560");
+		/*window.open("?w=1", "Preview Rekall", "menubar=no, status=no, scrollbars=no, menubar=no, width=1150, height=560");  */
 	});
 	$("#popupSettingsBtnEmbed").click(function(event){  
 		event.stopPropagation();
-		shareEmbed();
+		var tmp = shareEmbed();  
+		openAlert("textarea",tmp);
 	});
 	$("#popupSettingsBtnShare").click(function(event){  
-		event.stopPropagation();
-		shareLink();
+		event.stopPropagation();    
+		var tmp = shareLink();  
+		openAlert("input",tmp);
 	});
 	$("#popupSettingsBtnDownloadXml").click(function(event){  
 		event.stopPropagation();
-		window.open("php/project.php?downloadXML=1", '_blank');
+		window.open("php/project.php?downloadXML=1", '_self');
 
 	});
 	$("#popupSettingsBtnDelete").click(function(event){  
@@ -423,22 +425,51 @@ function closeAddLinkPopup() {
 function openAlert(message, buttons) {
 	//Rétro-compatibilité Rekall-Pro
 	if((message == undefined) && (buttons == undefined))
-		closeAlert();
-	
-	$("#popupAlertMessage").html(message);  
-	if(buttons == "nobuttons") {
-		$(".popupAlertButton").hide();
-	}
-	else if(buttons == "yesnodelete") {   
-		$(".popupAlertButton").hide();  
-		$("#popupAlertButtonYesdelete").show(); 
-		$("#popupAlertButtonCancel").show(); 
-	}      
-	else {
+		closeAlert();      
+		
+	if(message=="input"){      
+		$("#popupAlertMessage").html("Copy this URL to share your project");      
 		$(".popupAlertButton").hide();  
 		$("#popupAlertButtonOk").show(); 
+		
+		$("#popupAlertInput").val(buttons);
+		$("#popupAlertInput").show();           
+		$("#popupAlertTextarea").hide(); 
+		                                      
+		$("#popupAlertSpace").show();     
+		$("#popupAlertInput").focus().select();
+		
+	} else if(message=="textarea"){  
+		$("#popupAlertMessage").html("Copy this code and paste it into your HTML for embed");
+		$(".popupAlertButton").hide();  
+		$("#popupAlertButtonOk").show(); 
+		                                
+		$("#popupAlertTextarea").val(buttons);
+		$("#popupAlertInput").hide(); 
+		$("#popupAlertTextarea").show();               
+		                                  
+		$("#popupAlertSpace").show();         
+		$("#popupAlertTextarea").focus().select();
+		
+	} else {            
+		$("#popupAlertInput").hide(); 
+		$("#popupAlertTextarea").hide(); 
+		
+		$("#popupAlertMessage").html(message);  
+		if(buttons == "nobuttons") {
+			$(".popupAlertButton").hide();
+		}
+		else if(buttons == "yesnodelete") {   
+			$(".popupAlertButton").hide();  
+			$("#popupAlertButtonYesdelete").show(); 
+			$("#popupAlertButtonCancel").show(); 
+		}      
+		else {
+			$(".popupAlertButton").hide();  
+			$("#popupAlertButtonOk").show(); 
+		}
+		$("#popupAlertSpace").show();     
 	}
-	$("#popupAlertSpace").show(); 
 }       
 function closeAlert() {
 	$("#popupAlertMessage").html(""); 
@@ -811,13 +842,13 @@ function shareEmbed() {
 	var embedUrl = '<iframe src="' + rekall.baseUrl + '" width="' + width + '" height="' + height + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
 	embedUrl += '<p><a href="' + rekall.baseUrl + '">' + "Mon Projet Rekall" + '</a></p>';
 	console.log(embedUrl);
-	openAlert("Embed code in console");
+//	openAlert("Embed code in console");
 	return embedUrl;
 }
 function shareLink() {
 	var width = 960, height = round(width * 0.44);
 	var embedUrl = rekall.baseUrl;
-	openAlert(embedUrl);
+//	openAlert(embedUrl);
 	return embedUrl;
 }
 
