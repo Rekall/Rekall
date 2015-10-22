@@ -129,7 +129,25 @@ function setEditionControls() {
 			$("#flattentimeline").removeClass("draggable").removeClass("drag");  
 		}
 	});
-	   
+	         
+	
+	$("#left_menu_item_settings").click(function(event){  
+		event.stopPropagation(); 
+		$("#popupSettingsSpace").show(); 
+	}); 
+	
+	$("#popupSettingsSpace").click(function(event){  
+		event.stopPropagation(); 
+		closeSettingsPopup();
+	});  
+	
+	$("#left_menu_item_preview").click(function(event){  
+		event.stopPropagation();       
+		alert("Open preview");  
+	});
+	
+	
+	
 	                                           
 	$("#left_menu_item_addnote").click(function(event){  
 		event.stopPropagation();   
@@ -150,7 +168,11 @@ function setEditionControls() {
 	$("#popupAddLinkButtonCancel").click(function(event){   
 		event.stopPropagation();            
 		closeAddLinkPopup();
-	});   
+	});    
+	$("#popupAddLinkSpace").click(function(event){   
+		event.stopPropagation();            
+		closeAddLinkPopup();
+	});
 	
 	$("#popupAddLinkButtonOk").click(function(event){ 
 		var myLink = $("#popupAddLinkInput").val();    
@@ -360,7 +382,11 @@ function setEditionControls() {
 
 	
 }  
+         
 
+function closeSettingsPopup() {
+	$("#popupSettingsSpace").hide();
+}
 
 function addLink(url) {
 	
