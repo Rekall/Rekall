@@ -86,7 +86,7 @@
 						success: function(retour) {
 							console.log(retour);
 							if(retour.success == 1) {
-								window.document.location = document.URL.substr(0,document.URL.lastIndexOf('/')) + "/" + retour.value + "?password=" + passwordRaw;
+								window.document.location = document.URL.substr(0,document.URL.lastIndexOf('/')) + "/" + retour.value + "?p=" + passwordRaw;
 							}
 							else {
 								alert(retour.error)

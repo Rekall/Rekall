@@ -6,7 +6,7 @@ $(document).ready(function() {
 	rouletteStart();
 	var httpGetData = {"status": 1};
 	if(getParameterByName("p") != "")
-		httpGetData.password = (CryptoJS.SHA1(getParameterByName("p")) + "").toUpperCase();
+		httpGetData.p = (CryptoJS.SHA1(getParameterByName("p")) + "").toUpperCase();
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
