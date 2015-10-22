@@ -26,6 +26,13 @@ function Project(url) {
 	this.sources = new Object();
 	this.url = url;
 	this.firstAnalysis = true;
+	this.metadata = {
+		"Title":    "Title",
+		"Author":   "Author",
+		"Email":    "Email",
+		"Date": 	"Date",
+		"Comments": "Comments",
+	}
 }
 
 Project.prototype.addDocument = function(key, document) {
@@ -98,6 +105,9 @@ Project.prototype.loadXML = function(xml) {
 				thiss.sources["Files"].documents[key].tags[index].setTimeEnd(timeEnd);
 			}
 		}
+	});
+	xml.find('projectMeta').each(function() {
+		thiss.metadata[$(this).attr('ctg')] = $(this).attr('cnt');
 	});
 	var videoUrl = undefined, videoTech = undefined;
 	xml.find('video').each(function() {

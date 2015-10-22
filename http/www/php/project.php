@@ -263,6 +263,20 @@
 
 		echo json_encode($retours);
 	}
+	function editProjectMeta2($baliseName, $metadataKey, $metadataValue) {
+		global $project;
+		global $racine;
+		$retours = array("success" => 1, "value" => "");
+
+		//Tag de timeline
+		$balise = $project->createElement($baliseName);
+		$balise->setAttribute("ctg", $metadataKey);
+		$balise->setAttribute("cnt", $metadataValue);
+		$racine->appendChild($balise);
+		$retours["value"] = $metadataKey." = ".$metadataValue;
+
+		echo json_encode($retours);
+	}
 	
 	
 	//Renomme un projet Rekall
@@ -388,7 +402,7 @@
 			}
 			else if((isset($_GET["metadataKey"])) && (isset($_GET["metadataValue"]))) {
 				openProject();
-				editProjectMeta("meta", $_GET["metadataKey"], $_GET["metadataValue"]);
+				editProjectMeta2("projectMeta", $_GET["metadataKey"], $_GET["metadataValue"]);
 				closeProject();
 			}
 			else if((isset($_GET["edit"])) && (isset($_GET["to"]))) {
