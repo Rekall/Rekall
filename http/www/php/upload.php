@@ -108,6 +108,7 @@
 		if(isset($_POST["locationName"]))		 $metas["Rekall->Location Name"] = $_POST["locationName"];
 		if(isset($_POST["locationGps"]))		 $metas["Rekall->Location GPS"]  = $_POST["locationGps"];
 		if(isset($_POST["author"]))				 $metas["Rekall->Author"]        = $_POST["author"];
+		if(isset($_POST["link"]))		 		 $metas["Rekall->Link"]  		 = $_POST["link"];
 		$metas["Rekall User Infos->User Name"] = $metas["Rekall->Author"];
 		$metas["Rekall User Infos->User IP"]   = $_SERVER['REMOTE_ADDR'];
 
