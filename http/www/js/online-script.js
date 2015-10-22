@@ -143,8 +143,8 @@ function setEditionControls() {
 	
 	$("#left_menu_item_preview").click(function(event){  
 		event.stopPropagation();
-		window.open("index.html?preview=1", '_blank');
-		window.open("index.html?preview=1", "Preview Rekall", "menubar=no, status=no, scrollbars=no, menubar=no, width=1150, height=560");
+		window.open("?preview=1", '_blank');
+		window.open("?preview=1", "Preview Rekall", "menubar=no, status=no, scrollbars=no, menubar=no, width=1150, height=560");
 	});
 	
 	                                           
