@@ -146,6 +146,23 @@ function setEditionControls() {
 		window.open("?w=1", '_blank');
 		window.open("?w=1", "Preview Rekall", "menubar=no, status=no, scrollbars=no, menubar=no, width=1150, height=560");
 	});
+	$("#popupSettingsBtnEmbed").click(function(event){  
+		event.stopPropagation();
+		shareEmbed();
+	});
+	$("#popupSettingsBtnShare").click(function(event){  
+		event.stopPropagation();
+		shareLink();
+	});
+	$("#popupSettingsBtnDownloadXml").click(function(event){  
+		event.stopPropagation();
+		window.open("php/project.php?downloadXML=1", '_blank');
+
+	});
+	$("#popupSettingsBtnDelete").click(function(event){  
+		event.stopPropagation();
+		alert("DELETE");
+	});
 	
 	                                           
 	$("#left_menu_item_addnote").click(function(event){  
@@ -788,12 +805,19 @@ function uploadFilesNext() {
 }
 
 //Code d'embarquement du projet Rekall
-function embed() {
+function shareEmbed() {
 	var width = 960, height = round(width * 0.44);
 	var embedUrl = '<iframe src="' + rekall.baseUrl + '" width="' + width + '" height="' + height + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
 	embedUrl += '<p><a href="' + rekall.baseUrl + '">' + "Mon Projet Rekall" + '</a></p>';
 	console.log(embedUrl);
 	openAlert("Embed code in console");
+	return embedUrl;
+}
+function shareLink() {
+	var width = 960, height = round(width * 0.44);
+	var embedUrl = rekall.baseUrl;
+	openAlert(embedUrl);
+	return embedUrl;
 }
 
 function rouletteStart(isProgress) {

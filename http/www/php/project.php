@@ -379,6 +379,13 @@
 				editProjectMeta("video", "url", $_GET["video"]);
 				closeProject();
 			}
+			else if(isset($_GET["downloadXML"])) {
+				$file_url = '../file/project.xml';
+				header('Content-Type: application/octet-stream');
+				header("Content-Transfer-Encoding: Binary"); 
+				header("Content-disposition: attachment; filename=\"".basename($file_url)."\""); 
+				readfile($file_url);
+			}
 			else if((isset($_GET["metadataKey"])) && (isset($_GET["metadataValue"]))) {
 				openProject();
 				editProjectMeta("meta", $_GET["metadataKey"], $_GET["metadataValue"]);
