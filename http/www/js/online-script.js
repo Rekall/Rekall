@@ -18,7 +18,7 @@ $(document).ready(function() {
 			
 			if(rekall_common.owner.canEdit) {
 				//Mode preview or not
-				$(".editmode").removeClass("editmode"); 
+				$(".editmode").removeClass("editmode");     
 			    $(".empty").show();
 			    $("#watermark").hide();
 				
@@ -42,9 +42,9 @@ $(document).ready(function() {
 					});
 				}
 
-			} else {
+			} else {                                                    
 				$(".empty").hide();  
-			    $("#watermark").show();
+			    $("#watermark").show(); 
 			} 
 			
 			rouletteEnd();
@@ -143,7 +143,7 @@ function setEditionControls() {
 		else $("#popupSettingsAuthor").html("+ Add project author").addClass("empty");
 		
 		if(rekall.project.metadata["Email"]!="") $("#popupSettingsEmail").html(rekall.project.metadata["Email"]).removeClass("empty"); 
-		else $("#popupSettingsEmail").html("+ Add an email address").addClass("empty");
+		else $("#popupSettingsEmail").html("+ Add email address").addClass("empty");
 		
 		if(rekall.project.metadata["Comments"]!="") $("#popupSettingsCredits").html(rekall.project.metadata["Comments"]).removeClass("empty"); 
 		else $("#popupSettingsCredits").html("+ Add project credits").addClass("empty");      
@@ -160,29 +160,40 @@ function setEditionControls() {
 		$(this).hide();   
 		if(!$(this).hasClass("empty")) $("#popupSettingsTitleInput").val($(this).html());
 		$("#popupSettingsTitleInput").show().focus(); 
-	});  
+	});    
 	$("#popupSettingsAuthor").click(function(event){  
 		event.stopPropagation();     
 		closeSettingsInputs();
 		$(this).hide();          
 		if(!$(this).hasClass("empty")) $("#popupSettingsAuthorInput").val($(this).html());
 		$("#popupSettingsAuthorInput").show().focus(); 
-	});
+	});  
 	$("#popupSettingsEmail").click(function(event){  
 		event.stopPropagation();     
 		closeSettingsInputs();
 		$(this).hide();            
 		if(!$(this).hasClass("empty")) $("#popupSettingsEmailInput").val($(this).html());
 		$("#popupSettingsEmailInput").show().focus(); 
-	});
+	});       
 	$("#popupSettingsCredits").click(function(event){  
 		event.stopPropagation();     
 		closeSettingsInputs();
 		$(this).hide();      
 		if(!$(this).hasClass("empty")) $("#popupSettingsCreditsInput").val($(this).html());
 		$("#popupSettingsCreditsInput").show().focus(); 
+	});                
+	
+	$(".popupSettingsInput").keyup(function(event){  
+		event.stopPropagation();              
+		if(event.which == 13) {                                                                      
+			closeSettingsInputs();
+		}
 	});
 	
+	$("#popupSettings").click(function(event){  
+		event.stopPropagation(); 
+		closeSettingsInputs();
+	});
 	
 	
 	$("#popupSettingsSpace").click(function(event){  
@@ -337,11 +348,11 @@ function setEditionControls() {
 		$("#popupAuthorInput").show().focus(); 
 	});      
 	
-	$("#popupLink").click(function(event){  
+	$("#popupLink").click(function(event){         
 		event.stopPropagation();     
 		closeInputs();
 		$(this).hide();
-		$("#popupLinkInput").show().focus(); 
+		$("#popupLinkInput").show().focus();    
 	});  
 	
 	
@@ -352,14 +363,7 @@ function setEditionControls() {
 	
 	$("#popupNomInput").keyup(function(event){  
 		event.stopPropagation();              
-		if(event.which == 13) {    
-			var keyDoc = $(this).parent().attr("keydoc"); 
-			var newName = $(this).val().trim();        
-			$(this).val(newName);
-			setMetaFromDom(keyDoc, "Rekall->Name", newName); 
-			
-			if(newName!="") $("#popupNom").html(newName).removeClass("empty"); 
-			else $("#popupNom").html("+ Add a name").addClass("empty");     
+		if(event.which == 13) {                                                      
 			closeInputs(); 
 		}
 	});    
@@ -367,62 +371,38 @@ function setEditionControls() {
 	$("#popupLegendeInput").keyup(function(event){    
 		event.stopPropagation(); 
 		
-		var isEnter = false; 
-		
+		var isEnter = false;        
 		if (event.key !== undefined) {
 		       if (event.key === 'Enter' && event.altKey) {
 		          //openAlert('Alt + Enter pressed!');
-		       } else if(event.key === 'Enter') isEnter = true; 
-		
+		       } else if(event.key === 'Enter') isEnter = true;  
 		    } else if (event.keyIdentifier !== undefined) {
 		       if (event.keyIdentifier === "Enter" && event.altKey) {
 		          //openAlert('Alt + Enter pressed!');
-		       } else if(event.keyIdentifier === 'Enter') isEnter = true;
-
+		       } else if(event.keyIdentifier === 'Enter') isEnter = true;    
 		    } else if (event.keyCode !== undefined) {
 		       if (event.keyCode === 13 && event.altKey) {
 		          //openAlert('Alt + Enter pressed!');
 		    } else if(event.keyCode === 13) isEnter = true; 
 		}
 		             
-		if(isEnter == true) {    
-			var keyDoc = $(this).parent().attr("keydoc"); 
-			var newComment = $(this).val().trim();    
-			$(this).val(newComment);
-			setMetaFromDom(keyDoc, "Rekall->Comments", newComment.replace(/\n/gi, "<br/>")); 
-			
-			if(newComment!="") $("#popupLegende").html(newComment.replace(/\n/gi, "<br/>")).removeClass("empty"); 
-			else $("#popupLegende").html("+ Add a comment").addClass("empty");     
+		if(isEnter == true) {                                                              
 			closeInputs(); 
 		}
 	});         
 	
 	$("#popupAuthorInput").keyup(function(event){  
 		event.stopPropagation();              
-		if(event.which == 13) {    
-			var keyDoc = $(this).parent().attr("keydoc"); 
-			var newAuthor = $(this).val().trim();        
-			$(this).val(newAuthor);
-			setMetaFromDom(keyDoc, "Rekall->Author", newAuthor); 
-			
-			if(newAuthor!="") $("#popupAuthor").html(newAuthor).removeClass("empty"); 
-			else $("#popupAuthor").html("+ Add an author").addClass("empty");     
+		if(event.which == 13) {                                                       
 			closeInputs(); 
 		}
 	});
 	
-	$("#popupLinkInput").keyup(function(event){  
+	$("#popupLinkInput").keyup(function(event){       
 		event.stopPropagation();              
-		if(event.which == 13) {    
-			var keyDoc = $(this).parent().attr("keydoc"); 
-			var newLink = $(this).val().trim();        
-			$(this).val(newLink);
-			setMetaFromDom(keyDoc, "Rekall->Link", newLink); 
-			
-			if(newLink!="") $("#popupLink").html(newLink).removeClass("empty"); 
-			else $("#popupLink").html("+ Add a link").addClass("empty");     
+		if(event.which == 13) {                                                        
 			closeInputs(); 
-		}
+		}                                         
 	});
 	 
 	$("#popupSetHighlight").click(function(event){
@@ -524,7 +504,54 @@ function closeAlert() {
 	$("#popupAlertSpace").hide(); 
 }     
 
-function closeSettingsInputs() {         
+function closeSettingsInputs() {
+	$.each($(".popupSettingsInput"), function() { 
+		if($(this).css("display") != "none") {
+			if($(this).attr("id")=="popupSettingsTitleInput") {                                           
+				
+   // 			var keyDoc = $(this).parent().attr("keydoc"); 
+				var newName = $(this).val().trim();        
+				$(this).val(newName);
+   // 			setMetaFromDom(keyDoc, "Rekall->Name", newName); 
+
+				if(newName!="") $("#popupSettingsTitle").html(newName).removeClass("empty"); 
+				else $("#popupSettingsTitle").html("+ Add project name").addClass("empty");
+				  
+			} else if($(this).attr("id")=="popupSettingsAuthorInput") {  
+				
+	//			var keyDoc = $(this).parent().attr("keydoc"); 
+				var newComment = $(this).val().trim();    
+				$(this).val(newComment);
+	//			setMetaFromDom(keyDoc, "Rekall->Comments", newComment.replace(/\n/gi, "<br/>")); 
+
+				if(newComment!="") $("#popupSettingsAuthor").html(newComment.replace(/\n/gi, "<br/>")).removeClass("empty"); 
+				else $("#popupSettingsAuthor").html("+ Add project author").addClass("empty"); 
+				   
+			} else if($(this).attr("id")=="popupSettingsEmailInput") {  
+				
+	  //  		var keyDoc = $(this).parent().attr("keydoc"); 
+				var newAuthor = $(this).val().trim();        
+				$(this).val(newAuthor);
+	 //   		setMetaFromDom(keyDoc, "Rekall->Author", newAuthor); 
+
+				if(newAuthor!="") $("#popupSettingsEmail").html(newAuthor).removeClass("empty"); 
+				else $("#popupSettingsEmail").html("+ Add email address").addClass("empty");   
+				  
+			} else if($(this).attr("id")=="popupSettingsCreditsInput") {   
+			
+	//			var keyDoc = $(this).parent().attr("keydoc"); 
+				var newLink = $(this).val().trim();        
+				$(this).val(newLink);
+	//			setMetaFromDom(keyDoc, "Rekall->Link", newLink); 
+
+				if(newLink!="") $("#popupSettingsCredits").html(newLink).removeClass("empty"); 
+				else $("#popupSettingsCredits").html("+ Add project credits").addClass("empty");
+			
+			}
+		}
+		
+		//alert("ok"); 
+	});         
    	$(".popupSettingsInput").hide();
 	$(".popupSettingsTxt").show();  
 }
@@ -565,11 +592,17 @@ function closeInputs() {
 			} else if($(this).attr("id")=="popupLinkInput") {   
 			
 				var keyDoc = $(this).parent().attr("keydoc"); 
-				var newLink = $(this).val().trim();        
+				var newLink = $(this).val().trim();    
+				
+				if(newLink.indexOf("http://")!=0) newLink = "http://"+newLink;
+				    
 				$(this).val(newLink);
 				setMetaFromDom(keyDoc, "Rekall->Link", newLink); 
 
-				if(newLink!="") $("#popupLink").html(newLink).removeClass("empty"); 
+				if(newLink!="") {
+					if(rekall_common.owner.canEdit) $("#popupLink").html(newLink).removeClass("empty");   
+					else $("#popupLink").html("<a href='"+newLink+"' target='_blank'>"+newLink+"</a>").removeClass("empty");
+				}
 				else $("#popupLink").html("+ Add a link").addClass("empty");
 			
 			}
@@ -666,7 +699,10 @@ function fillPopupEdit(tag) {
 	else $("#popupAuthor").html("+ Add an author").addClass("empty"); 
     
 	var link = tag.getMetadata("Rekall->Link");
-	if((link)&&(link!="")) $("#popupLink").html(link).removeClass("empty");
+	if((link)&&(link!="")) {
+		if(rekall_common.owner.canEdit) $("#popupLink").html(link).removeClass("empty");   
+		else $("#popupLink").html("<a href='"+link+"' target='_blank'>"+link+"</a>").removeClass("empty");
+	}
 	else $("#popupLink").html("+ Add a link").addClass("empty");      
 	
 	                                         
