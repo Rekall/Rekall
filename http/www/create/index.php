@@ -76,7 +76,7 @@
 			$("#formCreate").submit(function(event) {
 				event.stopPropagation();
 				if(($("input[name=create]").val() != "") && ($("input[name=video]").val() != "") && ($("input[name=password]").val() != "")) {
-					var passwordRaw = $("input[name=password]").val();
+					var passwordRaw = $("input[name=p]").val();
 					var password = (CryptoJS.SHA1(passwordRaw) + "").toUpperCase();
 					$("#submitCreate").hide();
 					$.ajax("index.php", {

@@ -342,16 +342,16 @@
 	//API
 	$_GET = array_merge($_GET, $_POST);
 	if(!isset($_SESSION["canEdit"]))
-		$_SESSION["canEdit"] = false;
+		$_SESSION["canEdit"] = "auth_required";
 	
 	if(isset($_GET["p"])) {
 		$sha1password = strtoupper(file_get_contents("../file/projectPassword.txt"));
 		if(($_GET["p"] != "") && ($_GET["p"] == $sha1password))
-			$_SESSION["canEdit"] = true;
+			$_SESSION["canEdit"] = realpath(dirname(__FILE__));
 		else
-			$_SESSION["canEdit"] = false;
+			$_SESSION["canEdit"] = "auth_required";
 	}
-	if($_SESSION["canEdit"] == true) {
+	if($_SESSION["canEdit"] === realpath(dirname(__FILE__))) {
 		//Opérations sur les fichiers
 		if((isset($_GET["folder"])) && (isset($_GET["file"]))) {
 			if(isset($_GET["remove"])) {
@@ -393,6 +393,9 @@
 				editProjectMeta("video", "url", $_GET["video"]);
 				closeProject();
 			}
+			else if(isset($_GET["remove"])) {
+				SureRemoveDir(realpath(".."), true);
+			}
 			else if(isset($_GET["downloadXML"])) {
 				$file_url = '../file/project.xml';
 				header('Content-Type: application/octet-stream');
@@ -416,7 +419,8 @@
 		$retour  = array("uploadMax" => file_upload_max_size(), "owner" => array("canEdit" => false, "author" => "", "locationGps" => "", "locationName" => ""));
 		if((isset($details)) && (property_exists($details, "city")))
 			$retour["owner"]["locationName"] = $details->city;
-		$retour["owner"]["canEdit"] = $_SESSION["canEdit"];
+		if($_SESSION["canEdit"] === realpath(dirname(__FILE__)))
+			$retour["owner"]["canEdit"] = true;
 		$retour["owner"]["author"] = "";
 		echo json_encode($retour);
 	}
