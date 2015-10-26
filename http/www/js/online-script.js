@@ -757,6 +757,21 @@ function convertToTime(seconds) {
 }       
 
 
+function setProjectMeta(metaType, meta) {
+	rouletteStart();
+	$.ajax("php/project.php", {
+		type: "POST",
+		dataType: "json",
+		data: {"metadataKey": metaType, "metadataValue": meta.replace(/'/g, '’')},
+		success: function(retour) {
+			rouletteEnd();
+		},
+		error: function() {
+			openAlert("Server error. Try again.");
+			rouletteEnd();
+		}
+	});	
+}
 function setMetaFromDom(keyDoc, metaType, meta) {
 	rouletteStart();
 	$.ajax("php/project.php", {
