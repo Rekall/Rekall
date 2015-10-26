@@ -681,7 +681,7 @@ function closeInputs() {
 				var keyDoc = $(this).parent().attr("keydoc"); 
 				var newLink = $(this).val().trim();    
 				
-				if(newLink.indexOf("http://")!=0) newLink = "http://"+newLink;
+				if(newLink!="") if(newLink.indexOf("http://")!=0) newLink = "http://"+newLink;
 				    
 				$(this).val(newLink);
 				setMetaFromDom(keyDoc, "Rekall->Link", newLink); 
@@ -692,6 +692,29 @@ function closeInputs() {
 				}
 				else $("#popupLink").html("+ Add a link").addClass("empty");
 			
+			} else if($(this).attr("id")=="popupTCedit") {
+				var keyDoc = $(this).parent().parent().attr("keydoc");    
+				var inMin = $("#popupTCinMin").val();
+				var inSec = $("#popupTCinSec").val();
+				var outMin = $("#popupTCoutMin").val();
+				var outSec = $("#popupTCoutSec").val();
+				var TCin = (inMin*60)+(inSec*1);   
+				var TCout = (outMin*60)+(outSec*1);   
+
+				var endVideo = rekall.videoPlayer.duration();
+                
+                var isReturn = true;
+                                            				
+				if((inMin>=60)||(inSec>=60)||(outMin>=60)||(outSec>=60)||(inMin<0)||(inSec<0)||(outMin<0)||(outSec<0)) openAlert("Invalid time code", "ok");
+				else if(TCin>TCout) 			openAlert("Start time must be set before end time", "ok"); 
+				else if(TCout>endVideo) 		openAlert("End time must not be set after " + convertToTime(endVideo) + " (end of the video)", "ok");                      
+				else {
+					setTCFromDom(keyDoc, TCin, TCout);           
+					$("#popupTCin").html(inMin+":"+inSec);  
+					$("#popupTCout").html(outMin+":"+outSec);    
+					isReturn = false;
+				}          
+				if(isReturn) return true;
 			}
 		}
 		
@@ -1029,8 +1052,8 @@ function uploadFilesNext() {
 //Code d'embarquement du projet Rekall
 function shareEmbed() {
 	var width = 960, height = round(width * 0.44);
-	var embedUrl = '<iframe src="' + rekall.baseUrl + '" width="' + width + '" height="' + height + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
-	embedUrl += '<p><a href="' + rekall.baseUrl + '">' + "Mon Projet Rekall" + '</a></p>';
+	var embedUrl = '<iframe src="' + rekall.baseUrl + '?w=1" width="' + width + '" height="' + height + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+	embedUrl += '<p><a href="' + rekall.baseUrl + '?w=1">' + rekall.project.metadata["Title"] + '</a> from '+rekall.project.metadata["Author"]+' on <a href="http://www.memorekall.fr">MemoRekall</a>.</p>';
 	console.log(embedUrl);
 //	openAlert("Embed code in console");
 	return embedUrl;
