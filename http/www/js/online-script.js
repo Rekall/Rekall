@@ -20,7 +20,7 @@ $(document).ready(function() {
 				//Mode preview or not
 				$(".editmode").removeClass("editmode");     
 			    $(".empty").show();
-			    $("#watermark").hide();
+			    $(".displayMode").hide();
 				
 				setEditionControls();
 				
@@ -44,7 +44,28 @@ $(document).ready(function() {
 
 			} else {                                                    
 				$(".empty").hide();  
-			    $("#watermark").show(); 
+			    $(".displayMode").show(); 
+			
+				$("#projectInfoBtn").click(function(event){  
+					event.stopPropagation(); 
+					$("#popupSettingsSpace").show();         
+
+					$("#popupSettingsTitle").html(rekall.project.metadata["Title"]).removeClass("empty"); 
+					$("#popupSettingsAuthor").html(rekall.project.metadata["Author"]).removeClass("empty");
+					$("#popupSettingsEmail").html(rekall.project.metadata["Email"]).removeClass("empty");      
+					$("#popupSettingsCredits").html(rekall.project.metadata["Comments"].replace(/\n/gi, "<br/>")).removeClass("empty");             
+
+				});  
+				
+				$("#popupSettings").click(function(event){  
+					event.stopPropagation(); 
+					closeSettingsPopup();
+				});
+                             
+				$("#popupSettingsSpace").click(function(event){  
+					event.stopPropagation(); 
+					closeSettingsPopup();
+				});
 			} 
 			
 			rouletteEnd();
@@ -136,50 +157,71 @@ function setEditionControls() {
 		event.stopPropagation(); 
 		$("#popupSettingsSpace").show();         
 		                     
-		if(rekall.project.metadata["Title"]!="") $("#popupSettingsTitle").html(rekall.project.metadata["Title"]).removeClass("empty"); 
-		else $("#popupSettingsTitle").html("+ Add project title").addClass("empty");
+		if(rekall.project.metadata["Title"]!="") {
+			$("#popupSettingsTitle").html(rekall.project.metadata["Title"]).removeClass("empty"); 
+			$("#popupSettingsTitleLabel").show();
+		} else {
+			$("#popupSettingsTitle").html("+ Add project name").addClass("empty");   
+			$("#popupSettingsTitleLabel").hide();
+		}
 		
-		if(rekall.project.metadata["Author"]!="") $("#popupSettingsAuthor").html(rekall.project.metadata["Author"]).removeClass("empty"); 
-		else $("#popupSettingsAuthor").html("+ Add project author").addClass("empty");
+		if(rekall.project.metadata["Author"]!="") {
+			$("#popupSettingsAuthor").html(rekall.project.metadata["Author"]).removeClass("empty");   
+			$("#popupSettingsAuthorLabel").show();
+		} else {  
+			$("#popupSettingsAuthor").html("+ Add project author").addClass("empty");     
+			$("#popupSettingsAuthorLabel").hide();
+		}
 		
-		if(rekall.project.metadata["Email"]!="") $("#popupSettingsEmail").html(rekall.project.metadata["Email"]).removeClass("empty"); 
-		else $("#popupSettingsEmail").html("+ Add email address").addClass("empty");
+		if(rekall.project.metadata["Email"]!="") {
+			$("#popupSettingsEmail").html(rekall.project.metadata["Email"]).removeClass("empty");   
+			$("#popupSettingsEmailLabel").show();
+		} else {  
+			$("#popupSettingsEmail").html("+ Add email address").addClass("empty");   
+			$("#popupSettingsEmailLabel").hide();
+		}
 		
-		if(rekall.project.metadata["Comments"]!="") $("#popupSettingsCredits").html(rekall.project.metadata["Comments"]).removeClass("empty"); 
-		else $("#popupSettingsCredits").html("+ Add project credits").addClass("empty");      
+		if(rekall.project.metadata["Comments"]!="") {
+			$("#popupSettingsCredits").html(rekall.project.metadata["Comments"].replace(/\n/gi, "<br/>")).removeClass("empty");   
+			$("#popupSettingsCreditsLabel").show();
+		} else {
+			$("#popupSettingsCredits").html("+ Add project credits").addClass("empty");    
+			$("#popupSettingsCreditsLabel").hide();
+		}     
 		
 		if(rekall_common.owner.canEdit) {                    
 	    	$(".empty").show();         
 		}
 		                                                                             
-	});   
+	});  
+
 	
-	$("#popupSettingsTitle").click(function(event){  
+	$("#popupSettingsTitleDiv").click(function(event){  
 		event.stopPropagation();     
 		closeSettingsInputs();
 		$(this).hide();   
-		if(!$(this).hasClass("empty")) $("#popupSettingsTitleInput").val($(this).html());
+		if(!$("#popupSettingsTitle").hasClass("empty")) $("#popupSettingsTitleInput").val($("#popupSettingsTitle").html());
 		$("#popupSettingsTitleInput").show().focus(); 
 	});    
-	$("#popupSettingsAuthor").click(function(event){  
+	$("#popupSettingsAuthorDiv").click(function(event){  
 		event.stopPropagation();     
 		closeSettingsInputs();
 		$(this).hide();          
-		if(!$(this).hasClass("empty")) $("#popupSettingsAuthorInput").val($(this).html());
+		if(!$("#popupSettingsAuthor").hasClass("empty")) $("#popupSettingsAuthorInput").val($("#popupSettingsAuthor").html());
 		$("#popupSettingsAuthorInput").show().focus(); 
 	});  
-	$("#popupSettingsEmail").click(function(event){  
+	$("#popupSettingsEmailDiv").click(function(event){  
 		event.stopPropagation();     
 		closeSettingsInputs();
 		$(this).hide();            
-		if(!$(this).hasClass("empty")) $("#popupSettingsEmailInput").val($(this).html());
+		if(!$("#popupSettingsEmail").hasClass("empty")) $("#popupSettingsEmailInput").val($("#popupSettingsEmail").html());
 		$("#popupSettingsEmailInput").show().focus(); 
 	});       
-	$("#popupSettingsCredits").click(function(event){  
+	$("#popupSettingsCreditsDiv").click(function(event){  
 		event.stopPropagation();     
 		closeSettingsInputs();
 		$(this).hide();      
-		if(!$(this).hasClass("empty")) $("#popupSettingsCreditsInput").val($(this).html());
+		if(!$("#popupSettingsCredits").hasClass("empty")) $("#popupSettingsCreditsInput").val($("#popupSettingsCredits").html());
 		$("#popupSettingsCreditsInput").show().focus(); 
 	});                
 	
@@ -187,6 +229,34 @@ function setEditionControls() {
 		event.stopPropagation();              
 		if(event.which == 13) {                                                                      
 			closeSettingsInputs();
+		}
+	}); 
+	
+	$(".popupSettingsInput").click(function(event){       
+			event.stopPropagation();
+	}); 
+	
+	$("#popupSettingsCreditsInput").unbind( "keyup" );
+	$("#popupSettingsCreditsInput").keyup(function(event){    
+		event.stopPropagation(); 
+		
+		var isEnter = false;        
+		if (event.key !== undefined) {
+		       if (event.key === 'Enter' && event.altKey) {
+		          //openAlert('Alt + Enter pressed!');
+		       } else if(event.key === 'Enter') isEnter = true;  
+		    } else if (event.keyIdentifier !== undefined) {
+		       if (event.keyIdentifier === "Enter" && event.altKey) {
+		          //openAlert('Alt + Enter pressed!');
+		       } else if(event.keyIdentifier === 'Enter') isEnter = true;    
+		    } else if (event.keyCode !== undefined) {
+		       if (event.keyCode === 13 && event.altKey) {
+		          //openAlert('Alt + Enter pressed!');
+		    } else if(event.keyCode === 13) isEnter = true; 
+		}
+		             
+		if(isEnter == true) {                                                              
+			closeSettingsInputs(); 
 		}
 	});
 	
@@ -429,7 +499,8 @@ function setEditionControls() {
 }  
          
 
-function closeSettingsPopup() {
+function closeSettingsPopup() {    
+	closeSettingsInputs();
 	$("#popupSettingsSpace").hide();
 }
 
@@ -504,48 +575,64 @@ function closeAlert() {
 	$("#popupAlertSpace").hide(); 
 }     
 
-function closeSettingsInputs() {
+function closeSettingsInputs() {     
 	$.each($(".popupSettingsInput"), function() { 
 		if($(this).css("display") != "none") {
 			if($(this).attr("id")=="popupSettingsTitleInput") {                                           
-				
-   // 			var keyDoc = $(this).parent().attr("keydoc"); 
+				                                                 
 				var newName = $(this).val().trim();        
-				$(this).val(newName);
-   // 			setMetaFromDom(keyDoc, "Rekall->Name", newName); 
+				$(this).val(newName);                                
+				setProjectMeta("Title", newName);
 
-				if(newName!="") $("#popupSettingsTitle").html(newName).removeClass("empty"); 
-				else $("#popupSettingsTitle").html("+ Add project name").addClass("empty");
+				if(newName!="") {
+					$("#popupSettingsTitle").html(newName).removeClass("empty"); 
+					$("#popupSettingsTitleLabel").show();
+				} else { 
+					$("#popupSettingsTitle").html("+ Add project name").addClass("empty").show();   
+					$("#popupSettingsTitleLabel").hide();
+				}
 				  
 			} else if($(this).attr("id")=="popupSettingsAuthorInput") {  
-				
-	//			var keyDoc = $(this).parent().attr("keydoc"); 
-				var newComment = $(this).val().trim();    
-				$(this).val(newComment);
-	//			setMetaFromDom(keyDoc, "Rekall->Comments", newComment.replace(/\n/gi, "<br/>")); 
+				                                                 
+				var newAuthor = $(this).val().trim();    
+				$(this).val(newAuthor);                                                        
+				setProjectMeta("Author", newAuthor); 
 
-				if(newComment!="") $("#popupSettingsAuthor").html(newComment.replace(/\n/gi, "<br/>")).removeClass("empty"); 
-				else $("#popupSettingsAuthor").html("+ Add project author").addClass("empty"); 
+				if(newAuthor!="") {
+					$("#popupSettingsAuthor").html(newAuthor).removeClass("empty"); 
+					$("#popupSettingsAuthorLabel").show();
+				} else {
+					$("#popupSettingsAuthor").html("+ Add project author").addClass("empty").show();
+					$("#popupSettingsAuthorLabel").hide();   
+				}
 				   
 			} else if($(this).attr("id")=="popupSettingsEmailInput") {  
-				
-	  //  		var keyDoc = $(this).parent().attr("keydoc"); 
-				var newAuthor = $(this).val().trim();        
-				$(this).val(newAuthor);
-	 //   		setMetaFromDom(keyDoc, "Rekall->Author", newAuthor); 
+				                                                    
+				var newEmail = $(this).val().trim();        
+				$(this).val(newEmail);                                 
+				setProjectMeta("Email", newEmail);
 
-				if(newAuthor!="") $("#popupSettingsEmail").html(newAuthor).removeClass("empty"); 
-				else $("#popupSettingsEmail").html("+ Add email address").addClass("empty");   
+				if(newEmail!="") {
+					$("#popupSettingsEmail").html(newEmail).removeClass("empty");      
+					$("#popupSettingsEmailLabel").show();
+				} else {
+					$("#popupSettingsEmail").html("+ Add email address").addClass("empty").show(); 
+					$("#popupSettingsEmailLabel").hide();
+				}  
 				  
 			} else if($(this).attr("id")=="popupSettingsCreditsInput") {   
-			
-	//			var keyDoc = $(this).parent().attr("keydoc"); 
-				var newLink = $(this).val().trim();        
-				$(this).val(newLink);
-	//			setMetaFromDom(keyDoc, "Rekall->Link", newLink); 
+			                                                  
+				var newCredits = $(this).val().trim();        
+				$(this).val(newCredits);                               
+				setProjectMeta("Comments", newCredits);
 
-				if(newLink!="") $("#popupSettingsCredits").html(newLink).removeClass("empty"); 
-				else $("#popupSettingsCredits").html("+ Add project credits").addClass("empty");
+				if(newCredits!="") {
+					$("#popupSettingsCredits").html(newCredits.replace(/\n/gi, "<br/>")).removeClass("empty");     
+					$("#popupSettingsCreditsLabel").show();
+				} else {
+					$("#popupSettingsCredits").html("+ Add project credits").addClass("empty").show(); 
+					$("#popupSettingsCreditsLabel").hide();
+				}
 			
 			}
 		}
@@ -711,7 +798,7 @@ function fillPopupEdit(tag) {
 		else $("#popupEditSupprimer").html("Delete File");  
 		                                  
     	$(".empty").show();            
-		$("#watermark").hide();
+		$(".displayMode").hide();
 		$("#popupNomInput").val(tag.getMetadata("Rekall->Name")); 
 		
 		$("#popupTCinMin").val(startVerb.split(":")[0]);
@@ -736,7 +823,7 @@ function fillPopupEdit(tag) {
 	} else {
 		$(".empty").hide();
 		$(".editmode").hide();
-		$("#watermark").show();
+		$(".displayMode").show();
 	}
 	
 	

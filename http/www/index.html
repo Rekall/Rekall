@@ -73,7 +73,8 @@
 			    <input class="popupFormButton" id="popupFormButtonUpload" type="submit" value="Upload" name="submit">   
 			</div>  
 		</div>     -->   
-		<a id="watermarkBox" href="http://www.memorekall.fr"><img id="watermark" src="css/images/watermark.png" /></a>
+		<a class="displayMode" id="watermarkBox" href="http://www.memorekall.fr"><img id="watermark" src="css/images/watermark.png" /></a> 
+		<div class="displayMode" id="projectInfoBtn">i</div> 
 		<div id="popupAlertSpace">
 			<div id="popupAlert">    
 				<div id="popupAlertMessage"></div>
@@ -100,19 +101,19 @@
 			<table id="popupSettings">  
 				<tr>
 					<td id="popupSettingsLeft">                       
-						<div class="popupSettingsTxt" id="popupSettingsTitle" title="Project title"></div>   
+						<div class="popupSettingsTxt" id="popupSettingsTitleDiv" title="Project title"><span class="popupSettingsLabel" id="popupSettingsTitleLabel">Project</span>&nbsp;&nbsp;<span id="popupSettingsTitle"></span></div>   
 						<input class="popupSettingsInput" id="popupSettingsTitleInput" type="text"></input>
 						 
-						<div class="popupSettingsTxt" id="popupSettingsAuthor" title="Project author"></div>     
+						<div class="popupSettingsTxt" id="popupSettingsAuthorDiv" title="Project author"><span class="popupSettingsLabel" id="popupSettingsAuthorLabel">By</span>&nbsp;&nbsp;<span id="popupSettingsAuthor"></span></div>     
 						<input class="popupSettingsInput" id="popupSettingsAuthorInput" type="text"></input>
 						
-						<div class="popupSettingsTxt" id="popupSettingsEmail" title="Project author email"></div>  
+						<div class="popupSettingsTxt" id="popupSettingsEmailDiv" title="Project author email"><span class="popupSettingsLabel" id="popupSettingsEmailLabel">@</span>&nbsp;&nbsp;<span id="popupSettingsEmail"></span></div>  
 						<input class="popupSettingsInput" id="popupSettingsEmailInput" type="text"></input>
 						            
-						<div class="popupSettingsTxt" id="popupSettingsCredits" title="Project credits"></div> 
+						<div class="popupSettingsTxt" id="popupSettingsCreditsDiv" title="Project credits"><span class="popupSettingsLabel" id="popupSettingsCreditsLabel">Credits</span><br/><span id="popupSettingsCredits"></span></div> 
 						<textarea rows="3" class="popupSettingsInput" id="popupSettingsCreditsInput" type="text"></textarea> 
 					</td>
-					<td id="popupSettingsRight">                                      
+					<td id="popupSettingsRight" class="editmode">                                      
 						<div class="popupSettingsBtn" id="popupSettingsBtnShare">Share</div>        
 						<div class="popupSettingsBtn" id="popupSettingsBtnEmbed">Embed</div>    
 						<div class="popupSettingsBtn" id="popupSettingsBtnDownloadXml">Download XML</div>    
