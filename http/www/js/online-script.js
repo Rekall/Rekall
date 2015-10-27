@@ -798,7 +798,8 @@ function fillPopupEdit(tag) {
 			else if(type.indexOf("audio") > -1) $("#popupImg").attr("src","css/images/img-music.png");  //alert("son");  
 			else if(type.indexOf("vcard") > -1) $("#popupImg").attr("src","css/images/img-user.png");  //alert("user"); 
 			else if(type.indexOf("video") > -1) $("#popupImg").attr("src","css/images/img-video.png");  //alert("video");  
-			else if(type.indexOf("msword") > -1) $("#popupImg").attr("src","css/images/img-word.png");  //alert("word");  
+			else if(type.indexOf("msword") > -1) $("#popupImg").attr("src","css/images/img-word.png");  //alert("word");      
+			else if(type.indexOf("link") > -1) $("#popupImg").attr("src","css/images/img-link.png");  //alert("son");
 			else $("#popupImg").attr("src","css/images/img-document.png");  //alert(type);
 		}    
 		$("#popupImg").unbind( "click" );
