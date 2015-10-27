@@ -119,7 +119,7 @@
 		$type = "rekall/marker";
 		if(isset($_POST["type"]))
 			$type = $_POST["type"];
-		$metasAdded = addMarkerToProject($_POST["type"], $_POST["name"], $metas, $tcIn, $tcOut);
+		$metasAdded = addMarkerToProject($type, $_POST["name"], $metas, $tcIn, $tcOut);
 		$key = $metasAdded["key"];
 		unset($metasAdded["key"]);
 		$retour .= '"code":1, "tcIn":'.$tcIn.', tcOut":'.$tcOut.', "key":"'.$key.'", "status":"OK", "metas":'.json_encode($metasAdded);
