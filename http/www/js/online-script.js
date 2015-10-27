@@ -5,8 +5,11 @@ $(document).ready(function() {
 
 	rouletteStart();
 	var httpGetData = {"status": 1};
-	if(getParameterByName("p") != "")
-		httpGetData.p = (CryptoJS.SHA1(getParameterByName("p")) + "").toUpperCase();
+	if(getParameterByName("p") != "") {
+		httpGetData.p = getParameterByName("p");
+		if(httpGetData.p.length != 40)
+			httpGetData.p = (CryptoJS.SHA1(getParameterByName("p")) + "").toUpperCase();
+	}
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
