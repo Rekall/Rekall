@@ -106,7 +106,12 @@ $(document).ready(function() {
 	$("#popupAlertButtonYesdelete").click(function(){
 		var keyDoc = $("#popupRight").attr("keyDoc");
 		deleteFromDom(keyDoc);
-	});       
+	});  
+	
+	$("#popupAlertButtonYesdeleteproject").click(function(){   
+		//alert("pouf");
+		removeproject();
+	});     
 	
 
 	
@@ -292,7 +297,8 @@ function setEditionControls() {
 	});
 	$("#popupSettingsBtnDelete").click(function(event){  
 		event.stopPropagation();
-		alert("DELETE");
+		//alert("DELETE");
+		openAlert("Do you really want to delete this project ?", "yesnodeleteproject"); 
 	});                               
 	                                           
 	$("#left_menu_item_addnote").click(function(event){  
@@ -561,7 +567,12 @@ function openAlert(message, buttons) {
 			$(".popupAlertButton").hide();  
 			$("#popupAlertButtonYesdelete").show(); 
 			$("#popupAlertButtonCancel").show(); 
-		}      
+		} 
+		else if(buttons == "yesnodeleteproject") {   
+			$(".popupAlertButton").hide();  
+			$("#popupAlertButtonYesdeleteproject").show(); 
+			$("#popupAlertButtonCancel").show(); 
+		}     
 		else {
 			$(".popupAlertButton").hide();  
 			$("#popupAlertButtonOk").show(); 

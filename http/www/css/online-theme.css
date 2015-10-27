@@ -225,7 +225,7 @@ html, body {
 	background:				rgba(255,255,255,.05);
 	color:					#fff 
 }   
-#popupAlertButtonOk, #popupAlertButtonYesdelete, #popupAlertButtonCancel  { 
+#popupAlertButtonOk, #popupAlertButtonYesdelete, #popupAlertButtonCancel, #popupAlertButtonYesdeleteproject  { 
 		display:				inline-block;
 }
 
