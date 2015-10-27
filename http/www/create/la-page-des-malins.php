@@ -1,13 +1,10 @@
 <?php 
-
-	$count = 0;
-	if($handle = opendir('.'))
-		while (false !== ($entry = readdir($handle)))
-	    	if ($entry != "." && $entry != "..")
-				if((is_dir($entry)) && ($entry != "php") && ($entry != "css") && ($entry != "js"))
-					$count++;
-	
-
+	$listOfProjects = array();
+	$listOfFolders = scandir(".");
+	foreach($listOfFolders as $entry)
+		if ($entry != "." && $entry != "..")
+			if((is_dir($entry)) && ($entry != "php") && ($entry != "css") && ($entry != "js"))
+				$listOfProjects[] = array("name" => $entry, "url" => "http://".$_SERVER['HTTP_HOST']."/".$entry."/?p=".file_get_contents($entry."/file/projectPassword.txt"));
 
 	if(isset($_GET["id"])) {
 		header('Content-Type: text/plain charset=utf-8');
@@ -42,6 +39,7 @@
 			}
 			closedir($handle);
 		}
+		exit();
 	}
 	
 	//Download un fichier
@@ -81,17 +79,19 @@
 	<script language="javascript" type='text/javascript'>
 		$(document).ready(function() {
 			var id = 0;
-			$("#GO").click(function() {
+			$("#GO").click(function(event) {
+				event.stopImmediatePropagation();
+				event.preventDefault();
 				$("#GO").hide();
 				go(id);
 			});
 			function go(id) {
-				$.ajax("patch.php", {
+				$.ajax("la-page-des-malins.php", {
 					data: {id: id},
 					async: false,
 					success: function(data) {
 						$("#log").prepend((data+"").replace(/(?:\r\n|\r|\n)/g, '<br />'));
-						if(id <= <?=$count?>)
+						if(id <= <?=count($listOfProjects)?>)
 							setTimeout(function() { go(++id); }, 100);
 					}
 				});
@@ -100,7 +100,23 @@
 	</script>
 </head>
 <body id="createProjectBody">              
-	<div id='GO'>GO pour <?=$count?> projets</div>     
-	<div id='log' style='font-family: Monaco;'></div>     
+	<img id="createProjectLogo" src="css/images/logo.png" />
+	<form action="#" method="post" id='formCreate'>
+	    <input id="GO" class='submitButton' type="submit" value="Mettre à jour les <?=count($listOfProjects)?> projets" name="submit"><br/><br/><br/>
+		<div id='log' style='font-family: Monaco; font-size: 10px;'></div><br/><br/><br/>
+	</form>
+	
+	<form action="#" method="post" id='formCreate'>
+		Accès rapide en <u>mode édition</u> aux projets<br/><br/>
+<?php
+	foreach($listOfProjects as $infos) {
+?>
+		<a target="_blank" href='<?=$infos["url"]?>'><?=$infos["name"]?></a><br/>
+<?php
+	}
+?>
+		
+	</form>        
+	
 </body>
 </html>

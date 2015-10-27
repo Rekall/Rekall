@@ -113,7 +113,7 @@ $(document).ready(function() {
 	
 	$("#popupAlertButtonYesdeleteproject").click(function(){   
 		//alert("pouf");
-		removeproject();
+		removeProject();
 	});     
 	
 

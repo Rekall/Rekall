@@ -26,7 +26,7 @@ html, body {
 	height:					30vh;     
 	margin:					3vh 0;
 }   
-#formCreate label {               
+label {               
 	width:					40vw; 
 	margin:					auto; 
 	text-align:				left;
@@ -36,7 +36,7 @@ html, body {
 	font-size:				2vh;    
 	line-height:			1.2em;
 }
-#formCreate input[type=text], #formCreate input[type=password] {                        
+input[type=text], input[type=password] {                        
 	width:					40vw;   
 	height:					5vh;   
 	line-height:			5vh;
@@ -54,7 +54,7 @@ html, body {
 	color:					rgba(255,255,255,.1);   
 	font-style:				italic;     
 }
-#submitCreate {
+#submitCreate, .submitButton {
 	width:					20vw;   
 	height:					6vh;   
 	line-height:			6vh;
@@ -69,7 +69,7 @@ html, body {
 	text-transform:			uppercase; 
 	cursor:					pointer;
 }  
-#submitCreate:hover {    
+#submitCreate:hover, .submitButton:hover {    
     background:				#65B162;   
 }
 
