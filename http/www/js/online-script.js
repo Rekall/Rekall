@@ -885,7 +885,8 @@ function removeProject() {
 		dataType: "json",
 		data: {"remove": 1},
 		success: function(retour) {
-			rouletteEnd();
+			rouletteEnd();   
+			window.location.replace("http://project.memorekall.fr");
 		},
 		error: function() {
 			openAlert("Server error. Try again.");
