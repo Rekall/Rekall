@@ -64,7 +64,7 @@
 								$metasAdded = addFileToProject($uploadFolder.$filename, $metas, $tcIn, $tcOut);
 								$key = $metasAdded["key"];
 								unset($metasAdded["key"]);
-								$retour .= '"code":1, "tcIn":'.$tcIn.', tcOut":'.$tcOut.', "key":"'.$key.'", "status":"OK ('.(filesize($uploadFolder.$filename)/1000.).' kB)", "metas":'.json_encode($metasAdded);
+								$retour .= '"code":1, "tcIn":'.$tcIn.', "tcOut":'.$tcOut.', "key":"'.$key.'", "status":"OK ('.(filesize($uploadFolder.$filename)/1000.).' kB)", "metas":'.json_encode($metasAdded);
 								$status |= true;
 							}
 							else
@@ -122,7 +122,7 @@
 		$metasAdded = addMarkerToProject($type, $_POST["name"], $metas, $tcIn, $tcOut);
 		$key = $metasAdded["key"];
 		unset($metasAdded["key"]);
-		$retour .= '"code":1, "tcIn":'.$tcIn.', tcOut":'.$tcOut.', "key":"'.$key.'", "status":"OK", "metas":'.json_encode($metasAdded);
+		$retour .= '"code":1, "tcIn":'.$tcIn.', "tcOut":'.$tcOut.', "key":"'.$key.'", "status":"OK", "metas":'.json_encode($metasAdded);
 		$status |= true;
 
 		$retour .= "},";
