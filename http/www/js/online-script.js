@@ -1002,7 +1002,7 @@ function uploadFiles(files) {
 		}
 		
 		formData.append("tcIn", 		rekall.timeline.timeCurrent);
-		formData.append("tcOut", 		rekall.timeline.timeCurrent);
+		formData.append("tcOut", 		rekall.timeline.timeCurrent+10);
 		formData.append("author",       rekall_common.owner.author);
 		formData.append("locationGps",  rekall_common.owner.locationGps);
 		formData.append("locationName", rekall_common.owner.locationName);
