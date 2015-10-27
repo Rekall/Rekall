@@ -867,6 +867,22 @@ function convertToTime(seconds) {
 }       
 
 
+function removeProject() {
+	rouletteStart();
+	$.ajax("php/project.php", {
+		type: "POST",
+		dataType: "json",
+		data: {"remove": 1},
+		success: function(retour) {
+			rouletteEnd();
+		},
+		error: function() {
+			openAlert("Server error. Try again.");
+			rouletteEnd();
+		}
+	});	
+}
+
 function setProjectMeta(metaType, meta) {
 	rouletteStart();
 	$.ajax("php/project.php", {
