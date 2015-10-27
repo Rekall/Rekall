@@ -376,7 +376,14 @@ function setEditionControls() {
 		var timeCurrent = convertToTime(Math.round(rekall.timeline.timeCurrent));
 		$("#popupTCoutMin").val(timeCurrent.split(":")[0]); 
 		$("#popupTCoutSec").val(timeCurrent.split(":")[1]); 
-	});                                                
+	});   
+	$("#eovTCout").click(function(event){
+		event.stopPropagation();                 
+		var endVideo = rekall.videoPlayer.duration();                                             
+		var timeEnd = convertToTime(Math.round(endVideo));
+		$("#popupTCoutMin").val(timeEnd.split(":")[0]); 
+		$("#popupTCoutSec").val(timeEnd.split(":")[1]); 
+	});                                             
 	
 	$("#TCvalidModif").click(function(event){
 		event.stopPropagation();      
@@ -707,7 +714,7 @@ function closeInputs() {
 				else $("#popupLink").html("+ Add a link").addClass("empty");
 			
 			} else if($(this).attr("id")=="popupTCedit") {
-				var keyDoc = $(this).parent().parent().attr("keydoc");    
+				var keyDoc = $("#popupRight").attr("keydoc");    
 				var inMin = $("#popupTCinMin").val();
 				var inSec = $("#popupTCinSec").val();
 				var outMin = $("#popupTCoutMin").val();
@@ -722,7 +729,7 @@ function closeInputs() {
 				if((inMin>=60)||(inSec>=60)||(outMin>=60)||(outSec>=60)||(inMin<0)||(inSec<0)||(outMin<0)||(outSec<0)) openAlert("Invalid time code", "ok");
 				else if(TCin>TCout) 			openAlert("Start time must be set before end time", "ok"); 
 				else if(TCout>endVideo) 		openAlert("End time must not be set after " + convertToTime(endVideo) + " (end of the video)", "ok");                      
-				else {
+				else {                                                                   
 					setTCFromDom(keyDoc, TCin, TCout);           
 					$("#popupTCin").html(inMin+":"+inSec);  
 					$("#popupTCout").html(outMin+":"+outSec);    
