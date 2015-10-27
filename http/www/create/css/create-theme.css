@@ -73,3 +73,10 @@ input[type=text], input[type=password] {
     background:				#65B162;   
 }
 
+
+.projectItem {
+	padding: 2px;
+}
+.projectItem.red {
+	color: red;
+}

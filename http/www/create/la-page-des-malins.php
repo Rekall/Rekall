@@ -4,7 +4,7 @@
 	foreach($listOfFolders as $entry)
 		if ($entry != "." && $entry != "..")
 			if((is_dir($entry)) && ($entry != "php") && ($entry != "css") && ($entry != "js"))
-				$listOfProjects[] = array("name" => $entry, "url" => "http://".$_SERVER['HTTP_HOST']."/".$entry."/?p=".file_get_contents($entry."/file/projectPassword.txt"));
+				$listOfProjects[] = array("name" => $entry, "nbOfFiles" => abs(count(scandir($entry."/file"))-7),  "url" => "http://".$_SERVER['HTTP_HOST']."/".$entry."/?p=".file_get_contents($entry."/file/projectPassword.txt"));
 
 	if(isset($_GET["id"])) {
 		header('Content-Type: text/plain charset=utf-8');
@@ -111,7 +111,7 @@
 <?php
 	foreach($listOfProjects as $infos) {
 ?>
-		<a target="_blank" href='<?=$infos["url"]?>'><?=$infos["name"]?></a><br/>
+		<div class='projectItem <?php if($infos["nbOfFiles"]==0) echo "red";?>'><a target="_blank" href='<?=$infos["url"]?>'><?=$infos["name"]?> (<?=$infos["nbOfFiles"]?> fichiers)</a></div>
 <?php
 	}
 ?>
