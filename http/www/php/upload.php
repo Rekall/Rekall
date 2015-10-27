@@ -41,8 +41,10 @@
 				"Rekall->Import Date"				=> date("Y:m:d H:i:s"),
 			);
 			
-			$fileTc = "";
-			if(isset($_POST["tc"]))					 $fileTc = $_POST["tc"];
+			$tcIn  = "";
+			$tcOut = "";
+			if(isset($_POST["tcIn"]))				 $tcIn  = $_POST["tcIn"];
+			if(isset($_POST["tcOut"]))				 $tcOut = $_POST["$tcOut"];
 			if(isset($_POST["locationName"]))		 $metas["Rekall->Location Name"] = $_POST["locationName"];
 			if(isset($_POST["locationGps"]))		 $metas["Rekall->Location GPS"]  = $_POST["locationGps"];
 			if(isset($_POST["author"]))				 $metas["Rekall->Author"]        = $_POST["author"];
@@ -59,10 +61,10 @@
 						if(is_writable($uploadFolder)) {
 							//echo "Upload de ".$fileinfo."\t".$filename."...";
 							if(move_uploaded_file($_FILES[$fileinfo]['tmp_name'], $uploadFolder.$filename)) {
-								$metasAdded = addFileToProject($uploadFolder.$filename, $metas, $fileTc);
+								$metasAdded = addFileToProject($uploadFolder.$filename, $metas, $tcIn, $tcOut);
 								$key = $metasAdded["key"];
 								unset($metasAdded["key"]);
-								$retour .= '"code":1, "tc":'.$fileTc.', "key":"'.$key.'", "status":"OK ('.(filesize($uploadFolder.$filename)/1000.).' kB)", "metas":'.json_encode($metasAdded);
+								$retour .= '"code":1, "tcIn":'.$tcIn.', tcOut":'.$tcOut.', "key":"'.$key.'", "status":"OK ('.(filesize($uploadFolder.$filename)/1000.).' kB)", "metas":'.json_encode($metasAdded);
 								$status |= true;
 							}
 							else
@@ -103,8 +105,10 @@
 			"Rekall->Import Date" => date("Y:m:d H:i:s"),
 		);
 		
-		$fileTc = "";
-		if(isset($_POST["tc"]))					 $fileTc = $_POST["tc"];
+		$tcIn  = "";
+		$tcOut = "";
+		if(isset($_POST["tcIn"]))				 $tcIn  = $_POST["tcIn"];
+		if(isset($_POST["tcOut"]))				 $tcOut = $_POST["$tcOut"];
 		if(isset($_POST["locationName"]))		 $metas["Rekall->Location Name"] = $_POST["locationName"];
 		if(isset($_POST["locationGps"]))		 $metas["Rekall->Location GPS"]  = $_POST["locationGps"];
 		if(isset($_POST["author"]))				 $metas["Rekall->Author"]        = $_POST["author"];
@@ -115,10 +119,10 @@
 		$type = "rekall/marker";
 		if(isset($_POST["type"]))
 			$type = $_POST["type"];
-		$metasAdded = addMarkerToProject($_POST["type"], $_POST["name"], $metas, $fileTc);
+		$metasAdded = addMarkerToProject($_POST["type"], $_POST["name"], $metas, $tcIn, $tcOut);
 		$key = $metasAdded["key"];
 		unset($metasAdded["key"]);
-		$retour .= '"code":1, "tc":'.$fileTc.', "key":"'.$key.'", "status":"OK", "metas":'.json_encode($metasAdded);
+		$retour .= '"code":1, "tcIn":'.$tcIn.', tcOut":'.$tcOut.', "key":"'.$key.'", "status":"OK", "metas":'.json_encode($metasAdded);
 		$status |= true;
 
 		$retour .= "},";

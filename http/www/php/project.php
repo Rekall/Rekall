@@ -21,11 +21,12 @@
 	}
 	
 	//Ajoute un fichier
-	function addFileToProject($file, $metas, $tc) {
+	function addFileToProject($file, $metas, $tcIn, $tcOut) {
 		global $project;
 		global $racine;
 		//echo $file."=".$tc;
-		$tc          = floatval($tc);
+		$tcIn        = floatval($tcIn);
+		$tcOut       = floatval($tcOut);
 		$document    = $project->createElement("document");
 		
 		$finfo       = finfo_open(FILEINFO_MIME_TYPE);
@@ -85,8 +86,8 @@
 		//Tag de timeline
 		$tag = $project->createElement("tag");
 		$tag->setAttribute("key",       $key);
-		$tag->setAttribute("timeStart", $tc);
-		$tag->setAttribute("timeEnd",   $tc);
+		$tag->setAttribute("timeStart", $tcIn);
+		$tag->setAttribute("timeEnd",   $tcOut);
 		$tag->setAttribute("version",   0);
 		$racine->appendChild($tag);
 		
@@ -95,11 +96,12 @@
 
 	
 	//Ajoute un marker
-	function addMarkerToProject($type, $name, $metas, $tc) {
+	function addMarkerToProject($type, $name, $metas, $tcIn, $tcOut) {
 		global $project;
 		global $racine;
 
-		$tc          = floatval($tc);
+		$tcIn        = floatval($tcIn);
+		$tcOut       = floatval($tcOut);
 		$document    = $project->createElement("document");
 
 		//Création des métadatas
@@ -128,8 +130,8 @@
 		//Tag de timeline
 		$tag = $project->createElement("tag");
 		$tag->setAttribute("key",       $key);
-		$tag->setAttribute("timeStart", $tc);
-		$tag->setAttribute("timeEnd",   $tc);
+		$tag->setAttribute("timeStart", $tcIn);
+		$tag->setAttribute("timeEnd",   $tcOut);
 		$tag->setAttribute("version",   0);
 		$racine->appendChild($tag);
 		
