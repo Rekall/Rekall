@@ -10,34 +10,32 @@
 		header('Content-Type: text/plain charset=utf-8');
 		$countMin = $_GET["id"]; $countMax = 1000;
 		$count = 0;
-		if($handle = opendir('.')) {
-	    	while (false !== ($entry = readdir($handle))) {
-	        	if ($entry != "." && $entry != "..") {
-					if((is_dir($entry)) && ($entry != "php") && ($entry != "css") && ($entry != "js")) {
-						if(($countMin <= $count) && ($count < $countMax)) {
-							echo "----- Update #".$count." de ".$entry." -----\n";
-			            	echo "Copie de php/functions.php  ->  ".$entry."/php/functions.php\n";
-							copy("php/functions.php", $entry."/php/functions.php");
+		$listOfFolders = scandir(".");
+		foreach($listOfFolders as $entry) {
+			if ($entry != "." && $entry != "..") {
+				if((is_dir($entry)) && ($entry != "php") && ($entry != "css") && ($entry != "js")) {
+					if(($countMin <= $count) && ($count < $countMax)) {
+						echo "----- Update #".$count." de ".$entry." -----\n";
+		            	echo "Copie de php/functions.php  ->  ".$entry."/php/functions.php\n";
+						copy("php/functions.php", $entry."/php/functions.php");
 
-			            	echo "Copie de php/project.php  ->  ".$entry."/php/project.php\n";
-							copy("php/project.php", $entry."/php/project.php");
+		            	echo "Copie de php/project.php  ->  ".$entry."/php/project.php\n";
+						copy("php/project.php", $entry."/php/project.php");
 
-			            	echo "Copie de create.zip  ->  ".$entry."/php/create.zip\n";
-							copy("create.zip", $entry."/php/create.zip");
+		            	echo "Copie de create.zip  ->  ".$entry."/php/create.zip\n";
+						copy("create.zip", $entry."/php/create.zip");
 
-							$url = "http://project.memorekall.fr/".$entry."/php/project.php?update=now";
-							echo "Update de ".$url."\n";
-							openUrl($url);
+						$url = "http://project.memorekall.fr/".$entry."/php/project.php?update=now";
+						echo "Update de ".$url."\n";
+						openUrl($url);
 
-							echo "\n\n";
-							exit(0);
-						}
-
-						$count++;
+						echo "\n\n";
+						exit(0);
 					}
+
+					$count++;
 				}
 			}
-			closedir($handle);
 		}
 		exit();
 	}

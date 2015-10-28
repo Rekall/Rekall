@@ -1,6 +1,9 @@
 var rekall = new Rekall();
 var rekall_common = new Object();
 $(document).ready(function() {
+	Utils.actionPrefix = "php/";
+	Utils.actionSuffix = ".php?r=";
+	
 	rekall_common.owner = {"canEdit": false, "author": "", "locationGps": "", "locationName": ""};
 
 	rouletteStart();

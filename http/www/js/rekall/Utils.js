@@ -118,19 +118,23 @@ Utils.getPreviewPath = function(tagOrDoc) {
 	else
 		return undefined;
 }
+Utils.actionPrefix = "";
+Utils.actionSuffix = "/";
 Utils.getLocalFilePath = function(tagOrDoc, action, prefix) {
 	var fileName      = tagOrDoc.getMetadata("File->File Name");
 	var fileDirectory = tagOrDoc.getMetadata("Rekall->Folder");
-	if((fileName != undefined) && (fileDirectory != undefined)) {
-		var path = "/" + fileDirectory + fileName;
-		if(action == undefined)
-			action = "file";
-		if(prefix != true)
-			path = rekall.project.url + action + path;
-		return path;
-	}
+	if((fileName != undefined) && (fileDirectory != undefined)) 
+		return Utils.getLocalFilePathFromFilename(fileDirectory + fileName, action, prefix);
 	else
 		return "";
+}
+Utils.getLocalFilePathFromFilename = function(fileName, action, prefix) {
+	var path = Utils.actionSuffix + fileName;
+	if(action == undefined)
+		action = "file";
+	if(prefix != true)
+		path = rekall.project.url + Utils.actionPrefix + action + path;
+	return path;
 }
 
 Utils.getColor = function(percent) {

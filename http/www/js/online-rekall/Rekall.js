@@ -48,7 +48,7 @@ Rekall.prototype.loadXMLFile = function() {
 	
 	var thiss = this;
 	rouletteStart();
-	$.ajax("file/project.xml", {
+	$.ajax("php/file.php?r=project.xml", {
 		type: 	"GET",
 		cache: 	false,
 		data: 	{"rand": random()},
