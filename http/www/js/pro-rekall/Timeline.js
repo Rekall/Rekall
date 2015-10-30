@@ -47,14 +47,14 @@ Timeline.prototype.play = function(timeCurrentOffset) {
 	this.timeStart         = moment();
 	this.state = 1;
 	rekall.captationVideoPlayers.play(timeCurrentOffset);
-	rekall.updateFlattenTimeline();
+//HideFlattenTimeline	rekall.updateFlattenTimeline();
 	$("#timeline-play").hide();
 	$("#timeline-pause").show();
 }
 Timeline.prototype.stop = function() {
 	this.state = 0;
 	rekall.captationVideoPlayers.pause();
-	rekall.updateFlattenTimeline();
+//HideFlattenTimeline	rekall.updateFlattenTimeline();
 	$("#timeline-play").show();
 	$("#timeline-pause").hide();
 }
@@ -65,7 +65,7 @@ Timeline.prototype.rewind = function(timeCurrentOffset) {
 	this.timeCurrentOffset = timeCurrentOffset;
 	this.state = 2;
 	rekall.captationVideoPlayers.rewind(timeCurrentOffset);
-	rekall.updateFlattenTimeline();
+//HideFlattenTimeline	rekall.updateFlattenTimeline();
 	$("#timeline-play").show();
 	$("#timeline-pause").hide();
 }
@@ -95,7 +95,7 @@ Timeline.prototype.update = function() {
 			this.text.setText((this.timeCurrent+"").toHHMMSSmmm());
 			this.text.setX(timeBarPoints[0] + 3);
 			
-			rekall.updateFlattenTimeline();			
+//HideFlattenTimeline			rekall.updateFlattenTimeline();			
 			return true;
 		}
 	}
@@ -108,9 +108,9 @@ Timeline.prototype.update = function() {
 	return false;
 }
 
-Timeline.prototype.updateFlattenTimeline = function() {
-	//for (var key in Tags.flattenTimelineTags) {
-	//var tag = Tags.flattenTimelineTags[key];
+Timeline.prototype.updateFlattenTimeline = function() {   
+//HideFlattenTimeline
+/*
 	var categories = rekall.sortings["horizontal"].categories;
 	if(rekall.sortings["horizontal"].metadataKey == "Time")
 		categories = {time: {tags: Tags.flattenTimelineTags}};
@@ -165,6 +165,6 @@ Timeline.prototype.updateFlattenTimeline = function() {
 				}
 			}
 		}
-	}
+	}   */
 }
 
