@@ -291,6 +291,8 @@ VideoPlayers.prototype.resize = function(visible) {
 	}
 }
 VideoPlayers.prototype.show = function(document, visibility) {
+	return;
+	
 	var dom = $("#renders");
 	//Local usage of video
 	dom = undefined;
