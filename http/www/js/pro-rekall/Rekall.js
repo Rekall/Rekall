@@ -687,14 +687,14 @@ Rekall.prototype.start = function() {
 				rekall.analyse(false);
 				rekall.timeline.tagLayer.draw();
 			}
-			else if((rekall.mousePressed) && (Tags.hoveredTag == undefined)) {
+			else if((rekall.mousePressed)/* && (Tags.hoveredTag == undefined)*/) {
 				rekall.timeline.selectionLayer.path.polygon.addPoint(pos);
 				drawSelection(event);
 			}
-			else if(Tags.hoveredTag != undefined) {
+		   /* else if(Tags.hoveredTag != undefined) {
 				if(hoveredTagOld != Tags.hoveredTag)
 					Tags.hoveredTag.displayMetadata();
-			}
+			}  */
 			
 			/*if(((rekall.mousePressed) || (Tags.hoveredTag != undefined)) && (rekall.mousePressedMode == "move"))
 				window.document.body.style.cursor = 'move';
