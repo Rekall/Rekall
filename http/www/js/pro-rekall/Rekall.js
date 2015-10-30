@@ -41,7 +41,7 @@ function Rekall() {
 	this.shouldAnalyse		         = true;
 	this.shouldAnalyseFull           = true;
 	this.shouldAnalyseIsCheckbox     = false;
-	this.shouldUpdateFlattenTimeline = true;
+//HideFlattenTimeline	this.shouldUpdateFlattenTimeline = true;
 	this.selectionId = 0;
 	
 	//Map
@@ -281,10 +281,11 @@ Rekall.prototype.start = function() {
 					rekall.project.analyse(shouldAnalyseFull, shouldAnalyseIsCheckbox);
 				}
 			
-				if(rekall.shouldUpdateFlattenTimeline) {
+//HideFlattenTimeline
+/*				if(rekall.shouldUpdateFlattenTimeline) {
 					rekall.shouldUpdateFlattenTimeline = false;
 					rekall.timeline.bar.updateFlattenTimeline();
-				}
+				}   */
 			});
 		}
 		//setTimeout(refresh, 50);
@@ -334,7 +335,7 @@ Rekall.prototype.start = function() {
 	$("#inspecteurTabNav").click(function() {
 		$("#inspecteur").parent().toggle();
 		if($("#inspecteur").parent().is(":visible"))	$("#inspecteurTabNav").html("&times;");
-		else											$("#inspecteurTabNav").html("Inspector");
+		else											$("#inspecteurTabNav").html("METADATA");
 		rekall.map.resize();
 		rekall.panner.resize();
 		rekall.captationVideoPlayers.resize();
@@ -590,10 +591,11 @@ Rekall.prototype.start = function() {
 		rekall.timeline.bar.toggle();
 	});
 	
-	$("#flattentimeline div:first span").click(function() {
+//HideFlattenTimeline
+/*	$("#flattentimeline div:first span").click(function() {
 		rekall.analyse(true);
 	});
-
+*/
 	//Survols et sélections
 	$("#timeline").mousedown(function(event){
 		if(rekall.isScrolling != true) {
@@ -817,7 +819,7 @@ Rekall.prototype.analyse = function(full, isCheckbox) {
 		this.shouldAnalyseIsCheckbox = isCheckbox;
 }
 Rekall.prototype.updateFlattenTimeline = function() {
-	this.shouldUpdateFlattenTimeline = true;
+//HideFlattenTimeline	this.shouldUpdateFlattenTimeline = true;
 }
 
 Rekall.prototype.resize = function() {

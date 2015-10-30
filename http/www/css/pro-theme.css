@@ -1,3 +1,26 @@
+/*
+    This file is part of Rekall.
+    Copyright (C) 2013-2015
+
+    Project Manager: Clarisse Bardiot
+    Development & interactive design: Guillaume Jacquemin & Guillaume Marais (http://www.buzzinglight.com)
+
+    This file was written by Guillaume Marais.
+
+    Rekall is a free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 @import url("font/stylesheet.css");
 
 html, body {
@@ -390,7 +413,8 @@ u {
 	margin-right:	20px;
 }
 #central li#inspecteurTabNav {  
-	background:#EC8960;
+/*    background:#EC8960;     */
+	background:#2C3032;
 	color: 		#F5F8EE;
 }
 #central li#maximizeTabNav {
@@ -711,7 +735,7 @@ u {
 	max-height:140px;    
 	display:inline-block;   
 }    
-
+/*
 #visibleontimeline_switch_button {
 	width:14px; height:14px;
 	background:url('/css/images/icn-meta-visibility-0.png'); 
@@ -721,7 +745,8 @@ u {
 }  
 #visibleontimeline_switch_button.visible { 
 	background:url('/css/images/icn-meta-visibility-1.png');      
-}
+}     
+*/
 
 
 
@@ -1224,7 +1249,15 @@ input[type="text"], textarea {
 	padding:			5px;
 }
 
+#emptyMeta {
+	text-align:			center;  
+}   
+#emptyMeta img {
+	margin-top:			20%;
+}
 
+
+/*
 #flattentimeline {
 	color:				white;
 	background-color: 	black;
@@ -1236,13 +1269,8 @@ input[type="text"], textarea {
 	font-weight:			200;
 	height:40px;
 	line-height:40px;
-	text-align:center;
-	/*background:#2C3032;*/
-	/*background:#2C3033;*/
-	/*background:#57A5AF;*/
-	background:#EC8960;
-	/*background-image: -webkit-linear-gradient(left, #EC8960 0%, #57A5AF 100%);*/
-	/*background-image: -webkit-linear-gradient(left, #94CA6F 0%, #B495CC 100%);*/
+	text-align:center;       
+	background:#EC8960;                                                             
 	text-transform:uppercase;
 	color:rgba(255,255,255,1);
 	font-size:18px;
@@ -1265,7 +1293,7 @@ input[type="text"], textarea {
 	height:100%;
 	overflow:	hidden;
 	overflow-y:	auto;
-	background-color:#1B1D1E; /*191716;*/
+	background-color:#1B1D1E; 
 }
 .flattentimeline_item {
 	position:				relative;
@@ -1273,10 +1301,10 @@ input[type="text"], textarea {
 	color:			  		white;
 	margin:					0px 0px;
 	cursor:					pointer;
-	background:#26292B;/*231F1E;*/
+	background:#26292B;
 }
 .flattentimeline_item:hover {
-	background:#1D2021;/*191716;*/
+	background:#1D2021;
 }
 .flattentimeline_image {
 	border-radius: 0;
@@ -1319,10 +1347,6 @@ input[type="text"], textarea {
     background-size: 		cover;
 }
 
-/*.flattentimeline_color {
-	top:					0px;
-	height:					100%;
-}*/
 .flattentimeline_bar, .flattentimeline_opacifiant {
 	background-color:		rgba(0, 0, 0, 0.75);
 	height:					2px;
@@ -1351,21 +1375,7 @@ input[type="text"], textarea {
 	height:					20px;
 	display:none;
 }
-/*.flattentimeline_type {
-	top:					14px;
-	left:					6px;
-	width:					26px;
-	height:					26px;
-	background-position:	center center;
-	background-repeat:		no-repeat;
-	opacity:				.5;
-}*/
-/*.flattentimeline_type {
-	width:10px; height:10px;
-	border-radius:10px;
-	float:right;
-	margin:20px 15px 20px 0;
-}*/
+
 .flattentimeline_type {
 	width:20px; height:20px;
 	border-radius:20px;
@@ -1396,11 +1406,10 @@ input[type="text"], textarea {
 	text-align: 			center; 
 	display:none;
 }
-.flattentimeline_bar {
-	/*width: 			  0%;*/
-	background-color:#26292B;/*#2DCAE1;*/
+.flattentimeline_bar {          
+	background-color:#26292B;
 	opacity:1;
-}      
+}       */
 
 .reload_btn, .settings_btn {
 	background-position:	center center;

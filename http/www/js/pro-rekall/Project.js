@@ -591,7 +591,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 		rekall.timeline.timeLayer.group.destroyChildren();
 		
 		//Besoins de trier et de classer
-		Tags.flattenTimelineTags = [];
+//HideFlattenTimeline		Tags.flattenTimelineTags = [];
 		rekall.map.gpsPositions = new Array();
 	}
 	
@@ -755,7 +755,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				var tag = verticalSortingCategory.tags[key];
 				if(full != false) {
 					if(tag.isGoodVersion())
-						Tags.flattenTimelineTags.push(tag);
+//HideFlattenTimeline						Tags.flattenTimelineTags.push(tag);
 						
 					//Analyse GPS
 					var gpsPosition = {latitude: NaN, longitude: NaN, tag: undefined};
@@ -992,38 +992,31 @@ Project.prototype.analyse = function(full, isCheckbox) {
 	
 	
 	//Timeline applatie
-	//TODO
-	if((full != false) && (true)) {
-		Tags.flattenTimelineTags.sort(function(a, b) {
+//HideFlattenTimeline
+/*	if((full != false) && (true)) {
+ 	Tags.flattenTimelineTags.sort(function(a, b) {
 			if(a.timeStart < b.timeStart) return -1;
 			if(a.timeStart > b.timeStart) return 1;
 			return 0;
-		});
+		});    
 
-		$("#flattentimeline_items").html("");
+		$("#flattentimeline_items").html("");    
 		var counter = 0;
-		/*
-		for (var key in Tags.flattenTimelineTags) {
-			var tag = Tags.flattenTimelineTags[key];
-			*/
+
 
 		var categories = rekall.sortings["horizontal"].categories;
-		if(rekall.sortings["horizontal"].metadataKey == "Time")
-			categories = {time: {tags: Tags.flattenTimelineTags}};
+	if(rekall.sortings["horizontal"].metadataKey == "Time") categories = {time: {tags: Tags.flattenTimelineTags}};
 			
 		for (var key in categories) {
-			$.each(categories[key].tags, function(index, tag) {
-				//var tag = rekall.sortings["horizontal"].categories[key].tags[index];
+			$.each(categories[key].tags, function(index, tag) {                        
 				var test = function() {
 					var styleColor = "background-color: " + tag.color + ";";
 					var textColor = "color: " + tag.color + ";";
-				
-					/*var styleColor = "background-image: -webkit-linear-gradient(left, #000 0%, " + tag.color + " 100%);";*/
-					var styleColor2 = styleColor;//"background-color: #3EA8B1;";
+				    
+					var styleColor2 = styleColor;
 					var styleImage = "";
 					if(tag.thumbnail.url != undefined) {
-						styleImage = "background-image: url(" + tag.thumbnail.url + ");";//" opacity: 0.5;";
-						/*styleColor += "opacity: 0.25;"; */
+						styleImage = "background-image: url(" + tag.thumbnail.url + ");";    
 					} else styleImage = "background-color: rgba(0,0,0,.9)";
 				
 					var icnType = "";
@@ -1039,21 +1032,12 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				
 					
 					var html = "<div draggable=true class='flattentimeline_item'>";
-					html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";
-					/*html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "'></div>";*/
-				
-					/*html 	+= "<div class='flattentimeline_bar'        style=''></div>";*/
-				
-					html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";
-				
-					/*html 	+= "<div class='flattentimeline_counter'      style='" + styleColor2 + "'></div>";*/
-				
+					html 	+= "<div class='flattentimeline_image'      style='" + styleImage + "'></div>";          
+					html 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";         
 					html 	+= "<div class='flattentimeline_type'		style='" + icnType +"' title='" + tmpType + "'></div>";
-					html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";
-				/*	html 	+= "<div class='flattentimeline_type'		style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";*/
+					html 	+= "<div class='flattentimeline_color'      style='" + styleColor + "' title='" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "'></div>";   
 					html 	+= "<div class='flattentimeline_counter' ></div>";
-					html 	+= "<div class='flattentimeline_title' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";
-					/*html 	+= "<div class='flattentimeline_subtitle'>" + tag.getMetadata(rekall.sortings["colors"].metadataKey) + "</div>";*/
+					html 	+= "<div class='flattentimeline_title' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>";                   
 					html    += "</div>";
 				
 					tag.flattenTimelineDom = $(html);
@@ -1073,8 +1057,8 @@ Project.prototype.analyse = function(full, isCheckbox) {
 					$('#flattentimeline_items').append(test);
 				});
 			});
-		}
-	}
+		} 
+	}     */
 	
 	if(this.firstAnalysis) {
 		rekall.timeline.bar.rewind();

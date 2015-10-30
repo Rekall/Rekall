@@ -5,7 +5,7 @@
     Project Manager: Clarisse Bardiot
     Development & interactive design: Guillaume Jacquemin & Guillaume Marais (http://www.buzzinglight.com)
 
-    This file was written by Guillaume Jacquemin.
+    This file was written by Guillaume Jacquemin & Guillaume Marais.
 
     Rekall is a free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

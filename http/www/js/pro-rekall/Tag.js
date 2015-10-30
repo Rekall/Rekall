@@ -5,7 +5,7 @@
     Project Manager: Clarisse Bardiot
     Development & interactive design: Guillaume Jacquemin & Guillaume Marais (http://www.buzzinglight.com)
 
-    This file was written by Guillaume Jacquemin.
+    This file was written by Guillaume Jacquemin & Guillaume Marais.
 
     Rekall is a free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -228,20 +228,24 @@ Tag.prototype.displayMetadata = function() {
 Tag.displayMetadata = function() {	
 	//Restaure un truc propre
 	if(Tags.count() == 0) {                   
-		$("#visibleontimeline_switch_button").hide(); 
+//		$("#visibleontimeline_switch_button").hide(); 
 		$("#metadata_main_title").parent().hide();     
 		$("#metadatas").parent().hide();  
 		$("#metadatas_tools").parent().hide();        
-		$("#metadata_menu_bar_block").parent().hide();
-		$("#flattentimeline").parent().show();
+		$("#metadata_menu_bar_block").parent().hide();    
+		$("#preview").parent().hide();  
+//HideFlattenTimeline		$("#flattentimeline").parent().show();  
+		$("#emptyMeta").parent().show();
 	}
 	else {                 
-		$("#visibleontimeline_switch_button").show();   
+//		$("#visibleontimeline_switch_button").show();   
 		$("#metadata_main_title").parent().show();
 		$("#metadatas").parent().show(); 
 		$("#metadatas_tools").parent().show(); 
 		$("#metadata_menu_bar_block").parent().show();   
-		$("#flattentimeline").parent().hide();
+		$("#preview").parent().show();  
+//HideFlattenTimeline		$("#flattentimeline").parent().hide();    
+        $("#emptyMeta").parent().hide();
 	}
 
 		
@@ -262,8 +266,8 @@ Tag.displayMetadata = function() {
 // GM - Affichage de la pastille Visible on Timeline 	    
 				//alert(Tags.unique().document.metadatas[0]["Rekall->Visibility"]); 
 
-				if(Tags.unique().document.metadatas[0]["Rekall->Visibility"] == "Visible on timeline") $("#visibleontimeline_switch_button").addClass("visible");
-				else $("#visibleontimeline_switch_button").removeClass("visible");
+//				if(Tags.unique().document.metadatas[0]["Rekall->Visibility"] == "Visible on timeline") $("#visibleontimeline_switch_button").addClass("visible");
+//				else $("#visibleontimeline_switch_button").removeClass("visible");
 					
 				console.log(Tags.unique());  
 				$("#previewVideo").hide();
@@ -378,7 +382,8 @@ Tag.displayMetadata = function() {
 		$("#previewVideo").hide();
 		$("#preview_menu_bar").hide();
 		$("#inspecteur")      .css("background-color", "#2C3032");
-		$("#inspecteurTabNav").css("background-color", "#EC8960");
+//		$("#inspecteurTabNav").css("background-color", "#EC8960"); 
+		$("#inspecteurTabNav").css("background-color", "#2C3032");
 		rekall.previewVideoPlayer.hide();
 	}
 	
@@ -695,7 +700,7 @@ Tag.displayMetadata = function() {
 	});   
 
 // GM 
-	$("#visibleontimeline_switch_button").unbind("click");
+/*	$("#visibleontimeline_switch_button").unbind("click");
 	$("#visibleontimeline_switch_button").click(function(event) {                        
 
 		function inputBlur(obj, visibility) {      
@@ -709,7 +714,7 @@ Tag.displayMetadata = function() {
 		else inputBlur($(this), "Hidden on timeline" ); 
 		
 
-	});
+	});    */
                  
 	//Affichage de l'éditeur
 	$("#metadatas .metadatas_table_element").click(function(event) {
