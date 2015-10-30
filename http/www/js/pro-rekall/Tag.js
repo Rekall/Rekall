@@ -252,7 +252,7 @@ Tag.displayMetadata = function() {
 	//Titre
 	if(Tags.count() == 1) {
 		//Preview
-		if(Tags.unique().isAudio()) {
+	    if(Tags.unique().isAudio()) {
 			rekall.previewVideoPlayer.loadLocal(Tags.unique(), $("#inspecteur").is(":visible") && (Tags.isStrong));
 			$("#previewImage").hide();
 			$("#previewVideo").show();
@@ -280,7 +280,7 @@ Tag.displayMetadata = function() {
 				$("#preview_menu_bar").hide();
 			}
 			rekall.previewVideoPlayer.hide();
-		}
+		} 
 		
 
 		$("#metadatas_title").text(Tags.unique().getMetadata("Rekall->Name"));
@@ -398,13 +398,13 @@ Tag.displayMetadata = function() {
 			$("#mapTabNav").trigger("click");
 		});
 	}
-	else
+	else 
 		$("#metadatas_menu_bar_map").hide();
 		
-	if((Tags.count() == 1) && (Tags.unique().isImage())) {
+    if((Tags.count() == 1) && (Tags.unique().isImage())) {
 		$("#metadatas_menu_bar_zoom").show();
 		$("#metadatas_menu_bar_zoom").click(function() {
-			$("#pannerTabNav").trigger("click");
+		    $("#pannerTabNav").trigger("click");
 		});
 	}
 	else
@@ -420,7 +420,7 @@ Tag.displayMetadata = function() {
 	}
 	else {
 		rekall.map.show(gpsPositions, undefined, true);
-		rekall.panner.show(Tags.selectedTags);
+	   // rekall.panner.show(Tags.selectedTags);
 	}
 
 	
@@ -588,7 +588,7 @@ Tag.displayMetadata = function() {
 		
 	}  		
 		
-		// GM GM GM	 
+	    // GM GM GM	 
 	
 		//Fonction temporaire de validation de l'édition d'un élément
 		function GMchangeValueTo(obj, metadataKey, metadataValue) {
@@ -598,64 +598,18 @@ Tag.displayMetadata = function() {
 				var reopen  = false;  
 				           
 				// mic-mac pour retrouver de quel doc on parle ?
-				
-				//if(obj.hasClass("one_selection")) {
+				                                                   
 					if(metadataValue == undefined)
 						metadataValue = obj.parent().find(".selected").text();
 					if(metadataValue == "—")
-						metadataValue = "";
-				   /* if(metadataKey.toLowerCase().indexOf("date/time") !== -1) {
-						var metadataValueTmp = moment(metadataValue);
-						if(metadataValueTmp.isValid())
-							metadataValue = metadataValueTmp.format("YYYY:MM:DD HH:mm:ss");
-					}   		*/
+						metadataValue = "";  
 					for (var index in Tags.selectedTags) {
 						var tag = Tags.selectedTags[index];
 						var hasChanged = tag.setMetadata(metadataKey, metadataValue.trim());
 						changed |= hasChanged;
 						if(hasChanged)
 							projectChangedXml += "<edition key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" metadataKey=\"" + Utils.escapeHtml(metadataKey) + "\" metadataValue=\"" + Utils.escapeHtml(metadataValue.trim()) + "\" />\n";
-					}
-				/*}
-				else { 
-					if(metadataValue)
-						reopen = true;
-
-					//Parsing des valeurs à ajouter et à virer
-					var keywordsToAdd = new Object(), keywordsToRemove = new Object();
-					if(!metadataValue)
-						metadataValue = obj.parent().find("input, textarea").val();
-					var splits = Utils.splitKeywords(metadataValue);
-					for (var index in splits)
-						keywordsToAdd[splits[index]] = true;
-					obj.parent().find(".added").each(function() {
-						keywordsToAdd[$(this).text().trim()] = true;
-					});
-					obj.parent().find(".selected").each(function() {
-						keywordsToAdd[$(this).text().trim()] = true;
-					});
-					obj.parent().find(".removed").each(function() {
-						keywordsToRemove[$(this).text().trim()] = true;
-					});
-
-					//Applique les changements
-					for (var index in Tags.selectedTags) {
-						var tag = Tags.selectedTags[index];
-						var keywords = Utils.splitKeywords(tag.getMetadata(metadataKey));
-						for (var keyword in keywordsToAdd) {
-							if($.inArray(keyword, keywords) === -1)
-								keywords.push(keyword);
-						}
-						for (var keyword in keywordsToRemove) {
-							if($.inArray(keyword, keywords) !== -1)
-								keywords.splice(keywords.indexOf(keyword), 1);
-						}
-						var hasChanged = tag.setMetadata(metadataKey, Utils.joinKeywords(keywords));
-						changed |= hasChanged;
-						if(hasChanged)
-							projectChangedXml += "<edition key=\"" + Utils.escapeHtml(tag.document.key) + "\" version=\"" + tag.version + "\" metadataKey=\"" + Utils.escapeHtml(metadataKey) + "\" metadataValue=\"" + Utils.escapeHtml(Utils.joinKeywords(keywords)) + "\" />\n";
-					}  */
-			  //  }
+					}             
 			} 
 
 		//Ferme tous les éditeurs
@@ -670,9 +624,9 @@ Tag.displayMetadata = function() {
 			rekall.projectChanged(projectChangedXml);
 		}
 		      
-	}
+	}        
                
-
+  
 // GM                                        
 	$("#metadatas_comments").click(function(event) {   
 		

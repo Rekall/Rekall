@@ -225,6 +225,9 @@ Panner.prototype.show = function(filter, bounds) {
 						event.stopPropagation();
 						Tags.addOne(thumbnail.tag, true);
 						Tag.displayMetadata();
+					});  
+					thumbnail.dom.dblclick(function(event) {
+						rekall.panner.show(Tags.selectedTags); 
 					});
 					thumbnail.dom.on({
 						dragstart: function(event) {
