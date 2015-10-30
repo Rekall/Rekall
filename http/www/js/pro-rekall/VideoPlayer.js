@@ -96,7 +96,7 @@ VideoPlayer.prototype.activate = function() {
 				thiss.semihide($("#" + thiss.uniqueName));
 				thiss.player.userActive(true);
 			
-				thiss.video.thumbnails([]);
+				//thiss.video.thumbnails([]);
 				if((thiss.thumbPath != undefined) && (thiss.thumbPath != "")) {
 					$.ajax({
 						url: 	thiss.poster,
