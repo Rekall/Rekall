@@ -315,12 +315,18 @@ Rekall.prototype.start = function() {
 
 	$("#navigateurTabNav").click(function() {
 	    var tmpWidth = $("#left_menu_item_open").width();
-		if(tmpWidth>0) {
+		if(tmpWidth>0) {                
+			var searchField = $("#left_menu_item_open #left_menu_item_tab_search_search input").val();     
+			if(searchField!=""){
+				$("#left_menu_item_open #left_menu_item_tab_search_search input").val(""); 
+				rekall.sortings["search"].setCriterias(rekall.sortings["search"].metadataConfigStr, rekall.sortings["search"].valCanBeFloats, "", false);    
+				rekall.analyse(true, true);   
+			}
 			$("#left_menu_item_open").attr("tool","").width(0);//hide();
 			$(".left_menu_item_checklist").hide();
 			$(".left_menu_item_tab_search").hide();
 			$("#navigateurTabNav").css("backgroundColor","#559299");
-			$(".left_menu_item").removeClass("selected");
+			$(".left_menu_item").removeClass("selected");   
 		} else {
 			$("#left_menu").parent().toggle();
 			if($("#left_menu").parent().is(":visible"))	$("#navigateurTabNav").html("&times;");

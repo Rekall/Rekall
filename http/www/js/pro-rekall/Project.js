@@ -438,10 +438,16 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				$(".left_menu_item").removeClass("selected");
 	
 				//toggle = on ferme la fenetre
-				if($("#left_menu_item_open").attr("tool")==tool) {
+				if($("#left_menu_item_open").attr("tool")==tool) { 
+					var searchField = $("#left_menu_item_open #left_menu_item_tab_search_search input").val();   
+					if(searchField!=""){
+						$("#left_menu_item_open #left_menu_item_tab_search_search input").val(""); 
+						rekall.sortings["search"].setCriterias(rekall.sortings["search"].metadataConfigStr, rekall.sortings["search"].valCanBeFloats, "", false);    
+						rekall.analyse(true, true);   
+					}
 					$("#left_menu_item_open").width(0);
 					$("#left_menu_item_open").attr("tool","");
-					$("#navigateurTabNav").css("backgroundColor","#559299");
+					$("#navigateurTabNav").css("backgroundColor","#559299");   
 				} else {
 					$("#left_menu_item_open").attr("tool",tool);
 					$("#left_menu_item_open_title").html(tool);
