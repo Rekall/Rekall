@@ -340,8 +340,8 @@ Rekall.prototype.start = function() {
 		}    
 	});
 	$("#inspecteurTabNav").click(function() {
-		$("#inspecteur").parent().toggle();
-		if($("#inspecteur").parent().is(":visible"))	$("#inspecteurTabNav").html("&times;");
+		$("#inspecteur").parent().parent().toggle();
+		if($("#inspecteur").parent().parent().is(":visible"))	$("#inspecteurTabNav").html("&times;");
 		else											$("#inspecteurTabNav").html("METADATA");
 		rekall.map.resize();
 		rekall.panner.resize();

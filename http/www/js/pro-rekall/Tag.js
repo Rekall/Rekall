@@ -320,7 +320,7 @@ Tag.displayMetadata = function() {
 			$("#metadatas_subtitle").html(version);
 		else
 			$("#metadatas_subtitle").html("");
-		$("#inspecteur")      .css("background-color", Tags.unique().color);
+		$("#layout_inspecteur")      .css("background-color", Tags.unique().color);
 		$("#inspecteurTabNav").css("background-color", Tags.unique().color);
 		if(Tags.unique().getMetadata("File->File Name") != undefined) {
 			if(rekall_common.isLocal) {
@@ -369,7 +369,7 @@ Tag.displayMetadata = function() {
 	else if(Tags.count() > 1) {
 		$("#metadatas_title")   .text("MULTIPLE SELECTION");
 		$("#metadatas_subtitle").text("");
-		$("#inspecteur")      .css("background-color", "#2C3032");
+		$("#layout_inspecteur")      .css("background-color", "#2C3032");
 		$("#inspecteurTabNav").css("background-color", "#2C3032");
 	}
 	if(Tags.count() != 1) {
@@ -381,7 +381,7 @@ Tag.displayMetadata = function() {
 		$("#previewImage").hide();
 		$("#previewVideo").hide();
 		$("#preview_menu_bar").hide();
-		$("#inspecteur")      .css("background-color", "#2C3032");
+		$("#layout_inspecteur")      .css("background-color", "#2C3032");
 //		$("#inspecteurTabNav").css("background-color", "#EC8960"); 
 		$("#inspecteurTabNav").css("background-color", "#2C3032");
 		rekall.previewVideoPlayer.hide();
