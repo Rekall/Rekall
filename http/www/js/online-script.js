@@ -916,6 +916,7 @@ function setProjectMeta(metaType, meta) {
 		dataType: "json",
 		data: {"metadataKey": metaType, "metadataValue": meta.replace(/'/g, '’')},
 		success: function(retour) {
+			rekall.project.metadata[metaType] = meta;
 			rouletteEnd();
 		},
 		error: function() {
