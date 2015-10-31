@@ -246,9 +246,9 @@ Tag.displayMetadata = function() {
 		$("#preview").parent().show();  
 //HideFlattenTimeline		$("#flattentimeline").parent().hide();    
         $("#emptyMeta").parent().hide();
-	}
-
-		
+	} 
+	
+	  
 	//Titre
 	if(Tags.count() == 1) {
 		//Preview
@@ -404,7 +404,9 @@ Tag.displayMetadata = function() {
     if((Tags.count() == 1) && (Tags.unique().isImage())) {
 		$("#metadatas_menu_bar_zoom").show();
 		$("#metadatas_menu_bar_zoom").click(function() {
-		    $("#pannerTabNav").trigger("click");
+		    //$("#pannerTabNav").trigger("click");    
+			rekall.panner.show(Tags.selectedTags);   
+			$("#central ul").hide();
 		});
 	}
 	else
@@ -933,6 +935,24 @@ Tag.displayMetadata = function() {
 		}
 	});
 	$("#metadatas .metadatas_table_element .metadatas_table_element_category").filter(function() { return $.inArray($(this).text(), Tag.metadataEditionKey) !== -1; }).trigger("click");
+	                       
+	
+	for (var category in rekall.panner.thumbnails) {
+		var contents = rekall.panner.thumbnails[category];
+		$.each(contents.thumbnails, function(index, thumbnail) {
+			if(thumbnail.dom != undefined) {          
+				var opacity = 1, add = true;
+			 	if((!Tags.unique())||(thumbnail.tag==Tags.unique())) {
+					opacity = 1;
+					scrollTo = thumbnail;
+				}  
+				else {
+					opacity = 0.5;       
+				}    
+			    thumbnail.dom.css("opacity", opacity).css("display", "inline-block");           
+			}
+		});    
+	}
 	
 	rekall.analyse(false);
 }

@@ -27,7 +27,8 @@ function Panner() {
 	this.recreateGallery = true;     
 	
     $("#panner .gallery").click(function(event) {
-		event.stopPropagation();
+		event.stopPropagation();   
+		//alert("ok");
 		Tags.clear(true);
 	});                  
 	
@@ -40,7 +41,9 @@ function Panner() {
 	});
 	$("#closePhotoBtn").click(function(event) {
 		event.stopPropagation();
-		Tags.clear(true);
+		//Tags.clear(true);         
+		rekall.panner.hidePhoto();
+		$("#central ul").show();
 	});
     $("#panner .panzoom").panzoom({
 		$zoomRange: 	$("#panner .zoom-range"),

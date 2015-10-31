@@ -691,10 +691,10 @@ Rekall.prototype.start = function() {
 				rekall.timeline.selectionLayer.path.polygon.addPoint(pos);
 				drawSelection(event);
 			}
-		   /* else if(Tags.hoveredTag != undefined) {
-				if(hoveredTagOld != Tags.hoveredTag)
-					Tags.hoveredTag.displayMetadata();
-			}  */
+		    else if(Tags.hoveredTag != undefined) {
+				/*if(hoveredTagOld != Tags.hoveredTag)
+					Tags.hoveredTag.displayMetadata();*/
+			}  
 			
 			/*if(((rekall.mousePressed) || (Tags.hoveredTag != undefined)) && (rekall.mousePressedMode == "move"))
 				window.document.body.style.cursor = 'move';
