@@ -290,7 +290,7 @@ Tag.displayMetadata = function() {
 			if(!Tags.unique().isGoodVersion())
 				version += "<br/><span>set this version as best one</span>";
 			
-			$("#metadatas_version").slider({
+			$("#metadatas_version").show().slider({
 				value: 	Tags.unique().version,
 				min: 	0,
 				max: 	Tags.unique().document.currentVersion,
@@ -309,15 +309,18 @@ Tag.displayMetadata = function() {
 			$("#metadatas_version .ui-slider-handle").show();
 		}
 		else {
-			$("#metadatas_version").slider();
+			$("#metadatas_version").slider().hide();
 			$("#metadatas_version .ui-slider-handle").hide();
-		}
-		if((Tags.unique().getMetadata(rekall.sortings["colors"].metadataKey) != "") && (version != ""))
+		}        
+		
+		$("#metadatas_subtitle").html("").hide(); 
+		/*if((Tags.unique().getMetadata(rekall.sortings["colors"].metadataKey) != "") && (version != ""))
 			$("#metadatas_subtitle").html(Tags.unique().getMetadata(rekall.sortings["colors"].metadataKey) + " — " + version);
 		else if(Tags.unique().getMetadata(rekall.sortings["colors"].metadataKey) != "")
 			$("#metadatas_subtitle").html(Tags.unique().getMetadata(rekall.sortings["colors"].metadataKey));
-		else if(version != "")
-			$("#metadatas_subtitle").html(version);
+		else */
+		if(version != "")
+			$("#metadatas_subtitle").html(version).show();
 		else
 			$("#metadatas_subtitle").html("");
 		$("#layout_inspecteur")      .css("background-color", Tags.unique().color);

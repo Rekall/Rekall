@@ -392,7 +392,29 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				if((metadataKey != undefined) && (metadataKey != "") && (tool != undefined))
 					rekall.sortings[tool].setCriterias(metadataKey, rekall.sortings[tool].valCanBeFloats, undefined, true);        
 			}
-		});
+		});  
+		
+ /*   	$( ".checkboxGroupsOnOff" ).unbind();
+		$( ".checkboxGroupsOnOff" ).change(function() {    
+			var isChecked = $("#checkboxGroupsOn").prop('checked'); 
+			if(isChecked) {   
+				var meta = $(".left_menu_select_meta").val();     
+				//alert(meta);                              
+				if(meta!="instructions"){
+					var category = $(".left_menu_select_meta").attr("category");               
+					var tool = $(".left_menu_select_meta").attr("tool");
+					$(".left_menu_select_meta").hide();
+					$("#left_menu_select_"+category).show();              
+					category = category.replace("_"," ").replace("_"," ");
+					var metadataKey = category+"->"+meta;
+					if((metadataKey != undefined) && (metadataKey != "") && (tool != undefined))
+						rekall.sortings[tool].setCriterias(metadataKey, rekall.sortings[tool].valCanBeFloats, undefined, true);        
+				}
+				
+			} else {
+				rekall.sortings["groups"].setCriterias("Rekall->Group", rekall.sortings["groups"].valCanBeFloats, undefined, true);  
+			}   
+		});     */
 
 		//Drag/drop pour setter les tools
 		$('#left_menu .left_menu_item.dropable').on({
@@ -455,13 +477,19 @@ Project.prototype.analyse = function(full, isCheckbox) {
 					$("#left_menu_item_open").width(220);
 					$(".left_menu_item_open_cat").hide();
 					$(".left_menu_item_checklist").hide();
-					$(".left_menu_item_tab_search").hide();
+					$(".left_menu_item_tab_search").hide(); 
+//					$("#checkboxGroupsSwitch").hide();
 					$("#navigateurTabNav").css("backgroundColor","#2C4749");
 					$(this).addClass("selected");
 		
 					if((tool!="horizontal")&&(tool!="vertical")) {
 						$("#"+tool+"Checklist").show();
-						$("#left_menu_item_tab_search_"+tool).show();
+						$("#left_menu_item_tab_search_"+tool).show(); 
+						
+/*						if(tool=="groups") {
+							$("#checkboxGroupsSwitch").show();
+						}       
+*/					
 					}
 
 					$("#left_menu_item_open_"+tool).show();
@@ -498,7 +526,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 									meta = tmp[0];     */   
 								   	//alert(tmp.length+" / "+meta); 
 									$(".left_menu_select_meta").hide();
-									$("#left_menu_select_"+category).val(meta).show();
+									$("#left_menu_select_"+category).val(meta).show(); 
 								}
 							}
 						}
@@ -967,7 +995,7 @@ Project.prototype.analyse = function(full, isCheckbox) {
 	//Duplicates
 	if(true) {
 		for (var key in rekall.sortings["hashes"].categories) {
-			var category = rekall.sortings["hashes"].categories[key];
+			var category = rekall.sortings["hashes"].categories[key];  
 			if((category.visible) && (category.checked)) {
 				category.path = new Kinetic.Path({
 					stroke: 			'#FFFFFF',
@@ -982,6 +1010,8 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				var path = "";
 				var selected = category.tags[0].isSelected();
 				for(var i = 1 ; i < category.tags.length ; i++) {
+				  /*  var tmpDate = category.tags[i].getMetadata("Rekall->Date"); 
+					alert(tmpDate);  */
 					selected |= category.tags[i].isSelected();
 					path += Utils.movePath(category.tags[0].rect.getCenter());
 					var offset = 0;

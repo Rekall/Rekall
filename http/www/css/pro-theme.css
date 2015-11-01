@@ -253,7 +253,10 @@ u {
 }
 #inspecteur {               
 	height:			100%;  
-}             
+}  
+#inspecteur tr {               
+	display:		none;  
+}           
 #navigateur {                    
 	background:#26292B;                                                                                      
 }    
@@ -433,23 +436,26 @@ u {
 
 
 .ui-slider {
-	height: 			1px;
-	border:				0px solid transparent;
-	background-image: 	none;
+	height: 				2px;
+	border:					0px solid transparent;
+	background-image: 		none; 
+	background-color:		rgba(255,255,255,.25); 
 	
 }
 .ui-slider .ui-slider-handle {
-	width: 				12px;
-	height: 			12px;
-	top:				-6px;
-	-webkit-border-radius: 	6px;
-	-moz-border-radius: 	6px;
-	border-radius: 			6px;
-	
+	width: 					10px;
+	height: 				10px;
+	top:					-4px;
+	-webkit-border-radius: 	5px;
+	-moz-border-radius: 	5px;
+	border-radius: 			5px;  
+}                               
+.ui-state-hover {
+	cursor:					pointer;
 }
 
 .ui-menu {
-	width: 55%;
+	width: 				55%;
 	margin-left: 		5px;
 	border:				0px solid transparent;
 	background:			none;
@@ -457,15 +463,16 @@ u {
 	font-size:	 		10px;
 	color: 				rgba(255, 255, 255, 0.5);
 }
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus, .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
-	background: 		none;
-	background-image: 	none;
-	background-color: 	transparent;
-	font-weight:		normal;
-	border:				0px solid black;
-	margin:				0px;
-	color:				white;
-}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus, .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+	background: 			none;
+	background-image: 		none;        
+	font-weight:			normal;
+	border:			    	0px	!important;
+	margin:					0 0 0 -5px !important;  
+	background-color:		white;  
+	cursor:					pointer;
+} 
+
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
 	font-weight:		normal;
 }
@@ -497,11 +504,7 @@ u {
 	margin:				0px;
 	color:				#2DCAE1;
 }
-.ui-state-default, .ui-widget-content .ui-state-default {
-	border:				0px solid transparent;
-	background:			none;
-	background-color:	white;
-}
+
 
 
 
@@ -761,7 +764,7 @@ u {
 #metadatas_tools {                            
 	background-color:	rgba(0, 0, 0, 0.1);  
 	padding:			0 10px; 
-	height:				auto;     
+	height:				auto;    
 }        
 #metadatas_title {
 	font-size: 		11px;  
@@ -802,8 +805,7 @@ u {
 	overflow-y:			auto;   */      
 }
 #metadatas_version {
-	margin:			0px 10px 0px 10px;     
-	display:		none;
+	margin:				20px 80px 10px 80px; 
 }
 #metadatas_subtitle {
 	margin:			0px 0px 15px 0px;
@@ -811,7 +813,7 @@ u {
 	text-transform: uppercase;    
 	color: 			rgba(255,255,255,.5); 
 	font-size: 		8px; 
-	display:		none;   
+	/*display:		none;  */ 
 }
 #metadatas_subtitle span {
 	font-size: 		8px;
@@ -1602,6 +1604,10 @@ input[type="text"], textarea {
 	width:180px; height:1px;
 	background:rgba(255,255,255,.2);
 	margin:5px 20px;
+}       
+
+#checkboxGroupsSwitch {
+	display:		none;
 }
 
 .selectallBtn, .unselectallBtn {
@@ -1613,11 +1619,12 @@ input[type="text"], textarea {
 }
 
 .left_menu_item_checklist {
-	width:180px; 
+	width:180px;          
+	height:			100%;
 	margin:20px 20px;
 	padding-top:20px;
 	border-top:1px solid rgba(255,255,255,.1);
-	max-height:340px;
+	/*max-height:340px; */
 	display:block;
 	overflow:	hidden;
 	overflow-y:	auto;
