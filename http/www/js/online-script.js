@@ -117,7 +117,18 @@ $(document).ready(function() {
 	$("#popupAlertButtonYesdeleteproject").click(function(){   
 		//alert("pouf");
 		removeProject();
-	});     
+	});  
+	
+	$("#popupSettingsBtnEmbed").click(function(event){  
+		event.stopPropagation();
+		var tmp = shareEmbed();  
+		openAlert("textarea",tmp);
+	});
+	$("#popupSettingsBtnShare").click(function(event){  
+		event.stopPropagation();    
+		var tmp = shareLink();  
+		openAlert("input",tmp);
+	});   
 	
 
 	
@@ -287,16 +298,7 @@ function setEditionControls() {
 		window.open("?w=1", '_blank');
 		/*window.open("?w=1", "Preview Rekall", "menubar=no, status=no, scrollbars=no, menubar=no, width=1150, height=560");  */
 	});
-	$("#popupSettingsBtnEmbed").click(function(event){  
-		event.stopPropagation();
-		var tmp = shareEmbed();  
-		openAlert("textarea",tmp);
-	});
-	$("#popupSettingsBtnShare").click(function(event){  
-		event.stopPropagation();    
-		var tmp = shareLink();  
-		openAlert("input",tmp);
-	});
+
 	$("#popupSettingsBtnDownloadXml").click(function(event){  
 		event.stopPropagation();
 		window.open("php/project.php?downloadXML=1", '_self'); 
@@ -545,7 +547,7 @@ function openAlert(message, buttons) {
 		closeAlert();      
 		
 	if(message=="input"){      
-		$("#popupAlertMessage").html("Copy this URL to share your project");      
+		$("#popupAlertMessage").html("Copy this link to share <i>"+rekall.project.metadata["Title"]+"</i>");      
 		$(".popupAlertButton").hide();  
 		$("#popupAlertButtonOk").show(); 
 		
@@ -557,7 +559,7 @@ function openAlert(message, buttons) {
 		$("#popupAlertInput").focus().select();
 		
 	} else if(message=="textarea"){  
-		$("#popupAlertMessage").html("Copy this code and paste it into your HTML for embed");
+		$("#popupAlertMessage").html("Embed <i>"+rekall.project.metadata["Title"]+"</i> on your webpage");
 		$(".popupAlertButton").hide();  
 		$("#popupAlertButtonOk").show(); 
 		                                
