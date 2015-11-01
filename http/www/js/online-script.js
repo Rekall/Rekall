@@ -807,8 +807,13 @@ function fillPopupEdit(tag) {
 		}    
 		$("#popupImg").unbind( "click" );
 		$("#popupImg").click(function(event){ 
-			event.stopPropagation(); 
-			tag.openBrowser(); 
+			event.stopPropagation();        
+			var link = tag.getMetadata("Rekall->Link"); 
+			if(type.indexOf("link")>-1) {    
+				if(link!="")                 
+					window.open(link,'_blank');  
+			
+			} else tag.openBrowser(); 
 		});                               
 	}                        
 	
@@ -833,7 +838,7 @@ function fillPopupEdit(tag) {
 	if((author)&&(author!="")) $("#popupAuthor").html(author).removeClass("empty");
 	else $("#popupAuthor").html("+ Add an author").addClass("empty"); 
     
-	var link = tag.getMetadata("Rekall->Link");
+	var link = tag.getMetadata("Rekall->Link"); 
 	if((link)&&(link!="")) {
 		if(rekall_common.owner.canEdit) $("#popupLink").html(link).removeClass("empty");   
 		else $("#popupLink").html("<a href='"+link+"' target='_blank'>"+link+"</a>").removeClass("empty");
