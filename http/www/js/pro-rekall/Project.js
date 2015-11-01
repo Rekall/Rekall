@@ -390,7 +390,8 @@ Project.prototype.analyse = function(full, isCheckbox) {
 				category = category.replace("_"," ").replace("_"," ");
 				var metadataKey = category+"->"+meta;
 				if((metadataKey != undefined) && (metadataKey != "") && (tool != undefined))
-					rekall.sortings[tool].setCriterias(metadataKey, rekall.sortings[tool].valCanBeFloats, undefined, true);        
+					//rekall.sortings[tool].setCriterias(metadataKey, rekall.sortings[tool].valCanBeFloats, undefined, true);
+					rekall.sortings[tool].setCriterias(metadataKey, false, undefined, true);         
 			}
 		});  
 		
