@@ -810,12 +810,12 @@ function fillPopupEdit(tag) {
 		$("#popupImg").unbind( "click" );
 		$("#popupImg").click(function(event){ 
 			event.stopPropagation();        
-			var link = tag.getMetadata("Rekall->Link"); 
-			if(type.indexOf("link")>-1) {    
-				if(link!="")                 
-					window.open(link,'_blank');  
-			
-			} else tag.openBrowser(); 
+			if(tag.isLink()) {
+				if(link != "")
+				window.open(link,'_blank');  
+			}
+			else
+				tag.openBrowser(); 
 		});                               
 	}                        
 	
