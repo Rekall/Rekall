@@ -28,7 +28,7 @@ function Source(hash) {
 
 Source.prototype.addDocument = function(document) {
 	if(document.key == undefined) {
-		document.key = this.mapPath(Utils.getLocalFilePath(document, "", true));;
+		document.key = this.mapPath(Utils.getLocalFilePath(document, "", true, true));;
 		if(document.key == "")
 			document.key = "marker-" + CryptoJS.SHA1(moment() + random() + "").toString();
 	}

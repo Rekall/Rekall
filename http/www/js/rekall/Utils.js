@@ -120,20 +120,29 @@ Utils.getPreviewPath = function(tagOrDoc) {
 }
 Utils.actionPrefix = "";
 Utils.actionSuffix = "/";
-Utils.getLocalFilePath = function(tagOrDoc, action, prefix) {
+Utils.getLocalFilePath = function(tagOrDoc, action, prefix, noPrefixSuffix) {
 	var fileName      = tagOrDoc.getMetadata("File->File Name");
 	var fileDirectory = tagOrDoc.getMetadata("Rekall->Folder");
 	if((fileName != undefined) && (fileDirectory != undefined)) 
-		return Utils.getLocalFilePathFromFilename(fileDirectory + fileName, action, prefix);
+		return Utils.getLocalFilePathFromFilename(fileDirectory + fileName, action, prefix, noPrefixSuffix);
 	else
 		return "";
 }
-Utils.getLocalFilePathFromFilename = function(fileName, action, prefix) {
-	var path = Utils.actionSuffix + fileName;
+Utils.getLocalFilePathFromFilename = function(fileName, action, prefix, noPrefixSuffix) {
+	var path = "";
+	if(noPrefixSuffix == true)
+		path = "/" + fileName;
+	else
+		path = Utils.actionSuffix + fileName;
+		
 	if(action == undefined)
 		action = "file";
-	if(prefix != true)
-		path = rekall.project.url + Utils.actionPrefix + action + path;
+	if(prefix != true) {
+		if(noPrefixSuffix == true)
+			path = rekall.project.url + action + path;
+		else
+			path = rekall.project.url + Utils.actionPrefix + action + path;
+	}
 	return path;
 }
 

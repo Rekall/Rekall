@@ -881,9 +881,8 @@ function fillPopupEdit(tag) {
 		$(".displayMode").show();
 	}
 	
-	
-	$("#popupLeft").attr("keydoc",tag.document.key); 
-	$("#popupRight").attr("keydoc",tag.document.key);        
+	$("#popupLeft") .attr("keydoc", tag.document.key); 
+	$("#popupRight").attr("keydoc", tag.document.key);        
 
 	$("#popupSpace").show();   
 	$("#popupEdit").show();
