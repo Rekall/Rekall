@@ -85,7 +85,6 @@ Metadatas Global::getMetadatas(QFileInfo file, ProjectInterface *project, bool d
         retour["Rekall->Comments"]   = "";
         retour["Rekall->Keywords"]   = "";
         retour["Rekall->Group"]      = "";
-        retour["Rekall->Visibility"] = "";
         qreal duration = 0;
         QStringList keywords;
 
