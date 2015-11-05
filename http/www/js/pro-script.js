@@ -229,7 +229,7 @@ function documentReadyMenu() {
 				$(this).find("div").hide();
 			});
 			
-			$("#menu_projects #menu_addproject").click(function(event) {
+			$("#menu_addproject").click(function(event) {
 				event.stopPropagation();
 				$.ajax("/add", {
 					success: function() {

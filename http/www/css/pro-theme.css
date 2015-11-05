@@ -132,13 +132,13 @@ u {
 .menu h1 > span, #menu_projects div > span {
 	font-size:		8px;
 	cursor:			pointer;
-	text-transform:	uppercase;
+	text-transform:	uppercase;  
 }
 .menu h1 > span > span {
 	border-bottom:  1px dotted rgba(245, 248, 238, 0.6);	
 }
 .menu h1 > span {
-	opacity: 0;
+	opacity: 0.75;
 }
 .menu:hover h1 > span {
 	opacity: 0.75;
@@ -212,13 +212,32 @@ u {
 	color: 			black;
 }
 .menu .menu_removeproject {
-	top:			10px;
+	top:			10px;   
 }
 .menu .menu_renameproject {
-	top:			31px;
+	top:			31px;    
 }
 .menu .menu_finderproject {
-	top:			53px;
+	top:			53px;    
+} 
+
+#menu_addproject {
+	font-size:		12px;
+	cursor:			pointer;
+	position:		relative;
+	background: 	#617A72;
+	padding:		15px 36px;
+	-webkit-border-radius: 	3px;
+	-moz-border-radius: 	3px;
+	border-radius: 			3px;   
+	width: 			80%;
+	max-width:		680px;
+	text-align:		center;   
+	text-transform:	uppercase;  
+	font-weight:	500;
+}  
+#menu_addproject:hover {                  
+	background: 	#3F7F69;
 }
 
 
