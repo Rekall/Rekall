@@ -70,6 +70,31 @@ Rekall.prototype.loadXMLFile = function() {
 			rouletteEnd();
 		},
 		error: function() {
+			$.ajax("file/project.xml", {
+				type: 	"GET",
+				cache: 	false,
+				data: 	{"rand": random()},
+				dataType: "xml",
+				success: function(xml) {
+					if((xml == null) || (xml == undefined))
+						openAlert("Your project is unreachable. Did you move the folder to an other location?", 60);
+					else {
+						$(xml).find('project').each(function() {
+							if($(this).find('document').length == 0)
+								openAlert("Start by addind files to your project.", 60);
+							else {
+								if(rekall.project == undefined)
+									rekall.project = new Project(url);
+								rekall.project.loadXML($(this));
+							}
+						});
+					}
+					rouletteEnd();
+				},
+				error: function() {
+					rouletteEnd();
+				}
+			});
 			rouletteEnd();
 		}
 	});
