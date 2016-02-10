@@ -12,6 +12,7 @@
  */
 
 #include <sys/inotify.h>
+#include <unistd.h>
 
 #include "folderwatcher_linux.h"
 
