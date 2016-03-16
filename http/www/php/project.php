@@ -317,6 +317,8 @@
 		if ($res === TRUE) {
 			$retours["value"] .= "Moving files... ";
 			rename("../file", "../file_cpy");
+			SureRemoveDir("../js", true);
+			SureRemoveDir("../css", true);
 
 			$retours["value"] .= "Unzipping... ";
 			$zip->extractTo("../");
