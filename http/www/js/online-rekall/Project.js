@@ -368,8 +368,15 @@ Project.prototype.analyse = function() {
 					//htmlHighlight	+=	"<div class='flattentimeline_image'      	style='"+colorTransp+" "+styleImage+"'></div>"; 
 					htmlHighlight 	+=	"<div class='flattentimeline_title' 		style='" + textColor + "' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>"; 
 					
-					if(tag.getMetadata("Rekall->Comments")!="") 
-						htmlHighlight 	+=	"<div class='flattentimeline_description'>" + tag.getMetadata("Rekall->Comments") + "</div>"; 
+					if(tag.getMetadata("Rekall->Comments")!="") {
+						
+						var tmpComments = tag.getMetadata("Rekall->Comments");
+						if(tmpComments.length>150){
+							tmpComments = tmpComments.substring(0, 150) + "...";
+						}
+						htmlHighlight 	+=	"<div class='flattentimeline_description'>" + tmpComments + "</div>"; 
+					}
+						
 						
 					htmlHighlight 	+=	"<div class='flattentimeline_typeTxt'		>" + typeTxt + "</div>";      
 					htmlHighlight 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";  
