@@ -44,7 +44,7 @@
 			$tcIn  = "";
 			$tcOut = "";
 			if(isset($_POST["tcIn"]))				 $tcIn  = $_POST["tcIn"];
-			if(isset($_POST["tcOut"]))				 $tcOut = $_POST["$tcOut"];
+			if(isset($_POST["tcOut"]))				 $tcOut = $_POST["tcOut"];
 			if(isset($_POST["locationName"]))		 $metas["Rekall->Location Name"] = $_POST["locationName"];
 			if(isset($_POST["locationGps"]))		 $metas["Rekall->Location GPS"]  = $_POST["locationGps"];
 			if(isset($_POST["author"]))				 $metas["Rekall->Author"]        = $_POST["author"];

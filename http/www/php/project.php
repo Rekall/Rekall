@@ -229,7 +229,7 @@
 		$tag->setAttribute("version",   0);
 		$racine->appendChild($tag);
 		$retours["value"] = $key." = [".$tcIn.", ".$tcOut."]";
-
+		
 		echo json_encode($retours);
 	}
 	
@@ -305,6 +305,7 @@
 	
 	//Met à jour Rekall
 	function update() {
+		
 		$retours = array("success" => 0, "error" => "", "value" => "");
 		
 		if(!file_exists("create.zip")) {
@@ -341,8 +342,6 @@
 		echo json_encode($retours);
 	}
 	
-	
-
 	//API
 	$_GET = array_merge($_GET, $_POST);
 	if(!isset($_SESSION["canEdit"]))

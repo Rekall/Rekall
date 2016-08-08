@@ -13,6 +13,7 @@ $(document).ready(function() {
 		if(httpGetData.p.length != 40)
 			httpGetData.p = (CryptoJS.SHA1(getParameterByName("p")) + "").toUpperCase();
 	}
+	
 	$.ajax("php/project.php", {
 		type: "POST",
 		dataType: "json",
@@ -21,7 +22,9 @@ $(document).ready(function() {
 			rekall_common = infos;
 			if(getParameterByName("w") != "")
 				rekall_common.owner.canEdit = false;
-			
+//
+//rekall_common.owner.canEdit = true;			
+							
 			if(rekall_common.owner.canEdit) {
 				//Mode preview or not
 				$(".editmode").removeClass("editmode");     
@@ -249,7 +252,7 @@ function setEditionControls() {
 	
 	$(".popupSettingsInput").keyup(function(event){  
 		event.stopPropagation();              
-		if(event.which == 13) {                                                                      
+		if(event.which == 13) {                                                                 
 			closeSettingsInputs();
 		}
 	}); 
@@ -459,7 +462,8 @@ function setEditionControls() {
 		}
 	});    
 	 
-	$("#popupLegendeInput").keyup(function(event){    
+	//Validation du commentaire avec Entrée = désactivé
+	/*$("#popupLegendeInput").keyup(function(event){    
 		event.stopPropagation(); 
 		
 		var isEnter = false;        
@@ -480,7 +484,7 @@ function setEditionControls() {
 		if(isEnter == true) {                                                              
 			closeInputs(); 
 		}
-	});         
+	}); */        
 	
 	$("#popupAuthorInput").keyup(function(event){  
 		event.stopPropagation();              
@@ -958,6 +962,7 @@ function setTCFromDom(keyDoc, TCin, TCout) {
 			rekall.loadXMLFile();
 		},
 		error: function() {
+			alert("Error");
 			openAlert("Server error. Try again.");
 			rouletteEnd();
 		}
