@@ -1,5 +1,5 @@
 #!/bin/bash
-cd `dirname $0`
+cd "$(dirname "$0")"
 rm -R -f createTmp
 rm -f create/create.zip
 mkdir createTmp
