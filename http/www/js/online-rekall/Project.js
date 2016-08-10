@@ -120,7 +120,9 @@ Project.prototype.loadXML = function(xml) {
 	});
 	
 	if((videoUrl != "") && (videoUrl != undefined)) {
-		var techOrder = ["vimeo", "html5", "flash"];
+		var techOrder = ["vimeo", "youtube", "html5", "flash"];
+		if(videoUrl.indexOf("youtube") >= 0)	videoTech = "youtube";
+		if(videoUrl.indexOf("vimeo") >= 0)		videoTech = "vimeo";
 		if((videoTech != "") && (videoTech != undefined))
 			techOrder = [videoTech, "html5", "flash"];
 
