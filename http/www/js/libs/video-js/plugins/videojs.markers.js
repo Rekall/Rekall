@@ -54,7 +54,7 @@
       /**
        * register the markers plugin (dependent on jquery)
        */
-   
+    
       var setting      = $.extend(true, {}, defaultSetting, options),
           markersMap   = {},
           markersList  = [], // list of markers sorted by time
@@ -366,6 +366,10 @@
          updateTime: function(){
             // notify the plugin to update the UI for changes in marker times 
             updateMarkers();
+         },
+         initialize: function(){
+            // notify the plugin to update the UI for changes in marker times 
+            initialize();
          },
          reset: function(newMarkers){
             // remove all the existing markers and add new ones

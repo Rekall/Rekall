@@ -71,29 +71,31 @@ Timeline.prototype.updateFlattenTimeline = function() {
 					progress = undefined;
 				
 				var dom = tag.flattenTimelineDom;
-				if(progress == undefined) {         
-					//dom.slideUp();  
-					dom.removeClass("docTocome").removeClass("docLive").removeClass("docFaraway");
-					dom.find(".flattentimeline_counter").hide();
-				}
-				else {
-					if(timeEndExtended == tag.timeEnd)
-						dom.find(".flattentimeline_opacifiant").css("width", constrain(progress, 0, 1)*100 + "%");
-					else
-						dom.find(".flattentimeline_opacifiant").css("width", "100%");
+				if(dom != undefined) {
+					if(progress == undefined) {         
+						//dom.slideUp();  
+						dom.removeClass("docTocome").removeClass("docLive").removeClass("docFaraway");
+						dom.find(".flattentimeline_counter").hide();
+					}
+					else {
+						if(timeEndExtended == tag.timeEnd)
+							dom.find(".flattentimeline_opacifiant").css("width", constrain(progress, 0, 1)*100 + "%");
+						else
+							dom.find(".flattentimeline_opacifiant").css("width", "100%");
 
-					if((0 <= progress) && (progress < 1))  
-						dom.removeClass("docTocome").removeClass("docFaraway").addClass("docLive");//.slideDown();//("opacity", 1.0).slideDown();   
-						//dom.css("opacity", 1.0).slideDown();
-					else if((-5 <= progress) && (progress <= 0))
-						dom.removeClass("docLive").removeClass("docFaraway").addClass("docTocome");//.slideDown();
-						//dom.css("opacity", 0.5).slideDown();
-					else if(-9999999 < progress)
-						dom.removeClass("docTocome").removeClass("docLive").addClass("docFaraway");//.slideDown();
-						//dom.css("opacity", 0.1).slideDown();
-					else         
-						dom.removeClass("docTocome").removeClass("docLive").removeClass("docFaraway");//.hide();
-						//dom.css("opacity", 0.1).hide();
+						if((0 <= progress) && (progress < 1))  
+							dom.removeClass("docTocome").removeClass("docFaraway").addClass("docLive");//.slideDown();//("opacity", 1.0).slideDown();   
+							//dom.css("opacity", 1.0).slideDown();
+						else if((-5 <= progress) && (progress <= 0))
+							dom.removeClass("docLive").removeClass("docFaraway").addClass("docTocome");//.slideDown();
+							//dom.css("opacity", 0.5).slideDown();
+						else if(-9999999 < progress)
+							dom.removeClass("docTocome").removeClass("docLive").addClass("docFaraway");//.slideDown();
+							//dom.css("opacity", 0.1).slideDown();
+						else         
+							dom.removeClass("docTocome").removeClass("docLive").removeClass("docFaraway");//.hide();
+							//dom.css("opacity", 0.1).hide();
+					}
 				}
 			}
 		}

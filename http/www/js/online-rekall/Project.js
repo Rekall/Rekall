@@ -120,92 +120,32 @@ Project.prototype.loadXML = function(xml) {
 	});
 	
 	if((videoUrl != "") && (videoUrl != undefined)) {
-		var techOrder = ["youtube", "html5", "flash"];
+		var techOrder = ["vimeo", "html5", "flash"];
 		if((videoTech != "") && (videoTech != undefined))
 			techOrder = [videoTech, "html5", "flash"];
-		/*
-		//rekall.videoPlayer."techOrder": ["youtube", "html5", "flash"], //youtube dailymotion vimeo
-		if((videoTech != "") && (videoTech != undefined))
-			rekall.videoPlayer.options.techOrder = [videoTech];
-		//rekall.videoPlayer.options.techOrder = ['flash', 'html5'];
-		*/
+
 		//Video
 		if(rekall.videoPlayer == undefined) {
 			videojs("video", {
+				"techOrder": techOrder,
 				"controls": true,
 				"autoplay": false,
-				"preload": 	"auto",
 				"loop": 	"false",
-				"techOrder": techOrder, //youtube dailymotion vimeo
-		/*
-				"poster":   "http://video-js.zencoder.com/oceans-clip.png",
-				"src": 	 	"https://vimeo.com/45161598",
-				"techOrder": [""], "src" : "",
-				"techOrder": ["vimeo"], "src" : "",
-				"techOrder": ["html5", "flash"], "src": "oceans-clip.mp4",
-		*/
-				children: {
-					controlBar: {
-						children: {
-							fullscreenToggle: 	false,
-						}
+				"preload": 	"auto",
+				"sources": [
+					{
+						"type": "video/" + videoTech,
+						"src": videoUrl
 					}
-				}
-				/*
-				    PosterImage
-				    TextTrackDisplay
-				    LoadingSpinner
-				    BigPlayButton
-				    ControlBar
-				        PlayToggle
-				        FullscreenToggle
-				        CurrentTimeDisplay
-				        TimeDivider
-				        DurationDisplay
-				        RemainingTimeDisplay
-				        ProgressControl
-				            SeekBar
-				              LoadProgressBar
-				              PlayProgressBar
-				              SeekHandle
-				        VolumeControl
-				            VolumeBar
-				                VolumeLevel
-				                VolumeHandle
-				        MuteToggle
-				*/
+				]
 			}, function() {
 				rekall.videoPlayer = this;
-				//rekall.videoPlayer.volume(0);
-				//rekall.timeline.play();
-				rekall.videoPlayer.src(videoUrl);
-				//rekall.videoPlayer.src([{type: "video/mp4", src: "http://video-js.zencoder.com/oceans-clip.mp4"}, {type: "video/webm", src: "http://video-js.zencoder.com/oceans-clip.webm"}, {type: "video/ogg", src: "http://video-js.zencoder.com/oceans-clip.ogv"}]);
-				//rekall.videoPlayer.src("http://www.dailymotion.com/video/xxvfw4_guillaume-jacquemin-soiree-di-zain-5-code-s-data-s_creation");
+				$(".vjs-fullscreen-control").hide();
 				
-				/*
-				try {
-					var options = {
-						optionsAnnotator: {user: {},store: {}},
-						optionsVideoJS: {},
-						optionsRS: {},
-						optionsOVA: {posBigNew:'ul'},
-					}
-					//Add the div id to annotate by Annotator. In the demo.html the id is "airlock" too.
-					var ova = new OpenVideoAnnotation.Annotator($('#video'),options);
-
-					//(optional) Set the configuration for the users
-					ova.setCurrentUser($('#username').val());
-
-					$('#username').change(function () {
-						ova.setCurrentUser($(this).val());
-					});
-				}
-				catch(err) {
-					
-				}
-				*/
-
 				rekall.videoPlayer.on("durationchange", function(e) {
+					rekall.videoPlayer.markers.removeAll == undefined;
+					rekall.project.analyse();
+		            rekall.videoPlayer.markers.initialize();
 				});
 				rekall.videoPlayer.on("ended", function(e) {
 				});
@@ -220,6 +160,8 @@ Project.prototype.loadXML = function(xml) {
 				rekall.videoPlayer.on("loadeddata", function(e) {
 				});
 				rekall.videoPlayer.on("loadedmetadata", function(e) {
+					console.log(counts.documents + " documents analysés, " + counts.metadatas + " métadonnées extraites et " + counts.tags + " tags affichés !");
+					rekall.project.analyse();
 				});
 				rekall.videoPlayer.on("loadstart", function(e) {
 				});
@@ -244,8 +186,6 @@ Project.prototype.loadXML = function(xml) {
 				});
 				$(window).trigger("resize");
 	
-				console.log(counts.documents + " documents analysés, " + counts.metadatas + " métadonnées extraites et " + counts.tags + " tags affichés !");
-				rekall.project.analyse();
 			});
 		}
 		else {
