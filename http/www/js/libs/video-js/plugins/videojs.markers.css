@@ -19,7 +19,6 @@
 .vjs-tip {
   visibility: hidden;
   display: block;
-  opacity: 0.8;
   padding: 5px;
   font-size: 10px;
   position: absolute;
@@ -30,6 +29,7 @@
   background: url(data:image/gif;base64,R0lGODlhCQAJAIABAAAAAAAAACH5BAEAAAEALAAAAAAJAAkAAAIRjAOnwIrcDJxvwkplPtchVQAAOw==) no-repeat top left;
   bottom: 0;
   left: 50%;
+	opacity:	.8;
   margin-left: -4px;
   background-position: bottom left;
   position: absolute;
@@ -41,7 +41,7 @@
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   padding: 5px 8px 4px 8px;
-  background-color: black;
+  background-color: rgba(0,0,0,.8);
   color: white;
   max-width: 200px;
   text-align: center;

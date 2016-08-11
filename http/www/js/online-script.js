@@ -178,6 +178,11 @@ function setEditionControls() {
 	});
 	         
 	
+	$("#left_menu_bottom").click(function(event){
+		var tmp = $(".vjs-marker").css("z-index");
+		alert("val = "+tmp);
+	});
+	
 	$("#left_menu_item_settings").click(function(event){  
 		event.stopPropagation(); 
 		$("#popupSettingsSpace").show();         
@@ -219,6 +224,7 @@ function setEditionControls() {
 		}
 		                                                                             
 	});  
+	
 
 	
 	$("#popupSettingsTitleDiv").click(function(event){  
