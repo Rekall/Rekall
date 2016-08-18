@@ -121,8 +121,11 @@ Project.prototype.loadXML = function(xml) {
 	
 	if((videoUrl != "") && (videoUrl != undefined)) {
 		var techOrder = ["vimeo", "youtube", "html5", "flash"];
-		if(videoUrl.indexOf("youtube") >= 0)	videoTech = "youtube";
-		if(videoUrl.indexOf("vimeo") >= 0)		videoTech = "vimeo";
+		if(videoUrl.indexOf("youtube") >= 0)		videoTech = "youtube";
+		if(videoUrl.indexOf("youtu.be") >= 0)		videoTech = "youtube";
+		if(videoUrl.indexOf("vimeo") >= 0)			videoTech = "vimeo";
+		if(videoUrl.indexOf("dailymotion") >= 0)	videoTech = "dailymotion";
+		if(videoUrl.indexOf("dai.ly") >= 0)			videoTech = "dailymotion";
 		if((videoTech != "") && (videoTech != undefined))
 			techOrder = [videoTech, "html5", "flash"];
 
