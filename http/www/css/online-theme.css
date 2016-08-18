@@ -995,7 +995,7 @@ html, body {
 	display:				inline-block;
 } 
 
-.flattentimeline_highlightitem .flattentimeline_typeTxt {    
+.flattentimeline_highlightitem .flattentimeline_typeTxt, .flattentimeline_highlightitem .flattentimeline_author {    
 	font-weight:			400;
 	font-size:				9px;  
 	line-height:			1.2em;                  
@@ -1008,6 +1008,9 @@ html, body {
 	display:				inline-block;   
 	font-style:				italic;   
 	/*text-transform:			uppercase; */
+}
+.flattentimeline_highlightitem .flattentimeline_author {    
+	font-style:				normal;   
 }
 
 .flattentimeline_subtitle {

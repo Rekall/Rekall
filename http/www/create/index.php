@@ -111,7 +111,7 @@
 		<label>Project name *</label>
 		<input type="text" name="create"   placeholder="my-project-name" size="30"><br/>
 		<label>YouTube video URL *</label>
-	    <input type="text" name="video"    placeholder="https://www.youtube.com/watch?v=4Rcw5GCXJnQ" size="30"><br/>
+	    <input type="text" name="video"    placeholder="http://www.youtube.com/watch?v=bnC9pu65pa0" size="30"><br/> 
 		<label>Edition password *</label>
 	    <input type="password" name="p" placeholder="password" size="30"><br/>
 

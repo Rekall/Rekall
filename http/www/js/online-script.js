@@ -1033,8 +1033,11 @@ function uploadFiles(files) {
 			formData.append("name", file);
 		}
 		
+		var tcOut = rekall.timeline.timeCurrent + 15;
+		if(tcOut>=rekall.videoPlayer.duration()) tcOut = rekall.videoPlayer.duration();
+		
 		formData.append("tcIn", 		rekall.timeline.timeCurrent);
-		formData.append("tcOut", 		rekall.videoPlayer.duration());
+		formData.append("tcOut", 		tcOut);
 		formData.append("author",       rekall_common.owner.author);
 		formData.append("locationGps",  rekall_common.owner.locationGps);
 		formData.append("locationName", rekall_common.owner.locationName);

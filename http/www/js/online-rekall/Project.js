@@ -368,6 +368,7 @@ Project.prototype.analyse = function() {
 					//htmlHighlight	+=	"<div class='flattentimeline_image'      	style='"+colorTransp+" "+styleImage+"'></div>"; 
 					htmlHighlight 	+=	"<div class='flattentimeline_title' 		style='" + textColor + "' title='" + tag.getMetadata("Rekall->Name") + "'>" + tag.getMetadata("Rekall->Name") + "</div>"; 
 					
+					
 					if(tag.getMetadata("Rekall->Comments")!="") {
 						
 						var tmpComments = tag.getMetadata("Rekall->Comments");
@@ -377,6 +378,8 @@ Project.prototype.analyse = function() {
 						htmlHighlight 	+=	"<div class='flattentimeline_description'>" + tmpComments + "</div>"; 
 					}
 						
+					if(tag.getMetadata("Rekall->Author")!="")	htmlHighlight 	+=	"<div class='flattentimeline_author'>" + tag.getMetadata("Rekall->Author") + "</div>";
+				
 						
 					htmlHighlight 	+=	"<div class='flattentimeline_typeTxt'		>" + typeTxt + "</div>";      
 					htmlHighlight 	+= "<div class='flattentimeline_opacifiant' style='" + styleColor2 + "'></div>";  
