@@ -79,6 +79,9 @@ $(document).ready(function() {
 			
 			rouletteEnd();
 			rekall.loadXMLFile();  
+			
+			var tmpUrl = shareLink();
+			$("#watermarkBox").attr("href",tmpUrl);
 
 		},
 		error: function() {
@@ -86,10 +89,8 @@ $(document).ready(function() {
 			rekall.loadXMLFile();
 		}
 	});
-	   
-	
-	$("#watermarkBox").attr("href",shareLink());
-   
+	 
+
 	    
 	
 	$("#popupAlertSpace").click(function(event){  
