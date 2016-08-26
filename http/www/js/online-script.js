@@ -87,7 +87,8 @@ $(document).ready(function() {
 		}
 	});
 	   
-
+	
+	$("#watermarkBox").attr("href",shareLink());
    
 	    
 	

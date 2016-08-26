@@ -1137,43 +1137,71 @@ html, body {
 	width:0 !important;
 }      
 
-#watermark {                  
-	width:				15vh; 
-	height:				15vh; 
-	min-width:			80px; 
-	min-height:			80px;
-	position:			absolute;
-	z-index:			100000;   
-	top:				10px; 
-	left:				10px; 
-	opacity:			.5;                 
+@media screen and (min-width: 1001px) {
+  	#watermark {                  
+		display:			none;              
+	}
+	#projectInfoBtn {
+		position:			absolute;
+		display:			none;
+	}
 }
-#watermark:hover {   
-    opacity:			1;  
-} 
-   
-#projectInfoBtn {
-	width:				5vh; 
-	height:				5vh;  
-	background:			#FFF;  
+
+@media screen and (max-width: 1000px) {
+  	#watermark {                  
+		width:				40px; 
+		height:				40px;
+		position:			absolute;
+		z-index:			100000;     
+		bottom:				50px;
+		left:				20px; 
+		opacity:			.5;                 
+	}
+	#watermark:hover {   
+	    opacity:			1;  
+	}
+	
+	#projectInfoBtn {
+		width:				30px; 
+		height:				30px;
+		background:			#FFF;  
+		position:			absolute;
+		z-index:			100000;   
+		top:				20px; 
+		left:				20px;
+		opacity:			.25;  
+		border-radius:		200px;    
+		font-family:		serif;
+		font-style:			italic;
+		font-weight:		bold;
+		color:				#000;   
+		font-size:			24px;  
+		text-align:			center;   
+		line-height:		30px;   
+		cursor:				pointer;
+	}    
+	#projectInfoBtn:hover {   
+	    opacity:			.5;  
+	}
+}
+
+#openFullScreen {                  
+	width:				30px; 
+	height:				30px; 
+	min-width:			25px; 
+	min-height:			25px;
 	position:			absolute;
 	z-index:			100000;   
-	top:				10px; 
+	bottom:				40px; 
 	right:				220px; 
-	opacity:			.25;  
-	border-radius:		200px;    
-	font-family:		serif;
-	font-style:			italic;
-	font-weight:		bold;
-	color:				#000;   
-	font-size:			4vh;  
-	text-align:			center;   
-	line-height:		5vh;   
-	cursor:				pointer;
-}    
-#projectInfoBtn:hover {   
-    opacity:			.5;  
-}                         
+	opacity:			.5;    
+	display:			none;             
+}
+#openFullScreen:hover {   
+    opacity:			1;  
+}
+   
+                        
 
 .displayMode {
    /* display:			none;   */

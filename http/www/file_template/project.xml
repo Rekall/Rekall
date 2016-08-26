@@ -3,10 +3,10 @@
 <project>
   <video url="__video__"/>
   <document key="marker-1f10323d5f4a1c119e777e59c2f00dcc650e750d">
-    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Author" cnt=""/>
     <meta ctg="Rekall-&gt;Date/Time" cnt="2015:08:31 18:06:16"/>
     <meta ctg="Rekall-&gt;Import Date" cnt="2015:08:31 18:06:16"/>
-    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt=""/>
     <meta ctg="Rekall-&gt;Location Name" cnt="48.867359621322265, 2.3618561655447228"/>
     <meta ctg="Rekall-&gt;Location GPS" cnt="48.867359621322265, 2.3618561655447228"/>
     <meta ctg="Rekall User Infos-&gt;User IP" cnt="127.0.0.1"/>
@@ -16,7 +16,7 @@
     <meta ctg="Rekall-&gt;Visibility" cnt=""/>
     <meta ctg="Rekall-&gt;Type" cnt="rekall/marker"/>
     <meta ctg="Rekall-&gt;Flag" cnt="Marker"/>
-    <meta ctg="Rekall-&gt;Name" cnt="A note"/>
+    <meta ctg="Rekall-&gt;Name" cnt="New note"/>
   </document>
   <tag key="marker-1f10323d5f4a1c119e777e59c2f00dcc650e750d" timeStart="0" timeEnd="10" version="0"/>
 </project>
