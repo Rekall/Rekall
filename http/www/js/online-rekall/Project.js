@@ -378,6 +378,17 @@ Project.prototype.analyse = function() {
 						if(tmpComments.length>150){
 							tmpComments = tmpComments.substring(0, 150) + "...";
 						}
+						
+						var tmpcount = 0;
+						var tmpIndex = tmpComments.indexOf("<br/>");
+						while((tmpcount<3)&&(tmpIndex!=-1)) {
+							//alert(tmpComments+" / "+tmpIndex);
+							tmpcount++;
+							tmpIndex = tmpComments.indexOf("<br/>",tmpIndex+1);
+						}
+						if(tmpIndex!=-1) {
+							tmpComments = tmpComments.substring(0, tmpIndex) + "...";
+						}
 						htmlHighlight 	+=	"<div class='flattentimeline_description'>" + tmpComments + "</div>"; 
 					}
 						
