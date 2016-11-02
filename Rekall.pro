@@ -24,7 +24,7 @@ message($$[QT_VERSION])
 contains(QT_VERSION, "^5.*") {
     message("Rekall For QT5")
     DEFINES += QT5
-    QT      += core gui network xml widgets webkitwidgets multimedia multimediawidgets
+    QT      += core gui network xml widgets multimedia multimediawidgets webengine webenginewidgets
 } else {
     message("Rekall For QT4 — not compatible, please upgrade")
 }

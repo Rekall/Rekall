@@ -80,6 +80,87 @@ VideoPlayer.prototype.loadLocal = function(tagOrDoc, play) {
 VideoPlayer.prototype.activate = function() {
 	if(this.webbasedPlayer) {
 		var thiss = this;
+		videojs(this.uniqueName, {
+			"techOrder": ["html5"],
+			"controls": true,
+			"autoplay": false,
+			"loop": 	"false",
+			"preload": 	"auto"
+		}, function() {
+			thiss.player = this;
+			$("#" + thiss.uniqueName).find(".vjs-control-bar").append("<div class='vjs-time-controls vjs-control vjs-custom'></div>");
+			thiss.semihide($("#" + thiss.uniqueName));
+		
+			thiss.player.on('seeking', function(e) {
+			});
+		
+			thiss.player.on("loadedmetadata", function() {
+				thiss.player.play();
+				if(!thiss.autoplay)
+					thiss.player.pause();
+				thiss.semihide($("#" + thiss.uniqueName));
+				thiss.player.userActive(true);
+			
+				//thiss.video.thumbnails([]);
+				if((thiss.thumbPath != undefined) && (thiss.thumbPath != "")) {
+					$.ajax({
+						url: 	thiss.poster,
+						type: 	'HEAD',
+						error: function() {
+						},
+						success: function() {
+							var duration = thiss.player.duration();
+							var thumbnails = new Object();
+							var thumbEach = 5;
+							for(var thumbIndex = 0 ; thumbIndex < ceil(duration / thumbEach) ; thumbIndex++) {
+								thumbnails[thumbEach*thumbIndex] = new Object();
+								thumbnails[thumbEach*thumbIndex].src = thiss.thumbPath + "_" + (thumbIndex+1) + ".jpg";
+							}
+							thiss.video.thumbnails(thumbnails);
+						}
+					});
+				}
+			});
+			
+			thiss.player.on("durationchange", function(e) {
+			});
+			thiss.player.on("ended", function(e) {
+			});
+			thiss.player.on("error", function(e) {
+			});
+			thiss.player.on("firstplay", function(e) {
+			});
+			thiss.player.on("fullscreenchange", function(e) {
+			});
+			thiss.player.on("loadedalldata", function(e) {
+			});
+			thiss.player.on("loadeddata", function(e) {
+			});
+			thiss.player.on("loadedmetadata", function(e) {
+			});
+			thiss.player.on("loadstart", function(e) {
+			});
+			thiss.player.on("pause", function(e) {
+			});
+			thiss.player.on("play", function(e) {
+			});
+			thiss.player.on("progress", function(e) {
+			});
+			thiss.player.on("seeked", function(e) {
+			});
+			thiss.player.on("seeking", function(e) {
+			});
+			thiss.player.on("timeupdate", function(e) {
+			});
+			thiss.player.on("volumechange", function(e) {
+			});
+			thiss.player.on("waiting", function(e) {
+			});
+			thiss.player.on("resize", function(e) {
+			});
+		});
+		
+		/*
 		this.video = videojs(this.uniqueName);
 		this.video.ready(function() {
 			thiss.player = this;
@@ -117,6 +198,7 @@ VideoPlayer.prototype.activate = function() {
 				}
 			});
 		});
+		*/
 	
 		$("#" + thiss.uniqueName).mouseover(function() {
 			thiss.semishow($(this));
@@ -143,7 +225,8 @@ VideoPlayer.prototype.hide = function() {
 	if(this.webbasedPlayer) {
 		this.dom.find("#" + this.uniqueName).parent().hide();
 		this.tagOrDoc = undefined;
-		this.player.pause();
+		if(this.player)
+			this.player.pause();
 		this.autoplay = false;
 	}
 	else if(this.tagOrDoc != undefined) {

@@ -30,7 +30,6 @@
 #include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <QMenuBar>
-#include <QWebView>
 #include <QFileDialog>
 #include <QMenuBar>
 #include "webwrapper.h"
