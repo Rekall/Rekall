@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     //rekallApp.installTranslator(&translator);
 
     QString appName    = "Rekall ";
-    QString appVersion = "1.0.0";
+    QString appVersion = "2.0.0";
 
 #ifdef Q_OS_MAC
     appName += "Mac";
