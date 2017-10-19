@@ -1,0 +1,11 @@
+<Files ".htaccess">
+Order Allow,Deny
+Deny from all
+</Files>
+
+<Files "projectPassword.txt">
+Order Allow,Deny
+Deny from all
+</Files>
+
+Options All -Indexes

@@ -1,0 +1,268 @@
+<?xml version="1.0"?>
+<!DOCTYPE rekall>
+<project>
+  <video url="http://www.youtube.com/watch?v=bnC9pu65pa0"/>
+  <document key="marker-1f10323d5f4a1c119e777e59c2f00dcc650e750d">
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:08:31 18:06:16"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:08:31 18:06:16"/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt="48.867359621322265, 2.3618561655447228"/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt="48.867359621322265, 2.3618561655447228"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="127.0.0.1"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="Rekall-&gt;Keywords" cnt=""/>
+    <meta ctg="Rekall-&gt;Group" cnt=""/>
+    <meta ctg="Rekall-&gt;Visibility" cnt=""/>
+    <meta ctg="Rekall-&gt;Type" cnt="rekall/marker"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="Marker"/>
+    <meta ctg="Rekall-&gt;Name" cnt="Mon marker"/>
+  </document>
+  <tag key="marker-1f10323d5f4a1c119e777e59c2f00dcc650e750d" timeStart="0" timeEnd="10" version="0"/>
+  <edition key="marker-1f10323d5f4a1c119e777e59c2f00dcc650e750d" metadataKey="Rekall-&gt;Name" metadataValue="D&#xE9;but de la vid&#xE9;o" version="0"/>
+  <tag key="/capture.png" timeStart="0" timeEnd="60" version="0"/>
+  <tag key="/capture.png" timeStart="0" timeEnd="60" version="0"/>
+  <edition key="/capture.png" metadataKey="Rekall-&gt;Comments" metadataValue="Le compresseur multi-bande a &#xE9;t&#xE9; pens&#xE9; comme tel" version="0"/>
+  <edition key="/capture.png" metadataKey="Rekall-&gt;Comments" metadataValue="Le compresseur multi-bandes a &#xE9;t&#xE9; r&#xE9;gl&#xE9; comme tel" version="0"/>
+  <edition key="marker-1f10323d5f4a1c119e777e59c2f00dcc650e750d" metadataKey="Rekall-&gt;Name" metadataValue="Pr&#xE9;sentation" version="0"/>
+  <document key="marker-6c63420c4bc4622ee56fd20d33d1f1320115b5ea">
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:09:01 21:36:15"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:01 21:36:15"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt="8 Avenue du Bel air, 75012 Paris, France"/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt="48.845954376543,2.3980615974311115"/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="82.226.26.77"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="Rekall-&gt;Type" cnt="rekall/marker"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="Marker"/>
+    <meta ctg="Rekall-&gt;Name" cnt="Mon marker"/>
+    <meta ctg="key" cnt="marker-6c63420c4bc4622ee56fd20d33d1f1320115b5ea"/>
+  </document>
+  <tag key="marker-6c63420c4bc4622ee56fd20d33d1f1320115b5ea" timeStart="67.388412694" timeEnd="67.388412694" version="0"/>
+  <tag key="marker-6c63420c4bc4622ee56fd20d33d1f1320115b5ea" timeStart="67" timeEnd="75" version="0"/>
+  <edition key="marker-6c63420c4bc4622ee56fd20d33d1f1320115b5ea" metadataKey="Rekall-&gt;Name" metadataValue="Modulateur en anneaux" version="0"/>
+  <tag key="marker-6c63420c4bc4622ee56fd20d33d1f1320115b5ea" timeStart="72" timeEnd="82" version="0"/>
+  <document key="marker-6606836f06e25d3d4770cc870f48c1c882ef92eb">
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:09:02 08:37:32"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:02 08:37:32"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt="10 Avenue du Bel air, 75012 Paris, France"/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt="48.8460836,2.398246"/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="82.226.26.77"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="Rekall-&gt;Type" cnt="rekall/marker"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="Marker"/>
+    <meta ctg="Rekall-&gt;Name" cnt="Mon marker"/>
+    <meta ctg="key" cnt="marker-6606836f06e25d3d4770cc870f48c1c882ef92eb"/>
+  </document>
+  <tag key="marker-6606836f06e25d3d4770cc870f48c1c882ef92eb" timeStart="121.946568" timeEnd="121.946568" version="0"/>
+  <edition key="marker-6606836f06e25d3d4770cc870f48c1c882ef92eb" metadataKey="Rekall-&gt;Name" metadataValue="Filtrage" version="0"/>
+  <edition key="marker-6606836f06e25d3d4770cc870f48c1c882ef92eb" metadataKey="Rekall-&gt;Comments" metadataValue="Filtre @ -24 db/Octave" version="0"/>
+  <edition key="marker-6606836f06e25d3d4770cc870f48c1c882ef92eb" metadataKey="Rekall-&gt;Highlight" metadataValue="true" version="0"/>
+  <tag key="marker-6606836f06e25d3d4770cc870f48c1c882ef92eb" timeStart="121" timeEnd="145" version="0"/>
+  <tag key="marker-6606836f06e25d3d4770cc870f48c1c882ef92eb" timeStart="121" timeEnd="141" version="0"/>
+  <document>
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="File-&gt;File Access Date/Time" cnt="2015:06:18 19:08:00"/>
+    <meta ctg="File-&gt;File Creation Date/Time" cnt="2015:06:18 19:08:00"/>
+    <meta ctg="File-&gt;File Modification Date/Time" cnt="2015:06:18 19:08:00"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:06:18 19:08:00"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:02 08:52:00"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt="10 Avenue du Bel air, 75012 Paris, France"/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt="48.8460786,2.3982101"/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="82.226.26.77"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="File-&gt;Hash" cnt="81DE2F9AFEB07C52C4482D33D26098D9136B120D"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="File"/>
+    <meta ctg="File-&gt;Thumbnail" cnt=""/>
+    <meta ctg="File-&gt;Owner" cnt="buzzingl"/>
+    <meta ctg="File-&gt;MIME Type" cnt="application/pdf"/>
+    <meta ctg="File-&gt;File Type" cnt="application/pdf"/>
+    <meta ctg="Rekall-&gt;Type" cnt="application/pdf"/>
+    <meta ctg="File-&gt;File Name" cnt="Slim Phatty.pdf"/>
+    <meta ctg="File-&gt;Extension" cnt="pdf"/>
+    <meta ctg="File-&gt;Basename" cnt="Slim Phatty"/>
+    <meta ctg="Rekall-&gt;Name" cnt="Slim Phatty"/>
+    <meta ctg="Rekall-&gt;Extension" cnt="PDF"/>
+    <meta ctg="Rekall-&gt;Folder" cnt=""/>
+    <meta ctg="Rekall-&gt;File Size" cnt="1752727"/>
+    <meta ctg="Rekall-&gt;File Size (MB)" cnt="1.6715307235718"/>
+    <meta ctg="key" cnt="/Slim Phatty.pdf"/>
+  </document>
+  <tag key="/Slim Phatty.pdf" timeStart="32.844" timeEnd="32.844" version="0"/>
+  <edition key="/Slim Phatty.pdf" metadataKey="Rekall-&gt;Comments" metadataValue="Notice technique du g&#xE9;n&#xE9;rateur anisotropique" version="0"/>
+  <tag key="/Slim Phatty.pdf" timeStart="30" timeEnd="60" version="0"/>
+  <tag key="/Slim Phatty.pdf" timeStart="30" timeEnd="60" version="0"/>
+  <edition key="/Slim Phatty.pdf" metadataKey="Rekall-&gt;Name" metadataValue="Notice technique" version="0"/>
+  <tag key="/Capture d&#x2019;&#xE9;cran 2015-08-12 &#xE0; 14.58.20.png" timeStart="0" timeEnd="0" version="0"/>
+  <document>
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="File-&gt;File Access Date/Time" cnt="2015:07:11 11:00:47"/>
+    <meta ctg="File-&gt;File Creation Date/Time" cnt="2015:07:11 11:00:47"/>
+    <meta ctg="File-&gt;File Modification Date/Time" cnt="2015:07:11 11:00:47"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:07:11 11:00:47"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:02 22:58:13"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt=""/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt=""/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="193.248.46.80"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="File-&gt;Hash" cnt="10802734D5BE2D9650CE29726A72985682EFBBF4"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="File"/>
+    <meta ctg="File-&gt;Thumbnail" cnt="DA39A3EE5E6B4B0D3255BFEF95601890AFD80709-10802734D5BE2D9650CE29726A72985682EFBBF4"/>
+    <meta ctg="File-&gt;Owner" cnt="buzzingl"/>
+    <meta ctg="File-&gt;MIME Type" cnt="image/jpeg"/>
+    <meta ctg="File-&gt;File Type" cnt="image/jpeg"/>
+    <meta ctg="Rekall-&gt;Type" cnt="image/jpeg"/>
+    <meta ctg="File-&gt;File Name" cnt="tumblr_m5vv7yqtyv1rtqnm9o1_500.jpg"/>
+    <meta ctg="File-&gt;Extension" cnt="jpg"/>
+    <meta ctg="File-&gt;Basename" cnt="tumblr_m5vv7yqtyv1rtqnm9o1_500"/>
+    <meta ctg="Rekall-&gt;Name" cnt="tumblr_m5vv7yqtyv1rtqnm9o1_500"/>
+    <meta ctg="Rekall-&gt;Extension" cnt="JPG"/>
+    <meta ctg="Rekall-&gt;Folder" cnt=""/>
+    <meta ctg="Rekall-&gt;File Size" cnt="47693"/>
+    <meta ctg="Rekall-&gt;File Size (MB)" cnt="0.045483589172363"/>
+    <meta ctg="key" cnt="/tumblr_m5vv7yqtyv1rtqnm9o1_500.jpg"/>
+  </document>
+  <tag key="/tumblr_m5vv7yqtyv1rtqnm9o1_500.jpg" timeStart="81.599600838" timeEnd="81.599600838" version="0"/>
+  <edition key="/tumblr_m5vv7yqtyv1rtqnm9o1_500.jpg" metadataKey="Rekall-&gt;Comments" metadataValue="il &#xE9;tait une fois" version="0"/>
+  <edition key="/tumblr_m5vv7yqtyv1rtqnm9o1_500.jpg" metadataKey="Rekall-&gt;Highlight" metadataValue="true" version="0"/>
+  <tag key="/tumblr_m5vv7yqtyv1rtqnm9o1_500.jpg" timeStart="81" timeEnd="139" version="0"/>
+  <tag key="/tumblr_m5vv7yqtyv1rtqnm9o1_500.jpg" timeStart="81" timeEnd="139" version="0"/>
+  <document key="marker-85da001da5f557919a926cdcf4c7bfb134c0e409">
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:09:02 23:00:34"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:02 23:00:34"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt=""/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt=""/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="193.248.46.80"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="Rekall-&gt;Type" cnt="rekall/marker"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="Marker"/>
+    <meta ctg="Rekall-&gt;Name" cnt="New note"/>
+    <meta ctg="key" cnt="marker-85da001da5f557919a926cdcf4c7bfb134c0e409"/>
+  </document>
+  <tag key="marker-85da001da5f557919a926cdcf4c7bfb134c0e409" timeStart="95.649246321" timeEnd="95.649246321" version="0"/>
+  <edition key="marker-85da001da5f557919a926cdcf4c7bfb134c0e409" metadataKey="Rekall-&gt;Comments" metadataValue="je vois pas la dur&#xE9;e d&#x2019;une image" version="0"/>
+  <tag key="marker-85da001da5f557919a926cdcf4c7bfb134c0e409" timeStart="95" timeEnd="110" version="0"/>
+  <edition key="marker-85da001da5f557919a926cdcf4c7bfb134c0e409" metadataKey="Rekall-&gt;Name" metadataValue="je vois pas la dur&#xE9;e d&#x2019;une image" version="0"/>
+  <document key="marker-3392530819884b092292da6d8d49eaa38aaaf2f4">
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:09:02 23:02:17"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:02 23:02:17"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt=""/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt=""/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="193.248.46.80"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="Rekall-&gt;Type" cnt="rekall/marker"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="Marker"/>
+    <meta ctg="Rekall-&gt;Name" cnt="New note"/>
+    <meta ctg="key" cnt="marker-3392530819884b092292da6d8d49eaa38aaaf2f4"/>
+  </document>
+  <tag key="marker-3392530819884b092292da6d8d49eaa38aaaf2f4" timeStart="121.313080564" timeEnd="121.313080564" version="0"/>
+  <tag key="/capture42F4D.png" timeStart="0" timeEnd="60" version="0"/>
+  <edition key="/capture42F4D.png" metadataKey="Rekall-&gt;Comments" metadataValue="Compresseur multi-bandes" version="0"/>
+  <edition key="marker-6606836f06e25d3d4770cc870f48c1c882ef92eb" metadataKey="Rekall-&gt;Highlight" metadataValue="" version="0"/>
+  <edition key="marker-6606836f06e25d3d4770cc870f48c1c882ef92eb" metadataKey="Rekall-&gt;Highlight" metadataValue="true" version="0"/>
+  <document key="marker-459a730652f5425f3d33a2216b74309c931be2ed">
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:09:05 16:36:47"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:05 16:36:47"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt=""/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt=""/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="80.215.178.248"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="Rekall-&gt;Type" cnt="rekall/marker"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="Marker"/>
+    <meta ctg="Rekall-&gt;Name" cnt="New note"/>
+    <meta ctg="key" cnt="marker-459a730652f5425f3d33a2216b74309c931be2ed"/>
+  </document>
+  <tag key="marker-459a730652f5425f3d33a2216b74309c931be2ed" timeStart="50.246" timeEnd="50.246" version="0"/>
+  <edition key="/tumblr_m5vv7yqtyv1rtqnm9o1_500.jpg" metadataKey="Rekall-&gt;Highlight" metadataValue="" version="0"/>
+  <document key="marker-f7b3f6568240a8f918b19bc093c19a4714040915">
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:09:07 11:04:26"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:07 11:04:26"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt=""/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt=""/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="80.215.234.212"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="Rekall-&gt;Type" cnt="rekall/marker"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="Marker"/>
+    <meta ctg="Rekall-&gt;Name" cnt="New note"/>
+    <meta ctg="key" cnt="marker-f7b3f6568240a8f918b19bc093c19a4714040915"/>
+  </document>
+  <tag key="marker-f7b3f6568240a8f918b19bc093c19a4714040915" timeStart="6.577" timeEnd="6.577" version="0"/>
+  <edition key="/sdfdsfdsf.png" metadataKey="Rekall-&gt;Comments" metadataValue="Compresseur multi-bandes" version="0"/>
+  <document>
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="File-&gt;File Access Date/Time" cnt="2015:08:31 17:19:32"/>
+    <meta ctg="File-&gt;File Creation Date/Time" cnt="2015:08:31 17:19:32"/>
+    <meta ctg="File-&gt;File Modification Date/Time" cnt="2015:08:31 17:19:32"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:08:31 17:19:32"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:07 20:59:50"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt="5 Rue Meslay, 75003 Paris, France"/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt="48.86730611542859,2.3619106418432563"/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="88.165.92.2"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="File-&gt;Hash" cnt="7789615020E6816373D6A80138DD45152370C69C"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="File"/>
+    <meta ctg="File-&gt;Thumbnail" cnt="DA39A3EE5E6B4B0D3255BFEF95601890AFD80709-7789615020E6816373D6A80138DD45152370C69C"/>
+    <meta ctg="File-&gt;Owner" cnt="buzzingl"/>
+    <meta ctg="File-&gt;MIME Type" cnt="image/png"/>
+    <meta ctg="File-&gt;File Type" cnt="image/png"/>
+    <meta ctg="Rekall-&gt;Type" cnt="image/png"/>
+    <meta ctg="File-&gt;File Name" cnt="Tst.png"/>
+    <meta ctg="File-&gt;Extension" cnt="png"/>
+    <meta ctg="File-&gt;Basename" cnt="Tst"/>
+    <meta ctg="Rekall-&gt;Name" cnt="Tst"/>
+    <meta ctg="Rekall-&gt;Extension" cnt="PNG"/>
+    <meta ctg="Rekall-&gt;Folder" cnt=""/>
+    <meta ctg="Rekall-&gt;File Size" cnt="187747"/>
+    <meta ctg="Rekall-&gt;File Size (MB)" cnt="0.17904949188232"/>
+    <meta ctg="key" cnt="/Tst.png"/>
+  </document>
+  <tag key="/Tst.png" timeStart="0" timeEnd="0" version="0"/>
+  <edition key="/Tst.png" metadataKey="Rekall-&gt;Name" metadataValue="Test" version="0"/>
+  <edition key="/Tst.png" metadataKey="Rekall-&gt;Comments" metadataValue="Encore un test" version="0"/>
+  <edition key="/Tst.png" metadataKey="Rekall-&gt;Comments" metadataValue="Compresseur multi-bandes" version="0"/>
+  <edition key="/Tst.png" metadataKey="Rekall-&gt;Highlight" metadataValue="true" version="0"/>
+  <document key="marker-7dc0a152c42697bd0b39c2daa161d447acb2fabe">
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:09:08 15:04:50"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:08 15:04:50"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt=""/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt=""/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="88.165.92.2"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="Rekall-&gt;Type" cnt="rekall/marker"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="Marker"/>
+    <meta ctg="Rekall-&gt;Name" cnt="New note"/>
+    <meta ctg="key" cnt="marker-7dc0a152c42697bd0b39c2daa161d447acb2fabe"/>
+  </document>
+  <tag key="marker-7dc0a152c42697bd0b39c2daa161d447acb2fabe" timeStart="0" timeEnd="0" version="0"/>
+  <document key="marker-6e7da2f0e7fedebd699ee0a912b71d6b27e5c00b">
+    <meta ctg="Rekall-&gt;Author" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall-&gt;Date/Time" cnt="2015:09:08 15:04:54"/>
+    <meta ctg="Rekall-&gt;Import Date" cnt="2015:09:08 15:04:54"/>
+    <meta ctg="Rekall-&gt;Location Name" cnt=""/>
+    <meta ctg="Rekall-&gt;Location GPS" cnt=""/>
+    <meta ctg="Rekall User Infos-&gt;User Name" cnt="Guillaume Jacquemin"/>
+    <meta ctg="Rekall User Infos-&gt;User IP" cnt="88.165.92.2"/>
+    <meta ctg="Rekall-&gt;Comments" cnt=""/>
+    <meta ctg="Rekall-&gt;Type" cnt="rekall/marker"/>
+    <meta ctg="Rekall-&gt;Flag" cnt="Marker"/>
+    <meta ctg="Rekall-&gt;Name" cnt="New note"/>
+    <meta ctg="key" cnt="marker-6e7da2f0e7fedebd699ee0a912b71d6b27e5c00b"/>
+  </document>
+  <tag key="marker-6e7da2f0e7fedebd699ee0a912b71d6b27e5c00b" timeStart="0" timeEnd="0" version="0"/>
+</project>

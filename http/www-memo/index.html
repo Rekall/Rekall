@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="fr">
+	<meta name="language" content="fr">
+	<meta name="designer" content="buzzing light">  
+	<meta name="copyright" content="buzzing light">
+	<meta name="HandheldFriendly" content="true" />
+	<meta name="viewport" content="width=device-width, user-scalable=no"><!--, minimum-scale=1.0, maximum-scale=1.0-->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+	<link rel="apple-touch-icon" href="favicon.png" />
+	<link rel="stylesheet" type="text/css" href="css/reset.css" />
+
+	<title>MemoRekall</title>
+	
+    <script language="javascript" type='text/javascript' src='js/libs/jquery.min.js'></script>     
+    <script language="javascript" type='text/javascript' src='js/libs/jquery-migrate.js'></script>	             
+	<script language="javascript" type='text/javascript' src='js/libs/url.min.js'></script>
+	<script language="javascript" type='text/javascript' src='js/libs/tinycolor.js'></script>
+	<script language="javascript" type='text/javascript' src='js/libs/sha1.js'></script>
+	<script language="javascript" type='text/javascript' src='js/libs/fastdom.js'></script>
+	<script language="javascript" type='text/javascript' src='js/libs/moment-with-langs.min.js'></script>
+
+	<script language="javascript" type='text/javascript' src='js/rekall/Utils.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Rekall.js'></script>
+	<script language="javascript" type='text/javascript' src='js/rekall/Source.js'></script>
+	<script language="javascript" type='text/javascript' src='js/rekall/Sorting.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Project.js'></script>
+	<script language="javascript" type='text/javascript' src='js/rekall/Document.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Tag.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Tags.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-rekall/Timeline.js'></script>
+
+	<script language="javascript" type='text/javascript' src='js/iannix.js'></script>
+	<script language="javascript" type='text/javascript' src='js/online-script.js'></script>
+
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/video.min.js"></script>
+	<link        rel="stylesheet" type="text/css"       href="js/libs/video-js/video-js.min.css" />
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/formats/vjs.youtube.js"></script>
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/formats/vjs.vimeo.js"></script>
+	<!--
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/formats/vjs.dailymotion.js"></script>
+	-->
+
+	<!--
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/plugins/rangeslider.min.js"></script>
+	<link        rel="stylesheet" type="text/css"       href="js/libs/video-js/plugins/rangeslider.min.css" />
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/plugins/annotator.min.js"></script>
+	<link        rel="stylesheet" type="text/css"       href="js/libs/video-js/plugins/annotator.min.css" />
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/plugins/ova.min.js"></script>
+	<link        rel="stylesheet" type="text/css"       href="js/libs/video-js/plugins/ova.min.css"/>
+	-->
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/plugins/videojs.markers.js"></script>
+	<link        rel="stylesheet" type="text/css"       href="js/libs/video-js/plugins/videojs.markers.css"/>
+	<script language="javascript" type='text/javascript' src="js/libs/video-js/plugins/videojs.caption.js"></script>
+	<link        rel="stylesheet" type="text/css"       href="js/libs/video-js/plugins/videojs.caption.css"/>
+
+	<script>
+		videojs.options.flash.swf = "video-js/video-js.swf";
+	</script>
+	
+	<link rel="stylesheet" type="text/css" href="css/online-theme.css" />
+</head>
+<body>     
+	
+		       
+	<div id='container'>  
+		<div id="ruban"></div>     
+	   <!-- <div id="popupFormSpace">   
+			<div id="popupForm">                                                    
+				<div id="popupFormMessage"></div>                  
+				<div class="popupFormButton" id="popupFormButtonCancel">Cancel</div> 
+			    <input class="popupFormButton" id="popupFormButtonUpload" type="submit" value="Upload" name="submit">   
+			</div>  
+		</div>     -->   
+		<a class="displayMode" id="watermarkBox" href="http://www.memorekall.fr" title="Open in MemoRekall" target="_parent"><img id="watermark" src="css/images/watermark.png" /></a> 
+		<!--<a class="displayMode" id="openFullScreenBox" href="http://www.memorekall.fr" alt="Open in MemoRekall" target="_blank"><img id="openFullScreen" src="css/images/expand.png" /></a>-->
+		<div class="displayMode" id="projectInfoBtn" title="Project informations">i</div> 
+		<div id="popupAlertSpace">
+			<div id="popupAlert">    
+				<div id="popupAlertMessage"></div>
+				<input type="text" id="popupAlertInput" />
+				<textarea rows="5" id="popupAlertTextarea"></textarea>
+				<div id="popupAlertButtons">
+					<div class="popupAlertButton" id="popupAlertButtonOk">OK</div>
+					<div class="popupAlertButton" id="popupAlertButtonCancel">Cancel</div>
+					<div class="popupAlertButton" id="popupAlertButtonYesdelete">Delete</div>   
+					<div class="popupAlertButton" id="popupAlertButtonYesdeleteproject">Delete</div>
+				</div>  
+			</div>
+		</div>  
+		<div id="popupAddLinkSpace">                        
+			<div id="popupAddLink">                          
+				<div id="popupAddLinkMessage">Add a link</div>                                      
+				<input id="popupAddLinkInput" type="text" value="" placeHolder="Paste URL here"/>     
+				<div id="popupAddLinkButtons">                                             
+					<div class="popupAddLinkButton" id="popupAddLinkButtonCancel">Cancel</div>
+					<div class="popupAddLinkButton" id="popupAddLinkButtonOk">Add Link</div>    
+				</div>
+			</div>
+		</div>  
+		<div id="popupSettingsSpace">  
+			<table id="popupSettings">  
+				<tr>
+					<td id="popupSettingsLeft">                       
+						<div class="popupSettingsTxt" id="popupSettingsTitleDiv" title="Project title"><span class="popupSettingsLabel" id="popupSettingsTitleLabel">Project</span>&nbsp;&nbsp;<span id="popupSettingsTitle"></span></div>   
+						<input class="popupSettingsInput" id="popupSettingsTitleInput" type="text"></input>
+						 
+						<div class="popupSettingsTxt" id="popupSettingsAuthorDiv" title="Project author"><span class="popupSettingsLabel" id="popupSettingsAuthorLabel">By</span>&nbsp;&nbsp;<span id="popupSettingsAuthor"></span></div>     
+						<input class="popupSettingsInput" id="popupSettingsAuthorInput" type="text"></input>
+						
+						<div class="popupSettingsTxt" id="popupSettingsEmailDiv" title="Project author email"><span class="popupSettingsLabel" id="popupSettingsEmailLabel">@</span>&nbsp;&nbsp;<span id="popupSettingsEmail"></span></div>  
+						<input class="popupSettingsInput" id="popupSettingsEmailInput" type="text"></input>
+						            
+						<div class="popupSettingsTxt" id="popupSettingsCreditsDiv" title="Project credits"><span class="popupSettingsLabel" id="popupSettingsCreditsLabel">Credits</span><br/><span id="popupSettingsCredits"></span></div> 
+						<textarea rows="3" class="popupSettingsInput" id="popupSettingsCreditsInput" type="text"></textarea> 
+					</td>
+					<td id="popupSettingsRight">                                      
+						<div class="popupSettingsBtn" id="popupSettingsBtnShare">Share</div>        
+						<div class="popupSettingsBtn" id="popupSettingsBtnEmbed">Embed</div>    
+						<div class="popupSettingsBtn editmode" id="popupSettingsBtnDownloadXml">Download XML</div>    
+						<div class="popupSettingsBtn editmode" id="popupSettingsBtnDelete">Delete project</div> 
+						<a class="popupSettingsA" href="http://www.memorekall.com" target="_blank">www.memorekall.com</a>    
+						
+				   <!-- 	<input id="popupSettingsShare" type="text" value="http://projects.rekall.com/monprojet" placeHolder=""/>  
+						<textarea id="popupSettingsEmbed" type="text"></textarea>  
+						<div id="popupSettingsDownloadXml">Download project XML</div>     -->
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div id="popupSpace">  
+			<table id="popupEdit">  
+				<tr>
+					<td id="popupLeft">            
+						<div class="editmode" id="popupSetHighlight">&#9733;&nbsp;Highlight</div>                                               
+						<div class="popupLeftItem" id="popupImgBox">
+							<img id="popupImg" src="file/rekall_cache/568261E53001FA741A069C684C6E25E7571006E8-45972424CDE1275C6FDD9DD7D52216C878F04AB8.jpg"/>
+							<div class="popupLeftItem" id="popupType"></div>  
+						</div>          
+						<!--<div class="popupRightItem separationHDark editmode"></div>-->         
+						<div class="editmode" id="popupEditSupprimer">Delete file</div>                                                       
+					</td>   
+					<td id="popupRight">    
+						<div id="closePopupEdit">&#10005;</div> 
+						
+						<div class="popupRightItem" id="popupNom"></div> 
+						<input class="popupInput" id="popupNomInput" type="text" value=""/>  
+						
+						<div class="popupRightItem" id="popupAuthor" title="Author"></div>
+						<input class="popupInput" id="popupAuthorInput" type="text"></input> 
+						                                                                               
+						<div class="popupRightItem" id="popupTC">
+							<div class="popupTCdisplay" id="popupTCin"></div>
+							<div class="popupTCdisplay" id="popupTCout"></div>
+						</div>
+						<div class="popupInput" id="popupTCedit">
+							<span class="popupTClabel">start</span>
+							<input class="popupTCeditfield" id="popupTCinMin" maxlength="2"  type="text" value=""/>&nbsp;:&nbsp;<input class="popupTCeditfield" id="popupTCinSec" maxlength="2"  type="text" value=""/>
+							&nbsp;&nbsp;&nbsp;&nbsp;<div class="nowTCbtn" id="nowTCin">now</div>   
+							<br/>
+							<span class="popupTClabel">end</span>
+							<input class="popupTCeditfield" id="popupTCoutMin" maxlength="2" type="text" value=""/>&nbsp;:&nbsp;<input class="popupTCeditfield" id="popupTCoutSec" maxlength="2" type="text" value=""/> 
+							&nbsp;&nbsp;&nbsp;&nbsp;<div class="nowTCbtn" id="nowTCout">now</div> / <div class="nowTCbtn" id="eovTCout">end of video</div>    
+							<!--<div class="TCvalidBtn" id="TCvalidModif">&check;</div>
+							<div class="TCvalidBtn" id="TCinvalidModif">&cross;</div> -->   
+						</div>                                                                    
+
+						<div class="popupRightItem" id="popupLegende" title="Comment"></div>  
+						<textarea class="popupInput" id="popupLegendeInput" type="text"></textarea>  
+				   		
+						<div class="popupRightItem" id="popupLink" title="Link"></div>  
+						<textarea class="popupInput" id="popupLinkInput" type="text"></textarea>      
+						                                                                            
+					   <!-- <div class="popupRightItem separationHDark editmode"></div> -->                 
+					</td>
+				</tr>          
+			</table>
+		</div>     
+		<table id='left_menu' class="editmode">  
+			<tr><td id="left_menu_top">               
+				<div class="left_menu_item dropable" id="left_menu_item_settings" title="Settings">
+					<div class="left_menu_item_icn" id="left_menu_item_icn_settings"></div>
+					<div class="left_menu_item_title">Settings</div>
+					<div class="left_menu_item_value"></div>
+				</div>    
+			    <div class="left_menu_item dropable" id="left_menu_item_preview" title="Preview">
+					<div class="left_menu_item_icn" id="left_menu_item_icn_preview"></div>
+					<div class="left_menu_item_title">Preview</div>
+					<div class="left_menu_item_value"></div>
+				</div>             
+			</tr></td>
+			<tr><td id="left_menu_bottom">                                     
+				                     
+				<div class="left_menu_item dropable" id="left_menu_item_addlink" title="AddLink">
+					<div class="left_menu_item_icn" id="left_menu_item_icn_addlink"></div>
+					<div class="left_menu_item_title">Add Link</div>
+					<div class="left_menu_item_value"></div>
+				</div>
+				
+				<div class="left_menu_item dropable" id="left_menu_item_addnote" title="AddNote">
+					<div class="left_menu_item_icn" id="left_menu_item_icn_addnote"></div>
+					<div class="left_menu_item_title">Add Note</div>
+					<div class="left_menu_item_value"></div>
+				</div>
+				     	
+				<div class="left_menu_item dropable" id="left_menu_item_addfile" title="AddFile">  
+						<form id="uploadForm" action="php/upload.php" method="post" enctype="multipart/form-data">    
+							<input type="file" name="fileToUpload[]" multiple="multiple" id="left_menu_item_btn_addfile">
+						</form>
+						<div class="left_menu_item_icn" id="left_menu_item_icn_addfile"></div>
+						<div class="left_menu_item_title">Add File</div>
+						<div class="left_menu_item_value"></div>
+					</div>
+			</tr></td>
+		</table>
+	    <video id="video" class="video-js vjs-default-skin vjs-big-play-centered">
+			<p class="vjs-no-js">Your browser is not compatible with HTML5. Please upgrade!</p>
+			<!--
+			<track kind="captions"  src="demo.captions.vtt" srclang="en" label="English"></track>
+			<track kind="subtitles" src="demo.captions.vtt" srclang="en" label="English"></track>
+			-->
+	    </video>
+		<div id='flattentimeline'>
+			<div id="flattentimeline_highlight">        
+			</div>
+			<p id='videoProgress'>&nbsp;</p>
+		</div>
+	</div>      
+</body>
+</html>
