@@ -1165,7 +1165,7 @@ function shareEmbed() {
 }
 function shareLink() {
 	var width = 960, height = round(width * 0.44);
-	var embedUrl = rekall.baseUrl;
+	var embedUrl = rekall.baseUrl + "?w=1";
 //	openAlert(embedUrl);
 	return embedUrl;
 }
