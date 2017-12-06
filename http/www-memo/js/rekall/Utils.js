@@ -113,8 +113,10 @@ Utils.elide2lines = function(text, length) {
 }
 
 Utils.getPreviewPath = function(tagOrDoc) {
-	if(tagOrDoc.getMetadata("File->Thumbnail") != undefined)
-		return rekall.project.url + "file/rekall_cache/" + tagOrDoc.getMetadata("File->Thumbnail");
+	if((tagOrDoc.getMetadata("File->Thumbnail") != undefined) && (tagOrDoc.getMetadata("File->Thumbnail") != ""))
+		return rekall.project.url + "file/rekall_cache/" + tagOrDoc.getMetadata("File->Thumbnail") + ".jpg";
+	else if(tagOrDoc.isImage())
+		return Utils.getLocalFilePath(tagOrDoc, "file");
 	else
 		return undefined;
 }

@@ -311,13 +311,7 @@ Project.prototype.analyse = function() {
 			
 			//Analyse de vignettes
 			if(true) {
-				var thumbUrl = undefined
-				if((tag.getMetadata("File->Thumbnail") != undefined) && (tag.getMetadata("File->Thumbnail") != "")) {
-					var thumbUrl = Utils.getPreviewPath(tag);
-
-					if(tag.isVideo())	thumbUrl += "_1.jpg";
-					else				thumbUrl +=  ".jpg";
-				}
+				var thumbUrl = Utils.getPreviewPath(tag);
 				tag.thumbnail = {url: thumbUrl, tag: tag};
 			}
 			
